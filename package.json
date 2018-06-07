@@ -1,0 +1,65 @@
+{
+  "name": "react-web-app",
+  "version": "1.0.0",
+  "description": "Template project for web applications.",
+  "author": "Fream S.A.",
+  "license": "MIT",
+  "homepage": "https://git.fream.pl/fream/web/react-web-app/blob/master/README.md",
+  "bugs": {
+    "url": "https://git.fream.pl/fream/web/react-web-app/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.fream.pl:fream/web/react-web-app.git"
+  },
+  "engines": {
+    "node": ">=8.0.0",
+    "npm": ">=5.0.0"
+  },
+  "dependencies": {
+    "@material-ui/core": "^1.1.0",
+    "@material-ui/docs": "^1.0.0-alpha.3",
+    "@material-ui/icons": "^1.1.0",
+    "@zeit/next-bundle-analyzer": "^0.1.1",
+    "axios": "^0.18.0",
+    "cross-env": "^5.1.6",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
+    "express": "^4.16.3",
+    "jest": "^23.0.1",
+    "jss": "^9.8.1",
+    "next": "^6.0.3",
+    "nprogress": "^0.2.0",
+    "prop-types": "^15.6.1",
+    "react": "^16.4.0",
+    "react-dom": "^16.4.0",
+    "react-jss": "^8.4.0",
+    "react-redux": "^5.0.7",
+    "redux": "^4.0.0",
+    "redux-devtools-extension": "^2.13.2",
+    "redux-logic": "^0.13.0",
+    "rxjs": "^5.5.10",
+    "styled-jsx": "^2.2.6"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.3",
+    "babel-plugin-module-resolver": "^3.1.1",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-import-resolver-babel-module": "^5.0.0-beta.0",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0",
+    "json-server": "^0.12.2"
+  },
+  "scripts": {
+    "analyze": "cross-env BUNDLE_ANALYZE=browser next build",
+    "build": "next build",
+    "dev": "node ./server/server.js",
+    "lint": "eslint . --ext .js,.jsx --ignore-path .gitignore --cache",
+    "lint-fix": "npm run lint -- --fix",
+    "start": "NODE_ENV=production node ./server/server.js",
+    "test": "jest",
+    "test-watch": "npm test -- --watch"
+  }
+}
