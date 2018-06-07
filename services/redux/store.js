@@ -1,7 +1,7 @@
 import { applyMiddleware, createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { createLogicMiddleware } from 'redux-logic';
-import config from 'config/default/app.config';
+import config from 'config';
 import httpClient from '../httpClient';
 import rootReducer from './rootReducer';
 import logic from './logic';
@@ -14,7 +14,7 @@ export default function createInitializedStore(initialState = { config }) {
     {
       ...initialState,
       view: {
-        title: config.name,
+        title: config.public.name,
       },
     },
     composeWithDevTools((

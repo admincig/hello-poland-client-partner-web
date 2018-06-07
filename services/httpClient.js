@@ -1,3 +1,8 @@
 import axios from 'axios';
+import config from 'config';
 
-export default axios;
+const instance = axios.create({
+  ...config.public.axios,
+});
+
+export default instance;

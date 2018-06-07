@@ -3,12 +3,12 @@ import Document, { Head, Main, NextScript } from 'next/document';
 import JssProvider from 'react-jss/lib/JssProvider';
 import flush from 'styled-jsx/server';
 import getPageContext from 'src/getPageContext';
-import AppConfig from 'config/default/app.config';
+import config from 'config';
 
 class MyDocument extends Document {
   render() {
     const { pageContext } = this.props;
-    const { name } = AppConfig;
+    const { name } = config.public;
 
     return (
       <html lang="en">

@@ -46,6 +46,44 @@ Template project for web applications.
 next.config.js - next.js configuration
 ```
 
+### App config
+Default development config is located in `config/develop.config.js`.
+
+#### Structure:
+```code
+{
+  // Will only be available on the server side
+  server: {
+    secret: 'my-secret'
+  },
+  // Will be available on both server and client
+  public: {
+    name: 'Default application name',
+    axios: {
+      baseURL: '/'
+    }
+  }
+}
+```
+See [Next.js docs](https://github.com/zeit/next.js#exposing-configuration-to-the-server--client-side) for more info.
+
+#### Usage:
+```code
+import config from 'config';
+
+const { secret } = config.server;
+const { name } = config.public;
+```
+
+#### Production
+Usually, different configs are used for production and development.
+By default, development config is used.
+To override it, pass `CONFIG_PATH` variable to `npm start` script:
+```bash
+CONFIG_PATH='./path-to-prod-config/config.js' npm run start
+```
+:warning: Remember to restart app after config changes.
+
 ## Initializing new project
 To initialize new project using this repository click the "New project" button available in group directory. Next go to "Import project" tab and click "Repo by URL" button.
 
