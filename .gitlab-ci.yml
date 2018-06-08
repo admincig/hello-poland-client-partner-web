@@ -13,6 +13,8 @@ test_project:
   stage: test
   before_script:
     - . envcfg
+    - git submodule sync --recursive
+    - git submodule update --init --recursive
     - npm i
   script:
     - npm run lint
@@ -31,6 +33,8 @@ build_project:
 #      - dist/
   before_script:
     - . envcfg
+    - git submodule sync --recursive
+    - git submodule update --init --recursive
     - npm i
   script:
     - npm run build
