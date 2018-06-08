@@ -26,6 +26,7 @@
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "express": "^4.16.3",
+    "http-proxy-middleware": "^0.18.0",
     "jest": "^23.0.1",
     "jss": "^9.8.1",
     "lodash": "^4.17.10",
@@ -51,7 +52,6 @@
     "eslint-plugin-import": "^2.11.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.7.0",
-    "http-proxy-middleware": "^0.18.0",
     "json-server": "^0.12.2"
   },
   "scripts": {

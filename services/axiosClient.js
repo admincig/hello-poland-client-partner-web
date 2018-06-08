@@ -38,6 +38,17 @@ export const createCancellableRequest = httpClient => (options, cancelled$) => {
   });
 };
 
+const sanitizeSchema = (axiosSchema) => {
+  const schema = {
+    ...axiosSchema,
+  };
+
+  delete schema.redux;
+  delete schema.store;
+
+  return schema;
+};
+
 export function withRedux(store, redux) {
   return args => ({
     ...args,
@@ -58,10 +69,7 @@ export function withRedux(store, redux) {
  * @return {Promise<Error>}
  */
 function errorInterceptor(error) {
-  delete error.redux;
-  delete error.store;
-
-  return Promise.reject(error);
+  return Promise.reject(sanitizeSchema(error));
 }
 
 /**
@@ -91,10 +99,7 @@ const requestLogInterceptor = (request) => {
   // eslint-disable-next-line no-console
   console.log(`[Request] - ${baseURL + url}`, request);
 
-  delete request.redux;
-  delete request.store;
-
-  return request;
+  return sanitizeSchema(request);
 };
 
 /**
@@ -109,10 +114,7 @@ const responseLogInterceptor = (response) => {
   // eslint-disable-next-line no-console
   console.log(`[Response] - ${url}`, response);
 
-  delete response.redux;
-  delete response.store;
-
-  return response;
+  return sanitizeSchema(response);
 };
 
 /**
@@ -162,7 +164,7 @@ async function JWTHTTPUnauthorizedInterceptor(response) {
     return errorLogInterceptor(`[HTTPClient] - ${status} - Session expired.`)(error);
   }
 
-  return axios(config);
+  return axios(sanitizeSchema(config));
 }
 
 /**
@@ -179,14 +181,14 @@ function JWTInterceptor(request) {
   const credentials = selectors.getCredentials(state);
 
   if (!credentials) {
-    return request;
+    return sanitizeSchema(request);
   }
 
   const { accessToken, refreshToken } = credentials;
   const token = url === '/auth/refresh' ? refreshToken : accessToken;
 
   return {
-    ...cloneDeep(request),
+    ...cloneDeep(sanitizeSchema(request)),
     headers: {
       authorization: `Bearer ${token}`,
     },

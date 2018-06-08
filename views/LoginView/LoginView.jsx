@@ -113,7 +113,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch =>
   bindActionCreators({
     login: profileActions.login,
-}, dispatch);
+  }, dispatch);
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),

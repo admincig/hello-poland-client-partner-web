@@ -3,6 +3,7 @@ stages:
   - build
 
 variables:
+  GIT_SUBMODULE_STRATEGY: recursive
   NODE_VERSION: "8"
 
 #

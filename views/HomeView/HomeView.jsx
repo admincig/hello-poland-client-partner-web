@@ -6,9 +6,11 @@ import Router from 'next/router';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import { selectors as profileSelectors } from 'shared/redux/profile';
+import {
+  actions as profileActions,
+  selectors as profileSelectors,
+} from 'shared/redux/profile';
 import Layout from 'components/Layout';
-import {actions as profileActions} from "../../shared/redux/profile";
 
 const styles = {
   content: {
