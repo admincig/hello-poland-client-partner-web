@@ -19,7 +19,10 @@
   },
   "plugins": [
     ["module-resolver", {
-      "root": ["./"]
+      "root": [
+        "./",
+        "./shared"
+      ]
     }]
   ]
 }
