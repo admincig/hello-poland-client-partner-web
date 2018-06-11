@@ -1,9 +1,9 @@
 import { logic as configLogic } from 'redux/config';
+import { logic as profileLogic } from 'redux/profile';
 import { logic as viewLogic } from 'redux/view';
-import { logic as moviesLogic } from 'redux/movies';
 
-export default [
-  ...configLogic,
-  ...viewLogic,
-  ...moviesLogic,
-];
+export default Object.values({
+  configLogic,
+  profileLogic,
+  viewLogic,
+}).reduce((acc, obj) => [...acc, ...Object.values(obj)], []);

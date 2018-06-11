@@ -3,6 +3,7 @@ stages:
   - build
 
 variables:
+  GIT_SUBMODULE_STRATEGY: recursive
   NODE_VERSION: "8"
 
 #
@@ -23,11 +24,11 @@ test_project:
 #
 build_project:
   stage: build
-  variables:
+#  variables:
 #  artifacts:
 #    name: "$CI_PROJECT_NAMESPACE_$CI_PROJECT_NAME-$CI_PIPELINE_ID"
 #    paths:
-#      - dist/
+#      - ./
   before_script:
     - . envcfg
     - npm i

@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { compose } from 'redux';
+import { bindActionCreators, compose } from 'redux';
 import { connect } from 'react-redux';
+import Router from 'next/router';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import Link from 'next/link';
+import { selectors as configSelectors } from 'redux/config';
+import {
+  actions as profileActions,
+  selectors as profileSelectors,
+} from 'redux/profile';
 import Layout from 'components/Layout';
-import { actions, selectors } from './redux/counter';
 
 const styles = {
   content: {
@@ -16,49 +19,82 @@ const styles = {
   },
 };
 
-const HomeView = ({
-  classes, count, add, subtract, reset,
-}) => (
-  <Layout>
-    <div className={classes.content}>
-      <Typography variant="subheading">
-        You can edit <code>pages/index.js</code> now and app will automatically refresh :)
-      </Typography>
-      <Link href="/about" passHref>
-        <Button component="a" variant="raised" color="primary">About</Button>
-      </Link>
-      <Link href="/movies" passHref>
-        <Button component="a" variant="raised" color="primary">Movies</Button>
-      </Link>
-      <Divider />
-      <div>
-        <Typography>Count: {count}</Typography>
-      </div>
-      <Button onClick={add}>Add</Button>
-      <Button onClick={subtract}>Subtract</Button>
-      <Button onClick={reset}>Reset</Button>
-    </div>
+class HomeView extends Component {
+  componentDidMount() {
+    this.handleAuthRedirection();
+  }
 
-  </Layout>
-);
+  componentDidUpdate() {
+    this.handleAuthRedirection();
+  }
+
+  handleAuthRedirection = () => {
+    const { assetPrefix, isAuthenticated } = this.props;
+
+    if (!isAuthenticated) {
+      Router.push(`${assetPrefix}/login`);
+    }
+  };
+
+  handleFetch = () => {
+    const { fetchProfile } = this.props;
+
+    fetchProfile();
+  };
+
+  handleLogout = () => {
+    const { logout } = this.props;
+
+    logout();
+  };
+
+  render() {
+    const { classes } = this.props;
+
+    return (
+      <Layout>
+        <Typography className={classes.content}>
+          Home view
+        </Typography>
+        <Button
+          variant="raised"
+          color="primary"
+          className={classes.button}
+          onClick={() => this.handleFetch()}
+        >
+          Pobierz dane
+        </Button>
+        <Button
+          variant="raised"
+          color="primary"
+          className={classes.button}
+          onClick={() => this.handleLogout()}
+        >
+          Wyloguj
+        </Button>
+      </Layout>
+    );
+  }
+}
 
 HomeView.propTypes = {
+  assetPrefix: PropTypes.string.isRequired,
   classes: PropTypes.shape({}).isRequired,
-  count: PropTypes.number.isRequired,
-  add: PropTypes.func.isRequired,
-  subtract: PropTypes.func.isRequired,
-  reset: PropTypes.func.isRequired,
+  fetchProfile: PropTypes.func.isRequired,
+  isAuthenticated: PropTypes.bool.isRequired,
+  logout: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
-  count: selectors.getCount(state),
+  assetPrefix: configSelectors.getAppConfig(state).public.assetPrefix || '',
+  isAuthenticated: profileSelectors.isAuthenticated(state),
 });
 
-const mapDispatchToProps = dispatch => ({
-  add: () => dispatch(actions.add()),
-  subtract: () => dispatch(actions.subtract()),
-  reset: () => dispatch(actions.reset()),
-});
+const mapDispatchToProps = dispatch =>
+  bindActionCreators({
+    fetchProfile: profileActions.fetchProfile,
+    logout: profileActions.logout,
+  }, dispatch);
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),

@@ -65,13 +65,6 @@ export const actions = {
 
 
 /*
- * LOGIC
- */
-
-export const logic = [];
-
-
-/*
  * SELECTORS
  */
 
@@ -89,6 +82,13 @@ export const selectors = {
   getDocumentTitle,
   getState,
 };
+
+
+/*
+ * LOGIC
+ */
+
+export const logic = {};
 
 
 /*

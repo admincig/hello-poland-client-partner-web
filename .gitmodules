@@ -1,3 +1,0 @@
-[submodule "shared/redux"]
-	path = shared/redux
-	url = git@git.fream.pl:hello-poland/client/web-shared-redux.git

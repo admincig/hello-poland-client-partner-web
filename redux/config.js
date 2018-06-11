@@ -17,13 +17,6 @@ export const actions = {};
 
 
 /*
- * LOGIC
- */
-
-export const logic = [];
-
-
-/*
  * SELECTORS
  */
 
@@ -49,6 +42,13 @@ export const selectors = {
   getAppConfig,
   getState,
 };
+
+
+/*
+ * LOGIC
+ */
+
+export const logic = {};
 
 
 /*
