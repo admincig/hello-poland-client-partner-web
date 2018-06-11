@@ -37,6 +37,7 @@ build_project:
   after_script:
     - rm -rf node_modules .git
     - export NODE_ENV="production"
+    - pwd; npm --version
     - npm install
 
 #
@@ -54,7 +55,7 @@ deploy_feature:
   dependencies:
     - build_project
   script:
-    - scp "$CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CI_PIPELINE_ID.zip" hpl@hpl.fream.pl:~/tmp
+    - scp "$CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CI_PIPELINE_ID.zip" hpl@sv04.fream.pl:~/tmp
 
 #stop_deploy_feature:
 #  stage: deploy
