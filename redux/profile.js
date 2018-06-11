@@ -154,7 +154,7 @@ const logout = options => ({
   type: LOGOUT,
   payload: {
     url: '/logout',
-    method: 'post',
+    method: 'get',
     ...options,
   },
 });
