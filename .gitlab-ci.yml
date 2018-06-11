@@ -5,6 +5,9 @@ stages:
 
 variables:
   NODE_VERSION: "8"
+  ARTIFACT_NAME: "${CI_PROJECT_NAME}.${CI_PIPELINE_ID}.${CI_COMMIT_SHA}"
+  REMOTE_USER: "hpl"
+  REMOTE_HOST: "sv04.fream.pl"
 
 #
 # test stage tasks
@@ -25,7 +28,7 @@ test_project:
 build_project:
   stage: build
   artifacts:
-    name: "$CI_PROJECT_NAME.$CI_PIPELINE_ID.$CI_COMMIT_SHA"
+    name: "${ARTIFACT_NAME}"
     when: on_success
     paths:
       - ./
@@ -53,9 +56,8 @@ deploy_feature:
     - build_project
   script:
     - ls -la
-    - tar -zcf "$CI_PROJECT_NAME.$CI_PIPELINE_ID.$CI_COMMIT_SHA.tar.gz" .
-    - scp "$CI_PROJECT_NAME.$CI_PIPELINE_ID.$CI_COMMIT_SHA.tar.gz" hpl@sv04.fream.pl:~/tmp
-    - ssh hpl@sv04.fream.pl 'pwd; ls -l tmp'
+    - ssh hpl@sv04.fream.pl "mkdir -p ~/tmp/${ARTIFACT_NAME}"
+    - rsync -az . "${REMOTE_USER}@${REMOTE_HOST}:~/tmp/${ARTIFACT_NAME}"
 
 #stop_deploy_feature:
 #  stage: deploy
