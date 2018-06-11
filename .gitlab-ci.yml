@@ -52,9 +52,10 @@ deploy_feature:
   dependencies:
     - build_project
   script:
-    - ls -l
-    - scp "$CI_PROJECT_NAME.$CI_PIPELINE_ID.$CI_COMMIT_SHA.zip" hpl@sv04.fream.pl:~/
-    - ssh hpl@sv04.fream.pl 'pwd'
+    - ls -la
+    - tar -zcf "$CI_PROJECT_NAME.$CI_PIPELINE_ID.$CI_COMMIT_SHA.tar.gz" .
+    - scp "$CI_PROJECT_NAME.$CI_PIPELINE_ID.$CI_COMMIT_SHA.tar.gz" hpl@sv04.fream.pl:~/tmp
+    - ssh hpl@sv04.fream.pl 'pwd; ls -l tmp'
 
 #stop_deploy_feature:
 #  stage: deploy
