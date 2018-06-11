@@ -3,7 +3,7 @@ import { selectors as configSelectors } from 'redux/config';
 import {
   actions as profileActions,
   selectors as profileSelectors,
-} from 'shared/redux/profile';
+} from 'redux/profile';
 
 const {
   errorLogInterceptor,

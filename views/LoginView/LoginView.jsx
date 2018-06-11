@@ -12,7 +12,7 @@ import TextField from '@material-ui/core/TextField';
 import {
   actions as profileActions,
   selectors as profileSelectors,
-} from 'shared/redux/profile';
+} from 'redux/profile';
 import Layout from 'components/Layout';
 
 const styles = theme => ({

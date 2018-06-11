@@ -1,6 +1,6 @@
 import { logic as configLogic } from 'redux/config';
+import { logic as profileLogic } from 'redux/profile';
 import { logic as viewLogic } from 'redux/view';
-import { logic as profileLogic } from 'shared/redux/profile';
 
 export default Object.values({
   configLogic,

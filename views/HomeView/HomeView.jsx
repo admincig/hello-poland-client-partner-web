@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import {
   actions as profileActions,
   selectors as profileSelectors,
-} from 'shared/redux/profile';
+} from 'redux/profile';
 import Layout from 'components/Layout';
 
 const styles = {
@@ -33,6 +33,12 @@ class HomeView extends Component {
     fetchProfile();
   };
 
+  handleLogout = () => {
+    const { logout } = this.props;
+
+    logout();
+  };
+
   render() {
     const { classes } = this.props;
 
@@ -49,6 +55,14 @@ class HomeView extends Component {
         >
           Pobierz dane
         </Button>
+        <Button
+          variant="raised"
+          color="primary"
+          className={classes.button}
+          onClick={() => this.handleLogout()}
+        >
+          Wyloguj
+        </Button>
       </Layout>
     );
   }
@@ -58,6 +72,7 @@ HomeView.propTypes = {
   isAuthenticated: PropTypes.bool.isRequired,
   classes: PropTypes.shape({}).isRequired,
   fetchProfile: PropTypes.func.isRequired,
+  logout: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -67,6 +82,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch =>
   bindActionCreators({
     fetchProfile: profileActions.fetchProfile,
+    logout: profileActions.logout,
   }, dispatch);
 
 export default compose(
