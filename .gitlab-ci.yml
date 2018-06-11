@@ -35,10 +35,7 @@ build_project:
   script:
     - NODE_ENV="production" npm run build
   after_script:
-    - rm -rf node_modules .git
-    - export NODE_ENV="production"
-    - pwd; echo $NODE_PATH; $NODE_PATH/npm --version; npm --version
-    - npm install
+    - rm -rf .git
 
 #
 # deploy stage tasks
