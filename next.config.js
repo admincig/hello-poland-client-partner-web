@@ -5,7 +5,7 @@ const configPath = process.env.CONFIG_PATH || './config/develop.config.js';
 const config = require(configPath);
 
 module.exports = {
-  assetPrefix: config.server.assetPrefix || '',
+  assetPrefix: config.public.assetPrefix || '',
   serverRuntimeConfig: config.server,
   publicRuntimeConfig: config.public,
   ...withBundleAnalyzer({

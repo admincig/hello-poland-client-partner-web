@@ -6,6 +6,7 @@ import Router from 'next/router';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import { selectors as configSelectors } from 'redux/config';
 import {
   actions as profileActions,
   selectors as profileSelectors,
@@ -28,10 +29,10 @@ class HomeView extends Component {
   }
 
   handleAuthRedirection = () => {
-    const { isAuthenticated } = this.props;
+    const { assetPrefix, isAuthenticated } = this.props;
 
     if (!isAuthenticated) {
-      Router.push('/login');
+      Router.push(`${assetPrefix}/login`);
     }
   };
 
@@ -77,13 +78,15 @@ class HomeView extends Component {
 }
 
 HomeView.propTypes = {
-  isAuthenticated: PropTypes.bool.isRequired,
+  assetPrefix: PropTypes.string.isRequired,
   classes: PropTypes.shape({}).isRequired,
   fetchProfile: PropTypes.func.isRequired,
+  isAuthenticated: PropTypes.bool.isRequired,
   logout: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
+  assetPrefix: configSelectors.getAppConfig(state).public.assetPrefix || '',
   isAuthenticated: profileSelectors.isAuthenticated(state),
 });
 
