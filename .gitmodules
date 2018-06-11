@@ -1,3 +1,0 @@
-[submodule "shared/redux"]
-	path = shared/redux
-	url = ../web-shared-redux.git
