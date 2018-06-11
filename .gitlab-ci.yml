@@ -25,7 +25,7 @@ test_project:
 build_project:
   stage: build
   artifacts:
-    name: "$CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CI_PIPELINE_ID"
+    name: "$CI_PROJECT_NAME.$CI_PIPELINE_ID.$CI_COMMIT_SHA"
     when: on_success
     paths:
       - ./
@@ -53,7 +53,8 @@ deploy_feature:
     - build_project
   script:
     - ls -l
-    - scp "$CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CI_PIPELINE_ID.zip" hpl@sv04.fream.pl:~/tmp
+    - scp "$CI_PROJECT_NAME.$CI_PIPELINE_ID.$CI_COMMIT_SHA.zip" hpl@sv04.fream.pl:~/
+    - ssh hpl@sv04.fream.pl 'pwd'
 
 #stop_deploy_feature:
 #  stage: deploy
