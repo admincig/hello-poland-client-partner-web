@@ -25,6 +25,7 @@ build_project:
   stage: build
   artifacts:
     name: "$CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CI_PIPELINE_ID"
+    when: on_success
     paths:
       - ./
   before_script:
@@ -34,4 +35,32 @@ build_project:
     - npm run
   after_script:
     - rm -rf node_modules .git
-    - NODE_ENV="production" npm install
+    - export NODE_ENV="production"
+    - npm install
+
+#
+# deploy stage tasks
+#
+deploy_feature:
+  stage: deploy
+  only:
+    - /^feature\/.*$/
+    - merge-requests
+  when: manual
+  environment:
+    name: ${CI_COMMIT_REF_NAME}
+    on_stop: stop_feature
+  dependencies:
+    - build_project
+  script:
+    - scp "$CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CI_PIPELINE_ID.zip" hpl@hpl.fream.pl:~/tmp
+
+stop_deploy_feature:
+  stage: deploy
+  only:
+    - /^feature\/.*$/
+    - merge-requests
+  when: manual
+  environment:
+    name: ${CI_COMMIT_REF_NAME}
+    action: stop
