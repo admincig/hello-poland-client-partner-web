@@ -27,7 +27,7 @@ app
 
     routes.forEach(({ page, path }) => {
       server.get(path, (req, res) => {
-        app.render(req, res, page, req.params);
+        app.render(req, res, page, { ...req.query, ...req.params });
       });
     });
 

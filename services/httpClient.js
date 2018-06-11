@@ -48,7 +48,7 @@ const responseInterceptors = [
  * INITIALIZE
  */
 
-export default function createHttpClient(store) {
+export default function createHTTPClient(store) {
   const instance = client.create();
   const state = store.getState();
   const appConfig = configSelectors.getAppConfig(state);

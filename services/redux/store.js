@@ -2,7 +2,7 @@ import { applyMiddleware, createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { createLogicMiddleware } from 'redux-logic';
 import config from 'config';
-import createHttpClient from 'services/httpClient';
+import createHTTPClient from 'services/httpClient';
 import rootReducer from './rootReducer';
 import logic from './logic';
 
@@ -25,7 +25,7 @@ export default function createInitializedStore(initialState = { config }) {
   );
 
   logicMiddleware.addDeps({
-    httpClient: createHttpClient(store),
+    httpClient: createHTTPClient(store),
   });
 
   store.logicMiddleware = logicMiddleware;
