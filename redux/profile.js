@@ -1,7 +1,7 @@
 import { createLogic } from 'redux-logic';
 
 export const name = 'profile';
-const prefix = `shared/${name}/`;
+const prefix = `${name}/`;
 
 
 /*
