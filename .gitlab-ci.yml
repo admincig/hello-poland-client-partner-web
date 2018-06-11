@@ -3,7 +3,6 @@ stages:
   - build
 
 variables:
-  GIT_SUBMODULE_STRATEGY: recursive
   NODE_VERSION: "8"
 
 #
@@ -13,7 +12,7 @@ test_project:
   stage: test
   before_script:
     - . envcfg
-    - npm i
+    - npm install
   script:
     - npm run lint
     - npm run test
@@ -24,13 +23,15 @@ test_project:
 #
 build_project:
   stage: build
-#  variables:
-#  artifacts:
-#    name: "$CI_PROJECT_NAMESPACE_$CI_PROJECT_NAME-$CI_PIPELINE_ID"
-#    paths:
-#      - ./
+  artifacts:
+    name: "$CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CI_PIPELINE_ID"
+    paths:
+      - ./
   before_script:
     - . envcfg
-    - npm i
+    - npm install
   script:
-    - npm run build
+    - npm run
+  after_script:
+    - rm -rf node_modules .git
+    - NODE_ENV="production" npm install
