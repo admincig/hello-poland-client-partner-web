@@ -20,12 +20,20 @@ const styles = {
 
 class HomeView extends Component {
   componentDidMount() {
+    this.handleAuthRedirection();
+  }
+
+  componentDidUpdate() {
+    this.handleAuthRedirection();
+  }
+
+  handleAuthRedirection = () => {
     const { isAuthenticated } = this.props;
 
     if (!isAuthenticated) {
       Router.push('/login');
     }
-  }
+  };
 
   handleFetch = () => {
     const { fetchProfile } = this.props;
