@@ -1,6 +1,7 @@
 stages:
   - test
   - build
+  - deploy
 
 variables:
   NODE_VERSION: "8"
@@ -49,18 +50,20 @@ deploy_feature:
   when: manual
   environment:
     name: ${CI_COMMIT_REF_NAME}
-    on_stop: stop_feature
+#    on_stop: stop_feature
   dependencies:
     - build_project
   script:
     - scp "$CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CI_PIPELINE_ID.zip" hpl@hpl.fream.pl:~/tmp
 
-stop_deploy_feature:
-  stage: deploy
-  only:
-    - /^feature\/.*$/
-    - merge-requests
-  when: manual
-  environment:
-    name: ${CI_COMMIT_REF_NAME}
-    action: stop
+#stop_deploy_feature:
+#  stage: deploy
+#  only:
+#    - /^feature\/.*$/
+#    - merge-requests
+#  when: manual
+#  environment:
+#    name: ${CI_COMMIT_REF_NAME}
+#    action: stop
+#  script:
+#    -
