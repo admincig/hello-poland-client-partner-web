@@ -33,7 +33,7 @@ build_project:
     - . envcfg
     - npm install
   script:
-    - npm run
+    - NODE_ENV="production" npm run build
   after_script:
     - rm -rf node_modules .git
     - export NODE_ENV="production"
