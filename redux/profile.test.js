@@ -154,7 +154,7 @@ describe('actions', () => {
       type: LOGOUT,
       payload: {
         url: '/logout',
-        method: 'post',
+        method: 'get',
         ...options,
       },
     };
