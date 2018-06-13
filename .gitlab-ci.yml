@@ -6,8 +6,6 @@ stages:
 variables:
   NODE_VERSION: "8"
   ARTIFACT_NAME: "${CI_PROJECT_NAME}.${CI_PIPELINE_ID}.${CI_COMMIT_SHA}"
-  REMOTE_USER: "hpl"
-  REMOTE_HOST: "sv04.fream.pl"
 
 #
 # test stage tasks
@@ -43,21 +41,22 @@ build_project:
 #
 # deploy stage tasks
 #
-deploy_feature:
-  stage: deploy
-  only:
-    - /^feature\/.*$/
-    - merge-requests
-  when: manual
-  environment:
-    name: ${CI_COMMIT_REF_NAME}
-#    on_stop: stop_feature
-  dependencies:
-    - build_project
-  script:
-    - ls -la
-    - ssh hpl@sv04.fream.pl "mkdir -p ~/tmp/${ARTIFACT_NAME}"
-    - rsync -az . "${REMOTE_USER}@${REMOTE_HOST}:~/tmp/${ARTIFACT_NAME}"
+#deploy_feature:
+#  stage: deploy
+#  only:
+#    - /^feature\/.*$/
+#    - merge-requests
+#  when: manual
+#  environment:
+#    name: ${CI_COMMIT_REF_NAME}
+##    on_stop: stop_feature
+#  dependencies:
+#    - build_project
+#  script:
+#    - ssh ${REMOTE_FEATURE_USER}@${REMOTE_FEATURE_HOST} "pmci prepare ${CI_COMMIT_REF_SLUG}"
+#    - rsync -az . "${REMOTE_FEATURE_USER}@${REMOTE_FEATURE_HOST}:~/tmp/deployments/${CI_COMMIT_REF_SLUG}"
+#    - ssh ${REMOTE_FEATURE_USER}@${REMOTE_FEATURE_HOST} "webctl deploy ${CI_COMMIT_REF_SLUG}"
+#    - ssh ${REMOTE_FEATURE_USER}@${REMOTE_FEATURE_HOST} "webctl start ${CI_COMMIT_REF_SLUG}"
 
 #stop_deploy_feature:
 #  stage: deploy
