@@ -120,11 +120,12 @@ class SightsList extends Component {
     });
   };
 
-  handleSightEventEdit = (sightId, sightEvent = {}) => {
+  handleSightEventEdit = (sightEvent = {}) => {
     const { fetchSightEvent } = this.props;
     const title = sightEvent.id ? 'Edytuj wydarzenie' : 'Dodaj wydarzenie';
 
-    if (fetchSightEvent && sightEvent.id) {
+    console.log(sightEvent);
+    if (sightEvent.id) {
       fetchSightEvent(sightEvent.id);
     }
 
@@ -135,10 +136,7 @@ class SightsList extends Component {
       },
       schema: sightEventSchema,
       title,
-      values: {
-        ...sightEvent,
-        sightId,
-      },
+      values: sightEvent,
     });
   };
 
@@ -165,7 +163,7 @@ class SightsList extends Component {
                   <ListItemSecondaryAction>
                     <IconButton
                       aria-label="Dodaj wydarzenie"
-                      onClick={() => this.handleSightEventEdit(sightId)}
+                      onClick={() => this.handleSightEventEdit({ sightId })}
                       title="Dodaj wydarzenie"
                     >
                       <AddIcon />
@@ -190,13 +188,13 @@ class SightsList extends Component {
                 <List style={{ marginLeft: 55 }}>
                   {sightEventsList
                     .filter(item => item.sightId === sightId)
-                    .map(({ id: sightEventId, name: sightEventName }) => (
-                      <ListItem key={sightEventId}>
+                    .map(sightEvent => (
+                      <ListItem key={sightEvent.id}>
                         <ListItemIcon>
                           <EventIcon />
                         </ListItemIcon>
                         <ListItemText
-                          primary={sightEventName}
+                          primary={sightEvent.name}
                         />
                         <ListItemSecondaryAction>
                           <IconButton
@@ -209,7 +207,7 @@ class SightsList extends Component {
                           <IconButton
                             aria-label="Edytuj wydarzenie"
                             onClick={
-                            () => this.handleSightEdit(sightEventId)
+                            () => this.handleSightEventEdit(sightEvent)
                           }
                             title="Edytuj wydarzenie"
                           >
