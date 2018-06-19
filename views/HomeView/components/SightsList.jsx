@@ -12,11 +12,16 @@ import IconButton from '@material-ui/core/IconButton';
 import AddIcon from '@material-ui/icons/Add';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
+import EventIcon from '@material-ui/icons/Event';
 import PlaceIcon from '@material-ui/icons/Place';
 import {
   actions as sightsActions,
   selectors as sightsSelectors,
 } from 'redux/sights';
+import {
+  actions as sightEventActions,
+  selectors as sightEventSelectors,
+} from 'redux/sightEvents';
 import FormDialog from 'components/FormDialog';
 import { EmptyResultsMessage } from 'components/ViewMessage';
 
@@ -138,7 +143,7 @@ class SightsList extends Component {
   };
 
   render() {
-    const { list } = this.props;
+    const { sightEventsList, sightsList } = this.props;
     const { dialog, dialogProperties } = this.state;
 
     return (
@@ -146,39 +151,81 @@ class SightsList extends Component {
         <Button onClick={() => this.handleSightEdit()}>
           Dodaj atrakcję
         </Button>
-        {list && list.length ?
+        {sightsList && sightsList.length ?
           <List>
-            {list.map(({ id, name }) => (
-              <ListItem key={id}>
-                <ListItemIcon>
-                  <PlaceIcon />
-                </ListItemIcon>
-                <ListItemText
-                  primary={name}
-                />
-                <ListItemSecondaryAction>
-                  <IconButton
-                    aria-label="Dodaj wydarzenie"
-                    onClick={() => this.handleSightEventEdit(id)}
-                    title="Dodaj wydarzenie"
-                  >
-                    <AddIcon />
-                  </IconButton>
-                  <IconButton
-                    aria-label="Edytuj atrakcję"
-                    onClick={() => this.handleSightEdit(list.find(item => item.id === id))}
-                    title="Edytuj atrakcję"
-                  >
-                    <CreateIcon />
-                  </IconButton>
-                  <IconButton
-                    aria-label="Usuń atrakcję"
-                    title="Usuń atrakcję"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
+            {sightsList.map(({ id: sightId, name }) => (
+              <Fragment key={sightId * Math.random()}>
+                <ListItem key={sightId}>
+                  <ListItemIcon>
+                    <PlaceIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={name}
+                  />
+                  <ListItemSecondaryAction>
+                    <IconButton
+                      aria-label="Dodaj wydarzenie"
+                      onClick={() => this.handleSightEventEdit(sightId)}
+                      title="Dodaj wydarzenie"
+                    >
+                      <AddIcon />
+                    </IconButton>
+                    <IconButton
+                      aria-label="Edytuj atrakcję"
+                      onClick={
+                        () => this.handleSightEdit(sightsList.find(item => item.id === sightId))
+                      }
+                      title="Edytuj atrakcję"
+                    >
+                      <CreateIcon />
+                    </IconButton>
+                    <IconButton
+                      aria-label="Usuń atrakcję"
+                      title="Usuń atrakcję"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
+                <List style={{ marginLeft: 55 }}>
+                  {sightEventsList
+                    .filter(item => item.sightId === sightId)
+                    .map(({ id: sightEventId, name: sightEventName }) => (
+                      <ListItem key={sightEventId}>
+                        <ListItemIcon>
+                          <EventIcon />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={sightEventName}
+                        />
+                        <ListItemSecondaryAction>
+                          <IconButton
+                            aria-label="Dodaj bilet"
+                          // onClick={() => this.handleSightEventEdit(id)}
+                            title="Dodaj bilet"
+                          >
+                            <AddIcon />
+                          </IconButton>
+                          <IconButton
+                            aria-label="Edytuj wydarzenie"
+                            onClick={
+                            () => this.handleSightEdit(sightEventId)
+                          }
+                            title="Edytuj wydarzenie"
+                          >
+                            <CreateIcon />
+                          </IconButton>
+                          <IconButton
+                            aria-label="Usuń wydarzenie"
+                            title="Usuń wydarzenie"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                  ))}
+                </List>
+              </Fragment>
             ))}
           </List>
           :
@@ -197,8 +244,9 @@ class SightsList extends Component {
 SightsList.propTypes = {
   fetchSight: PropTypes.func.isRequired,
   fetchSightEvent: PropTypes.func,
-  list: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  sightEventsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   sight: PropTypes.shape({}),
+  sightsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };
 
 SightsList.defaultProps = {
@@ -207,13 +255,15 @@ SightsList.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-  list: sightsSelectors.getSights(state),
+  sightEventsList: sightEventSelectors.getSightEvents(state),
   sight: sightsSelectors.getSight(state),
+  sightsList: sightsSelectors.getSights(state),
 });
 
 const mapDispatchToProps = dispatch =>
   bindActionCreators({
     fetchSight: sightsActions.fetchItem,
+    fetchSightEvent: sightEventActions.fetchItem,
   }, dispatch);
 
 export default compose(connect(mapStateToProps, mapDispatchToProps))(SightsList);
