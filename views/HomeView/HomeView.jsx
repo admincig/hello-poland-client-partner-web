@@ -3,29 +3,21 @@ import PropTypes from 'prop-types';
 import { bindActionCreators, compose } from 'redux';
 import { connect } from 'react-redux';
 import Router from 'next/router';
-import withStyles from '@material-ui/core/styles/withStyles';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
 import { selectors as configSelectors } from 'redux/config';
 import {
   actions as profileActions,
   selectors as profileSelectors,
 } from 'redux/profile';
 import Layout from 'components/Layout';
-
-const styles = {
-  content: {
-    padding: 16,
-  },
-};
+import SightsList from 'views/HomeView/components/SightsList';
 
 class HomeView extends Component {
   componentDidMount() {
-    this.handleAuthRedirection();
+    // this.handleAuthRedirection();
   }
 
   componentDidUpdate() {
-    this.handleAuthRedirection();
+    // this.handleAuthRedirection();
   }
 
   handleAuthRedirection = () => {
@@ -49,29 +41,9 @@ class HomeView extends Component {
   };
 
   render() {
-    const { classes } = this.props;
-
     return (
       <Layout>
-        <Typography className={classes.content}>
-          Home view
-        </Typography>
-        <Button
-          variant="raised"
-          color="primary"
-          className={classes.button}
-          onClick={() => this.handleFetch()}
-        >
-          Pobierz dane
-        </Button>
-        <Button
-          variant="raised"
-          color="primary"
-          className={classes.button}
-          onClick={() => this.handleLogout()}
-        >
-          Wyloguj
-        </Button>
+        <SightsList />
       </Layout>
     );
   }
@@ -79,7 +51,6 @@ class HomeView extends Component {
 
 HomeView.propTypes = {
   assetPrefix: PropTypes.string.isRequired,
-  classes: PropTypes.shape({}).isRequired,
   fetchProfile: PropTypes.func.isRequired,
   isAuthenticated: PropTypes.bool.isRequired,
   logout: PropTypes.func.isRequired,
@@ -96,7 +67,4 @@ const mapDispatchToProps = dispatch =>
     logout: profileActions.logout,
   }, dispatch);
 
-export default compose(
-  connect(mapStateToProps, mapDispatchToProps),
-  withStyles(styles),
-)(HomeView);
+export default compose(connect(mapStateToProps, mapDispatchToProps))(HomeView);
