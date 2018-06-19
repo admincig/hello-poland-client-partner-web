@@ -196,11 +196,13 @@ class SightsList extends Component {
 
 SightsList.propTypes = {
   fetchSight: PropTypes.func.isRequired,
+  fetchSightEvent: PropTypes.func,
   list: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   sight: PropTypes.shape({}),
 };
 
 SightsList.defaultProps = {
+  fetchSightEvent: null,
   sight: null,
 };
 

@@ -121,8 +121,6 @@ class FormDialog extends Component {
     } = this.props;
     const { formFields } = this.state;
 
-    console.log('render formFields', formFields);
-
     return (
       <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
         <DialogTitle id="form-dialog-title">{title}</DialogTitle>
