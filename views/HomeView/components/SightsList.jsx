@@ -12,6 +12,7 @@ import IconButton from '@material-ui/core/IconButton';
 import AddIcon from '@material-ui/icons/Add';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
+import DesktopWindows from '@material-ui/icons/DesktopWindows';
 import EventIcon from '@material-ui/icons/Event';
 import PlaceIcon from '@material-ui/icons/Place';
 import {
@@ -162,6 +163,12 @@ class SightsList extends Component {
                   />
                   <ListItemSecondaryAction>
                     <IconButton
+                      aria-label="Podgląd"
+                      title="Podgląd"
+                    >
+                      <DesktopWindows />
+                    </IconButton>
+                    <IconButton
                       aria-label="Dodaj wydarzenie"
                       onClick={() => this.handleSightEventEdit({ sightId })}
                       title="Dodaj wydarzenie"
@@ -197,6 +204,12 @@ class SightsList extends Component {
                           primary={sightEvent.name}
                         />
                         <ListItemSecondaryAction>
+                          <IconButton
+                            aria-label="Podgląd"
+                            title="Podgląd"
+                          >
+                            <DesktopWindows />
+                          </IconButton>
                           <IconButton
                             aria-label="Dodaj bilet"
                           // onClick={() => this.handleSightEventEdit(id)}
