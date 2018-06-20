@@ -114,8 +114,7 @@ describe('actions', () => {
       type: LOGIN,
       payload: {
         url: '/login',
-        // method: 'post',
-        method: 'get',
+        method: 'post',
         ...options,
         data,
       },
@@ -154,7 +153,7 @@ describe('actions', () => {
       type: LOGOUT,
       payload: {
         url: '/logout',
-        method: 'get',
+        method: 'post',
         ...options,
       },
     };
