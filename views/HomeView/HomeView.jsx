@@ -13,11 +13,11 @@ import SightsList from 'views/HomeView/components/SightsList';
 
 class HomeView extends Component {
   componentDidMount() {
-    // this.handleAuthRedirection();
+    this.handleAuthRedirection();
   }
 
   componentDidUpdate() {
-    // this.handleAuthRedirection();
+    this.handleAuthRedirection();
   }
 
   handleAuthRedirection = () => {
