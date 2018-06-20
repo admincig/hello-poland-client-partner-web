@@ -29,7 +29,7 @@ class LogoutView extends Component {
 
 
   render() {
-    return null;
+    return <div />;
   }
 }
 
