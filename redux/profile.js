@@ -113,7 +113,7 @@ const login = (data, options) => ({
   type: LOGIN,
   payload: {
     url: '/login',
-    method: 'get',
+    method: 'post',
     ...options,
     data,
   },
@@ -154,7 +154,7 @@ const logout = options => ({
   type: LOGOUT,
   payload: {
     url: '/logout',
-    method: 'get',
+    method: 'post',
     ...options,
   },
 });

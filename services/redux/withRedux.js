@@ -2,6 +2,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect, Provider } from 'react-redux';
+import { persistStore } from 'redux-persist';
+import { PersistGate } from 'redux-persist/integration/react';
 import createInitializedStore from './store';
 
 const __NEXT_REDUX_STORE__ = '__NEXT_REDUX_STORE__';
@@ -58,12 +60,22 @@ export default (...connectArgs) => (Component) => {
       ? store
       : getOrCreateStore(createInitializedStore, initialState);
 
+    const persistor = persistStore(reduxStore);
+
     // Wrap component using redux Provider with store
     // Create connected page with initialProps
     return React.createElement(
       Provider,
       { store: reduxStore },
-      React.createElement(ConnectedComponent, initialProps),
+      React.createElement(
+        PersistGate,
+        {
+          loading: 'Loading...',
+          onBeforeLift: () => {},
+          persistor,
+        },
+        React.createElement(ConnectedComponent, initialProps),
+      ),
     );
   };
 
