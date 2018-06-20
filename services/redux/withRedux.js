@@ -2,9 +2,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect, Provider } from 'react-redux';
-import { persistStore } from 'redux-persist';
-import { PersistGate } from 'redux-persist/integration/react';
 import createInitializedStore from './store';
+import { withLocalStorageProfile } from './profileSubscriber';
 
 const __NEXT_REDUX_STORE__ = '__NEXT_REDUX_STORE__';
 
@@ -42,7 +41,7 @@ const getOrCreateStore = (storeInitializer, initialState) => {
 
   // Persist store in global variables if invoked on client side
   if (!window[__NEXT_REDUX_STORE__]) {
-    window[__NEXT_REDUX_STORE__] = storeInitializer(initialState);
+    window[__NEXT_REDUX_STORE__] = storeInitializer(withLocalStorageProfile(initialState));
   }
 
   return window[__NEXT_REDUX_STORE__];
@@ -60,22 +59,10 @@ export default (...connectArgs) => (Component) => {
       ? store
       : getOrCreateStore(createInitializedStore, initialState);
 
-    const persistor = persistStore(reduxStore);
-
-    // Wrap component using redux Provider with store
-    // Create connected page with initialProps
     return React.createElement(
       Provider,
       { store: reduxStore },
-      React.createElement(
-        PersistGate,
-        {
-          loading: 'Loading...',
-          onBeforeLift: () => {},
-          persistor,
-        },
-        React.createElement(ConnectedComponent, initialProps),
-      ),
+      React.createElement(ConnectedComponent, initialProps),
     );
   };
 

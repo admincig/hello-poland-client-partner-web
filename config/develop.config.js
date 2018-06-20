@@ -10,11 +10,5 @@ module.exports = {
     axios: {
       baseURL: 'http://localhost:3000/api',
     },
-    persistance: {
-      whitelist: [
-        'profile',
-      ],
-      version: 1,
-    },
   },
 };
