@@ -47,8 +47,11 @@ export const types = {
  * @method
  * @return {{type: string}}
  */
-const errorUnauthorized = () => ({
+const errorUnauthorized = (options = {}) => ({
   type: ERROR_UNAUTHORIZED,
+  payload: {
+    ...options,
+  },
 });
 
 /**
@@ -356,12 +359,12 @@ const unauthorizedLogic = createLogic({
   type: [
     ERROR_UNAUTHORIZED,
   ],
-  process({ getState: getReduxState }, dispatch, done) {
+  process({ action: { payload }, getState: getReduxState }, dispatch, done) {
     const state = getReduxState();
     const isUserAuthenticated = isAuthenticated(state);
 
     if (isUserAuthenticated) {
-      dispatch(logout());
+      dispatch(logout(payload));
     }
 
     done();

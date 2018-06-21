@@ -5,7 +5,6 @@ const LS_KEY = 'profile';
 const isNodeProcess = () => Object.prototype.toString.call(global.process) === '[object process]';
 
 export default store => () => {
-  // console.log('profileSubscriber');
   if (!isNodeProcess()) {
     const ls = window.localStorage;
     const state = store.getState();
@@ -15,7 +14,6 @@ export default store => () => {
       || lastAction === LOGOUT_SUCCESS
       || lastAction === REFRESH_ACCESS_TOKEN_SUCCESS;
 
-    // console.log('profileSubscriber: isProfileDirty', isProfileDirty);
     if (isProfileDirty) {
       ls.setItem(LS_KEY, JSON.stringify(state.profile));
     }
@@ -27,7 +25,6 @@ export const withLocalStorageProfile = (initialState) => {
     const ls = window.localStorage;
     const profile = ls.getItem(LS_KEY);
 
-    // console.log('withLocalStorageProfile', profile);
     if (profile) {
       return {
         ...initialState,

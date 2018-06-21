@@ -15,18 +15,22 @@ class LogoutView extends Component {
   }
 
   handleLogout = () => {
-    const { assetPrefix, credentials, logout } = this.props;
-    const { accessToken, refreshToken } = credentials;
-    const data = {
-      accessToken,
-      refreshToken,
-    };
+    const {
+      assetPrefix, credentials, logout, isAuthenticated,
+    } = this.props;
 
-    logout({ data });
+    if (isAuthenticated) {
+      const { accessToken, refreshToken } = credentials;
+      const data = {
+        accessToken,
+        refreshToken,
+      };
+
+      logout({ data });
+    }
 
     Router.push(`${assetPrefix}/`);
   };
-
 
   render() {
     return <div />;
@@ -39,6 +43,7 @@ LogoutView.propTypes = {
     accessToken: PropTypes.string.isRequired,
     refreshToken: PropTypes.string.isRequired,
   }),
+  isAuthenticated: PropTypes.bool.isRequired,
   logout: PropTypes.func.isRequired,
 };
 
