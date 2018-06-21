@@ -104,7 +104,7 @@ Material UI
 
 ## Using HTTPClient
 By default we use [axios](https://github.com/axios/axios) for request handling. It consists of two classes:
-- axiosClient, which provides common methods that can be used depending on project requirements
+- axiosCommons, which provides common methods that can be used depending on project requirements
 - httpClient, which configures axios instance
 
 ### HTTPClient Interceptors
@@ -180,4 +180,4 @@ First two keys are mandatory.
        resolve: response => response,
      },
     ];   
-    ```   
+    ```
