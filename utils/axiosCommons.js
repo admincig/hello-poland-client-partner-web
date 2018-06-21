@@ -48,7 +48,16 @@ const sanitizeSchema = (axiosSchema) => {
   return schema;
 };
 
-
+/**
+ * Exposes redux to axios interceptors.
+ *
+ * @method
+ * @param {Object} store - redux store
+ * @param {Object} [redux] - necessary duck API
+ * @param {Object} [redux.actions] - duck actions
+ * @param {Object} [redux.selectors] - duck selectors
+ * @return {function(*): {redux: *, store: *}}
+ */
 export function withRedux(store, redux) {
   return args => ({
     ...args,
@@ -65,6 +74,7 @@ export function withRedux(store, redux) {
 /**
  * Standard error interceptor.
  *
+ * @method
  * @param {Object} error - axios config schema
  * @return {Promise<Error>}
  */
@@ -75,6 +85,7 @@ function errorInterceptor(error) {
 /**
  * Logs axios error details to console.
  *
+ * @method
  * @param label - error label
  * @return {*} - axios error
  */
@@ -90,6 +101,7 @@ function errorLogInterceptor(label) {
 /**
  * Logs request details to console.
  *
+ * @method
  * @param {Object} request
  * @return {Object} - axios config schema
  */
@@ -105,6 +117,7 @@ const requestLogInterceptor = (request) => {
 /**
  * Logs response details to console.
  *
+ * @method
  * @param response - axios config schema
  * @return {Object} - axios config schema
  */
@@ -120,6 +133,7 @@ const responseLogInterceptor = (response) => {
 /**
  * Handles unauthorized responses.
  *
+ * @method
  * @param {Object} response - axios config schema
  * @return {Promise<Error> || Object}
  */
@@ -154,11 +168,8 @@ async function JWTHTTPUnauthorizedInterceptor(response) {
   let nextAccessToken;
 
   try {
-    const ax = axios.create();
-    const { data } = await ax({
-      ...payload,
-      url: `${axiosConfig.baseURL}${payload.url}`,
-    });
+    const ax = axios.create(axiosConfig);
+    const { data } = await ax(payload);
 
     store.dispatch(actions.refreshAccessTokenSuccess({
       accessToken: data.accessToken,
@@ -184,8 +195,9 @@ async function JWTHTTPUnauthorizedInterceptor(response) {
 }
 
 /**
- * Adds JWT Authorization header
+ * Adds JWT Authorization header.
  *
+ * @method
  * @param request - axios config schema
  * @return {Object} - updated axios config schema
  */
