@@ -54,14 +54,22 @@ function serializeFormSchema(schema, values, path = '') {
 class FormDialog extends Component {
   static getDerivedStateFromProps(props, state) {
     const { schema, values } = props;
+    const { formFields } = state;
 
-    if (!_isEqual({}, schema)) {
+    // console.log('getDerivedStateFromProps', props, state);
+    // debugger;
+    if (!_isEqual({}, schema) && _isEqual({}, formFields)) {
+      // console.log('1');
       return {
         ...state,
         formFields: serializeFormSchema(schema, values),
       };
+    } else if (!_isEqual({}, formFields)) {
+      // console.log('2');
+      return state;
     }
 
+    // console.log('3');
     return null;
   }
 
@@ -69,14 +77,18 @@ class FormDialog extends Component {
     formFields: {},
   };
 
-  shouldComponentUpdate(nextProps) {
-    const { schema } = this.props;
-    const { schema: nextSchema } = nextProps;
-
-    return !_isEqual(schema, nextSchema);
-  }
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   const { schema } = this.props;
+  //   const { schema: nextSchema } = nextProps;
+  //
+  //   console.log('shouldComponentUpdate', !_isEqual(schema, nextSchema),
+  // !_isEqual(this.state, nextState));
+  //   console.log('state', this.state, 'nextState', nextState);
+  //   return !_isEqual(schema, nextSchema) || !_isEqual(this.state, nextState);
+  // }
 
   getDynamicFields = (formFields) => {
+    // console.log('getDynamicFields', formFields);
     if (Object.keys(formFields).length) {
       return Object.entries(formFields).map(([key, value]) => (
         <TextField
@@ -95,8 +107,14 @@ class FormDialog extends Component {
   };
 
   handleChange = name => (event) => {
+    const { formFields } = this.state;
+
+    // console.log(event.target.value);
     this.setState({
-      [name]: event.target.value,
+      formFields: {
+        ...formFields,
+        [name]: event.target.value,
+      },
     });
   };
 
@@ -108,6 +126,7 @@ class FormDialog extends Component {
   handleSubmit = (onSubmit) => {
     const { formFields } = this.state;
 
+    // debugger;
     onSubmit(serializeFormFields(formFields));
   };
 
@@ -121,6 +140,7 @@ class FormDialog extends Component {
     } = this.props;
     const { formFields } = this.state;
 
+    // console.log('render', formFields);
     return (
       <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
         <DialogTitle id="form-dialog-title">{title}</DialogTitle>

@@ -4,34 +4,16 @@ import _find from 'lodash/find';
 export const name = 'sightEvents';
 const prefix = `${name}/`;
 
-const mock = [
-  {
-    description: 'ipsum quam feugiat odio, ac rhoncus lectus erat a lectus. Aliquam justo urna, hendrerit in aliquam hendrerit, pharetra nec nunc. Ut volutpat quam sit amet sem dapibus, in blandit justo scelerisque. Quisque dui urna, fringilla non tristique et, molestie ac justo.',
-    id: 1,
-    lead: 'Maecenas maximus, mi in aliquet finibus.',
-    name: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-    sightId: 2,
-  },
-  {
-    description: 'Morbi volutpat, ipsum a pulvinar rutrum, augue nibh suscipit quam, et accumsan est enim sed mi. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.',
-    id: 2,
-    lead: 'Sed et libero quis tellus euismod blandit.',
-    name: 'Donec interdum felis odio, nec dictum eros lobortis a',
-    sightId: 3,
-  },
-  {
-    description: 'Fusce vitae ornare augue. Pellentesque eleifend massa vel mauris posuere pulvinar nec et nibh. Ut quis ipsum congue, sollicitudin risus ac, fermentum justo. Aliquam pretium augue vitae sodales dictum.',
-    id: 3,
-    lead: 'Aenean pellentesque pretium mi, ac aliquet velit malesuada sed.',
-    name: 'Cras consequat leo quam, at cursus tortor maximus vitae',
-    sightId: 2,
-  },
-];
-
 /*
  * TYPES
  */
 
+const CREATE_ITEM = `${prefix}CREATE_ITEM`;
+const CREATE_ITEM_FAILURE = `${prefix}CREATE_ITEM_FAILURE`;
+const CREATE_ITEM_SUCCESS = `${prefix}CREATE_ITEM_SUCCESS`;
+const DELETE_ITEM = `${prefix}DELETE_ITEM`;
+const DELETE_ITEM_FAILURE = `${prefix}DELETE_ITEM_FAILURE`;
+const DELETE_ITEM_SUCCESS = `${prefix}DELETE_ITEM_SUCCESS`;
 const FETCH_ITEM = `${prefix}FETCH_ITEM`;
 const FETCH_ITEM_CANCEL = `${prefix}FETCH_ITEM_CANCEL`;
 const FETCH_ITEM_FAILURE = `${prefix}FETCH_ITEM_FAILURE`;
@@ -40,8 +22,17 @@ const FETCH_LIST = `${prefix}FETCH_LIST`;
 const FETCH_LIST_CANCEL = `${prefix}FETCH_LIST_CANCEL`;
 const FETCH_LIST_FAILURE = `${prefix}FETCH_LIST_FAILURE`;
 const FETCH_LIST_SUCCESS = `${prefix}FETCH_LIST_SUCCESS`;
+const UPDATE_ITEM = `${prefix}UPDATE_ITEM`;
+const UPDATE_ITEM_FAILURE = `${prefix}UPDATE_ITEM_FAILURE`;
+const UPDATE_ITEM_SUCCESS = `${prefix}UPDATE_ITEM_SUCCESS`;
 
 export const types = {
+  CREATE_ITEM,
+  CREATE_ITEM_FAILURE,
+  CREATE_ITEM_SUCCESS,
+  DELETE_ITEM,
+  DELETE_ITEM_FAILURE,
+  DELETE_ITEM_SUCCESS,
   FETCH_ITEM,
   FETCH_ITEM_CANCEL,
   FETCH_ITEM_FAILURE,
@@ -50,12 +41,51 @@ export const types = {
   FETCH_LIST_CANCEL,
   FETCH_LIST_FAILURE,
   FETCH_LIST_SUCCESS,
+  UPDATE_ITEM,
+  UPDATE_ITEM_FAILURE,
+  UPDATE_ITEM_SUCCESS,
 };
 
 
 /*
  * ACTIONS
  */
+
+const createItem = options => ({
+  type: CREATE_ITEM,
+  payload: {
+    url: '/sight-events',
+    method: 'post',
+    ...options,
+  },
+});
+
+const createItemFailure = error => ({
+  type: CREATE_ITEM_FAILURE,
+  error,
+});
+
+const createItemSuccess = data => ({
+  type: CREATE_ITEM_SUCCESS,
+  data,
+});
+
+const deleteItem = id => ({
+  type: DELETE_ITEM,
+  payload: {
+    url: `/sight-events/${id}`,
+    method: 'delete',
+  },
+});
+
+const deleteItemFailure = error => ({
+  type: DELETE_ITEM_FAILURE,
+  error,
+});
+
+const deleteItemSuccess = () => ({
+  type: DELETE_ITEM_SUCCESS,
+});
 
 const fetchItem = id => ({
   type: FETCH_ITEM,
@@ -101,7 +131,32 @@ const fetchListSuccess = data => ({
   data,
 });
 
+const updateItem = (id, options) => ({
+  type: UPDATE_ITEM,
+  payload: {
+    url: `/sight-events/${id}`,
+    method: 'put',
+    ...options,
+  },
+});
+
+const updateItemFailure = error => ({
+  type: CREATE_ITEM_FAILURE,
+  error,
+});
+
+const updateItemSuccess = data => ({
+  type: CREATE_ITEM_SUCCESS,
+  data,
+});
+
 export const actions = {
+  createItem,
+  createItemFailure,
+  createItemSuccess,
+  deleteItem,
+  deleteItemFailure,
+  deleteItemSuccess,
   fetchItem,
   fetchItemCancel,
   fetchItemFailure,
@@ -110,6 +165,9 @@ export const actions = {
   fetchListCancel,
   fetchListFailure,
   fetchListSuccess,
+  updateItem,
+  updateItemFailure,
+  updateItemSuccess,
 };
 
 
@@ -148,9 +206,57 @@ export const selectors = {
  * LOGIC
  */
 
+const createItemLogic = createLogic({
+  type: [
+    CREATE_ITEM,
+  ],
+  latest: true,
+  async process({ action: { payload }, httpClient, cancelled$ }, dispatch, done) {
+    try {
+      const { data, status } = await httpClient.cancellable(payload, cancelled$);
+
+      if (status === 200 || status === 201) {
+        dispatch(createItemSuccess(data));
+      } else {
+        createItemFailure();
+      }
+    } catch (e) {
+      createItemFailure();
+    }
+
+    done();
+  },
+});
+
+const deleteItemLogic = createLogic({
+  type: [
+    DELETE_ITEM,
+  ],
+  latest: true,
+  async process({ action: { payload }, httpClient, cancelled$ }, dispatch, done) {
+    try {
+      const { data, status } = await httpClient.cancellable(payload, cancelled$);
+
+      if (status === 200 || status === 201) {
+        dispatch(deleteItemSuccess(data));
+      } else {
+        deleteItemFailure();
+      }
+    } catch (e) {
+      deleteItemFailure();
+    }
+
+    done();
+  },
+});
+
 const fetchItemLogic = createLogic({
-  type: FETCH_ITEM,
-  cancelType: [FETCH_ITEM_CANCEL],
+  type: [
+    FETCH_ITEM,
+  ],
+  cancelType: [
+    FETCH_ITEM_CANCEL,
+  ],
   latest: true,
   async process({ action: { payload }, httpClient, cancelled$ }, dispatch, done) {
     try {
@@ -170,8 +276,15 @@ const fetchItemLogic = createLogic({
 });
 
 const fetchListLogic = createLogic({
-  type: FETCH_LIST,
-  cancelType: [FETCH_LIST_CANCEL],
+  type: [
+    FETCH_LIST,
+    CREATE_ITEM_SUCCESS,
+    DELETE_ITEM_SUCCESS,
+    UPDATE_ITEM_SUCCESS,
+  ],
+  cancelType: [
+    FETCH_LIST_CANCEL,
+  ],
   latest: true,
   async process({ action: { payload }, httpClient, cancelled$ }, dispatch, done) {
     try {
@@ -190,9 +303,34 @@ const fetchListLogic = createLogic({
   },
 });
 
+const updateItemLogic = createLogic({
+  type: [
+    UPDATE_ITEM,
+  ],
+  latest: true,
+  async process({ action: { payload }, httpClient, cancelled$ }, dispatch, done) {
+    try {
+      const { data, status } = await httpClient.cancellable(payload, cancelled$);
+
+      if (status === 200 || status === 201) {
+        dispatch(updateItemSuccess(data));
+      } else {
+        updateItemFailure();
+      }
+    } catch (e) {
+      updateItemFailure();
+    }
+
+    done();
+  },
+});
+
 export const logic = {
+  createItemLogic,
+  deleteItemLogic,
   fetchItemLogic,
   fetchListLogic,
+  updateItemLogic,
 };
 
 
@@ -201,8 +339,7 @@ export const logic = {
  */
 
 const initialState = {
-  // list: [],
-  list: mock,
+  list: [],
   item: {},
 };
 

@@ -27,21 +27,20 @@ import FormDialog from 'components/FormDialog';
 import { EmptyResultsMessage } from 'components/ViewMessage';
 
 const sightSchema = {
-  agreements: [],
   description: '',
   email: '',
   id: null,
   lead: '',
   location: {
     city: '',
+    country: '',
+    latitude: null,
+    longitude: null,
     street: '',
+    zipCode: '',
   },
-  mainImage: '',
-  minPrice: null,
   name: '',
-  openingHours: [],
   phone: '',
-  score: null,
 };
 
 const sightEventSchema = {
@@ -81,6 +80,12 @@ class SightsList extends Component {
     },
   };
 
+  componentDidMount() {
+    const { fetchSightsList } = this.props;
+
+    fetchSightsList();
+  }
+
   handleFormDialogClose = () => {
     const dialogProperties = {
       onSubmit: () => {},
@@ -102,8 +107,16 @@ class SightsList extends Component {
     });
   };
 
+  handleSightDelete = (sightId) => {
+    const { deleteSight } = this.props;
+
+    if (!Number.isNaN(sightId)) {
+      deleteSight(sightId);
+    }
+  };
+
   handleSightEdit = (sight = {}) => {
-    const { fetchSight } = this.props;
+    const { createSight, updateSight, fetchSight } = this.props;
     const title = sight.id ? 'Edytuj atrakcję' : 'Dodaj atrakcję';
 
     if (sight.id) {
@@ -113,6 +126,13 @@ class SightsList extends Component {
     this.handleFormDialogOpen({
       onSubmit: (data) => {
         console.log('sight submit', data);
+
+        if (data.id) {
+          updateSight(data.id, { data });
+        } else {
+          createSight({ data });
+        }
+
         this.handleFormDialogClose();
       },
       schema: sightSchema,
@@ -133,6 +153,7 @@ class SightsList extends Component {
     this.handleFormDialogOpen({
       onSubmit: (data) => {
         console.log('sightEvent submit', data);
+        // debugger;
         this.handleFormDialogClose();
       },
       schema: sightEventSchema,
@@ -186,6 +207,7 @@ class SightsList extends Component {
                     </IconButton>
                     <IconButton
                       aria-label="Usuń atrakcję"
+                      onClick={() => this.handleSightDelete(sightId)}
                       title="Usuń atrakcję"
                     >
                       <DeleteIcon />
@@ -253,11 +275,15 @@ class SightsList extends Component {
 }
 
 SightsList.propTypes = {
+  createSight: PropTypes.func.isRequired,
+  deleteSight: PropTypes.func.isRequired,
   fetchSight: PropTypes.func.isRequired,
   fetchSightEvent: PropTypes.func,
+  fetchSightsList: PropTypes.func.isRequired,
   sightEventsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   sight: PropTypes.shape({}),
   sightsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  updateSight: PropTypes.func.isRequired,
 };
 
 SightsList.defaultProps = {
@@ -273,8 +299,12 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch =>
   bindActionCreators({
+    createSight: sightsActions.createItem,
+    deleteSight: sightsActions.deleteItem,
     fetchSight: sightsActions.fetchItem,
     fetchSightEvent: sightEventActions.fetchItem,
+    fetchSightsList: sightsActions.fetchList,
+    updateSight: sightsActions.updateItem,
   }, dispatch);
 
 export default compose(connect(mapStateToProps, mapDispatchToProps))(SightsList);
