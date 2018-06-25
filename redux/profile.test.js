@@ -51,9 +51,18 @@ describe('actions', () => {
     const { ERROR_UNAUTHORIZED } = types;
     const expectedAction = {
       type: ERROR_UNAUTHORIZED,
+      payload: {},
     };
+    const data = { a: 1 };
 
     expect(errorUnauthorized()).toEqual(expectedAction);
+
+    expect(errorUnauthorized({ data })).toEqual({
+      ...expectedAction,
+      payload: {
+        data,
+      },
+    });
   });
 
   it('should create an action to make profile request', () => {
@@ -114,8 +123,7 @@ describe('actions', () => {
       type: LOGIN,
       payload: {
         url: '/login',
-        // method: 'post',
-        method: 'get',
+        method: 'post',
         ...options,
         data,
       },
@@ -154,7 +162,7 @@ describe('actions', () => {
       type: LOGOUT,
       payload: {
         url: '/logout',
-        method: 'get',
+        method: 'post',
         ...options,
       },
     };

@@ -25,6 +25,12 @@ class MyDocument extends Document {
           />
           <link rel="manifest" href="/static/manifest.json" />
           <meta name="theme-color" content={pageContext.theme.palette.primary.main} />
+          <link rel="preconnect" href="https://fonts.gstatic.com/" />
+          <link
+            rel="preload"
+            as="style"
+            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"
+          />
           <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"

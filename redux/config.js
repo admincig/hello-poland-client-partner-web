@@ -55,7 +55,9 @@ export const logic = {};
  * REDUCERS
  */
 
-const initialState = {};
+const initialState = {
+  lastAction: null,
+};
 
 /**
  * View reducer
@@ -68,6 +70,9 @@ const initialState = {};
 export default function reducer(state = initialState, action) {
   switch (action.type) {
     default:
-      return state;
+      return {
+        ...state,
+        lastAction: action.type,
+      };
   }
 }
