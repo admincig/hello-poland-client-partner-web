@@ -9,6 +9,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
 import { selectors as configSelectors } from 'redux/config';
 import {
   actions as profileActions,
@@ -25,6 +26,9 @@ const styles = theme => ({
     position: 'absolute',
     top: '50%',
     bottom: '50%',
+  },
+  error: {
+    color: theme.palette.error.main,
   },
   textField: {
     width: '100%',
@@ -58,7 +62,7 @@ class LoginView extends Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, error } = this.props;
 
     return (
       <Layout>
@@ -83,6 +87,11 @@ class LoginView extends Component {
                     onChange={this.handleChange('password')}
                     margin="normal"
                   />
+                  {error && (
+                    <Typography className={classes.error} gutterBottom>
+                      Wystąpił błąd podczas logowania.
+                    </Typography>
+                  )}
                   <Button
                     variant="raised"
                     color="primary"
@@ -104,13 +113,19 @@ class LoginView extends Component {
 LoginView.propTypes = {
   assetPrefix: PropTypes.string.isRequired,
   classes: PropTypes.shape({}).isRequired,
+  error: PropTypes.shape({}),
   isAuthenticated: PropTypes.bool.isRequired,
   login: PropTypes.func.isRequired,
+};
+
+LoginView.defaultProps = {
+  error: null,
 };
 
 const mapStateToProps = state => ({
   assetPrefix: configSelectors.getAppConfig(state).public.assetPrefix || '',
   isAuthenticated: profileSelectors.isAuthenticated(state),
+  error: profileSelectors.getError(state),
 });
 
 const mapDispatchToProps = dispatch =>
