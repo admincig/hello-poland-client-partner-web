@@ -51,6 +51,48 @@ const sightEventSchema = {
   sightId: null,
 };
 
+function serializeFormFields(formFields) {
+  return Object.entries(formFields).reduce((acc, [key, value]) => {
+    if (key.indexOf('.') !== -1) {
+      const keys = key.split('.');
+      const keyName = keys.shift();
+      const nextPath = keys.join('.');
+
+      return {
+        ...acc,
+        [keyName]: {
+          ...acc[keyName],
+          ...serializeFormFields({ [nextPath]: value }),
+        },
+      };
+    }
+
+    return {
+      ...acc,
+      [key]: value,
+    };
+  }, {});
+}
+
+function serializeFormSchema(schema, values, path = '') {
+  return Object.entries(schema).reduce((acc, [sKey, sValue]) => {
+    const key = path.length ? `${path}.${sKey}` : sKey;
+    const value = (values && values[sKey]) || null;
+
+    if (sValue && typeof sValue === 'object' && !Array.isArray(sValue)) {
+      return {
+        ...acc,
+        ...serializeFormSchema(sValue, value, key),
+      };
+    }
+
+    return {
+      ...acc,
+      [key]: value,
+    };
+  }, {});
+}
+
 class SightsList extends Component {
   static getDerivedStateFromProps(props, state) {
     const { sight } = props;
@@ -74,9 +116,8 @@ class SightsList extends Component {
     dialog: false,
     dialogProperties: {
       onSubmit: () => {},
-      schema: {},
+      formFields: {},
       title: '',
-      values: {},
     },
   };
 
@@ -89,9 +130,8 @@ class SightsList extends Component {
   handleFormDialogClose = () => {
     const dialogProperties = {
       onSubmit: () => {},
-      schema: {},
+      formFields: {},
       title: '',
-      values: {},
     };
 
     this.setState({
@@ -124,7 +164,9 @@ class SightsList extends Component {
     }
 
     this.handleFormDialogOpen({
-      onSubmit: (data) => {
+      formFields: serializeFormSchema(sightSchema, sight),
+      onSubmit: (serializedData) => {
+        const data = serializeFormFields(serializedData);
         console.log('sight submit', data);
 
         if (data.id) {
@@ -140,9 +182,7 @@ class SightsList extends Component {
 
         this.handleFormDialogClose();
       },
-      schema: sightSchema,
       title,
-      values: sight,
     });
   };
 
@@ -156,14 +196,13 @@ class SightsList extends Component {
     }
 
     this.handleFormDialogOpen({
+      formFields: serializeFormSchema(sightEventSchema, sightEvent),
       onSubmit: (data) => {
         console.log('sightEvent submit', data);
         // debugger;
         this.handleFormDialogClose();
       },
-      schema: sightEventSchema,
       title,
-      values: sightEvent,
     });
   };
 
