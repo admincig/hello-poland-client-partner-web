@@ -94,24 +94,6 @@ function serializeFormSchema(schema, values, path = '') {
 }
 
 class SightsList extends Component {
-  static getDerivedStateFromProps(props, state) {
-    const { sight } = props;
-    const { dialogProperties } = state;
-    const { values } = dialogProperties;
-
-    if (sight && values && sight.id === values.id) {
-      return {
-        ...state,
-        dialogProperties: {
-          ...dialogProperties,
-          values: sight,
-        },
-      };
-    }
-
-    return null;
-  }
-
   state = {
     dialog: false,
     dialogProperties: {
@@ -127,39 +109,34 @@ class SightsList extends Component {
     fetchSightsList();
   }
 
-  handleFormDialogClose = () => {
-    const dialogProperties = {
+  setDefaultDialogProperties = () => this.setState({
+    dialogProperties: {
       onSubmit: () => {},
       formFields: {},
       title: '',
-    };
+    },
+  });
 
-    this.setState({
-      dialog: false,
-      dialogProperties,
-    });
-  };
+  handleFormDialogClose = () => this.setState({ dialog: false });
 
-  handleFormDialogOpen = (dialogProperties) => {
-    this.setState({
-      dialog: true,
-      dialogProperties,
-    });
-  };
+  handleFormDialogOpen = dialogProperties => this.setState({
+    dialog: true,
+    dialogProperties,
+  });
 
   handleSightDelete = (sightId) => {
     const { deleteSight } = this.props;
 
-    if (!Number.isNaN(sightId)) {
+    if (Number.isInteger(sightId)) {
       deleteSight(sightId);
     }
   };
 
   handleSightEdit = (sight = {}) => {
     const { createSight, updateSight, fetchSight } = this.props;
-    const title = sight.id ? 'Edytuj atrakcję' : 'Dodaj atrakcję';
+    const title = Number.isInteger(sight.id) ? 'Edytuj atrakcję' : 'Dodaj atrakcję';
 
-    if (sight.id) {
+    if (Number.isInteger(sight.id)) {
       fetchSight(sight.id);
     }
 
@@ -169,13 +146,13 @@ class SightsList extends Component {
         const data = serializeFormFields(serializedData);
         console.log('sight submit', data);
 
-        if (data.id) {
+        if (Number.isInteger(data.id)) {
           updateSight(data.id, { data });
         } else {
           createSight({
             data: {
               ...data,
-              id: null,
+              id: null, // remove when field id will be hidden
             },
           });
         }
@@ -310,6 +287,7 @@ class SightsList extends Component {
         }
         <FormDialog
           onClose={this.handleFormDialogClose}
+          onExited={this.setDefaultDialogProperties}
           open={dialog}
           {...dialogProperties}
         />

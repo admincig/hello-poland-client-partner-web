@@ -58,10 +58,7 @@ class FormDialog extends Component {
     });
   };
 
-  handleClose = () => {
-    this.setState({ formFields: {} });
-    this.props.onClose();
-  };
+  handleClose = () => this.props.onClose();
 
   handleSubmit = formFields => this.props.onSubmit(formFields);
 
