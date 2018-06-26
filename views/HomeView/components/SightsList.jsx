@@ -195,7 +195,7 @@ class SightsList extends Component {
         {sightsList && sightsList.length ?
           <List>
             {sightsList.map(({ id: sightId, name }) => (
-              <Fragment key={sightId * Math.random()}>
+              <Fragment key={`sight-${sightId}`}>
                 <ListItem key={sightId}>
                   <ListItemIcon>
                     <PlaceIcon />
@@ -239,7 +239,7 @@ class SightsList extends Component {
                   {sightEventsList
                     .filter(item => item.sightId === sightId)
                     .map(sightEvent => (
-                      <ListItem key={sightEvent.id}>
+                      <ListItem key={`sightEvent-${sightEvent.id}`}>
                         <ListItemIcon>
                           <EventIcon />
                         </ListItemIcon>

@@ -9,8 +9,14 @@ export default store => () => {
     const ls = window.localStorage;
     const state = store.getState();
     const { lastAction } = state.config;
-    const { LOGIN_SUCCESS, LOGOUT_SUCCESS, REFRESH_ACCESS_TOKEN_SUCCESS } = profileTypes;
-    const isProfileDirty = lastAction === LOGIN_SUCCESS
+    const {
+      FETCH_PROFILE_SUCCESS,
+      LOGIN_SUCCESS,
+      LOGOUT_SUCCESS,
+      REFRESH_ACCESS_TOKEN_SUCCESS,
+    } = profileTypes;
+    const isProfileDirty = lastAction === FETCH_PROFILE_SUCCESS
+      || lastAction === LOGIN_SUCCESS
       || lastAction === LOGOUT_SUCCESS
       || lastAction === REFRESH_ACCESS_TOKEN_SUCCESS;
 
