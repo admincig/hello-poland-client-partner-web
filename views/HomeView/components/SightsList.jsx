@@ -26,6 +26,8 @@ import {
 import FormDialog from 'components/FormDialog';
 import { EmptyResultsMessage } from 'components/ViewMessage';
 
+const IMG_URL = 'https://i.kinja-img.com/gawker-media/image/upload/t_original/wsgtilb9ibbxysybe3mu.png';
+
 const sightSchema = {
   description: '',
   email: '',
@@ -44,10 +46,22 @@ const sightSchema = {
 };
 
 const sightEventSchema = {
+  date: null,
   description: '',
+  email: '',
   id: null,
   lead: '',
+  location: {
+    city: '',
+    country: '',
+    latitude: null,
+    longitude: null,
+    street: '',
+    zipCode: '',
+  },
+  mainImageUrl: '',
   name: '',
+  phone: '',
   sightId: null,
 };
 
@@ -104,9 +118,10 @@ class SightsList extends Component {
   };
 
   componentDidMount() {
-    const { fetchSightsList } = this.props;
+    const { fetchSightsList, fetchSightEventsList } = this.props;
 
     fetchSightsList();
+    fetchSightEventsList();
   }
 
   setDefaultDialogProperties = () => this.setState({
@@ -164,19 +179,35 @@ class SightsList extends Component {
   };
 
   handleSightEventEdit = (sightEvent = {}) => {
-    const { fetchSightEvent } = this.props;
+    const { createSightEvent, updateSightEvent, fetchSightEvent } = this.props;
     const title = sightEvent.id ? 'Edytuj wydarzenie' : 'Dodaj wydarzenie';
 
     console.log(sightEvent);
-    if (sightEvent.id) {
+    if (Number.isInteger(sightEvent.id)) {
       fetchSightEvent(sightEvent.id);
     }
 
     this.handleFormDialogOpen({
-      formFields: serializeFormSchema(sightEventSchema, sightEvent),
-      onSubmit: (data) => {
+      formFields: serializeFormSchema(sightEventSchema, {
+        ...sightEvent,
+        date: (new Date()).toISOString(),
+        mainImageUrl: IMG_URL,
+      }),
+      onSubmit: (serializedData) => {
+        const data = serializeFormFields(serializedData);
         console.log('sightEvent submit', data);
-        // debugger;
+
+        if (Number.isInteger(data.id)) {
+          updateSightEvent(data.id, { data });
+        } else {
+          createSightEvent({
+            data: {
+              ...data,
+              id: null, // remove when field id will be hidden
+            },
+          });
+        }
+
         this.handleFormDialogClose();
       },
       title,
@@ -286,6 +317,7 @@ class SightsList extends Component {
           <EmptyResultsMessage message="Brak elementów do wyświetlenia" />
         }
         <FormDialog
+          disableBackdropClick
           onClose={this.handleFormDialogClose}
           onExited={this.setDefaultDialogProperties}
           open={dialog}
@@ -298,35 +330,45 @@ class SightsList extends Component {
 
 SightsList.propTypes = {
   createSight: PropTypes.func.isRequired,
+  createSightEvent: PropTypes.func.isRequired,
   deleteSight: PropTypes.func.isRequired,
+  deleteSightEvent: PropTypes.func.isRequired,
   fetchSight: PropTypes.func.isRequired,
-  fetchSightEvent: PropTypes.func,
+  fetchSightEvent: PropTypes.func.isRequired,
   fetchSightsList: PropTypes.func.isRequired,
-  sightEventsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  fetchSightEventsList: PropTypes.func.isRequired,
   sight: PropTypes.shape({}),
+  sightEvent: PropTypes.shape({}),
   sightsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  sightEventsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   updateSight: PropTypes.func.isRequired,
+  updateSightEvent: PropTypes.func.isRequired,
 };
 
 SightsList.defaultProps = {
-  fetchSightEvent: null,
   sight: null,
+  sightEvent: null,
 };
 
 const mapStateToProps = state => ({
-  sightEventsList: sightEventSelectors.getSightEvents(state),
   sight: sightsSelectors.getSight(state),
+  sightEvent: sightEventSelectors.getSightEvent(state),
   sightsList: sightsSelectors.getSights(state),
+  sightEventsList: sightEventSelectors.getSightEvents(state),
 });
 
 const mapDispatchToProps = dispatch =>
   bindActionCreators({
     createSight: sightsActions.createItem,
+    createSightEvent: sightEventActions.createItem,
     deleteSight: sightsActions.deleteItem,
+    deleteSightEvent: sightEventActions.deleteItem,
     fetchSight: sightsActions.fetchItem,
     fetchSightEvent: sightEventActions.fetchItem,
     fetchSightsList: sightsActions.fetchList,
+    fetchSightEventsList: sightEventActions.fetchList,
     updateSight: sightsActions.updateItem,
+    updateSightEvent: sightEventActions.updateItem,
   }, dispatch);
 
 export default compose(connect(mapStateToProps, mapDispatchToProps))(SightsList);
