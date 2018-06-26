@@ -439,9 +439,7 @@ function reducer(state = initialState, action) {
     case FETCH_LIST_SUCCESS:
       return {
         ...state,
-        list: [
-          ...action.data,
-        ],
+        list: action.data.items,
       };
     case FETCH_SEARCH_RESULTS_SUCCESS:
       return {
