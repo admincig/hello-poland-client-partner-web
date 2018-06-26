@@ -266,6 +266,7 @@ const createItemLogic = createLogic({
 
       if (status === 200 || status === 201) {
         dispatch(createItemSuccess(data));
+        dispatch(fetchList());
       } else {
         createItemFailure();
       }
@@ -286,8 +287,9 @@ const deleteItemLogic = createLogic({
     try {
       const { data, status } = await httpClient.cancellable(payload, cancelled$);
 
-      if (status === 200 || status === 201) {
+      if (status === 200 || status === 204) {
         dispatch(deleteItemSuccess(data));
+        dispatch(fetchList());
       } else {
         deleteItemFailure();
       }
@@ -327,9 +329,6 @@ const fetchItemLogic = createLogic({
 const fetchListLogic = createLogic({
   type: [
     FETCH_LIST,
-    CREATE_ITEM_SUCCESS,
-    DELETE_ITEM_SUCCESS,
-    UPDATE_ITEM_SUCCESS,
   ],
   cancelType: [
     FETCH_LIST_CANCEL,
@@ -386,8 +385,9 @@ const updateItemLogic = createLogic({
     try {
       const { data, status } = await httpClient.cancellable(payload, cancelled$);
 
-      if (status === 200 || status === 201) {
+      if (status === 200) {
         dispatch(updateItemSuccess(data));
+        dispatch(fetchList());
       } else {
         updateItemFailure();
       }

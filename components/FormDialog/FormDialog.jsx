@@ -56,20 +56,20 @@ class FormDialog extends Component {
     const { schema, values } = props;
     const { formFields } = state;
 
-    // console.log('getDerivedStateFromProps', props, state);
+    console.log('getDerivedStateFromProps', props, state);
     // debugger;
-    if (!_isEqual({}, schema) && _isEqual({}, formFields)) {
-      // console.log('1');
+    if (!_isEqual({}, schema)) {
+      console.log('1');
       return {
         ...state,
         formFields: serializeFormSchema(schema, values),
       };
     } else if (!_isEqual({}, formFields)) {
-      // console.log('2');
+      console.log('2');
       return state;
     }
 
-    // console.log('3');
+    console.log('3');
     return null;
   }
 
@@ -77,15 +77,14 @@ class FormDialog extends Component {
     formFields: {},
   };
 
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   const { schema } = this.props;
-  //   const { schema: nextSchema } = nextProps;
-  //
-  //   console.log('shouldComponentUpdate', !_isEqual(schema, nextSchema),
-  // !_isEqual(this.state, nextState));
-  //   console.log('state', this.state, 'nextState', nextState);
-  //   return !_isEqual(schema, nextSchema) || !_isEqual(this.state, nextState);
-  // }
+  shouldComponentUpdate(nextProps, nextState) {
+    const { schema } = this.props;
+    const { schema: nextSchema } = nextProps;
+
+    console.log('shouldComponentUpdate', !_isEqual(schema, nextSchema), !_isEqual(this.state, nextState));
+    console.log('state', this.state, 'nextState', nextState);
+    return !_isEqual(schema, nextSchema) || !_isEqual(this.state, nextState);
+  }
 
   getDynamicFields = (formFields) => {
     // console.log('getDynamicFields', formFields);

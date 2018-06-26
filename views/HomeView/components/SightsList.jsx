@@ -130,7 +130,12 @@ class SightsList extends Component {
         if (data.id) {
           updateSight(data.id, { data });
         } else {
-          createSight({ data });
+          createSight({
+            data: {
+              ...data,
+              id: null,
+            },
+          });
         }
 
         this.handleFormDialogClose();
