@@ -184,6 +184,8 @@ export const actions = {
  */
 const getState = state => state[name];
 
+const getError = state => getState(state).error;
+
 const getSightEvent = state => getState(state).item;
 
 const getSightEvents = state => getState(state).list;
@@ -195,6 +197,7 @@ const getSightEventById = (state, id) => {
 };
 
 export const selectors = {
+  getError,
   getSightEvent,
   getSightEventById,
   getSightEvents,
@@ -215,7 +218,7 @@ const createItemLogic = createLogic({
     try {
       const { data, status } = await httpClient.cancellable(payload, cancelled$);
 
-      if (status === 200 || status === 201) {
+      if (status === 200 || status === 204) {
         dispatch(createItemSuccess(data));
         dispatch(fetchList());
       } else {
@@ -339,20 +342,35 @@ export const logic = {
  */
 
 const initialState = {
-  list: [],
+  error: false,
   item: {},
+  list: [],
 };
 
 function reducer(state = initialState, action) {
   switch (action.type) {
+    case CREATE_ITEM_FAILURE:
+    case UPDATE_ITEM_FAILURE:
+      return {
+        ...state,
+        error: true,
+      };
+    case CREATE_ITEM_SUCCESS:
+    case UPDATE_ITEM_SUCCESS:
+      return {
+        ...state,
+        error: false,
+      };
     case FETCH_ITEM_SUCCESS:
       return {
         ...state,
+        error: false,
         item: action.data,
       };
     case FETCH_LIST_SUCCESS:
       return {
         ...state,
+        error: false,
         list: action.data.items,
       };
     default:

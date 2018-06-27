@@ -286,7 +286,9 @@ class SightsList extends Component {
                           </IconButton>
                           <IconButton
                             aria-label="Dodaj bilet"
-                          // onClick={() => this.handleSightEventEdit(id)}
+                            // onClick={() => {
+                            //   this.handleSightEventEdit({ sightEventId: sightEvent.id });
+                            // }}
                             title="Dodaj bilet"
                           >
                             <AddIcon />
