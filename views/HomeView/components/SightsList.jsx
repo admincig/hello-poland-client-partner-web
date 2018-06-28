@@ -31,6 +31,7 @@ const IMG_URL = 'https://i.kinja-img.com/gawker-media/image/upload/t_original/ws
 const sightSchema = {
   description: '',
   email: '',
+  generalAdmission: true,
   id: null,
   lead: '',
   location: {
@@ -156,7 +157,7 @@ class SightsList extends Component {
     }
 
     this.handleFormDialogOpen({
-      formFields: serializeFormSchema(sightSchema, sight),
+      formFields: serializeFormSchema(sightSchema, { ...sight, generalAdmission: true }),
       onSubmit: (serializedData) => {
         const data = serializeFormFields(serializedData);
         console.log('sight submit', data);
