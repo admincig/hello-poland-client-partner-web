@@ -179,6 +179,14 @@ class SightsList extends Component {
     });
   };
 
+  handleSightEventDelete = (sightEventId) => {
+    const { deleteSightEvent } = this.props;
+
+    if (Number.isInteger(sightEventId)) {
+      deleteSightEvent(sightEventId);
+    }
+  };
+
   handleSightEventEdit = (sightEvent = {}) => {
     const { createSightEvent, updateSightEvent, fetchSightEvent } = this.props;
     const title = sightEvent.id ? 'Edytuj wydarzenie' : 'Dodaj wydarzenie';
@@ -305,6 +313,7 @@ class SightsList extends Component {
                           </IconButton>
                           <IconButton
                             aria-label="Usuń wydarzenie"
+                            onClick={() => this.handleSightEventDelete(sightId)}
                             title="Usuń wydarzenie"
                           >
                             <DeleteIcon />
