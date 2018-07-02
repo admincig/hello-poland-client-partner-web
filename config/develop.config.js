@@ -2,7 +2,7 @@
 module.exports = {
   // Will only be available on the server side
   server: {
-    apiURL: 'https://hpl.fream.pl/api/v1',
+    apiURL: 'https://hpl.fream.pl/api/v1/partner',
   },
   // Will be available on both server and client
   public: {

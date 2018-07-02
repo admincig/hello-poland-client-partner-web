@@ -1,10 +1,11 @@
 stages:
   - test
   - build
+  - deploy
 
 variables:
-  GIT_SUBMODULE_STRATEGY: recursive
   NODE_VERSION: "8"
+  ARTIFACT_NAME: "${CI_PROJECT_NAME}.${CI_PIPELINE_ID}.${CI_COMMIT_SHA}"
 
 #
 # test stage tasks
@@ -13,7 +14,7 @@ test_project:
   stage: test
   before_script:
     - . envcfg
-    - npm i
+    - npm install
   script:
     - npm run lint
     - npm run test
@@ -24,13 +25,47 @@ test_project:
 #
 build_project:
   stage: build
-#  variables:
-#  artifacts:
-#    name: "$CI_PROJECT_NAMESPACE_$CI_PROJECT_NAME-$CI_PIPELINE_ID"
-#    paths:
-#      - ./
+  artifacts:
+    name: "${ARTIFACT_NAME}"
+    when: on_success
+    paths:
+      - ./
   before_script:
     - . envcfg
-    - npm i
+    - npm install
   script:
-    - npm run build
+    - NODE_ENV="production" npm run build
+  after_script:
+    - rm -rf .git
+
+#
+# deploy stage tasks
+#
+#deploy_feature:
+#  stage: deploy
+#  only:
+#    - /^feature\/.*$/
+#    - merge-requests
+#  when: manual
+#  environment:
+#    name: ${CI_COMMIT_REF_NAME}
+##    on_stop: stop_feature
+#  dependencies:
+#    - build_project
+#  script:
+#    - ssh ${REMOTE_FEATURE_USER}@${REMOTE_FEATURE_HOST} "pmci prepare ${CI_COMMIT_REF_SLUG}"
+#    - rsync -az . "${REMOTE_FEATURE_USER}@${REMOTE_FEATURE_HOST}:~/tmp/deployments/${CI_COMMIT_REF_SLUG}"
+#    - ssh ${REMOTE_FEATURE_USER}@${REMOTE_FEATURE_HOST} "webctl deploy ${CI_COMMIT_REF_SLUG}"
+#    - ssh ${REMOTE_FEATURE_USER}@${REMOTE_FEATURE_HOST} "webctl start ${CI_COMMIT_REF_SLUG}"
+
+#stop_deploy_feature:
+#  stage: deploy
+#  only:
+#    - /^feature\/.*$/
+#    - merge-requests
+#  when: manual
+#  environment:
+#    name: ${CI_COMMIT_REF_NAME}
+#    action: stop
+#  script:
+#    -

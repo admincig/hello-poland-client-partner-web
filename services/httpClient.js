@@ -8,13 +8,20 @@ import {
 } from 'redux/profile';
 
 const {
+  // errorLogInterceptor,
   errorInterceptor,
   JWTHTTPUnauthorizedInterceptor,
   JWTInterceptor,
+  // responseLogInterceptor,
+  // requestLogInterceptor,
 } = interceptors;
 
 
 const requestInterceptors = [
+  // {
+  //   reject: errorLogInterceptor('[Request Error]'),
+  //   resolve: requestLogInterceptor,
+  // },
   {
     redux: {
       selectors: profileSelectors,
@@ -25,6 +32,10 @@ const requestInterceptors = [
 ];
 
 const responseInterceptors = [
+  // {
+  //   reject: errorLogInterceptor('[Response Error]'),
+  //   resolve: responseLogInterceptor,
+  // },
   {
     redux: {
       actions: profileActions,

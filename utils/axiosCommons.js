@@ -140,6 +140,7 @@ const responseLogInterceptor = (response) => {
 async function JWTHTTPUnauthorizedInterceptor(response) {
   const { config, response: { status } } = response;
 
+
   if (status !== 401) {
     return errorInterceptor(response);
   }
@@ -147,6 +148,7 @@ async function JWTHTTPUnauthorizedInterceptor(response) {
   const { store, redux: { actions, selectors } } = response;
   const state = store.getState();
   const credentials = selectors.getCredentials(state);
+
 
   if (!credentials) {
     return errorInterceptor(response);
@@ -185,6 +187,7 @@ async function JWTHTTPUnauthorizedInterceptor(response) {
     return errorLogInterceptor(`[HTTPClient] - ${status} - Session expired.`)(error);
   }
 
+
   return axios(sanitizeSchema({
     ...config,
     headers: {
@@ -208,12 +211,14 @@ function JWTInterceptor(request) {
 
   const credentials = selectors.getCredentials(state);
 
+
   if (!credentials) {
     return sanitizeSchema(request);
   }
 
   const { accessToken, refreshToken } = credentials;
   const token = url === '/auth/refresh' ? refreshToken : accessToken;
+
 
   return {
     ..._cloneDeep(sanitizeSchema(request)),
