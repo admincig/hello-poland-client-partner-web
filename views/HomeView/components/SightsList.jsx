@@ -313,7 +313,7 @@ class SightsList extends Component {
                           </IconButton>
                           <IconButton
                             aria-label="Usuń wydarzenie"
-                            onClick={() => this.handleSightEventDelete(sightId)}
+                            onClick={() => this.handleSightEventDelete(sightEvent.id)}
                             title="Usuń wydarzenie"
                           >
                             <DeleteIcon />
