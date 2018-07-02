@@ -1,5 +1,6 @@
 import { createLogic } from 'redux-logic';
 import _find from 'lodash/find';
+import { actions as sightEventsActions } from './sightEvents';
 
 const debounceTime = 500;
 
@@ -270,6 +271,7 @@ const createItemLogic = createLogic({
       if (status === 200 || status === 201) {
         dispatch(createItemSuccess(data));
         dispatch(fetchList());
+        dispatch(sightEventsActions.fetchList());
       } else {
         createItemFailure();
       }
