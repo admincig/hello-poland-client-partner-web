@@ -54,7 +54,7 @@ export const types = {
 const createItem = options => ({
   type: CREATE_ITEM,
   payload: {
-    url: '/sight-events/add',
+    url: '/sight-events',
     method: 'post',
     ...options,
   },
