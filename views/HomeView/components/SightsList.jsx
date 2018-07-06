@@ -243,6 +243,7 @@ class SightsList extends Component {
             data: {
               ...data,
               id: null, // remove when field id will be hidden
+              date: data.date && data.date.length ? data.date : null,
             },
           });
         }
