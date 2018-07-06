@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators, compose } from 'redux';
 import { connect } from 'react-redux';
+import _isEqual from 'lodash/isEqual';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -125,6 +126,24 @@ class SightsList extends Component {
     fetchSightEventsList();
   }
 
+  componentDidUpdate(prevProps) {
+    const { sight: prevSight, sightEvent: prevSightEvent } = prevProps;
+    const { sight, sightEvent } = this.props;
+
+    if (!_isEqual(prevSight, sight)) {
+      this.setFormFields(serializeFormSchema(sightSchema, {
+        ...sight,
+        generalAdmission: true,
+      }));
+    } else if (!_isEqual(prevSightEvent, sightEvent)) {
+      this.setFormFields(serializeFormSchema(sightEventSchema, {
+        ...sightEvent,
+        date: (new Date()).toISOString(),
+        mainImageUrl: IMG_URL,
+      }));
+    }
+  }
+
   setDefaultDialogProperties = () => this.setState({
     dialogProperties: {
       onSubmit: () => {},
@@ -132,6 +151,17 @@ class SightsList extends Component {
       title: '',
     },
   });
+
+  setFormFields = (formFields) => {
+    const { dialogProperties } = this.state;
+
+    this.setState({
+      dialogProperties: {
+        ...dialogProperties,
+        formFields,
+      },
+    });
+  };
 
   handleFormDialogClose = () => this.setState({ dialog: false });
 
@@ -304,9 +334,7 @@ class SightsList extends Component {
                           </IconButton>
                           <IconButton
                             aria-label="Edytuj wydarzenie"
-                            onClick={
-                            () => this.handleSightEventEdit(sightEvent)
-                          }
+                            onClick={() => this.handleSightEventEdit(sightEvent)}
                             title="Edytuj wydarzenie"
                           >
                             <CreateIcon />
