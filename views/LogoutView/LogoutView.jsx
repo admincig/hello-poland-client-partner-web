@@ -8,63 +8,58 @@ import {
   actions as profileActions,
   selectors as profileSelectors,
 } from 'redux/profile';
-import Layout from 'components/Layout';
-import SightsList from 'views/HomeView/components/SightsList';
 
-class HomeView extends Component {
+class LogoutView extends Component {
   componentDidMount() {
-    this.handleAuthRedirection();
+    this.handleLogout();
   }
-
-  componentDidUpdate() {
-    this.handleAuthRedirection();
-  }
-
-  handleAuthRedirection = () => {
-    const { assetPrefix, isAuthenticated } = this.props;
-
-    if (!isAuthenticated) {
-      Router.push(`${assetPrefix}/login`);
-    }
-  };
-
-  handleFetch = () => {
-    const { fetchProfile } = this.props;
-
-    fetchProfile();
-  };
 
   handleLogout = () => {
-    const { logout } = this.props;
+    const {
+      assetPrefix, credentials, logout, isAuthenticated,
+    } = this.props;
 
-    logout();
+    if (isAuthenticated) {
+      const { accessToken, refreshToken } = credentials;
+      const data = {
+        accessToken,
+        refreshToken,
+      };
+
+      logout({ data });
+    }
+
+    Router.push(`${assetPrefix}/`);
   };
 
   render() {
-    return (
-      <Layout>
-        <SightsList />
-      </Layout>
-    );
+    return <div />;
   }
 }
 
-HomeView.propTypes = {
+LogoutView.propTypes = {
   assetPrefix: PropTypes.string.isRequired,
-  fetchProfile: PropTypes.func.isRequired,
+  credentials: PropTypes.shape({
+    accessToken: PropTypes.string.isRequired,
+    refreshToken: PropTypes.string.isRequired,
+  }),
   isAuthenticated: PropTypes.bool.isRequired,
   logout: PropTypes.func.isRequired,
 };
 
+LogoutView.defaultProps = {
+  credentials: {},
+};
+
 const mapStateToProps = state => ({
+  credentials: profileSelectors.getCredentials(state),
   assetPrefix: configSelectors.getAppConfig(state).public.assetPrefix || '',
   isAuthenticated: profileSelectors.isAuthenticated(state),
 });
 
 const mapDispatchToProps = dispatch =>
   bindActionCreators({
-    fetchProfile: profileActions.fetchProfile,
     logout: profileActions.logout,
   }, dispatch);
 
-export default compose(connect(mapStateToProps, mapDispatchToProps))(HomeView);
+export default compose(connect(mapStateToProps, mapDispatchToProps))(LogoutView);

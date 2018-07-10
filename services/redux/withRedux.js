@@ -3,6 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect, Provider } from 'react-redux';
 import createInitializedStore from './store';
+import { withLocalStorageProfile } from './profileSubscriber';
 
 const __NEXT_REDUX_STORE__ = '__NEXT_REDUX_STORE__';
 
@@ -40,7 +41,7 @@ const getOrCreateStore = (storeInitializer, initialState) => {
 
   // Persist store in global variables if invoked on client side
   if (!window[__NEXT_REDUX_STORE__]) {
-    window[__NEXT_REDUX_STORE__] = storeInitializer(initialState);
+    window[__NEXT_REDUX_STORE__] = storeInitializer(withLocalStorageProfile(initialState));
   }
 
   return window[__NEXT_REDUX_STORE__];
@@ -58,8 +59,6 @@ export default (...connectArgs) => (Component) => {
       ? store
       : getOrCreateStore(createInitializedStore, initialState);
 
-    // Wrap component using redux Provider with store
-    // Create connected page with initialProps
     return React.createElement(
       Provider,
       { store: reduxStore },
