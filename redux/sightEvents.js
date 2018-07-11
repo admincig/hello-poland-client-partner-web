@@ -290,9 +290,7 @@ const fetchListLogic = createLogic({
   latest: true,
   async process({ action: { payload }, httpClient, cancelled$ }, dispatch, done) {
     try {
-      console.log('sightEvents - fetchListLogic top');
       const { data, status } = await httpClient.cancellable(payload, cancelled$);
-      console.log('sightEvents - fetchListLogic middle', data);
 
       if (status === 200) {
         dispatch(fetchListSuccess(data));

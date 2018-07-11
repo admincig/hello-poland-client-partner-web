@@ -132,20 +132,25 @@ const responseLogInterceptor = (response) => {
   return sanitizeSchema(response);
 };
 
-/**
- * Handles unauthorized responses.
- *
- * @method
- * @param {Object} axiosResponse - axios config schema
- * @return {Promise<Error> || Object}
- */
-
 let refreshTokenRequestPromise = null;
 
+/**
+ * Clears refreshTokenRequestPromise to prevent side effects.
+ *
+ * @method
+ */
 function clearTokenRequest() {
   refreshTokenRequestPromise = null;
 }
 
+/**
+ * Creates promise from refresh token request.
+ *
+ * @method
+ * @param {Object} axiosConfig - axios config schema
+ * @param {Object} payload - request payload
+ * @return {Promise<*>}
+ */
 async function refreshTokenRequest(axiosConfig, payload) {
   if (refreshTokenRequestPromise) {
     return refreshTokenRequestPromise;
@@ -157,8 +162,14 @@ async function refreshTokenRequest(axiosConfig, payload) {
   return refreshTokenRequestPromise;
 }
 
+/**
+ * Handles unauthorized responses.
+ *
+ * @method
+ * @param {Object} axiosResponse - axios config schema
+ * @return {Promise<Error> || Object}
+ */
 async function JWTHTTPUnauthorizedInterceptor(axiosResponse) {
-  console.log('JWTHTTPUnauthorizedInterceptor', axiosResponse);
   const { config, response } = axiosResponse;
   const { status } = response || {};
 

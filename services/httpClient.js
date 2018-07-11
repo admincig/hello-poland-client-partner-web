@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { compose } from 'redux';
-import _debounce from 'lodash/debounce';
 import { cancellableRequest, interceptors, withRedux } from 'utils/axiosCommons';
 import { selectors as configSelectors } from 'redux/config';
 import {
