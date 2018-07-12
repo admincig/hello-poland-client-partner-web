@@ -8,12 +8,12 @@ import {
 } from 'redux/profile';
 
 const {
-  errorLogInterceptor,
+  // errorLogInterceptor,
   errorInterceptor,
   JWTHTTPUnauthorizedInterceptor,
   JWTInterceptor,
-  responseLogInterceptor,
-  requestLogInterceptor,
+  // responseLogInterceptor,
+  // requestLogInterceptor,
 } = interceptors;
 
 
@@ -25,10 +25,10 @@ const requestInterceptors = [
     reject: errorInterceptor,
     resolve: JWTInterceptor,
   },
-  {
-    reject: errorLogInterceptor('[Request Error]'),
-    resolve: requestLogInterceptor,
-  },
+  // {
+  //   reject: errorLogInterceptor('[Request Error]'),
+  //   resolve: requestLogInterceptor,
+  // },
 ];
 
 const responseInterceptors = [
@@ -43,10 +43,10 @@ const responseInterceptors = [
     reject: JWTHTTPUnauthorizedInterceptor,
     resolve: response => response,
   },
-  {
-    reject: errorLogInterceptor('[Response Error]'),
-    resolve: responseLogInterceptor,
-  },
+  // {
+  //   reject: errorLogInterceptor('[Response Error]'),
+  //   resolve: responseLogInterceptor,
+  // },
 ];
 
 /*
