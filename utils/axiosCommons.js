@@ -244,7 +244,6 @@ function JWTInterceptor(axiosRequest) {
 
   const credentials = selectors.getCredentials(state);
 
-
   if (!credentials) {
     return sanitizeSchema(axiosRequest);
   }
