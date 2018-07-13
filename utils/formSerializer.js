@@ -36,8 +36,6 @@ export function normalizeValue(key, data, value) {
  */
 export const serialize = (schema, data, path = '') => {
   if (!isArray(schema)) {
-    // console.error('Serialization failed. Schema is not an array. Returning fallback value');
-
     return {};
   }
 
@@ -90,18 +88,13 @@ export const serialize = (schema, data, path = '') => {
 
 export const deserialize = (series) => {
   if (!isObject(series)) {
-    // console.error(`Deserialization failed. Argument is not an plain object.
-    //  Returning fallback value`);
-
     return {};
   }
 
   return Object.entries(series).reduce((acc, [key, value], idx) => {
-    console.log('>', idx, key, value, acc);
     if (key.indexOf('.') !== -1) {
       const keys = key.split('.');
       const localKey = keys.shift();
-      console.log('.>', idx, localKey, value, 'n>', keys.join('.'));
 
       let localValue = {};
 
@@ -109,6 +102,7 @@ export const deserialize = (series) => {
         let serializedKey = keys.shift();
         let nextPath = keys.join('.');
         let localValues = [];
+        const isDeeper = !!nextPath.length;
 
         serializedKey = serializedKey.substring(0, serializedKey.indexOf('['));
 
@@ -117,26 +111,29 @@ export const deserialize = (series) => {
         }
 
         if (acc[localKey] && acc[localKey][serializedKey]) {
-          console.log('//>', acc[localKey]);
           localValues = acc[localKey][serializedKey];
         }
 
-        console.log('/>', serializedKey, localValues, nextPath);
-        console.log('des', deserialize({ [nextPath]: value }));
+        let deserializedData = null;
+
+        if (isDeeper) {
+          deserializedData = [deserialize({ [nextPath]: value })];
+        } else {
+          deserializedData = [...Object.values(deserialize({ [nextPath]: value }))];
+        }
+
         localValue = {
           [serializedKey]: [
             ...localValues,
-            ...Object.values(deserialize({ [nextPath]: value })),
+            ...deserializedData,
           ],
         };
       } else {
         const nextPath = keys.join('.');
 
-        console.log('\\>', localKey, value, 'n>', nextPath);
         localValue = deserialize({ [nextPath]: value });
       }
 
-      console.log(':>', localValue);
       return {
         ...acc,
         [localKey]: {
@@ -154,7 +151,6 @@ export const deserialize = (series) => {
         localValues = acc[localKey];
       }
 
-      // console.log('[>', idx, localKey, value);
       return {
         ...acc,
         [localKey]: [
