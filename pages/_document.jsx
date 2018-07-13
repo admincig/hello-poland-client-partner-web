@@ -1,8 +1,7 @@
 import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
 import Document, { Head, Main, NextScript } from 'next/document';
-import JssProvider from 'react-jss/lib/JssProvider';
 import flush from 'styled-jsx/server';
-import getPageContext from 'src/getPageContext';
 import config from 'config';
 
 class MyDocument extends Document {
@@ -19,18 +18,12 @@ class MyDocument extends Document {
           <meta
             name="viewport"
             content={
-              'user-scalable=0, initial-scale=1, ' +
-              'minimum-scale=1, width=device-width, height=device-height'
-            }
+            'user-scalable=0, initial-scale=1, ' +
+            'minimum-scale=1, width=device-width, height=device-height'
+          }
           />
           <link rel="manifest" href="/static/manifest.json" />
           <meta name="theme-color" content={pageContext.theme.palette.primary.main} />
-          <link rel="preconnect" href="https://fonts.gstatic.com/" />
-          <link
-            rel="preload"
-            as="style"
-            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"
-          />
           <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"
@@ -49,34 +42,45 @@ MyDocument.getInitialProps = (ctx) => {
   // Resolution order
   //
   // On the server:
-  // 1. page.getInitialProps
-  // 2. document.getInitialProps
-  // 3. page.render
-  // 4. document.render
+  // 1. app.getInitialProps
+  // 2. page.getInitialProps
+  // 3. document.getInitialProps
+  // 4. app.render
+  // 5. page.render
+  // 6. document.render
   //
   // On the server with error:
-  // 2. document.getInitialProps
+  // 1. document.getInitialProps
+  // 2. app.render
   // 3. page.render
   // 4. document.render
   //
   // On the client
-  // 1. page.getInitialProps
-  // 3. page.render
+  // 1. app.getInitialProps
+  // 2. page.getInitialProps
+  // 3. app.render
+  // 4. page.render
 
-  // Get the context of the page to collected side effects.
-  const pageContext = getPageContext();
-  const page = ctx.renderPage(Component => props => (
-    <JssProvider
-      registry={pageContext.sheetsRegistry}
-      generateClassName={pageContext.generateClassName}
-    >
-      <Component pageContext={pageContext} {...props} />
-    </JssProvider>
-  ));
+  // Render app and page and get the context of the page with collected side effects.
+  let pageContext;
+  const page = ctx.renderPage((Component) => {
+    const WrappedComponent = (props) => {
+      // eslint-disable-next-line prefer-destructuring
+      pageContext = props.pageContext;
+      return <Component {...props} />;
+    };
+
+    WrappedComponent.propTypes = {
+      pageContext: PropTypes.shape({}).isRequired,
+    };
+
+    return WrappedComponent;
+  });
 
   return {
     ...page,
     pageContext,
+    // Styles fragment is rendered after the app and page rendering finish.
     styles: (
       <Fragment>
         <style
