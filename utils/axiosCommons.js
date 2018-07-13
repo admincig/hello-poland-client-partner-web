@@ -9,26 +9,28 @@ import _cloneDeep from 'lodash/cloneDeep';
  * Adds support for cancelable requests.
  *
  * @method
- * @param httpClient - axios instance
- * @return { function(*, *=): *}
+ * @param options - axios payload options
+ * @param cancelled$ - cancelled$ observable from redux-logic
+ * @return { Promise }
  */
-export const createCancellableRequest = httpClient => (options, cancelled$) => {
+export function cancellableRequest(options, cancelled$) {
   if (!cancelled$) {
     // eslint-disable-next-line no-console
     console.error('Missing cancelled$ argument');
   }
 
-  const source = axios.CancelToken.source(); // axios.CancelToken
+  const source = axios.CancelToken.source();
 
   cancelled$.subscribe(() => {
     source.cancel();
   });
 
-  return httpClient({
+  return this({
     cancelToken: source.token,
     ...options,
   });
-};
+}
+
 
 /**
  * Removes custom keys from axios config schema.
@@ -130,28 +132,59 @@ const responseLogInterceptor = (response) => {
   return sanitizeSchema(response);
 };
 
+let refreshTokenRequestPromise = null;
+
+/**
+ * Clears refreshTokenRequestPromise to prevent side effects.
+ *
+ * @method
+ */
+function clearTokenRequest() {
+  refreshTokenRequestPromise = null;
+}
+
+/**
+ * Creates promise from refresh token request.
+ *
+ * @method
+ * @param {Object} axiosConfig - axios config schema
+ * @param {Object} payload - request payload
+ * @return {Promise<*>}
+ */
+async function refreshTokenRequest(axiosConfig, payload) {
+  if (refreshTokenRequestPromise) {
+    return refreshTokenRequestPromise;
+  }
+
+  const ax = axios.create(axiosConfig);
+  refreshTokenRequestPromise = ax(payload);
+
+  return refreshTokenRequestPromise;
+}
+
 /**
  * Handles unauthorized responses.
  *
  * @method
- * @param {Object} response - axios config schema
+ * @param {Object} axiosResponse - axios config schema
  * @return {Promise<Error> || Object}
  */
-async function JWTHTTPUnauthorizedInterceptor(response) {
-  const { config, response: { status } } = response;
+async function JWTHTTPUnauthorizedInterceptor(axiosResponse) {
+  const { config, response } = axiosResponse;
+  const { status } = response || {};
 
 
   if (status !== 401) {
-    return errorInterceptor(response);
+    return errorInterceptor(axiosResponse);
   }
 
-  const { store, redux: { actions, selectors } } = response;
+  const { store, redux: { actions, selectors } } = axiosResponse;
   const state = store.getState();
   const credentials = selectors.getCredentials(state);
 
 
   if (!credentials) {
-    return errorInterceptor(response);
+    return errorInterceptor(axiosResponse);
   }
 
   const { accessToken, refreshToken } = credentials;
@@ -170,8 +203,7 @@ async function JWTHTTPUnauthorizedInterceptor(response) {
   let nextAccessToken;
 
   try {
-    const ax = axios.create(axiosConfig);
-    const { data } = await ax(payload);
+    const { data } = await refreshTokenRequest(axiosConfig, payload);
 
     store.dispatch(actions.refreshAccessTokenSuccess({
       accessToken: data.accessToken,
@@ -185,8 +217,9 @@ async function JWTHTTPUnauthorizedInterceptor(response) {
     store.dispatch(actions.errorUnauthorized({ data }));
 
     return errorLogInterceptor(`[HTTPClient] - ${status} - Session expired.`)(error);
+  } finally {
+    clearTokenRequest();
   }
-
 
   return axios(sanitizeSchema({
     ...config,
@@ -201,27 +234,26 @@ async function JWTHTTPUnauthorizedInterceptor(response) {
  * Adds JWT Authorization header.
  *
  * @method
- * @param request - axios config schema
+ * @param axiosRequest - axios config schema
  * @return {Object} - updated axios config schema
  */
-function JWTInterceptor(request) {
-  const { redux, store, url } = request;
+function JWTInterceptor(axiosRequest) {
+  const { redux, store, url } = axiosRequest;
   const state = store.getState();
   const { selectors } = redux;
 
   const credentials = selectors.getCredentials(state);
 
-
   if (!credentials) {
-    return sanitizeSchema(request);
+    return sanitizeSchema(axiosRequest);
   }
 
   const { accessToken, refreshToken } = credentials;
-  const token = url === '/auth/refresh' ? refreshToken : accessToken;
+  const token = url.indexOf('refresh') !== -1 ? refreshToken : accessToken;
 
 
   return {
-    ..._cloneDeep(sanitizeSchema(request)),
+    ..._cloneDeep(sanitizeSchema(axiosRequest)),
     headers: {
       authorization: `Bearer ${token}`,
     },

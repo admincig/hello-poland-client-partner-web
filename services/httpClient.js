@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { compose } from 'redux';
-import { createCancellableRequest, interceptors, withRedux } from 'utils/axiosCommons';
+import { cancellableRequest, interceptors, withRedux } from 'utils/axiosCommons';
 import { selectors as configSelectors } from 'redux/config';
 import {
   actions as profileActions,
@@ -18,10 +18,6 @@ const {
 
 
 const requestInterceptors = [
-  // {
-  //   reject: errorLogInterceptor('[Request Error]'),
-  //   resolve: requestLogInterceptor,
-  // },
   {
     redux: {
       selectors: profileSelectors,
@@ -29,13 +25,13 @@ const requestInterceptors = [
     reject: errorInterceptor,
     resolve: JWTInterceptor,
   },
+  // {
+  //   reject: errorLogInterceptor('[Request Error]'),
+  //   resolve: requestLogInterceptor,
+  // },
 ];
 
 const responseInterceptors = [
-  // {
-  //   reject: errorLogInterceptor('[Response Error]'),
-  //   resolve: responseLogInterceptor,
-  // },
   {
     redux: {
       actions: profileActions,
@@ -47,6 +43,10 @@ const responseInterceptors = [
     reject: JWTHTTPUnauthorizedInterceptor,
     resolve: response => response,
   },
+  // {
+  //   reject: errorLogInterceptor('[Response Error]'),
+  //   resolve: responseLogInterceptor,
+  // },
 ];
 
 /*
@@ -65,7 +65,7 @@ export default function createHTTPClient(store) {
   });
 
   // Add request cancellation capabilities (not part of Axios API)
-  instance.cancellable = createCancellableRequest(instance);
+  instance.cancellable = cancellableRequest;
 
   // Initialize interceptors
   if (responseInterceptors.length) {

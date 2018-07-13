@@ -1,5 +1,6 @@
 const express = require('express');
 const next = require('next');
+const helmet = require('helmet');
 const routes = require('./routes');
 const proxyMiddleware = require('./proxy');
 
@@ -17,6 +18,8 @@ app
   .prepare()
   .then(() => {
     server = express();
+
+    server.use(helmet());
 
     // Proxy API requests to resolve problem with CORS
     if (dev) {

@@ -181,3 +181,23 @@ First two keys are mandatory.
      },
     ];   
     ```
+## Modifying `next.config.js`
+
+### Adding new plugins
+
+Example:
+
+```diff
+const withPlugins = require('next-compose-plugins');
+const bundleAnalyzer = require('@zeit/next-bundle-analyzer');
++ const css = require('@zeit/next-css');
+
+...
+
+module.exports = withPlugins([
+  [bundleAnalyzer, bundleAnalyzerConfig],
++ [css],
+  nextConfig,
+]);
+
+```
