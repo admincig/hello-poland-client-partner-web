@@ -144,6 +144,16 @@ class SightsList extends Component {
     }
   }
 
+  getFormattedDate = (date) => {
+    if (date == null) {
+      return null;
+    }
+
+    const d = new Date(date);
+
+    return `${d.toLocaleDateString()} ${d.toLocaleTimeString().substr(0, 5)}`;
+  };
+
   setDefaultDialogProperties = () => this.setState({
     dialogProperties: {
       onSubmit: () => {},
@@ -316,6 +326,7 @@ class SightsList extends Component {
                         </ListItemIcon>
                         <ListItemText
                           primary={sightEvent.name}
+                          secondary={this.getFormattedDate(sightEvent.date)}
                         />
                         <ListItemSecondaryAction>
                           <IconButton
