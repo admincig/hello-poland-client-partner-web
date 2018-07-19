@@ -30,7 +30,7 @@ import populate from '../../../utils/form-generator/data/populate';
 import serialize from '../../../utils/form-generator/data/serialize';
 import SwitchLabel from '../../../components/SwitchLabel';
 
-const IMG_URL = 'https://i.kinja-img.com/gawker-media/image/upload/t_original/wsgtilb9ibbxysybe3mu.png';
+// const IMG_URL = 'https://i.kinja-img.com/gawker-media/image/upload/t_original/wsgtilb9ibbxysybe3mu.png';
 
 const locationSchema = {
   key: 'location',
@@ -159,80 +159,80 @@ const sightSchema = [
   },
 ];
 
-const sightEventSchema = [
-  {
-    component: TextField,
-    key: 'id',
-    props: {
-      type: 'hidden',
-    },
-  },
-  {
-    component: TextField,
-    key: 'sightId',
-    props: {
-      type: 'hidden',
-    },
-  },
-  {
-    component: TextField,
-    key: 'name',
-    props: {
-      fullWidth: true,
-      label: 'Nazwa wydarzenia',
-      margin: 'normal',
-    },
-  },
-  {
-    component: SwitchLabel,
-    key: 'generalAdmission',
-    value: true,
-    props: {
-      label: 'Dodaj jako wydarzenie ogólne',
-    },
-  },
-  {
-    component: TextField,
-    key: 'lead',
-    props: {
-      fullWidth: true,
-      label: 'Zajawka',
-      margin: 'normal',
-    },
-  },
-  {
-    component: TextField,
-    key: 'description',
-    props: {
-      fullWidth: true,
-      label: 'Opis wydarzenia',
-      multiline: true,
-      rows: 4,
-      margin: 'normal',
-    },
-  },
-  {
-    component: TextField,
-    key: 'email',
-    props: {
-      fullWidth: true,
-      label: 'Adres e-mail',
-      margin: 'normal',
-    },
-  },
-  {
-    component: TextField,
-    key: 'phone',
-    props: {
-      fullWidth: true,
-      label: 'Numer telefonu',
-      margin: 'normal',
-    },
-  },
-  // {
-  //   ...locationSchema,
-  // },
-];
+// const sightEventSchema = [
+//   {
+//     component: TextField,
+//     key: 'id',
+//     props: {
+//       type: 'hidden',
+//     },
+//   },
+//   {
+//     component: TextField,
+//     key: 'sightId',
+//     props: {
+//       type: 'hidden',
+//     },
+//   },
+//   {
+//     component: TextField,
+//     key: 'name',
+//     props: {
+//       fullWidth: true,
+//       label: 'Nazwa wydarzenia',
+//       margin: 'normal',
+//     },
+//   },
+//   {
+//     component: SwitchLabel,
+//     key: 'generalAdmission',
+//     value: true,
+//     props: {
+//       label: 'Dodaj jako wydarzenie ogólne',
+//     },
+//   },
+//   {
+//     component: TextField,
+//     key: 'lead',
+//     props: {
+//       fullWidth: true,
+//       label: 'Zajawka',
+//       margin: 'normal',
+//     },
+//   },
+//   {
+//     component: TextField,
+//     key: 'description',
+//     props: {
+//       fullWidth: true,
+//       label: 'Opis wydarzenia',
+//       multiline: true,
+//       rows: 4,
+//       margin: 'normal',
+//     },
+//   },
+//   {
+//     component: TextField,
+//     key: 'email',
+//     props: {
+//       fullWidth: true,
+//       label: 'Adres e-mail',
+//       margin: 'normal',
+//     },
+//   },
+//   {
+//     component: TextField,
+//     key: 'phone',
+//     props: {
+//       fullWidth: true,
+//       label: 'Numer telefonu',
+//       margin: 'normal',
+//     },
+//   },
+//   {
+//     ...locationSchema,
+//   },
+// ];
 
 class SightsList extends Component {
   state = {
@@ -241,6 +241,13 @@ class SightsList extends Component {
     schema: null,
     title: null,
   };
+
+  componentDidMount() {
+    const { fetchSightsList, fetchSightEventsList } = this.props;
+
+    fetchSightsList();
+    fetchSightEventsList();
+  }
 
   setDefaultDialogProperties = () => this.setState({
     formData: null,
@@ -255,9 +262,9 @@ class SightsList extends Component {
     ...props,
   });
 
-  handleSightDelete = (sightId) => {
-
-  };
+  // handleSightDelete = (sightId) => {
+  //
+  // };
 
   handleSightEdit = (sight = {}) => {
     // const { createSight, updateSight, fetchSight } = this.props;
@@ -273,13 +280,13 @@ class SightsList extends Component {
     });
   };
 
-  handleSightEventDelete = (sightEventId) => {
+  // handleSightEventDelete = (sightEventId) => {
+  //
+  // };
 
-  };
-
-  handleSightEventEdit = (sightEvent = {}) => {
-
-  };
+  // handleSightEventEdit = (sightEvent = {}) => {
+  //
+  // };
 
   handleFormChange = name => (event, value) => {
     const { formData } = this.state;
@@ -297,7 +304,9 @@ class SightsList extends Component {
 
   render() {
     const { sightEventsList, sightsList } = this.props;
-    const { dialog, formData, schema, title } = this.state;
+    const {
+      dialog, formData, schema, title,
+    } = this.state;
 
     return (
       <Fragment>
@@ -416,25 +425,25 @@ class SightsList extends Component {
 }
 
 SightsList.propTypes = {
-  createSight: PropTypes.func.isRequired,
-  createSightEvent: PropTypes.func.isRequired,
-  deleteSight: PropTypes.func.isRequired,
-  deleteSightEvent: PropTypes.func.isRequired,
-  fetchSight: PropTypes.func.isRequired,
-  fetchSightEvent: PropTypes.func.isRequired,
+  // createSight: PropTypes.func.isRequired,
+  // createSightEvent: PropTypes.func.isRequired,
+  // deleteSight: PropTypes.func.isRequired,
+  // deleteSightEvent: PropTypes.func.isRequired,
+  // fetchSight: PropTypes.func.isRequired,
+  // fetchSightEvent: PropTypes.func.isRequired,
   fetchSightsList: PropTypes.func.isRequired,
   fetchSightEventsList: PropTypes.func.isRequired,
-  sight: PropTypes.shape({}),
-  sightEvent: PropTypes.shape({}),
+  // sight: PropTypes.shape({}),
+  // sightEvent: PropTypes.shape({}),
   sightsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   sightEventsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  updateSight: PropTypes.func.isRequired,
-  updateSightEvent: PropTypes.func.isRequired,
+  // updateSight: PropTypes.func.isRequired,
+  // updateSightEvent: PropTypes.func.isRequired,
 };
 
 SightsList.defaultProps = {
-  sight: null,
-  sightEvent: null,
+  // sight: null,
+  // sightEvent: null,
 };
 
 const mapStateToProps = state => ({
