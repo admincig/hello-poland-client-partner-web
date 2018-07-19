@@ -11,18 +11,19 @@ import Typography from '@material-ui/core/Typography';
 import FormGenerator from '../../utils/form-generator';
 
 const FormDialog = ({
-  onChange, onClose, onSubmit, schema, title, ...rest
+  data, onChange, onClose, onSubmit, schema, title, ...rest
 }) => (
   <Dialog onClose={onClose} aria-labelledby="form-dialog-title" {...rest}>
     <DialogTitle id="form-dialog-title">{title}</DialogTitle>
     <DialogContent>
       {schema &&
         <FormGenerator
+          data={data}
           onChange={onChange}
           renderGroup={({ children, item }) => (
             <FormControl key={item.key} component="fieldset" fullWidth>
               <FormLabel component="legend">
-                <Typography variant="headline" style={{ marginTop: 40 }}>{item.label}</Typography>
+                <Typography variant="title" style={{ marginTop: 40 }}>{item.label}</Typography>
               </FormLabel>
               {children}
             </FormControl>
@@ -39,6 +40,7 @@ const FormDialog = ({
 );
 
 FormDialog.propTypes = {
+  data: PropTypes.shape({}),
   onChange: PropTypes.func.isRequired,
   onClose: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
@@ -47,6 +49,7 @@ FormDialog.propTypes = {
 };
 
 FormDialog.defaultProps = {
+  data: {},
   onClose: () => {},
   schema: null,
   title: null,

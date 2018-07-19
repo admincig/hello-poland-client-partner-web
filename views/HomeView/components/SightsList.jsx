@@ -10,8 +10,6 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
 import AddIcon from '@material-ui/icons/Add';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -28,7 +26,9 @@ import {
 } from 'redux/sightEvents';
 import FormDialog from 'components/FormDialog';
 import { EmptyResultsMessage } from 'components/ViewMessage';
+import populate from '../../../utils/form-generator/data/populate';
 import serialize from '../../../utils/form-generator/data/serialize';
+import SwitchLabel from '../../../components/SwitchLabel';
 
 const IMG_URL = 'https://i.kinja-img.com/gawker-media/image/upload/t_original/wsgtilb9ibbxysybe3mu.png';
 
@@ -74,20 +74,20 @@ const locationSchema = {
         margin: 'normal',
       },
     },
-    {
-      component: TextField,
-      key: 'latitude',
-      props: {
-        type: 'hidden',
-      },
-    },
-    {
-      component: TextField,
-      key: 'longitude',
-      props: {
-        type: 'hidden',
-      },
-    },
+    // {
+    //   component: TextField,
+    //   key: 'latitude',
+    //   props: {
+    //     type: 'hidden',
+    //   },
+    // },
+    // {
+    //   component: TextField,
+    //   key: 'longitude',
+    //   props: {
+    //     type: 'hidden',
+    //   },
+    // },
   ],
 };
 
@@ -109,17 +109,11 @@ const sightSchema = [
     },
   },
   {
-    component: props => (
-      <FormControlLabel
-        control={<Switch value="generalAdmission" />}
-        {...props}
-      />
-    ),
+    component: SwitchLabel,
     key: 'generalAdmission',
+    value: true,
     props: {
-      checked: true,
       label: 'Dodaj wydarzenie ogólne',
-      margin: 'normal',
     },
   },
   {
@@ -190,17 +184,11 @@ const sightEventSchema = [
     },
   },
   {
-    component: props => (
-      <FormControlLabel
-        control={<Switch value="generalAdmission" />}
-        {...props}
-      />
-    ),
+    component: SwitchLabel,
     key: 'generalAdmission',
+    value: true,
     props: {
-      checked: true,
-      label: 'Dodaj wydarzenie ogólne',
-      margin: 'normal',
+      label: 'Dodaj jako wydarzenie ogólne',
     },
   },
   {
@@ -241,9 +229,9 @@ const sightEventSchema = [
       margin: 'normal',
     },
   },
-  {
-    ...locationSchema,
-  },
+  // {
+  //   ...locationSchema,
+  // },
 ];
 
 class SightsList extends Component {
@@ -273,11 +261,13 @@ class SightsList extends Component {
 
   handleSightEdit = (sight = {}) => {
     // const { createSight, updateSight, fetchSight } = this.props;
-    const title = Number.isInteger(sight.id) ? 'Edytuj atrakcję' : 'Dodaj atrakcję';
+    const isPersisted = Number.isInteger(sight.id);
+    const title = isPersisted ? 'Edytuj atrakcję' : 'Dodaj atrakcję';
     const serializedData = serialize(sightSchema);
+    const formData = populate(serializedData, sight);
 
     this.handleFormDialogOpen({
-      formData: serializedData,
+      formData,
       schema: sightSchema,
       title,
     });
@@ -307,7 +297,7 @@ class SightsList extends Component {
 
   render() {
     const { sightEventsList, sightsList } = this.props;
-    const { dialog, schema, title } = this.state;
+    const { dialog, formData, schema, title } = this.state;
 
     return (
       <Fragment>
@@ -409,6 +399,7 @@ class SightsList extends Component {
           <EmptyResultsMessage message="Brak elementów do wyświetlenia" />
         }
         <FormDialog
+          data={formData}
           disableBackdropClick
           onChange={this.handleFormChange}
           onClose={this.handleFormDialogClose}

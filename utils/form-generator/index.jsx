@@ -4,7 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import isArray from './utils/isArray';
 
 class FormGenerator extends Component {
-  getComponentsFromSchema = (schema, keyPath = '') => {
+  getComponentsFromSchema = (schema, data, keyPath = '') => {
     const { onChange, renderGroup } = this.props;
 
     return schema.map((item) => {
@@ -13,31 +13,34 @@ class FormGenerator extends Component {
       } = item;
 
       const keyName = keyPath.length ? `${keyPath}.${key}` : key;
-      let FormContent = null;
-
 
       if (isArray(itemSchema) && itemSchema.length) {
-        const children = this.getComponentsFromSchema(itemSchema, keyName);
+        const children = this.getComponentsFromSchema(itemSchema, data, keyName);
 
-        FormContent = () => renderGroup({ children, item });
-      } else {
-        FormContent = () => (
-          <FormComponent
-            key={keyName}
-            onChange={onChange(keyName)}
-            value={value !== null ? value : ''}
-            {...props}
-          />
-        );
+        return renderGroup({ children, item });
       }
 
-      return <FormContent key={key} />;
+      let componentValue = value !== null ? value : '';
+
+      if (data[keyName] != null) {
+        componentValue = data[keyName];
+      }
+
+      return (
+        <FormComponent
+          key={keyName}
+          name={keyName}
+          onChange={onChange(keyName)}
+          value={componentValue}
+          {...props}
+        />
+      );
     });
   };
 
   render() {
     const {
-      onChange, renderGroup, schema, ...rest
+      data, onChange, renderGroup, schema, ...rest
     } = this.props;
 
     if (!isArray(schema) || !schema.length) {
@@ -46,13 +49,14 @@ class FormGenerator extends Component {
 
     return (
       <Grid container {...rest}>
-        {this.getComponentsFromSchema(schema)}
+        {this.getComponentsFromSchema(schema, data)}
       </Grid>
     );
   }
 }
 
 FormGenerator.propTypes = {
+  data: PropTypes.shape({}),
   onChange: PropTypes.func.isRequired,
   renderGroup: PropTypes.func,
   schema: PropTypes.arrayOf(PropTypes.shape({
@@ -60,7 +64,7 @@ FormGenerator.propTypes = {
       PropTypes.element,
       PropTypes.func,
     ]),
-    key: PropTypes.string.isRequired,
+    key: PropTypes.string,
     props: PropTypes.shape({}),
     type: PropTypes.string,
     value: PropTypes.oneOfType([
@@ -72,6 +76,7 @@ FormGenerator.propTypes = {
 };
 
 FormGenerator.defaultProps = {
+  data: {},
   renderGroup: () => {},
 };
 
