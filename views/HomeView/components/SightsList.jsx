@@ -2,6 +2,8 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators, compose } from 'redux';
 import { connect } from 'react-redux';
+import { withStyles } from '@material-ui/core/styles';
+import _isEqual from 'lodash/isEqual';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -123,6 +125,8 @@ const sightSchema = [
       fullWidth: true,
       label: 'Zajawka',
       margin: 'normal',
+      multiline: true,
+      rowsMax: 3,
     },
   },
   {
@@ -131,9 +135,9 @@ const sightSchema = [
     props: {
       fullWidth: true,
       label: 'Opis atrakcji',
-      multiline: true,
-      rows: 4,
       margin: 'normal',
+      multiline: true,
+      rowsMax: 20,
     },
   },
   {
@@ -159,84 +163,93 @@ const sightSchema = [
   },
 ];
 
-// const sightEventSchema = [
-//   {
-//     component: TextField,
-//     key: 'id',
-//     props: {
-//       type: 'hidden',
-//     },
-//   },
-//   {
-//     component: TextField,
-//     key: 'sightId',
-//     props: {
-//       type: 'hidden',
-//     },
-//   },
-//   {
-//     component: TextField,
-//     key: 'name',
-//     props: {
-//       fullWidth: true,
-//       label: 'Nazwa wydarzenia',
-//       margin: 'normal',
-//     },
-//   },
-//   {
-//     component: SwitchLabel,
-//     key: 'generalAdmission',
-//     value: true,
-//     props: {
-//       label: 'Dodaj jako wydarzenie ogólne',
-//     },
-//   },
-//   {
-//     component: TextField,
-//     key: 'lead',
-//     props: {
-//       fullWidth: true,
-//       label: 'Zajawka',
-//       margin: 'normal',
-//     },
-//   },
-//   {
-//     component: TextField,
-//     key: 'description',
-//     props: {
-//       fullWidth: true,
-//       label: 'Opis wydarzenia',
-//       multiline: true,
-//       rows: 4,
-//       margin: 'normal',
-//     },
-//   },
-//   {
-//     component: TextField,
-//     key: 'email',
-//     props: {
-//       fullWidth: true,
-//       label: 'Adres e-mail',
-//       margin: 'normal',
-//     },
-//   },
-//   {
-//     component: TextField,
-//     key: 'phone',
-//     props: {
-//       fullWidth: true,
-//       label: 'Numer telefonu',
-//       margin: 'normal',
-//     },
-//   },
-//   {
-//     ...locationSchema,
-//   },
-// ];
+const sightEventSchema = [
+  {
+    component: TextField,
+    key: 'id',
+    props: {
+      type: 'hidden',
+    },
+  },
+  {
+    component: TextField,
+    key: 'sightId',
+    props: {
+      type: 'hidden',
+    },
+  },
+  {
+    component: TextField,
+    key: 'name',
+    props: {
+      fullWidth: true,
+      label: 'Nazwa wydarzenia',
+      margin: 'normal',
+    },
+  },
+  {
+    component: SwitchLabel,
+    key: 'generalAdmission',
+    value: false,
+    props: {
+      label: 'Dodaj jako wydarzenie ogólne',
+    },
+  },
+  {
+    component: TextField,
+    key: 'lead',
+    props: {
+      fullWidth: true,
+      label: 'Zajawka',
+      margin: 'normal',
+      multiline: true,
+      rowsMax: 3,
+    },
+  },
+  {
+    component: TextField,
+    key: 'description',
+    props: {
+      fullWidth: true,
+      label: 'Opis wydarzenia',
+      margin: 'normal',
+      multiline: true,
+      rowsMax: 20,
+    },
+  },
+  {
+    component: TextField,
+    key: 'email',
+    props: {
+      fullWidth: true,
+      label: 'Adres e-mail',
+      margin: 'normal',
+    },
+  },
+  {
+    component: TextField,
+    key: 'phone',
+    props: {
+      fullWidth: true,
+      label: 'Numer telefonu',
+      margin: 'normal',
+    },
+  },
+  {
+    ...locationSchema,
+  },
+];
+
+const styles = theme => ({
+  generalAdmission: {
+    color: theme.palette.primary.light,
+  },
+});
 
 class SightsList extends Component {
   state = {
     dialog: false,
+    formConfig: null,
     formData: null,
     schema: null,
     title: null,
@@ -249,49 +262,107 @@ class SightsList extends Component {
     fetchSightEventsList();
   }
 
+  componentDidUpdate(prevProps) {
+    const { sight: prevSight, sightEvent: prevSightEvent } = prevProps;
+    const { sight, sightEvent } = this.props;
+    const { dialog } = this.state;
+
+    if (dialog) {
+      if (!_isEqual(prevSight, sight)) {
+        this.updateFormData(sightSchema, sight);
+      } else if (!_isEqual(prevSightEvent, sightEvent)) {
+        this.updateFormData(sight);
+      }
+    }
+  }
+
   setDefaultDialogProperties = () => this.setState({
     formData: null,
+    formConfig: null,
     schema: null,
     title: null,
   });
 
   handleFormDialogClose = () => this.setState({ dialog: false });
 
-  handleFormDialogOpen = ({ ...props }) => this.setState({
-    dialog: true,
-    ...props,
-  });
+  handleFormDialogOpen = ({
+    data, formConfig, schema, title,
+  }) => {
+    const serializedData = serialize(schema);
+    const formData = populate(serializedData, data);
 
-  // handleSightDelete = (sightId) => {
-  //
-  // };
+    this.setState({
+      dialog: true,
+      formConfig,
+      formData,
+      schema,
+      title,
+    });
+  };
 
-  handleSightEdit = (sight = {}) => {
-    // const { createSight, updateSight, fetchSight } = this.props;
-    const isPersisted = Number.isInteger(sight.id);
+  handleSightDelete = (sightId) => {
+    const { deleteSight } = this.props;
+
+    if (Number.isInteger(sightId)) {
+      deleteSight(sightId);
+    }
+  };
+
+  handleSightEdit = (data = {}) => {
+    const { createSight, updateSight, fetchSight } = this.props;
+    const isPersisted = Number.isInteger(data.id);
     const title = isPersisted ? 'Edytuj atrakcję' : 'Dodaj atrakcję';
-    const serializedData = serialize(sightSchema);
-    const formData = populate(serializedData, sight);
+    const formConfig = {
+      action: createSight,
+    };
+
+    if (isPersisted) {
+      formConfig.action = updateSight;
+
+      fetchSight(data.id);
+    }
 
     this.handleFormDialogOpen({
-      formData,
+      data,
+      formConfig,
       schema: sightSchema,
       title,
     });
   };
 
-  // handleSightEventDelete = (sightEventId) => {
-  //
-  // };
+  handleSightEventDelete = (sightEventId) => {
+    const { deleteSightEvent } = this.props;
 
-  // handleSightEventEdit = (sightEvent = {}) => {
-  //
-  // };
+    if (Number.isInteger(sightEventId)) {
+      deleteSightEvent(sightEventId);
+    }
+  };
+
+  handleSightEventEdit = (data = {}) => {
+    const { createSightEvent, updateSightEvent, fetchSightEvent } = this.props;
+    const isPersisted = Number.isInteger(data.id);
+    const title = isPersisted ? 'Edytuj wydarzenie' : 'Dodaj wydarzenie';
+    const formConfig = {
+      action: createSightEvent,
+    };
+
+    if (isPersisted) {
+      formConfig.action = updateSightEvent;
+
+      fetchSightEvent(data.id);
+    }
+
+    this.handleFormDialogOpen({
+      data,
+      formConfig,
+      schema: sightEventSchema,
+      title,
+    });
+  };
 
   handleFormChange = name => (event, value) => {
     const { formData } = this.state;
 
-    console.log(name, event.target.value, value);
     this.setState({
       formData: {
         ...formData,
@@ -300,10 +371,30 @@ class SightsList extends Component {
     });
   };
 
-  handleFormSubmit = () => console.log('submiting...');
+  handleFormSubmit = () => {
+    const { formConfig, formData: data } = this.state;
+    const { action } = formConfig || {};
+
+    if (action) {
+      if (Number.isInteger(data.id)) {
+        action(data.id, { data });
+      } else {
+        action({ data });
+      }
+
+      this.handleFormDialogClose();
+    }
+  };
+
+  updateFormData = (schema, data) => {
+    const serializedData = serialize(schema);
+    const formData = populate(serializedData, data);
+
+    this.setState({ formData });
+  };
 
   render() {
-    const { sightEventsList, sightsList } = this.props;
+    const { classes, sightEventsList, sightsList } = this.props;
     const {
       dialog, formData, schema, title,
     } = this.state;
@@ -361,7 +452,9 @@ class SightsList extends Component {
                     .filter(item => item.sightId === sightId)
                     .map(sightEvent => (
                       <ListItem key={`sightEvent-${sightEvent.id}`}>
-                        <ListItemIcon>
+                        <ListItemIcon
+                          className={sightEvent.generalAdmission ? classes.generalAdmission : ''}
+                        >
                           <EventIcon />
                         </ListItemIcon>
                         <ListItemText
@@ -425,25 +518,26 @@ class SightsList extends Component {
 }
 
 SightsList.propTypes = {
-  // createSight: PropTypes.func.isRequired,
-  // createSightEvent: PropTypes.func.isRequired,
-  // deleteSight: PropTypes.func.isRequired,
-  // deleteSightEvent: PropTypes.func.isRequired,
-  // fetchSight: PropTypes.func.isRequired,
-  // fetchSightEvent: PropTypes.func.isRequired,
+  classes: PropTypes.shape({}).isRequired,
+  createSight: PropTypes.func.isRequired,
+  createSightEvent: PropTypes.func.isRequired,
+  deleteSight: PropTypes.func.isRequired,
+  deleteSightEvent: PropTypes.func.isRequired,
+  fetchSight: PropTypes.func.isRequired,
+  fetchSightEvent: PropTypes.func.isRequired,
   fetchSightsList: PropTypes.func.isRequired,
   fetchSightEventsList: PropTypes.func.isRequired,
-  // sight: PropTypes.shape({}),
-  // sightEvent: PropTypes.shape({}),
+  sight: PropTypes.shape({}),
+  sightEvent: PropTypes.shape({}),
   sightsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   sightEventsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  // updateSight: PropTypes.func.isRequired,
-  // updateSightEvent: PropTypes.func.isRequired,
+  updateSight: PropTypes.func.isRequired,
+  updateSightEvent: PropTypes.func.isRequired,
 };
 
 SightsList.defaultProps = {
-  // sight: null,
-  // sightEvent: null,
+  sight: null,
+  sightEvent: null,
 };
 
 const mapStateToProps = state => ({
@@ -467,4 +561,7 @@ const mapDispatchToProps = dispatch =>
     updateSightEvent: sightEventActions.updateItem,
   }, dispatch);
 
-export default compose(connect(mapStateToProps, mapDispatchToProps))(SightsList);
+export default compose(
+  withStyles(styles),
+  connect(mapStateToProps, mapDispatchToProps),
+)(SightsList);
