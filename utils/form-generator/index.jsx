@@ -1,9 +1,17 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import _isEqual from 'lodash/isEqual';
 import Grid from '@material-ui/core/Grid';
 import isArray from './utils/isArray';
 
 class FormGenerator extends Component {
+  shouldComponentUpdate(nextProps) {
+    const isDataDirty = !_isEqual(nextProps.data, this.props.data);
+    const isSchemaDirty = !_isEqual(nextProps.schema, this.props.schema);
+
+    return isDataDirty || isSchemaDirty;
+  }
+
   getComponentsFromSchema = (schema, data, keyPath = '') => {
     const { onChange, renderGroup } = this.props;
 
@@ -20,7 +28,7 @@ class FormGenerator extends Component {
         return renderGroup({ children, item });
       }
 
-      let componentValue = value !== null ? value : '';
+      let componentValue = value != null ? value : '';
 
       if (data[keyName] != null) {
         componentValue = data[keyName];

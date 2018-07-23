@@ -271,7 +271,7 @@ class SightsList extends Component {
       if (!_isEqual(prevSight, sight)) {
         this.updateFormData(sightSchema, sight);
       } else if (!_isEqual(prevSightEvent, sightEvent)) {
-        this.updateFormData(sight);
+        this.updateFormData(sightEventSchema, sightEvent);
       }
     }
   }
