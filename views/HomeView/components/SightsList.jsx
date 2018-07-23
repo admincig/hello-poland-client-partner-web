@@ -29,6 +29,7 @@ import {
 import FormDialog from 'components/FormDialog';
 import { EmptyResultsMessage } from 'components/ViewMessage';
 import populate from '../../../utils/form-generator/data/populate';
+import deserialize from '../../../utils/form-generator/data/deserialize';
 import serialize from '../../../utils/form-generator/data/serialize';
 import SwitchLabel from '../../../components/SwitchLabel';
 
@@ -372,8 +373,9 @@ class SightsList extends Component {
   };
 
   handleFormSubmit = () => {
-    const { formConfig, formData: data } = this.state;
+    const { formConfig, formData } = this.state;
     const { action } = formConfig || {};
+    const data = deserialize(formData);
 
     if (action) {
       if (Number.isInteger(data.id)) {
