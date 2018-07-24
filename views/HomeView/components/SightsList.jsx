@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators, compose } from 'redux';
 import { connect } from 'react-redux';
+import { withStyles } from '@material-ui/core/styles';
 import _isEqual from 'lodash/isEqual';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -10,6 +11,7 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -26,97 +28,232 @@ import {
 } from 'redux/sightEvents';
 import FormDialog from 'components/FormDialog';
 import { EmptyResultsMessage } from 'components/ViewMessage';
+import populate from '../../../utils/form-generator/data/populate';
+import deserialize from '../../../utils/form-generator/data/deserialize';
+import serialize from '../../../utils/form-generator/data/serialize';
+import SwitchLabel from '../../../components/SwitchLabel';
 
-const IMG_URL = 'https://i.kinja-img.com/gawker-media/image/upload/t_original/wsgtilb9ibbxysybe3mu.png';
+// const IMG_URL = 'https://i.kinja-img.com/gawker-media/image/upload/t_original/wsgtilb9ibbxysybe3mu.png';
 
-const sightSchema = {
-  description: '',
-  email: '',
-  generalAdmission: true,
-  id: null,
-  lead: '',
-  location: {
-    city: '',
-    country: '',
-    latitude: null,
-    longitude: null,
-    street: '',
-    zipCode: '',
-  },
-  name: '',
-  phone: '',
+const locationSchema = {
+  key: 'location',
+  type: 'Collection',
+  label: 'Lokalizacja',
+  schema: [
+    {
+      component: TextField,
+      key: 'street',
+      props: {
+        fullWidth: true,
+        label: 'Ulica',
+        margin: 'normal',
+      },
+    },
+    {
+      component: TextField,
+      key: 'zipCode',
+      props: {
+        fullWidth: true,
+        label: 'Kod pocztowy',
+        margin: 'normal',
+      },
+    },
+    {
+      component: TextField,
+      key: 'city',
+      props: {
+        fullWidth: true,
+        label: 'Miasto',
+        margin: 'normal',
+      },
+    },
+    {
+      component: TextField,
+      key: 'country',
+      value: 'Polska',
+      props: {
+        fullWidth: true,
+        label: 'Kraj',
+        margin: 'normal',
+      },
+    },
+    // {
+    //   component: TextField,
+    //   key: 'latitude',
+    //   props: {
+    //     type: 'hidden',
+    //   },
+    // },
+    // {
+    //   component: TextField,
+    //   key: 'longitude',
+    //   props: {
+    //     type: 'hidden',
+    //   },
+    // },
+  ],
 };
 
-const sightEventSchema = {
-  date: null,
-  description: '',
-  email: '',
-  id: null,
-  lead: '',
-  location: {
-    city: '',
-    country: '',
-    latitude: null,
-    longitude: null,
-    street: '',
-    zipCode: '',
+const sightSchema = [
+  {
+    component: TextField,
+    key: 'id',
+    props: {
+      type: 'hidden',
+    },
   },
-  mainImageUrl: '',
-  name: '',
-  phone: '',
-  sightId: null,
-};
+  {
+    component: TextField,
+    key: 'name',
+    props: {
+      fullWidth: true,
+      label: 'Nazwa atrakcji',
+      margin: 'normal',
+    },
+  },
+  {
+    component: SwitchLabel,
+    key: 'generalAdmission',
+    value: true,
+    props: {
+      label: 'Dodaj wydarzenie ogólne',
+    },
+  },
+  {
+    component: TextField,
+    key: 'lead',
+    props: {
+      fullWidth: true,
+      label: 'Zajawka',
+      margin: 'normal',
+      multiline: true,
+      rowsMax: 3,
+    },
+  },
+  {
+    component: TextField,
+    key: 'description',
+    props: {
+      fullWidth: true,
+      label: 'Opis atrakcji',
+      margin: 'normal',
+      multiline: true,
+      rowsMax: 20,
+    },
+  },
+  {
+    component: TextField,
+    key: 'email',
+    props: {
+      fullWidth: true,
+      label: 'Adres e-mail',
+      margin: 'normal',
+    },
+  },
+  {
+    component: TextField,
+    key: 'phone',
+    props: {
+      fullWidth: true,
+      label: 'Numer telefonu',
+      margin: 'normal',
+    },
+  },
+  {
+    ...locationSchema,
+  },
+];
 
-function serializeFormFields(formFields) {
-  return Object.entries(formFields).reduce((acc, [key, value]) => {
-    if (key.indexOf('.') !== -1) {
-      const keys = key.split('.');
-      const keyName = keys.shift();
-      const nextPath = keys.join('.');
+const sightEventSchema = [
+  {
+    component: TextField,
+    key: 'id',
+    props: {
+      type: 'hidden',
+    },
+  },
+  {
+    component: TextField,
+    key: 'sightId',
+    props: {
+      type: 'hidden',
+    },
+  },
+  {
+    component: TextField,
+    key: 'name',
+    props: {
+      fullWidth: true,
+      label: 'Nazwa wydarzenia',
+      margin: 'normal',
+    },
+  },
+  {
+    component: SwitchLabel,
+    key: 'generalAdmission',
+    value: false,
+    props: {
+      label: 'Dodaj jako wydarzenie ogólne',
+    },
+  },
+  {
+    component: TextField,
+    key: 'lead',
+    props: {
+      fullWidth: true,
+      label: 'Zajawka',
+      margin: 'normal',
+      multiline: true,
+      rowsMax: 3,
+    },
+  },
+  {
+    component: TextField,
+    key: 'description',
+    props: {
+      fullWidth: true,
+      label: 'Opis wydarzenia',
+      margin: 'normal',
+      multiline: true,
+      rowsMax: 20,
+    },
+  },
+  {
+    component: TextField,
+    key: 'email',
+    props: {
+      fullWidth: true,
+      label: 'Adres e-mail',
+      margin: 'normal',
+    },
+  },
+  {
+    component: TextField,
+    key: 'phone',
+    props: {
+      fullWidth: true,
+      label: 'Numer telefonu',
+      margin: 'normal',
+    },
+  },
+  {
+    ...locationSchema,
+  },
+];
 
-      return {
-        ...acc,
-        [keyName]: {
-          ...acc[keyName],
-          ...serializeFormFields({ [nextPath]: value }),
-        },
-      };
-    }
-
-    return {
-      ...acc,
-      [key]: value,
-    };
-  }, {});
-}
-
-function serializeFormSchema(schema, values, path = '') {
-  return Object.entries(schema).reduce((acc, [sKey, sValue]) => {
-    const key = path.length ? `${path}.${sKey}` : sKey;
-    const value = (values && values[sKey]) || null;
-
-    if (sValue && typeof sValue === 'object' && !Array.isArray(sValue)) {
-      return {
-        ...acc,
-        ...serializeFormSchema(sValue, value, key),
-      };
-    }
-
-    return {
-      ...acc,
-      [key]: value,
-    };
-  }, {});
-}
+const styles = theme => ({
+  generalAdmission: {
+    color: theme.palette.primary.light,
+  },
+});
 
 class SightsList extends Component {
   state = {
     dialog: false,
-    dialogProperties: {
-      onSubmit: () => {},
-      formFields: {},
-      title: '',
-    },
+    formConfig: null,
+    formData: null,
+    schema: null,
+    title: null,
   };
 
   componentDidMount() {
@@ -129,18 +266,14 @@ class SightsList extends Component {
   componentDidUpdate(prevProps) {
     const { sight: prevSight, sightEvent: prevSightEvent } = prevProps;
     const { sight, sightEvent } = this.props;
+    const { dialog } = this.state;
 
-    if (!_isEqual(prevSight, sight)) {
-      this.setFormFields(serializeFormSchema(sightSchema, {
-        ...sight,
-        generalAdmission: true,
-      }));
-    } else if (!_isEqual(prevSightEvent, sightEvent)) {
-      this.setFormFields(serializeFormSchema(sightEventSchema, {
-        ...sightEvent,
-        date: (new Date()).toISOString(),
-        mainImageUrl: IMG_URL,
-      }));
+    if (dialog) {
+      if (!_isEqual(prevSight, sight)) {
+        this.updateFormData(sightSchema, sight);
+      } else if (!_isEqual(prevSightEvent, sightEvent)) {
+        this.updateFormData(sightEventSchema, sightEvent);
+      }
     }
   }
 
@@ -155,30 +288,28 @@ class SightsList extends Component {
   };
 
   setDefaultDialogProperties = () => this.setState({
-    dialogProperties: {
-      onSubmit: () => {},
-      formFields: {},
-      title: '',
-    },
+    formData: null,
+    formConfig: null,
+    schema: null,
+    title: null,
   });
-
-  setFormFields = (formFields) => {
-    const { dialogProperties } = this.state;
-
-    this.setState({
-      dialogProperties: {
-        ...dialogProperties,
-        formFields,
-      },
-    });
-  };
 
   handleFormDialogClose = () => this.setState({ dialog: false });
 
-  handleFormDialogOpen = dialogProperties => this.setState({
-    dialog: true,
-    dialogProperties,
-  });
+  handleFormDialogOpen = ({
+    data, formConfig, schema, title,
+  }) => {
+    const serializedData = serialize(schema);
+    const formData = populate(serializedData, data);
+
+    this.setState({
+      dialog: true,
+      formConfig,
+      formData,
+      schema,
+      title,
+    });
+  };
 
   handleSightDelete = (sightId) => {
     const { deleteSight } = this.props;
@@ -188,33 +319,24 @@ class SightsList extends Component {
     }
   };
 
-  handleSightEdit = (sight = {}) => {
+  handleSightEdit = (data = {}) => {
     const { createSight, updateSight, fetchSight } = this.props;
-    const title = Number.isInteger(sight.id) ? 'Edytuj atrakcję' : 'Dodaj atrakcję';
+    const isPersisted = Number.isInteger(data.id);
+    const title = isPersisted ? 'Edytuj atrakcję' : 'Dodaj atrakcję';
+    const formConfig = {
+      action: createSight,
+    };
 
-    if (Number.isInteger(sight.id)) {
-      fetchSight(sight.id);
+    if (isPersisted) {
+      formConfig.action = updateSight;
+
+      fetchSight(data.id);
     }
 
     this.handleFormDialogOpen({
-      formFields: serializeFormSchema(sightSchema, { ...sight, generalAdmission: true }),
-      onSubmit: (serializedData) => {
-        const data = serializeFormFields(serializedData);
-        console.log('sight submit', data);
-
-        if (Number.isInteger(data.id)) {
-          updateSight(data.id, { data });
-        } else {
-          createSight({
-            data: {
-              ...data,
-              id: null, // remove when field id will be hidden
-            },
-          });
-        }
-
-        this.handleFormDialogClose();
-      },
+      data,
+      formConfig,
+      schema: sightSchema,
       title,
     });
   };
@@ -227,46 +349,67 @@ class SightsList extends Component {
     }
   };
 
-  handleSightEventEdit = (sightEvent = {}) => {
+  handleSightEventEdit = (data = {}) => {
     const { createSightEvent, updateSightEvent, fetchSightEvent } = this.props;
-    const title = sightEvent.id ? 'Edytuj wydarzenie' : 'Dodaj wydarzenie';
+    const isPersisted = Number.isInteger(data.id);
+    const title = isPersisted ? 'Edytuj wydarzenie' : 'Dodaj wydarzenie';
+    const formConfig = {
+      action: createSightEvent,
+    };
 
-    console.log(sightEvent);
-    if (Number.isInteger(sightEvent.id)) {
-      fetchSightEvent(sightEvent.id);
+    if (isPersisted) {
+      formConfig.action = updateSightEvent;
+
+      fetchSightEvent(data.id);
     }
 
     this.handleFormDialogOpen({
-      formFields: serializeFormSchema(sightEventSchema, {
-        ...sightEvent,
-        date: (new Date()).toISOString(),
-        mainImageUrl: IMG_URL,
-      }),
-      onSubmit: (serializedData) => {
-        const data = serializeFormFields(serializedData);
-        console.log('sightEvent submit', data);
-
-        if (Number.isInteger(data.id)) {
-          updateSightEvent(data.id, { data });
-        } else {
-          createSightEvent({
-            data: {
-              ...data,
-              id: null, // remove when field id will be hidden
-              date: data.date && data.date.length ? data.date : null,
-            },
-          });
-        }
-
-        this.handleFormDialogClose();
-      },
+      data,
+      formConfig,
+      schema: sightEventSchema,
       title,
     });
   };
 
+  handleFormChange = name => (event, value) => {
+    const { formData } = this.state;
+
+    this.setState({
+      formData: {
+        ...formData,
+        [name]: value !== undefined ? value : event.target.value,
+      },
+    });
+  };
+
+  handleFormSubmit = () => {
+    const { formConfig, formData } = this.state;
+    const { action } = formConfig || {};
+    const data = deserialize(formData);
+
+    if (action) {
+      if (Number.isInteger(data.id)) {
+        action(data.id, { data });
+      } else {
+        action({ data });
+      }
+
+      this.handleFormDialogClose();
+    }
+  };
+
+  updateFormData = (schema, data) => {
+    const serializedData = serialize(schema);
+    const formData = populate(serializedData, data);
+
+    this.setState({ formData });
+  };
+
   render() {
-    const { sightEventsList, sightsList } = this.props;
-    const { dialog, dialogProperties } = this.state;
+    const { classes, sightEventsList, sightsList } = this.props;
+    const {
+      dialog, formData, schema, title,
+    } = this.state;
 
     return (
       <Fragment>
@@ -321,7 +464,9 @@ class SightsList extends Component {
                     .filter(item => item.sightId === sightId)
                     .map(sightEvent => (
                       <ListItem key={`sightEvent-${sightEvent.id}`}>
-                        <ListItemIcon>
+                        <ListItemIcon
+                          className={sightEvent.generalAdmission ? classes.generalAdmission : ''}
+                        >
                           <EventIcon />
                         </ListItemIcon>
                         <ListItemText
@@ -369,18 +514,24 @@ class SightsList extends Component {
           <EmptyResultsMessage message="Brak elementów do wyświetlenia" />
         }
         <FormDialog
+          data={formData}
           disableBackdropClick
+          onChange={this.handleFormChange}
           onClose={this.handleFormDialogClose}
           onExited={this.setDefaultDialogProperties}
+          onSubmit={this.handleFormSubmit}
           open={dialog}
-          {...dialogProperties}
+          schema={schema}
+          title={title}
         />
+
       </Fragment>
     );
   }
 }
 
 SightsList.propTypes = {
+  classes: PropTypes.shape({}).isRequired,
   createSight: PropTypes.func.isRequired,
   createSightEvent: PropTypes.func.isRequired,
   deleteSight: PropTypes.func.isRequired,
@@ -423,4 +574,7 @@ const mapDispatchToProps = dispatch =>
     updateSightEvent: sightEventActions.updateItem,
   }, dispatch);
 
-export default compose(connect(mapStateToProps, mapDispatchToProps))(SightsList);
+export default compose(
+  withStyles(styles),
+  connect(mapStateToProps, mapDispatchToProps),
+)(SightsList);
