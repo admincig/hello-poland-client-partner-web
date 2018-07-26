@@ -62,7 +62,7 @@
     "dev": "node ./server/server.js",
     "lint": "eslint . --ext .js,.jsx --ignore-path .gitignore --cache",
     "lint-fix": "npm run lint -- --fix",
-    "start": "NODE_ENV=production node ./server/server.js",
+    "start": "cross-env NODE_ENV=production node ./server/server.js",
     "test": "jest",
     "test-watch": "npm test -- --watch"
   }
