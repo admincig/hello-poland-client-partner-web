@@ -148,7 +148,7 @@ First two keys are mandatory.
     import {
       actions as profileActions,
       selectors as profileSelectors,
-    } from 'redux/profile';
+    } from '@hello-poland/commons/lib/redux/profile';
  
     const {
      errorInterceptor,

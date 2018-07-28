@@ -21,11 +21,11 @@ import PlaceIcon from '@material-ui/icons/Place';
 import {
   actions as sightsActions,
   selectors as sightsSelectors,
-} from 'redux/sights';
+} from '@hello-poland/commons/lib/redux/sights';
 import {
   actions as sightEventActions,
   selectors as sightEventSelectors,
-} from 'redux/sightEvents';
+} from '@hello-poland/commons/lib/redux/sightEvents';
 import FormDialog from 'components/FormDialog';
 import { EmptyResultsMessage } from 'components/ViewMessage';
 import populate from '../../../utils/form-generator/data/populate';
@@ -389,9 +389,9 @@ class SightsList extends Component {
 
     if (action) {
       if (Number.isInteger(data.id)) {
-        action(data.id, { data });
+        action(data.id, data);
       } else {
-        action({ data });
+        action(data);
       }
 
       this.handleFormDialogClose();
@@ -460,7 +460,7 @@ class SightsList extends Component {
                   </ListItemSecondaryAction>
                 </ListItem>
                 <List style={{ marginLeft: 55 }}>
-                  {sightEventsList
+                  {sightEventsList && sightEventsList
                     .filter(item => item.sightId === sightId)
                     .map(sightEvent => (
                       <ListItem key={`sightEvent-${sightEvent.id}`}>
@@ -542,8 +542,8 @@ SightsList.propTypes = {
   fetchSightEventsList: PropTypes.func.isRequired,
   sight: PropTypes.shape({}),
   sightEvent: PropTypes.shape({}),
-  sightsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  sightEventsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  sightsList: PropTypes.arrayOf(PropTypes.shape({})),
+  sightEventsList: PropTypes.arrayOf(PropTypes.shape({})),
   updateSight: PropTypes.func.isRequired,
   updateSightEvent: PropTypes.func.isRequired,
 };
@@ -551,6 +551,8 @@ SightsList.propTypes = {
 SightsList.defaultProps = {
   sight: null,
   sightEvent: null,
+  sightEventsList: null,
+  sightsList: null,
 };
 
 const mapStateToProps = state => ({
