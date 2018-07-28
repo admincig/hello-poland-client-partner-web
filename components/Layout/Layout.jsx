@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Router from 'next/router';
 import { selectors as viewSelectors } from 'redux/view';
-import { selectors as profileSelectors } from 'redux/profile';
+import { selectors as profileSelectors } from '@hello-poland/commons/lib/redux/profile';
 import Header from './Header';
 
 const Layout = ({

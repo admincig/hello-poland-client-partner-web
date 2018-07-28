@@ -156,8 +156,12 @@ async function refreshTokenRequest(axiosConfig, payload) {
     return refreshTokenRequestPromise;
   }
 
-  const ax = axios.create(axiosConfig);
-  refreshTokenRequestPromise = ax(payload);
+  const config = {
+    ...axiosConfig,
+    ...payload,
+  };
+
+  refreshTokenRequestPromise = axios(config);
 
   return refreshTokenRequestPromise;
 }
@@ -188,15 +192,15 @@ async function JWTHTTPUnauthorizedInterceptor(axiosResponse) {
   }
 
   const { accessToken, refreshToken } = credentials;
-  const { payload } = actions.refreshAccessToken({
-    data: {
-      accessToken,
-      refreshToken,
-    },
-    headers: {
-      authorization: `Bearer ${refreshToken}`,
-    },
-  });
+  const reqData = {
+    accessToken,
+    refreshToken,
+  };
+  const headers = {
+    authorization: `Bearer ${refreshToken}`,
+  };
+
+  const { payload } = actions.refreshAccessToken(reqData, { headers });
 
   const appConfig = selectors.getAppConfig(state);
   const { axios: axiosConfig } = appConfig.public;
