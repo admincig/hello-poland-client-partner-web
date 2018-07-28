@@ -1,4 +1,7 @@
-import { types as profileTypes } from 'redux/profile';
+import {
+  actions as profileActions,
+  types as profileTypes,
+} from '@hello-poland/commons/lib/redux/profile';
 
 const LS_KEY = 'profile';
 
@@ -26,18 +29,18 @@ export default store => () => {
   }
 };
 
-export const withLocalStorageProfile = (initialState) => {
+export const withLocalStorageProfile = ({ dispatch }) => {
   if (window) {
     const ls = window.localStorage;
-    const profile = ls.getItem(LS_KEY);
+    const lsProfile = ls.getItem(LS_KEY);
 
-    if (profile) {
-      return {
-        ...initialState,
-        profile: JSON.parse(profile),
-      };
+    if (lsProfile) {
+      const { loginSuccess } = profileActions;
+      const { credentials, isAuthenticated } = JSON.parse(lsProfile);
+
+      if (isAuthenticated) {
+        dispatch(loginSuccess(credentials));
+      }
     }
   }
-
-  return initialState;
 };

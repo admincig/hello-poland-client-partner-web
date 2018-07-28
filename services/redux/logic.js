@@ -1,7 +1,7 @@
 import { logic as configLogic } from 'redux/config';
-import { logic as profileLogic } from 'redux/profile';
-import { logic as sightsLogic } from 'redux/sights';
-import { logic as sightEventsLogic } from 'redux/sightEvents';
+import { logic as profileLogic } from '@hello-poland/commons/lib/redux/profile';
+import { logic as sightsLogic } from '@hello-poland/commons/lib/redux/sights';
+import { logic as sightEventsLogic } from '@hello-poland/commons/lib/redux/sightEvents';
 import { logic as viewLogic } from 'redux/view';
 
 export default Object.values({

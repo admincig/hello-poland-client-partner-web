@@ -7,7 +7,7 @@ import { selectors as configSelectors } from 'redux/config';
 import {
   actions as profileActions,
   selectors as profileSelectors,
-} from 'redux/profile';
+} from '@hello-poland/commons/lib/redux/profile';
 
 class LogoutView extends Component {
   componentDidMount() {
@@ -26,10 +26,21 @@ class LogoutView extends Component {
         refreshToken,
       };
 
-      logout({ data });
+      logout(data);
     }
 
-    Router.push(`${assetPrefix}/`);
+    const { query: { redirect } } = Router;
+    let path = '';
+
+    if (redirect) {
+      path = redirect;
+    }
+
+    if (path.startsWith('/')) {
+      path = path.substring(1, path.length);
+    }
+
+    Router.push(`${assetPrefix}/${path}`);
   };
 
   render() {

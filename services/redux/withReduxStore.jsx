@@ -2,7 +2,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import initializeStore from './store';
-import { withLocalStorageProfile } from './profileSubscriber';
 
 const isServer = typeof window === 'undefined';
 const __NEXT_REDUX_STORE__ = '__NEXT_REDUX_STORE__';
@@ -15,8 +14,9 @@ function getOrCreateStore(initialState) {
 
   // Create store if unavailable on the client and set it on the window object
   if (!window[__NEXT_REDUX_STORE__]) {
-    window[__NEXT_REDUX_STORE__] = initializeStore(withLocalStorageProfile(initialState));
+    window[__NEXT_REDUX_STORE__] = initializeStore(initialState);
   }
+
   return window[__NEXT_REDUX_STORE__];
 }
 
