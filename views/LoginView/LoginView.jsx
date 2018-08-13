@@ -14,7 +14,7 @@ import { selectors as configSelectors } from 'redux/config';
 import {
   actions as profileActions,
   selectors as profileSelectors,
-} from '@hello-poland/commons/lib/redux/profile';
+} from '@hello-poland/commons/redux/profile';
 import Layout from 'components/Layout';
 
 const styles = theme => ({

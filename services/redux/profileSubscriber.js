@@ -1,7 +1,7 @@
 import {
   actions as profileActions,
   types as profileTypes,
-} from '@hello-poland/commons/lib/redux/profile';
+} from '@hello-poland/commons/redux/profile';
 
 const LS_KEY = 'profile';
 

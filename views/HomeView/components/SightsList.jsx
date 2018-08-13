@@ -21,11 +21,11 @@ import PlaceIcon from '@material-ui/icons/Place';
 import {
   actions as sightsActions,
   selectors as sightsSelectors,
-} from '@hello-poland/commons/lib/redux/sights';
+} from '@hello-poland/commons/redux/sights';
 import {
   actions as sightEventActions,
   selectors as sightEventSelectors,
-} from '@hello-poland/commons/lib/redux/sightEvents';
+} from '@hello-poland/commons/redux/sightEvents';
 import FormDialog from 'components/FormDialog';
 import { EmptyResultsMessage } from 'components/ViewMessage';
 import populate from '../../../utils/form-generator/data/populate';
