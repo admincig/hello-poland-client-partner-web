@@ -107,7 +107,7 @@ By default we use [axios](https://github.com/axios/axios) for request handling. 
 - `axios-commons`, which provides common methods that can be used depending on project requirements
 - httpClient, which configures axios instance
 
-For detailed information on `axios-commons` see it's readme.
+For detailed information on `axios-commons` see it's readme.false
 
 ## Modifying `next.config.js`
 
