@@ -2,17 +2,27 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
+import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from '@material-ui/core/styles';
 import format from 'date-fns/format';
 import SwitchLabel from '../SwitchLabel';
 
 const styles = () => ({
-  dates: {
+  twoColumns: {
     display: 'flex',
     justifyContent: 'space-between',
     width: '100%',
   },
 });
+
+const frequencyTypes = {
+  CUSTOM: 'CUSTOM',
+  DAILY: 'DAILY',
+  MONTHLY: 'MONTHLY',
+  WEEKDAYS: 'WEEKDAYS',
+  WEEKENDS: 'WEEKENDS',
+  WEEKLY: 'WEEKLY',
+};
 
 class TicketPoolDefinitionForm extends React.Component {
   getParsedDate = date => format(date, 'YYYY-MM-DDTHH:mm');
@@ -31,15 +41,15 @@ class TicketPoolDefinitionForm extends React.Component {
       endDate,
       entryEndDate,
       entryStartDate,
-      frequencyData,
+      'frequencyData.frequency': frequency,
+      'frequencyData.frequencyType': frequencyType,
       id,
       name,
       sightEventId,
       startDate,
     } = data;
 
-    const { frequency } = frequencyData || {};
-
+    console.log('TicketPoolDefinitionForm', data);
     return (
       <Grid container>
         <TextField
@@ -65,7 +75,7 @@ class TicketPoolDefinitionForm extends React.Component {
           onChange={this.handleChange('name')}
           value={name == null ? '' : name}
         />
-        <div className={classes.dates}>
+        <div className={classes.twoColumns}>
           <TextField
             key="startDate"
             label="Od"
@@ -91,7 +101,7 @@ class TicketPoolDefinitionForm extends React.Component {
             }
           />
         </div>
-        <div className={classes.dates}>
+        <div className={classes.twoColumns}>
           <TextField
             key="entryStartDate"
             label="Wejście od"
@@ -129,23 +139,36 @@ class TicketPoolDefinitionForm extends React.Component {
         />
         <SwitchLabel
           key="isCyclic"
-          label="Pula cykliczna"
+          label="Powtarzalna"
           name="isCyclic"
           onChange={this.handleChange('isCyclic')}
           value={isCyclic}
         />
-        {isCyclic ?
-          <React.Fragment>
+        {frequencyType ?
+          <div className={classes.twoColumns}>
             <TextField
-              fullWidth
               key="frequencyData.frequency"
-              label="Liczba dostępnych biletów"
+              label="Powtarzaj co"
               name="frequencyData.frequency"
               onChange={this.handleChange('frequencyData.frequency')}
               type="number"
               value={frequency == null ? '' : frequency}
             />
-          </React.Fragment>
+            {/* <TextField */}
+            {/* select */}
+            {/* label="Powtarzanie" */}
+            {/* value={frequencyType} */}
+            {/* onChange={this.handleChange('currency')} */}
+            {/* helperText="Please select your currency" */}
+            {/* margin="normal" */}
+            {/* > */}
+            {/* {frequencyTypes.map(option => ( */}
+            {/* <MenuItem key={option.value} value={option.value}> */}
+            {/* {option.label}xxx */}
+            {/* </MenuItem> */}
+            {/* ))} */}
+            {/* </TextField> */}
+          </div>
           :
           null
         }
