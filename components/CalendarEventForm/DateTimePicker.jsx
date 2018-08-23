@@ -6,9 +6,10 @@ import TimePicker from 'material-ui-pickers/TimePicker';
 
 const styles = {
   datePicker: {
-    width: 120,
+    width: 85,
   },
   timePicker: {
+    marginLeft: 10,
     width: 40,
   },
 };

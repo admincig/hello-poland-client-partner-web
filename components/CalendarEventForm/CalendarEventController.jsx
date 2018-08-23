@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _cloneDeep from 'lodash/cloneDeep';
 import addMinutes from 'date-fns/addMinutes';
 import format from 'date-fns/format';
 import subMinutes from 'date-fns/subMinutes';
@@ -18,7 +19,7 @@ class CalendarEventController extends React.Component {
       sightEventId: null,
       startDate: initialDate,
     },
-    frequencyType: 'null',
+    frequencyType: 'NONE',
   };
 
   getValueFromEvent = (event, value) => {
@@ -38,7 +39,6 @@ class CalendarEventController extends React.Component {
   };
 
   handleChange = (key, value) => {
-    console.log(key, value);
     this.setState({ [key]: value });
   };
 
@@ -49,6 +49,31 @@ class CalendarEventController extends React.Component {
     this.handleChange('formData', {
       ...formData,
       [fieldName]: fieldValue,
+    });
+  };
+
+  handleFrequencyDataChange = (frequencyData, frequencyType) => {
+    const { formData, frequencyType: stateFrequencyType } = this.state;
+    const stateFrequencyData = _cloneDeep(formData.frequencyData || {});
+    const type = frequencyType || stateFrequencyType;
+
+    if (type !== 'WEEKLY' && stateFrequencyData.daysOfMonth) {
+      delete stateFrequencyData.daysOfMonth;
+    }
+
+    if (type !== 'YEARLY' && stateFrequencyData.monthsOfYear) {
+      delete stateFrequencyData.monthsOfYear;
+    }
+
+    this.setState({
+      formData: {
+        ...formData,
+        frequencyData: {
+          ...stateFrequencyData,
+          ...frequencyData,
+        },
+      },
+      frequencyType: type,
     });
   };
 
@@ -67,18 +92,25 @@ class CalendarEventController extends React.Component {
   render() {
     const { children } = this.props;
 
+    console.log('CalendarEventController state', this.state);
     return children({
       ...this.state,
       handleChange: this.handleChange,
       handleDateChange: this.handleDateChange,
       handleFormDataChange: this.handleFormDataChange,
+      handleFrequencyDataChange: this.handleFrequencyDataChange,
       handlePropFromEventChange: this.handlePropFromEventChange,
     });
   }
 }
 
 CalendarEventController.propTypes = {
+  formData: PropTypes.shape({}),
   children: PropTypes.func.isRequired,
+};
+
+CalendarEventController.defaultProps = {
+  formData: {},
 };
 
 export default CalendarEventController;
