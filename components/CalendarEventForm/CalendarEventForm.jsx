@@ -36,6 +36,37 @@ const frequencyTypes = [
   },
 ];
 
+const daysOfWeekDefinitions = [
+  {
+    label: 'PN',
+    value: 0,
+  },
+  {
+    label: 'WT',
+    value: 1,
+  },
+  {
+    label: 'ŚR',
+    value: 2,
+  },
+  {
+    label: 'CZ',
+    value: 3,
+  },
+  {
+    label: 'PT',
+    value: 4,
+  },
+  {
+    label: 'SO',
+    value: 5,
+  },
+  {
+    label: 'NI',
+    value: 6,
+  },
+];
+
 const basicFrequencies = [
   {
     frequencyData: null,
@@ -70,6 +101,7 @@ const basicFrequencies = [
   },
   {
     frequencyData: {
+      daysOfWeek: [],
       frequency: 1,
       frequencyType: 'DAILY',
     },
@@ -78,40 +110,41 @@ const basicFrequencies = [
   },
 ];
 
-// const basicFrequencyTypes = [null, ...Object.values(frequencyTypes)].map(type => {
-//   return {
-//     value: type,
-//     label:
-//   }
-// });
+const styles = theme => ({
+  columns: {
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+  frequencyCustomizer: {
+    marginTop: theme.spacing.unit * 3,
+  },
+  frequencyTextfield: {
+    marginLeft: theme.spacing.unit * 3,
+    marginRight: theme.spacing.unit * 2,
+    width: 50,
+  },
+  fullWidth: {
+    width: '100%',
+  },
+  inline: {
+    alignItems: 'center',
+    display: 'inline-flex',
+  },
+  vertical: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+});
 
-const styles = (theme) => {
-  console.log(theme); return ({
-    columns: {
-      display: 'flex',
-      justifyContent: 'space-between',
-    },
-    frequencyCustomizer: {
-      marginTop: theme.spacing.unit * 3,
-    },
-    frequencyTextfield: {
-      marginLeft: theme.spacing.unit * 3,
-      marginRight: theme.spacing.unit * 2,
-      width: 50,
-    },
-    fullWidth: {
-      width: '100%',
-    },
-    inline: {
-      alignItems: 'center',
-      display: 'inline-flex',
-    },
-    vertical: {
-      display: 'flex',
-      alignItems: 'center',
-    },
-  });
-};
+function getNormalizedDay(dateObj) {
+  const day = (new Date(dateObj)).getDay();
+
+  if (day === 0) {
+    return 6;
+  }
+
+  return day - 1;
+}
 
 class CalendarEventForm extends React.Component {
   handleBasicFrequencyChange = callback => (event) => {
@@ -121,24 +154,32 @@ class CalendarEventForm extends React.Component {
     callback(item.frequencyData, type);
   };
 
-  handleFrequencyPropChange = callback => (event) => {
+  handleFrequencyPropChange = (callback, startDate) => (event) => {
     const { name, value } = event.target;
-    console.log(name, value);
+    const frequencyData = {
+      [name]: value,
+    };
 
-    callback({ [name]: value });
+    if (value === 'WEEKLY') {
+      frequencyData.daysOfWeek = [
+        getNormalizedDay(startDate),
+      ];
+    }
+
+    callback(frequencyData);
   };
 
   isChecked = (data, element) => data && data.some(item => element === item);
 
   render() {
-    const { classes } = this.props;
+    const { classes, formData: initialFormData, onChange } = this.props;
 
     return (
-      <div style={{ margin: 40 }}>
-        <CalendarEventController>
+      <div>
+        <CalendarEventController formData={initialFormData} onChange={onChange}>
           {({
-              formData, frequencyType, handleDateChange, handlePropFromEventChange,
-              handleFormDataChange, handleFrequencyDataChange, isFullDay,
+              formData, frequencyType, handleDateChange, handleFormDataChange,
+              handleFrequencyDataChange, handleFrequencyItemChange, handleFullDayChange, isFullDay,
             }) => (
               <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
                 <Grid container>
@@ -146,21 +187,34 @@ class CalendarEventForm extends React.Component {
                     fullWidth
                     label="Nazwa"
                     margin="normal"
-                    onChange={handleFormDataChange('name')}
+                    name="name"
+                    onChange={handleFormDataChange}
                     value={formData.name != null ? formData.name : ''}
+                  />
+                  <TextField
+                    label="Liczba dostępnych biletów"
+                    margin="normal"
+                    name="availableTicketsNumber"
+                    onChange={handleFormDataChange}
+                    type="number"
+                    value={
+                      formData.availableTicketsNumber != null ? formData.availableTicketsNumber : ''
+                    }
                   />
                   <div className={classNames(classes.columns, classes.fullWidth)}>
                     <DateTimePicker
                       date={formData.startDate}
                       fullDay={isFullDay}
                       label="Od"
-                      onChange={handleDateChange('startDate')}
+                      name="startDate"
+                      onChange={handleDateChange}
                     />
                     <DateTimePicker
                       date={formData.endDate}
                       fullDay={isFullDay}
                       label="Do"
-                      onChange={handleDateChange('endDate')}
+                      name="endDate"
+                      onChange={handleDateChange}
                     />
                   </div>
                   <div className={classNames(classes.columns, classes.fullWidth)}>
@@ -168,20 +222,22 @@ class CalendarEventForm extends React.Component {
                       date={formData.entryStartDate}
                       fullDay={isFullDay}
                       label="Wejście od"
-                      onChange={handleDateChange('entryStartDate')}
+                      name="entryStartDate"
+                      onChange={handleDateChange}
                     />
                     <DateTimePicker
                       date={formData.entryEndDate}
                       fullDay={isFullDay}
                       label="Wejście do"
-                      onChange={handleDateChange('entryEndDate')}
+                      name="entryEndDate"
+                      onChange={handleDateChange}
                     />
                   </div>
                   <div className={classNames(classes.vertical, classes.fullWidth)}>
                     <SwitchLabel
                       label="Cały dzień"
                       name="isFullDay"
-                      onChange={handlePropFromEventChange('isFullDay')}
+                      onChange={handleFullDayChange}
                       value={isFullDay}
                     />
                     <TextField
@@ -217,7 +273,12 @@ class CalendarEventForm extends React.Component {
                           }
                         />
                         <TextField
-                          onChange={this.handleFrequencyPropChange(handleFrequencyDataChange)}
+                          onChange={
+                            this.handleFrequencyPropChange(
+                              handleFrequencyDataChange,
+                              formData.startDate,
+                            )
+                          }
                           name="frequencyType"
                           select
                           value={
@@ -239,76 +300,20 @@ class CalendarEventForm extends React.Component {
                       {formData.frequencyData && formData.frequencyData.frequencyType === 'WEEKLY' &&
                         <div className={classNames(classes.frequencyCustomizer, classes.fullWidth)}>
                           <Typography>Powtarzaj w:</Typography>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={this.isChecked(formData.frequencyData.daysOfWeek, 0)}
-                                onChange={(event, value) => console.log(event.target, value)}
-                                value="0"
-                              />
-                            }
-                            label="PN"
-                          />
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={this.isChecked(formData.frequencyData.daysOfWeek, 1)}
-                                onChange={(event, value) => console.log(event, value)}
-                                value="1"
-                              />
-                            }
-                            label="WT"
-                          />
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={this.isChecked(formData.frequencyData.daysOfWeek, 2)}
-                                onChange={(event, value) => console.log(event, value)}
-                                value="2"
-                              />
-                            }
-                            label="ŚR"
-                          />
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={this.isChecked(formData.frequencyData.daysOfWeek, 3)}
-                                onChange={(event, value) => console.log(event, value)}
-                                value="3"
-                              />
-                            }
-                            label="CZ"
-                          />
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={this.isChecked(formData.frequencyData.daysOfWeek, 4)}
-                                onChange={(event, value) => console.log(event, value)}
-                                value="4"
-                              />
-                            }
-                            label="PT"
-                          />
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={this.isChecked(formData.frequencyData.daysOfWeek, 5)}
-                                onChange={(event, value) => console.log(event, value)}
-                                value="5"
-                              />
-                            }
-                            label="SO"
-                          />
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={this.isChecked(formData.frequencyData.daysOfWeek, 6)}
-                                onChange={(event, value) => console.log(event, value)}
-                                value="6"
-                              />
-                            }
-                            label="ND"
-                          />
+                          {daysOfWeekDefinitions.map(({ label, value }) => (
+                            <FormControlLabel
+                              key={`${label}-${value}`}
+                              control={
+                                <Checkbox
+                                  checked={this.isChecked(formData.frequencyData.daysOfWeek, value)}
+                                  onChange={handleFrequencyItemChange}
+                                  name="daysOfWeek"
+                                  value={`${value}`}
+                                />
+                              }
+                              label={label}
+                            />
+                          ))}
                         </div>
                       }
                     </div>
@@ -324,6 +329,13 @@ class CalendarEventForm extends React.Component {
 
 CalendarEventForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
+  formData: PropTypes.shape({}),
+  onChange: PropTypes.func,
+};
+
+CalendarEventForm.defaultProps = {
+  formData: null,
+  onChange: null,
 };
 
 export default withStyles(styles)(CalendarEventForm);

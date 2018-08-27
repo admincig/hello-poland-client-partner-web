@@ -20,7 +20,6 @@ import {
   selectors as sightEventSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
 import { actions as ticketPoolDefinitionActions } from '@hello-poland/commons/redux/ticketPoolDefinitions';
-import format from 'date-fns/format';
 import FormDialog from 'components/FormDialog';
 import TicketPoolDefinitionForm from 'components/TicketPoolDefinitionForm';
 import { EmptyResultsMessage } from 'components/ViewMessage';
@@ -82,6 +81,7 @@ class SightsList extends Component {
         return (
           <TicketPoolDefinitionForm
             {...props}
+            onChange={this.handleSimpleFormChange}
           />
         );
       case 'FormGenerator': {
@@ -90,6 +90,7 @@ class SightsList extends Component {
         return schema && schema.length ? (
           <FormGenerator
             {...props}
+            onChange={this.handleFormChange}
             renderGroup={({ children, item }) => (
               <FormControl key={item.key} component="fieldset" fullWidth>
                 <FormLabel component="legend">
@@ -246,20 +247,17 @@ class SightsList extends Component {
     });
   };
 
+  handleSimpleFormChange = formData => this.setState({ formData });
+
   handleFormSubmit = () => {
-    const { formConfig, formType, formData } = this.state;
+    const { formConfig, formData, formType } = this.state;
     const { action } = formConfig || {};
-    const data = deserialize(formData);
+    let data;
 
-    if (formType === 'TicketPoolDefinitionForm') {
-      data.endDate = format(data.startDate, 'YYYY-MM-DDTHH:mmZ');
-      data.entryEndDate = format(data.entryEndDate, 'YYYY-MM-DDTHH:mmZ');
-      data.entryStartDate = format(data.entryStartDate, 'YYYY-MM-DDTHH:mmZ');
-      data.startDate = format(data.startDate, 'YYYY-MM-DDTHH:mmZ');
-
-      if (data.isCyclic === false) {
-        delete data.frequencyData;
-      }
+    if (formType === 'FormGenerator') {
+      data = deserialize(formData);
+    } else {
+      data = formData;
     }
 
     if (action) {
@@ -286,6 +284,7 @@ class SightsList extends Component {
       dialog, formData, formType, schema, title,
     } = this.state;
 
+    console.log('SightsList', this.state);
     return (
       <Fragment>
         <Button onClick={() => this.handleSightEdit()}>
@@ -360,7 +359,6 @@ class SightsList extends Component {
         >
           {this.getFormComponent({
             data: formData,
-            onChange: this.handleFormChange,
             schema,
           }, formType)}
         </FormDialog>

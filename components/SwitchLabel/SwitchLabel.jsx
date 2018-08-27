@@ -7,7 +7,7 @@ const SwitchLabel = ({
   FormControlLabelProps, label, name, value, ...props
 }) => (
   <FormControlLabel
-    control={<Switch value={name} checked={value} {...props} />}
+    control={<Switch name={name} value={name} checked={value} {...props} />}
     label={label}
     {...FormControlLabelProps}
   />
