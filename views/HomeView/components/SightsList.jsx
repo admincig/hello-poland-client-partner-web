@@ -28,11 +28,11 @@ import FormGenerator from 'utils/form-generator';
 import populate from 'utils/form-generator/data/populate';
 import deserialize from 'utils/form-generator/data/deserialize';
 import serialize from 'utils/form-generator/data/serialize';
+import formatPrice from 'utils/formatPrice';
 import sightSchema from './sightSchema';
 import sightEventSchema from './sightEventSchema';
 import ticketPoolDefinitionSchema from './ticketPoolDefinitionSchema';
 import HomeListItem from './HomeListItem';
-import formatPrice from 'utils/formatPrice';
 
 // const IMG_URL = 'https://i.kinja-img.com/gawker-media/image/upload/t_original/wsgtilb9ibbxysybe3mu.png';
 
