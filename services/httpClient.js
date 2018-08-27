@@ -1,21 +1,15 @@
 import axios from 'axios';
 import { compose } from 'redux';
-import { cancellableRequest, interceptors, withRedux } from 'utils/axiosCommons';
+import cancellableRequest from '@fream/axios-commons/cancellableRequest';
+import withRedux from '@fream/axios-commons/utils/withRedux';
+import errorInterceptor from '@fream/axios-commons/interceptors/errorInterceptor';
+import JWTHTTPUnauthorizedInterceptor from '@fream/axios-commons/interceptors/JWTHTTPUnauthorizedInterceptor';
+import JWTInterceptor from '@fream/axios-commons/interceptors/JWTInterceptor';
 import { selectors as configSelectors } from 'redux/config';
 import {
   actions as profileActions,
   selectors as profileSelectors,
-} from '@hello-poland/commons/lib/redux/profile';
-
-const {
-  // errorLogInterceptor,
-  errorInterceptor,
-  JWTHTTPUnauthorizedInterceptor,
-  JWTInterceptor,
-  // responseLogInterceptor,
-  // requestLogInterceptor,
-} = interceptors;
-
+} from '@hello-poland/commons/redux/profile';
 
 const requestInterceptors = [
   {

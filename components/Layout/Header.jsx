@@ -108,13 +108,9 @@ Header.propTypes = {
   isAuthenticated: PropTypes.bool.isRequired,
   onLogout: PropTypes.func.isRequired,
   profile: PropTypes.shape({
-    email: PropTypes.string.isRequired,
+    email: PropTypes.string,
     name: PropTypes.string,
-  }),
-};
-
-Header.defaultProps = {
-  profile: null,
+  }).isRequired,
 };
 
 export default withStyles(styles)(Header);
