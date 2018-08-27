@@ -10,11 +10,11 @@ import setMinutes from 'date-fns/setMinutes';
 
 const styles = {
   datePicker: {
-    width: 85,
+    width: 90,
   },
   timePicker: {
     marginLeft: 10,
-    width: 40,
+    width: 45,
   },
 };
 
