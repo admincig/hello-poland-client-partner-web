@@ -153,7 +153,6 @@ class CalendarEventController extends React.Component {
   render() {
     const { children } = this.props;
 
-    console.log('CalendarEventController state', this.state);
     return children({
       ...this.state,
       handleChange: this.handleChange,

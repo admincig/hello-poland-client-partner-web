@@ -284,7 +284,6 @@ class SightsList extends Component {
       dialog, formData, formType, schema, title,
     } = this.state;
 
-    console.log('SightsList', this.state);
     return (
       <Fragment>
         <Button onClick={() => this.handleSightEdit()}>

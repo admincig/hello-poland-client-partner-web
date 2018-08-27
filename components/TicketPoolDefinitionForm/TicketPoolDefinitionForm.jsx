@@ -14,7 +14,7 @@ class TicketPoolDefinitionForm extends React.Component {
 
   render() {
     const { data, onChange } = this.props;
-    console.log('TicketPoolDefinitionForm', this.props);
+
     return (
       <CalendarEventForm
         formData={data}
