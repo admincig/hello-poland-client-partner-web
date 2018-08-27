@@ -11,6 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import ImportContacts from '@material-ui/icons/ImportContacts';
 import EventIcon from '@material-ui/icons/Event';
 import PlaceIcon from '@material-ui/icons/Place';
+import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import {
   actions as sightsActions,
   selectors as sightsSelectors,
@@ -31,6 +32,7 @@ import sightSchema from './sightSchema';
 import sightEventSchema from './sightEventSchema';
 import ticketPoolDefinitionSchema from './ticketPoolDefinitionSchema';
 import HomeListItem from './HomeListItem';
+import formatPrice from 'utils/formatPrice';
 
 // const IMG_URL = 'https://i.kinja-img.com/gawker-media/image/upload/t_original/wsgtilb9ibbxysybe3mu.png';
 
@@ -327,14 +329,32 @@ class SightsList extends Component {
                         <List style={{ marginLeft: 55 }}>
                           {sightEvent.ticketPoolDefinitions && sightEvent.ticketPoolDefinitions
                             .map(ticketPoolDefinition => (
-                              <HomeListItem
-                                icon={EventIcon}
-                                key={`${ticketPoolDefinition.id}-${ticketPoolDefinition.name}`}
-                                primary={ticketPoolDefinition.name}
-                                secondary={
-                                  `Liczba biletów: ${ticketPoolDefinition.availableTicketsNumber}`
-                                }
-                              />
+                              <Fragment
+                                key={`ticketPoolDefinition-${ticketPoolDefinition.id}-${ticketPoolDefinition.name}`}
+                              >
+                                <HomeListItem
+                                  icon={EventIcon}
+                                  key={`${ticketPoolDefinition.id}-${ticketPoolDefinition.name}`}
+                                  primary={ticketPoolDefinition.name}
+                                  secondary={
+                                    `Liczba biletów: ${ticketPoolDefinition.availableTicketsNumber}`
+                                  }
+                                />
+                                <List style={{ marginLeft: 55 }}>
+                                  {ticketPoolDefinition.ticketDefinitions &&
+                                    ticketPoolDefinition.ticketDefinitions.map(tickeDefinition => (
+                                      <HomeListItem
+                                        icon={LocalOfferIcon}
+                                        key={`ticketDefinition-${tickeDefinition.id}-${tickeDefinition.name}`}
+                                        primary={tickeDefinition.name}
+                                        secondary={
+                                          `Cena: ${formatPrice(tickeDefinition.price)}`
+                                        }
+                                      />
+                                    ))
+                                  }
+                                </List>
+                              </Fragment>
                             ))
                           }
                         </List>
