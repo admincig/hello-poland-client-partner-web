@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import Router from 'next/router';
-import { selectors as profileSelectors } from '@hello-poland/commons/lib/redux/profile';
+import { selectors as profileSelectors } from '@hello-poland/commons/redux/profile';
 import { withLocalStorageProfile } from '../redux/profileSubscriber';
 
 export default ({ redirectURL }) => (View) => {
