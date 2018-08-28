@@ -39,31 +39,31 @@ const frequencyTypes = [
 const daysOfWeekDefinitions = [
   {
     label: 'PN',
-    value: 0,
-  },
-  {
-    label: 'WT',
     value: 1,
   },
   {
-    label: 'ŚR',
+    label: 'WT',
     value: 2,
   },
   {
-    label: 'CZ',
+    label: 'ŚR',
     value: 3,
   },
   {
-    label: 'PT',
+    label: 'CZ',
     value: 4,
   },
   {
-    label: 'SO',
+    label: 'PT',
     value: 5,
   },
   {
-    label: 'NI',
+    label: 'SO',
     value: 6,
+  },
+  {
+    label: 'NI',
+    value: 7,
   },
 ];
 
@@ -83,7 +83,7 @@ const basicFrequencies = [
   },
   {
     frequencyData: {
-      daysOfWeek: [0, 1, 2, 3, 4],
+      daysOfWeek: [1, 2, 3, 4, 5],
       frequency: 1,
       frequencyType: 'WEEKLY',
     },
@@ -92,7 +92,7 @@ const basicFrequencies = [
   },
   {
     frequencyData: {
-      daysOfWeek: [5, 6],
+      daysOfWeek: [6, 7],
       frequency: 1,
       frequencyType: 'WEEKLY',
     },
@@ -140,10 +140,10 @@ function getNormalizedDay(dateObj) {
   const day = (new Date(dateObj)).getDay();
 
   if (day === 0) {
-    return 6;
+    return 7;
   }
 
-  return day - 1;
+  return day;
 }
 
 class CalendarEventForm extends React.Component {
@@ -192,6 +192,7 @@ class CalendarEventForm extends React.Component {
                     value={formData.name != null ? formData.name : ''}
                   />
                   <TextField
+                    fullWidth
                     label="Liczba dostępnych biletów"
                     margin="normal"
                     name="availableTicketsNumber"
