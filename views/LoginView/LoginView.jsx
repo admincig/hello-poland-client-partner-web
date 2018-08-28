@@ -57,8 +57,11 @@ class LoginView extends Component {
 
   handleFormSubmit = () => {
     const { login } = this.props;
+    const data = {
+      ...this.state,
+    };
 
-    login({ data: this.state });
+    login({ data });
   };
 
   render() {
