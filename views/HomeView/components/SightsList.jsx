@@ -334,6 +334,10 @@ class SightsList extends Component {
                                 secondary={
                                   `Liczba biletów: ${ticketPoolDefinition.availableTicketsNumber}`
                                 }
+                                onDeleteClick={
+                                  () => this.handleTicketPoolDelete(ticketPoolDefinition.id)
+                                }
+                                onAddLabel="Usuń pulę biletów"
                               />
                             ))
                           }
