@@ -339,21 +339,21 @@ class SightsList extends Component {
                                   secondary={
                                     `Liczba biletów: ${ticketPoolDefinition.availableTicketsNumber}`
                                   }
+                                  onDeleteClick={
+                                    () => this.handleTicketPoolDelete(ticketPoolDefinition.id)
+                                  }
+                                  onAddLabel="Usuń pulę biletów"
                                 />
                                 <List style={{ marginLeft: 55 }}>
                                   {ticketPoolDefinition.ticketDefinitions &&
-                                    ticketPoolDefinition.ticketDefinitions.map(tickeDefinition => (
+                                    ticketPoolDefinition.ticketDefinitions.map(ticketDefinition => (
                                       <HomeListItem
                                         icon={LocalOfferIcon}
-                                        key={`ticketDefinition-${tickeDefinition.id}-${tickeDefinition.name}`}
-                                        primary={tickeDefinition.name}
+                                        key={`ticketDefinition-${ticketDefinition.id}-${ticketDefinition.name}`}
+                                        primary={ticketDefinition.name}
                                         secondary={
-                                          `Cena: ${formatPrice(tickeDefinition.price)}`
+                                          `Cena: ${formatPrice(ticketDefinition.price)}`
                                         }
-                                        onDeleteClick={
-                                            () => this.handleTicketPoolDelete(ticketPoolDefinition.id)
-                                        }
-                                        onAddLabel="Usuń pulę biletów"
                                       />
                                     ))
                                   }
