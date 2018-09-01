@@ -328,7 +328,7 @@ class SightsList extends Component {
                         />
                         <List style={{ marginLeft: 55 }}>
                           {sightEvent.ticketPoolDefinitions && sightEvent.ticketPoolDefinitions
-                            .map(ticketPoolDefinition => (
+                            .filter(({ deleted }) => !deleted).map(ticketPoolDefinition => (
                               <Fragment
                                 key={`ticketPoolDefinition-${ticketPoolDefinition.id}-${ticketPoolDefinition.name}`}
                               >
