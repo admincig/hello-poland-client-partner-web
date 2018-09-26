@@ -154,7 +154,7 @@ class SightsList extends Component {
     if (isPersisted) {
       formConfig.action = updateSight;
 
-      fetchSight(data.id);
+      fetchSight({ id: data.id });
     }
 
     this.handleFormDialogOpen({
@@ -186,7 +186,7 @@ class SightsList extends Component {
     if (isPersisted) {
       formConfig.action = updateSightEvent;
 
-      fetchSightEvent(data.id);
+      fetchSightEvent({ id: data.id });
     }
 
     this.handleFormDialogOpen({
@@ -264,9 +264,9 @@ class SightsList extends Component {
 
     if (action) {
       if (Number.isInteger(data.id)) {
-        action(data.id, data);
+        action({ id: data.id, data });
       } else {
-        action(data);
+        action({ data });
       }
 
       this.handleFormDialogClose();
