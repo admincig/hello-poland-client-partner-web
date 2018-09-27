@@ -100,10 +100,9 @@ class TicketDefinitionForm extends Component {
       onSubmitFailure(formikActions);
     }
 
-    const { resetForm, setSubmitting } = formikActions;
+    const { setSubmitting } = formikActions;
 
     setSubmitting(false);
-    resetForm();
   };
 
   handleSubmitSuccess = formikActions => () => {
@@ -119,6 +118,7 @@ class TicketDefinitionForm extends Component {
 
     setSubmitting(false);
     resetForm();
+    this.handleLimitChange(false);
   };
 
   render() {
