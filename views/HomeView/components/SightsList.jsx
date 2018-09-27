@@ -251,6 +251,13 @@ class SightsList extends Component {
 
   handleSimpleFormChange = formData => this.setState({ formData });
 
+  handleFormSubmitSuccess = () => {
+    const { fetchSightsList, fetchSightEventsList } = this.props;
+
+    fetchSightsList();
+    fetchSightEventsList();
+  };
+
   handleFormSubmit = () => {
     const { formConfig, formData, formType } = this.state;
     const { action } = formConfig || {};
@@ -264,9 +271,9 @@ class SightsList extends Component {
 
     if (action) {
       if (Number.isInteger(data.id)) {
-        action({ id: data.id, data });
+        action({ id: data.id, data, onSuccess: this.handleFormSubmitSuccess });
       } else {
-        action({ data });
+        action({ data, onSuccess: this.handleFormSubmitSuccess });
       }
 
       this.handleFormDialogClose();
