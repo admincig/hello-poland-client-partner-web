@@ -2,7 +2,7 @@ import { applyMiddleware, createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { createLogicMiddleware } from 'redux-logic';
 import config from 'config';
-import createHTTPClient from 'services/httpClient.js';
+import createHTTPClient from 'services/httpClient';
 import rootReducer from './rootReducer';
 import logic from './logic';
 import getPersistedState, { subscribers } from './localStorage';

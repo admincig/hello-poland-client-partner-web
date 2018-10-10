@@ -9,8 +9,6 @@ import sanitizeSchema from 'utils/axios-commons/utils/sanitizeSchema';
  */
 
 
-
-
 export const interceptors = {
   // JWTHTTPUnauthorizedInterceptor,
   JWTInterceptor,
