@@ -2,10 +2,10 @@ import { applyMiddleware, createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { createLogicMiddleware } from 'redux-logic';
 import config from 'config';
-import createHTTPClient from 'services/httpClient';
+import createHTTPClient from 'services/httpClient.js';
 import rootReducer from './rootReducer';
 import logic from './logic';
-import profileSubscriber from './profileSubscriber';
+import getPersistedState, { subscribers } from './localStorage';
 
 export default function createInitializedStore(initialState = { config }) {
   const logicMiddleware = createLogicMiddleware(logic);
@@ -17,6 +17,7 @@ export default function createInitializedStore(initialState = { config }) {
       view: {
         title: config.public.name,
       },
+      ...getPersistedState(initialState),
     },
     composeWithDevTools((
       applyMiddleware((
@@ -25,13 +26,18 @@ export default function createInitializedStore(initialState = { config }) {
     )),
   );
 
+  const httpClient = createHTTPClient(store, config.public.axios);
+
   logicMiddleware.addDeps({
-    httpClient: createHTTPClient(store),
+    httpClient,
   });
+
+  // assign httpClient to logicMiddleware instance to have an easy access to it
+  logicMiddleware.httpClient = httpClient;
 
   store.logicMiddleware = logicMiddleware;
 
-  store.subscribe(profileSubscriber(store));
+  subscribers.forEach(subscriber => store.subscribe(subscriber(store)));
 
   // Uncomment to debug redux in browser console
   // logicMiddleware.monitor$.subscribe(o$ => console.log(o$));

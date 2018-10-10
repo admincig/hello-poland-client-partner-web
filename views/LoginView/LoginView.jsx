@@ -90,7 +90,7 @@ class LoginView extends Component {
                     onChange={this.handleChange('password')}
                     margin="normal"
                   />
-                  {error && (
+                  {error && Object.keys(error).length > 0 && (
                     <Typography className={classes.error} gutterBottom>
                       Wystąpił błąd podczas logowania.
                     </Typography>
@@ -131,10 +131,9 @@ const mapStateToProps = state => ({
   error: profileSelectors.getError(state),
 });
 
-const mapDispatchToProps = dispatch =>
-  bindActionCreators({
-    login: profileActions.login,
-  }, dispatch);
+const mapDispatchToProps = {
+  login: profileActions.login,
+};
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),

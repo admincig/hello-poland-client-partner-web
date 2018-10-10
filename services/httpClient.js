@@ -1,15 +1,20 @@
 import axios from 'axios';
-import { compose } from 'redux';
-import cancellableRequest from '@fream/axios-commons/cancellableRequest';
-import withRedux from '@fream/axios-commons/utils/withRedux';
-import errorInterceptor from '@fream/axios-commons/interceptors/errorInterceptor';
-import JWTHTTPUnauthorizedInterceptor from '@fream/axios-commons/interceptors/JWTHTTPUnauthorizedInterceptor';
-import JWTInterceptor from '@fream/axios-commons/interceptors/JWTInterceptor';
-import { selectors as configSelectors } from 'redux/config';
+// import cancellableRequest from '@fream/axios-commons/cancellableRequest';
+// import errorInterceptor from '@fream/axios-commons/interceptors/errorInterceptor';
+// import JWTHTTPUnauthorizedInterceptor from '@fream/axios-commons/interceptors/JWTHTTPUnauthorizedInterceptor';
+// import JWTInterceptor from '@fream/axios-commons/interceptors/JWTInterceptor';
+import cancellableRequest from 'utils/axios-commons/cancellableRequest';
+import errorInterceptor from 'utils/axios-commons/interceptors/errorInterceptor';
+// import errorLogInterceptor from 'utils/axios-commons/interceptors/errorLogInterceptor';
+// import requestLogInterceptor from 'utils/axios-commons/interceptors/requestLogInterceptor';
+// import responseLogInterceptor from 'utils/axios-commons/interceptors/responseLogInterceptor';
+import JWTHTTPUnauthorizedInterceptor from 'utils/axios-commons/interceptors/JWTHTTPUnauthorizedInterceptor';
+import JWTInterceptor from 'utils/axios-commons/interceptors/JWTInterceptor';
 import {
   actions as profileActions,
   selectors as profileSelectors,
 } from '@hello-poland/commons/redux/profile';
+
 
 const requestInterceptors = [
   {
@@ -31,7 +36,6 @@ const responseInterceptors = [
       actions: profileActions,
       selectors: {
         ...profileSelectors,
-        getAppConfig: configSelectors.getAppConfig,
       },
     },
     reject: JWTHTTPUnauthorizedInterceptor,
@@ -47,11 +51,8 @@ const responseInterceptors = [
  * INITIALIZE
  */
 
-export default function createHTTPClient(store) {
+export default function createHTTPClient(store, axiosConfig) {
   const instance = axios.create();
-  const state = store.getState();
-  const appConfig = configSelectors.getAppConfig(state);
-  const { axios: axiosConfig } = appConfig.public;
 
   // Configure axios
   Object.entries(axiosConfig).forEach(([key, value]) => {
@@ -65,8 +66,10 @@ export default function createHTTPClient(store) {
   if (responseInterceptors.length) {
     responseInterceptors.forEach(({ redux, reject, resolve }) => {
       instance.interceptors.response.use(
-        compose(resolve, withRedux(store, redux)),
-        compose(reject, withRedux(store, redux)),
+        args => resolve({ ...args, store, redux }),
+        args => reject({
+          ...args, axiosConfig, store, redux,
+        }),
       );
     });
   }
@@ -74,8 +77,8 @@ export default function createHTTPClient(store) {
   if (requestInterceptors.length) {
     requestInterceptors.forEach(({ redux, reject, resolve }) => {
       instance.interceptors.request.use(
-        compose(resolve, withRedux(store, redux)),
-        compose(reject, withRedux(store, redux)),
+        args => resolve({ ...args, store, redux }),
+        args => reject({ ...args, store, redux }),
       );
     });
   }
