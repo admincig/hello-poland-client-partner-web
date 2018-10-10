@@ -11,4 +11,4 @@ const HomeView = () => (
   </Layout>
 );
 
-export default withAuth({ redirectURL: '/login' })((HomeView));
+export default withAuth()(HomeView);
