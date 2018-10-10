@@ -1,15 +1,11 @@
 import axios from 'axios';
-// import cancellableRequest from '@fream/axios-commons/cancellableRequest';
-// import errorInterceptor from '@fream/axios-commons/interceptors/errorInterceptor';
-// import JWTHTTPUnauthorizedInterceptor from '@fream/axios-commons/interceptors/JWTHTTPUnauthorizedInterceptor';
-// import JWTInterceptor from '@fream/axios-commons/interceptors/JWTInterceptor';
-import cancellableRequest from 'utils/axios-commons/cancellableRequest';
-import errorInterceptor from 'utils/axios-commons/interceptors/errorInterceptor';
-// import errorLogInterceptor from 'utils/axios-commons/interceptors/errorLogInterceptor';
-// import requestLogInterceptor from 'utils/axios-commons/interceptors/requestLogInterceptor';
-// import responseLogInterceptor from 'utils/axios-commons/interceptors/responseLogInterceptor';
-import JWTHTTPUnauthorizedInterceptor from 'utils/axios-commons/interceptors/JWTHTTPUnauthorizedInterceptor';
-import JWTInterceptor from 'utils/axios-commons/interceptors/JWTInterceptor';
+import cancellableRequest from '@fream/axios-commons/cancellableRequest';
+import errorInterceptor from '@fream/axios-commons/interceptors/errorInterceptor';
+// import errorLogInterceptor from '@fream/axios-commons/interceptors/errorLogInterceptor';
+// import requestLogInterceptor from '@fream/axios-commons/interceptors/requestLogInterceptor';
+// import responseLogInterceptor from '@fream/axios-commons/interceptors/responseLogInterceptor';
+import JWTHTTPUnauthorizedInterceptor from '@fream/axios-commons/interceptors/JWTHTTPUnauthorizedInterceptor';
+import JWTInterceptor from '@fream/axios-commons/interceptors/JWTInterceptor';
 import {
   actions as profileActions,
   selectors as profileSelectors,

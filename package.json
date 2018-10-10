@@ -18,7 +18,7 @@
     "npm": ">=5.0.0"
   },
   "dependencies": {
-    "@fream/axios-commons": "^1.1.0-beta.2",
+    "@fream/axios-commons": "^2.0.0-beta.1",
     "@hello-poland/commons": "^0.7.7",
     "@material-ui/core": "^1.4.3",
     "@material-ui/docs": "^1.0.0-alpha.3",
