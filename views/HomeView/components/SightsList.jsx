@@ -139,7 +139,7 @@ class SightsList extends Component {
     const { deleteSight } = this.props;
 
     if (Number.isInteger(sightId)) {
-      deleteSight(sightId);
+      deleteSight({ id: sightId, onSuccess: this.handleFormSubmitSuccess });
     }
   };
 
@@ -170,7 +170,7 @@ class SightsList extends Component {
     const { deleteSightEvent } = this.props;
 
     if (Number.isInteger(sightEventId)) {
-      deleteSightEvent(sightEventId);
+      deleteSightEvent({ id: sightEventId, onSuccess: this.handleFormSubmitSuccess });
     }
   };
 
@@ -202,7 +202,10 @@ class SightsList extends Component {
     const { deleteTicketPoolDefinition } = this.props;
 
     if (Number.isInteger(ticketPoolDefinitionId)) {
-      deleteTicketPoolDefinition(ticketPoolDefinitionId);
+      deleteTicketPoolDefinition({
+        id: ticketPoolDefinitionId,
+        onSuccess: this.handleFormSubmitSuccess,
+      });
     }
   };
 
