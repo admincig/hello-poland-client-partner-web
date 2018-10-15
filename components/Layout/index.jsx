@@ -1,3 +1,4 @@
-import Layout from './Layout';
-
-export default Layout;
+export { default as Header } from './Header';
+export { default as Content } from './Content';
+export { default as MenuDrawer } from './MenuDrawer';
+export { default } from './Layout';

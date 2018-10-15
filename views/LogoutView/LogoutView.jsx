@@ -51,8 +51,8 @@ class LogoutView extends Component {
 LogoutView.propTypes = {
   assetPrefix: PropTypes.string.isRequired,
   credentials: PropTypes.shape({
-    accessToken: PropTypes.string.isRequired,
-    refreshToken: PropTypes.string.isRequired,
+    accessToken: PropTypes.string,
+    refreshToken: PropTypes.string,
   }),
   isAuthenticated: PropTypes.bool.isRequired,
   logout: PropTypes.func.isRequired,

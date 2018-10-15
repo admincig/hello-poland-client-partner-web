@@ -139,7 +139,7 @@ class SightsList extends Component {
     const { deleteSight } = this.props;
 
     if (Number.isInteger(sightId)) {
-      deleteSight(sightId);
+      deleteSight({ id: sightId, onSuccess: this.handleFormSubmitSuccess });
     }
   };
 
@@ -154,7 +154,7 @@ class SightsList extends Component {
     if (isPersisted) {
       formConfig.action = updateSight;
 
-      fetchSight(data.id);
+      fetchSight({ id: data.id });
     }
 
     this.handleFormDialogOpen({
@@ -170,7 +170,7 @@ class SightsList extends Component {
     const { deleteSightEvent } = this.props;
 
     if (Number.isInteger(sightEventId)) {
-      deleteSightEvent(sightEventId);
+      deleteSightEvent({ id: sightEventId, onSuccess: this.handleFormSubmitSuccess });
     }
   };
 
@@ -186,7 +186,7 @@ class SightsList extends Component {
     if (isPersisted) {
       formConfig.action = updateSightEvent;
 
-      fetchSightEvent(data.id);
+      fetchSightEvent({ id: data.id });
     }
 
     this.handleFormDialogOpen({
@@ -202,7 +202,10 @@ class SightsList extends Component {
     const { deleteTicketPoolDefinition } = this.props;
 
     if (Number.isInteger(ticketPoolDefinitionId)) {
-      deleteTicketPoolDefinition(ticketPoolDefinitionId);
+      deleteTicketPoolDefinition({
+        id: ticketPoolDefinitionId,
+        onSuccess: this.handleFormSubmitSuccess,
+      });
     }
   };
 
@@ -251,6 +254,13 @@ class SightsList extends Component {
 
   handleSimpleFormChange = formData => this.setState({ formData });
 
+  handleFormSubmitSuccess = () => {
+    const { fetchSightsList, fetchSightEventsList } = this.props;
+
+    fetchSightsList();
+    fetchSightEventsList();
+  };
+
   handleFormSubmit = () => {
     const { formConfig, formData, formType } = this.state;
     const { action } = formConfig || {};
@@ -264,9 +274,9 @@ class SightsList extends Component {
 
     if (action) {
       if (Number.isInteger(data.id)) {
-        action(data.id, data);
+        action({ id: data.id, data, onSuccess: this.handleFormSubmitSuccess });
       } else {
-        action(data);
+        action({ data, onSuccess: this.handleFormSubmitSuccess });
       }
 
       this.handleFormDialogClose();
