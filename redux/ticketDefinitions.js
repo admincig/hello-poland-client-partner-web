@@ -4,7 +4,7 @@ import _find from 'lodash/find';
 const debounceTime = 500;
 
 export const apiURL = '/ticket-definitions';
-export const name = 'ticket-definitions';
+export const name = 'ticketDefinitions';
 const prefix = `commons/${name}/`;
 
 /*
@@ -553,7 +553,7 @@ const getError = state => getState(state).error;
  * @param {Object} state
  * @return {*}
  */
-const getSight = state => getState(state).item;
+const getTicketDefinition = state => getState(state).item;
 
 /**
  * Returns currently loaded Sights list.
@@ -562,7 +562,7 @@ const getSight = state => getState(state).item;
  * @param {Object} state
  * @return {*}
  */
-const getSights = state => getState(state).list;
+const getTicketDefinitions = state => getState(state).list;
 
 /**
  * Returns Sight with specified id from Sights list.
@@ -572,18 +572,18 @@ const getSights = state => getState(state).list;
  * @param {number} id - Sight id
  * @return {*}
  */
-const getSightById = (state, id) => {
-  const list = getSights(state);
+const getTicketDefinitionById = (state, id) => {
+  const list = getTicketDefinitions(state);
 
   return _find(list, { id }) || null;
 };
 
 export const selectors = {
   getError,
-  getSight,
-  getSightById,
-  getSights,
   getState,
+  getTicketDefinition,
+  getTicketDefinitionById,
+  getTicketDefinitions,
 };
 
 
@@ -621,7 +621,7 @@ const createItemLogic = createLogic({
         dispatch(createItemSuccess(data));
 
         if (onSuccess) {
-          onSuccess();
+          onSuccess(data.id);
         }
       } else {
         dispatch(createItemFailure(response));

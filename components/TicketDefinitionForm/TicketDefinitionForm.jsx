@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import _isNumber from 'lodash/isNumber';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
@@ -12,7 +11,6 @@ import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import yupNumber from 'yup/lib/number';
-import SwitchLabel from 'components/SwitchLabel';
 import { actions as ticketDefinitionsActions } from 'redux/ticketDefinitions';
 
 const GridItem = ({ children, ...props }) => (
@@ -27,7 +25,6 @@ GridItem.propTypes = {
 
 const commonProps = {
   fullWidth: true,
-  margin: 'normal',
 };
 
 const styles = () => ({
@@ -39,22 +36,8 @@ const styles = () => ({
 });
 
 class TicketDefinitionForm extends Component {
-  constructor(props) {
-    super(props);
-
-    const { initialValues: { availableTicketsNumber } } = props;
-
-    this.state = {
-      hasTicketLimit: _isNumber(availableTicketsNumber) && availableTicketsNumber > 0,
-    };
-  }
-
-  handleLimitChange = hasTicketLimit => this.setState({ hasTicketLimit });
-
   handleReset = (values, formikActions) => {
     const { onReset } = this.props;
-
-    this.handleLimitChange(false);
 
     if (onReset) {
       onReset(values, formikActions);
@@ -73,12 +56,9 @@ class TicketDefinitionForm extends Component {
     const { createItem, updateItem } = this.props;
     let action = createItem;
     const { id, ...data } = values;
-    const { availableTicketsNumber } = data;
-    const hasTicketLimit = _isNumber(availableTicketsNumber) && availableTicketsNumber > 0;
     const payload = {
       data: {
         ...data,
-        availableTicketsNumber: hasTicketLimit ? availableTicketsNumber : -1,
         price: parseInt(data.price * 100, 10),
       },
       onFailure: this.handleSubmitFailure(formikActions),
@@ -105,11 +85,11 @@ class TicketDefinitionForm extends Component {
     setSubmitting(false);
   };
 
-  handleSubmitSuccess = formikActions => () => {
+  handleSubmitSuccess = formikActions => (ticketDefinitionId) => {
     const { onSubmitSuccess } = this.props;
 
     if (onSubmitSuccess) {
-      onSubmitSuccess(formikActions);
+      onSubmitSuccess(ticketDefinitionId, formikActions);
 
       return;
     }
@@ -118,11 +98,9 @@ class TicketDefinitionForm extends Component {
 
     setSubmitting(false);
     resetForm();
-    this.handleLimitChange(false);
   };
 
   render() {
-    const { hasTicketLimit } = this.state;
     const {
       classes, createItem, onReset, onSubmit, onSubmitFailure, onSubmitSuccess, updateItem, ...props
     } = this.props;
@@ -134,7 +112,7 @@ class TicketDefinitionForm extends Component {
         onSubmit={this.handleSubmit}
         onReset={this.handleReset}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, ...formikActions }) => (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <Hidden xlDown implementation="css">
@@ -142,34 +120,23 @@ class TicketDefinitionForm extends Component {
               </Hidden>
               <GridItem md={12} sm={12}>
                 <Field component={TextField} label="Nazwa (np. Normalny)" name="name" required {...commonProps} />
-              </GridItem>
-              <GridItem md={5} sm={5}>
                 <Field component={TextField} label="Cena (PLN)" name="price" type="number" required {...commonProps} />
               </GridItem>
-              <GridItem md={2} sm={2} className={classes.limit}>
-                <SwitchLabel
-                  disabled={isSubmitting}
-                  label="Limit biletów"
-                  name="hasTicketLimit"
-                  onChange={(event, checked) => this.handleLimitChange(checked)}
-                  value={hasTicketLimit}
-                />
+            </Grid>
+            <Grid container spacing={16}>
+              <GridItem md={2} sm={2}>
+                <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
+                  Dodaj
+                </Button>
               </GridItem>
-              <GridItem md={5} sm={5}>
-                {hasTicketLimit &&
-                  <Field
-                    {...commonProps}
-                    component={TextField}
-                    label="Liczba biletów"
-                    name="availableTicketsNumber"
-                    type="number"
-                  />
+              <GridItem md={2} sm={2}>
+                {onReset &&
+                  <Button variant="contained" color="primary" type="reset" disabled={isSubmitting} onClick={() => this.handleReset(null, formikActions)}>
+                    Anuluj
+                  </Button>
                 }
               </GridItem>
             </Grid>
-            <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
-              Dodaj
-            </Button>
           </Form>
         )}
       </Formik>
@@ -191,7 +158,6 @@ TicketDefinitionForm.propTypes = {
 
 TicketDefinitionForm.defaultProps = {
   initialValues: {
-    availableTicketsNumber: '',
     id: '',
     name: '',
     price: '',
@@ -203,7 +169,6 @@ TicketDefinitionForm.defaultProps = {
   validationSchema: yupObject().shape({
     name: yupString().min(3).max(30).required(),
     price: yupNumber().min(0).required(),
-    availableTicketsNumber: yupNumber().min(1),
   }),
 };
 

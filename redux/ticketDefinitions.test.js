@@ -481,51 +481,48 @@ describe('selectors', () => {
     });
   });
 
-  describe('using getSight', () => {
-    it('should return null if there is no item data', () => {
-      const { getSight } = selectors;
+  describe('using getTicketDefinition', () => {
+    const { getTicketDefinition } = selectors;
 
-      expect(getSight(appState)).toBeNull();
+    it('should return null if there is no item data', () => {
+      expect(getTicketDefinition(appState)).toBeNull();
     });
 
     it('should return item data', () => {
-      const { getSight } = selectors;
       const expectedValue = { id: 1 };
       const state = generateAppState({ item: expectedValue });
 
-      expect(getSight(state)).toEqual(expectedValue);
+      expect(getTicketDefinition(state)).toEqual(expectedValue);
     });
   });
 
-  describe('using getSights', () => {
-    it('should return null if there is no list data', () => {
-      const { getSights } = selectors;
+  describe('using getTicketDefinitions', () => {
+    const { getTicketDefinitions } = selectors;
 
-      expect(getSights(appState)).toBeNull();
+    it('should return null if there is no list data', () => {
+      expect(getTicketDefinitions(appState)).toBeNull();
     });
 
     it('should return list data', () => {
-      const { getSights } = selectors;
       const expectedValue = [
         { id: 1 },
         { id: 2 },
       ];
       const state = generateAppState({ list: expectedValue });
 
-      expect(getSights(state)).toEqual(expectedValue);
+      expect(getTicketDefinitions(state)).toEqual(expectedValue);
     });
   });
 
-  describe('using getSightById', () => {
-    it('should return null if there is no item data', () => {
-      const { getSightById } = selectors;
+  describe('using getTicketDefinitionById', () => {
+    const { getTicketDefinitionById } = selectors;
 
-      expect(getSightById(appState)).toBeNull();
-      expect(getSightById(appState, 1)).toBeNull();
+    it('should return null if there is no item data', () => {
+      expect(getTicketDefinitionById(appState)).toBeNull();
+      expect(getTicketDefinitionById(appState, 1)).toBeNull();
     });
 
     it('should return list data', () => {
-      const { getSightById } = selectors;
       const id = 1;
       const expectedValue = [
         { id: 1 },
@@ -533,7 +530,7 @@ describe('selectors', () => {
       ];
       const state = generateAppState({ list: expectedValue });
 
-      expect(getSightById(state, id)).toEqual(expectedValue[0]);
+      expect(getTicketDefinitionById(state, id)).toEqual(expectedValue[0]);
     });
   });
 });
