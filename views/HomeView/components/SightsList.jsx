@@ -43,6 +43,7 @@ class SightsList extends Component {
     formData: null,
     formType: null,
     schema: null,
+    submitError: false,
     title: null,
   };
 
@@ -117,7 +118,7 @@ class SightsList extends Component {
     title: null,
   });
 
-  handleFormDialogClose = () => this.setState({ dialog: false });
+  handleFormDialogClose = () => this.setState({ dialog: false, submitError: false });
 
   handleFormDialogOpen = ({
     data, formConfig, formType, schema, title,
@@ -259,12 +260,20 @@ class SightsList extends Component {
 
     fetchSightsList();
     fetchSightEventsList();
+
+    this.handleFormDialogClose();
   };
+
+  handleFormSubmitError = () => this.setState({ submitError: true });
+
+  clearFormSubmitError = () => this.setState({ submitError: false });
 
   handleFormSubmit = () => {
     const { formConfig, formData, formType } = this.state;
     const { action } = formConfig || {};
     let data;
+
+    this.clearFormSubmitError();
 
     if (formType === 'FormGenerator') {
       data = deserialize(formData);
@@ -274,12 +283,19 @@ class SightsList extends Component {
 
     if (action) {
       if (Number.isInteger(data.id)) {
-        action({ id: data.id, data, onSuccess: this.handleFormSubmitSuccess });
+        action({
+          id: data.id,
+          data,
+          onFailure: this.handleFormSubmitError,
+          onSuccess: this.handleFormSubmitSuccess,
+        });
       } else {
-        action({ data, onSuccess: this.handleFormSubmitSuccess });
+        action({
+          data,
+          onFailure: this.handleFormSubmitError,
+          onSuccess: this.handleFormSubmitSuccess,
+        });
       }
-
-      this.handleFormDialogClose();
     }
   };
 
@@ -293,7 +309,7 @@ class SightsList extends Component {
   render() {
     const { sightEventsList, sightsList } = this.props;
     const {
-      dialog, formData, formType, schema, title,
+      dialog, formData, formType, schema, submitError, title,
     } = this.state;
 
     return (
@@ -388,6 +404,7 @@ class SightsList extends Component {
           onExited={this.setDefaultDialogProperties}
           onSubmit={this.handleFormSubmit}
           open={dialog}
+          error={submitError}
           title={title}
         >
           {this.getFormComponent({

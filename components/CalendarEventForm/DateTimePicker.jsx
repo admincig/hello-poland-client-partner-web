@@ -16,6 +16,10 @@ const styles = {
     marginLeft: 10,
     width: 45,
   },
+  wrapper: {
+    display: 'flex',
+    alignItems: 'flex-end',
+  },
 };
 
 const changeTypes = {
@@ -52,7 +56,7 @@ class DateTimePicker extends Component {
     } = this.props;
 
     return (
-      <div>
+      <div className={classes.wrapper}>
         <DatePicker
           className={classes.datePicker}
           disablePast
@@ -64,15 +68,15 @@ class DateTimePicker extends Component {
           {...DatePickerProps}
         />
         {!fullDay &&
-        <TimePicker
-          ampm={false}
-          className={classes.timePicker}
-          clearable
-          margin="normal"
-          onChange={this.handleChange(changeTypes.TIME)}
-          value={date}
-          {...TimePickerProps}
-        />
+          <TimePicker
+            ampm={false}
+            className={classes.timePicker}
+            clearable
+            margin="normal"
+            onChange={this.handleChange(changeTypes.TIME)}
+            value={date}
+            {...TimePickerProps}
+          />
         }
       </div>
     );
