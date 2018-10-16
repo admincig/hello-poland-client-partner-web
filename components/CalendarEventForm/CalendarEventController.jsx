@@ -26,7 +26,7 @@ class CalendarEventController extends React.Component {
       isFullDay: false,
       isDefinitionFormVisible: false,
       formData: {
-        availableTicketsNumber: null,
+        availableTicketsNumber: -1,
         endDate: this.getFormattedDate(addMinutes(this.initialDate, 60)),
         entryEndDate: this.getFormattedDate(addMinutes(this.initialDate, 10)),
         entryStartDate: this.getFormattedDate(subMinutes(this.initialDate, 10)),
@@ -76,6 +76,19 @@ class CalendarEventController extends React.Component {
       if (this.props.onChange) {
         this.props.onChange(this.state.formData);
       }
+    });
+  };
+
+  handleAvailableTicketsChange = (...args) => {
+    const { formData } = this.state;
+    const key = this.getKeyFromEvent(...args);
+    const value = this.getValueFromEvent(...args);
+
+    this.handleChange({
+      formData: {
+        ...formData,
+        [key]: value > 0 ? value : -1,
+      },
     });
   };
 
@@ -237,6 +250,7 @@ class CalendarEventController extends React.Component {
     return children({
       ...this.props,
       ...this.state,
+      handleAvailableTicketsChange: this.handleAvailableTicketsChange,
       handleChange: this.handleChange,
       handleDateChange: this.handleDateChange,
       handleDefinitionFormClose: this.handleDefinitionFormClose,

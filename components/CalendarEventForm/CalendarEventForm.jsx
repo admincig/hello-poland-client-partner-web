@@ -183,11 +183,11 @@ class CalendarEventForm extends React.Component {
         <CalendarEventController formData={initialFormData} onChange={onChange}>
           {({
               formData, frequencyType, selectedTicketDefinitionId, ticketDefinitionsList,
-              fetchTicketDefinitions, handleDateChange, handleDefinitionFormClose,
-              handleDefinitionFormOpen, handleFormDataChange, handleFrequencyDataChange,
-              handleFrequencyItemChange, handleFullDayChange, handlePropFromEventChange,
-              handleTicketDefinitionAdd, handleTicketDefinitionChange, handleTicketDefinitionDelete,
-              isFullDay, isDefinitionFormVisible,
+              fetchTicketDefinitions, handleAvailableTicketsChange, handleDateChange,
+              handleDefinitionFormClose, handleDefinitionFormOpen, handleFormDataChange,
+              handleFrequencyDataChange, handleFrequencyItemChange, handleFullDayChange,
+              handlePropFromEventChange, handleTicketDefinitionAdd, handleTicketDefinitionChange,
+              handleTicketDefinitionDelete, isFullDay, isDefinitionFormVisible,
             }) => (
               <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
                 <Grid container>
@@ -204,10 +204,11 @@ class CalendarEventForm extends React.Component {
                     label="Limit biletów w puli"
                     margin="normal"
                     name="availableTicketsNumber"
-                    onChange={handleFormDataChange}
+                    onChange={handleAvailableTicketsChange}
                     type="number"
                     value={
-                      formData.availableTicketsNumber != null ? formData.availableTicketsNumber : ''
+                      formData.availableTicketsNumber && formData.availableTicketsNumber > 0
+                        ? formData.availableTicketsNumber : ''
                     }
                   />
                   <div className={classNames(classes.columns, classes.fullWidth)}>

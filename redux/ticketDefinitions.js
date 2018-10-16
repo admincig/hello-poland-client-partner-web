@@ -1,16 +1,18 @@
 import { createLogic } from 'redux-logic';
 import _find from 'lodash/find';
+import { types as profileTypes } from '@hello-poland/commons/redux/profile';
 
 const debounceTime = 500;
 
 export const apiURL = '/ticket-definitions';
 export const name = 'ticketDefinitions';
-const prefix = `commons/${name}/`;
+const prefix = `${name}/`;
 
 /*
  * TYPES
  */
 
+const CLEAR = `${prefix}CLEAR`;
 const CLEAR_SEARCH_RESULTS = `${prefix}CLEAR_SEARCH_RESULTS`;
 const CLEAR_ITEM = `${prefix}CLEAR_ITEM`;
 const CREATE_ITEM = `${prefix}CREATE_ITEM`;
@@ -65,6 +67,16 @@ export const types = {
 /*
  * ACTIONS
  */
+
+/**
+ * Creates action for clearing reducer data.
+ *
+ * @method
+ * @return {{type: string}}
+ */
+const clear = () => ({
+  type: CLEAR,
+});
 
 /**
  * Creates action for search results removal.
@@ -591,6 +603,17 @@ export const selectors = {
  * LOGIC
  */
 
+const clearReducerLogic = createLogic({
+  type: [
+    profileTypes.LOGOUT_SUCCESS,
+  ],
+  latest: true,
+  async process(options, dispatch, done) {
+    dispatch(clear());
+    done();
+  },
+});
+
 const clearSearchResultsLogic = createLogic({
   type: [
     CLEAR_SEARCH_RESULTS,
@@ -847,6 +870,7 @@ const updateItemLogic = createLogic({
 });
 
 export const logic = {
+  clearReducerLogic,
   clearSearchResultsLogic,
   createItemLogic,
   deleteItemLogic,
@@ -869,6 +893,11 @@ export const defaultInitialState = {
 
 const reducer = (initialState = defaultInitialState) => (state = initialState, action) => {
   switch (action.type) {
+    case CLEAR:
+      return {
+        ...state,
+        ...initialState,
+      };
     case CLEAR_SEARCH_RESULTS:
       return {
         ...state,
