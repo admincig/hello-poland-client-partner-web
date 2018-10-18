@@ -1,3 +1,16 @@
+import React from 'react';
 import LoginView from 'views/LoginView';
 
-export default LoginView;
+const Login = props => (
+  <LoginView {...props} />
+);
+
+Login.getInitialProps = ({ query }) => {
+  const { returnUrl } = query;
+
+  return {
+    returnUrl,
+  };
+};
+
+export default Login;

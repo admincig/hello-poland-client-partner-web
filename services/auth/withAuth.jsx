@@ -1,66 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { compose } from 'redux';
 import { connect } from 'react-redux';
 import Router from 'next/router';
 import { selectors as profileSelectors } from '@hello-poland/commons/redux/profile';
-import { withLocalStorageProfile } from '../redux/profileSubscriber';
 
-export default ({ redirectURL }) => (View) => {
+export default ({ redirectURL } = { redirectURL: '/login' }) => (View) => {
   class ViewWithAuth extends React.Component {
-    static contextTypes = {
-      store: PropTypes.shape({}),
-    };
-
     componentDidMount() {
-      this.rehydrateProfile();
-      this.handleInitAuthRedirection();
+      const { isAuthenticated } = this.props;
+
+      if (!isAuthenticated) {
+        this.redirect();
+      }
     }
 
     componentDidUpdate() {
-      this.handleAuthRedirection();
+      const { isAuthenticated } = this.props;
+      if (!isAuthenticated) {
+        this.redirect();
+      }
     }
 
-    rehydrateProfile = () => {
-      const { store } = this.context;
-
-      withLocalStorageProfile(store);
-    };
-
-    handleAuthRedirection = () => {
-      const { isAuthenticated } = this.props;
-
-      this.redirectView(isAuthenticated);
-    };
-
-    handleInitAuthRedirection = () => {
-      const { store: { getState } } = this.context;
-      const state = getState();
-      const isAuthenticated = profileSelectors.isAuthenticated(state);
-
-      this.redirectView(isAuthenticated);
-    };
-
-    redirectView = (isAuthenticated) => {
-      if (!isAuthenticated) {
-        let path = '/logout';
-
-        if (redirectURL) {
-          path = redirectURL;
-        }
-
-        Router.push(path);
-      }
+    redirect = () => {
+      Router.push(redirectURL);
     };
 
     render() {
-      const { isAuthenticated, ...props } = this.props;
-
-      if (!isAuthenticated) {
-        return null;
-      }
-
-      return <View {...props} />;
+      return <View {...this.props} />;
     }
   }
 
@@ -72,5 +38,5 @@ export default ({ redirectURL }) => (View) => {
     isAuthenticated: profileSelectors.isAuthenticated(state),
   });
 
-  return compose(connect(mapStateToProps))(ViewWithAuth);
+  return connect(mapStateToProps)(ViewWithAuth);
 };

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { bindActionCreators, compose } from 'redux';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import Router from 'next/router';
 import withStyles from '@material-ui/core/styles/withStyles';
@@ -90,7 +90,7 @@ class LoginView extends Component {
                     onChange={this.handleChange('password')}
                     margin="normal"
                   />
-                  {error && (
+                  {error && Object.keys(error).length > 0 && (
                     <Typography className={classes.error} gutterBottom>
                       Wystąpił błąd podczas logowania.
                     </Typography>
@@ -131,10 +131,9 @@ const mapStateToProps = state => ({
   error: profileSelectors.getError(state),
 });
 
-const mapDispatchToProps = dispatch =>
-  bindActionCreators({
-    login: profileActions.login,
-  }, dispatch);
+const mapDispatchToProps = {
+  login: profileActions.login,
+};
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),

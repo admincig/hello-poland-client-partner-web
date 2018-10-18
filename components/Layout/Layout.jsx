@@ -1,47 +1,61 @@
-import React, { Fragment } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import Router from 'next/router';
-import { selectors as viewSelectors } from 'redux/view';
-import { selectors as profileSelectors } from '@hello-poland/commons/redux/profile';
+import { withRouter } from 'next/router';
+import Content from './Content';
 import Header from './Header';
+import MenuDrawer from './MenuDrawer';
 
-const Layout = ({
-  children, documentTitle, isAuthenticated, profile,
-}) => (
-  <Fragment>
-    <Header
-      documentTitle={documentTitle}
-      isAuthenticated={isAuthenticated}
-      onLogout={() => {
-        if (isAuthenticated) {
-          Router.push('/logout');
-        }
-      }}
-      profile={profile}
-    />
-    {children}
-  </Fragment>
-);
+const MENU_ITEMS = [];
+
+class Layout extends Component {
+  state = {
+    isMenuOpened: false,
+  };
+
+  openMenu = () => {
+    this.setState({
+      isMenuOpened: true,
+    });
+  };
+
+  closeMenu = () => {
+    this.setState({
+      isMenuOpened: false,
+    });
+  };
+
+  render() {
+    const { HeaderProps, children, router } = this.props;
+    const { isMenuOpened } = this.state;
+
+    return (
+      <React.Fragment>
+        <Header onMenuButtonClick={this.openMenu} {...HeaderProps} />
+        <Content>
+          {MENU_ITEMS.length
+            ? <MenuDrawer
+              menuItems={MENU_ITEMS}
+              open={isMenuOpened}
+              onClose={this.closeMenu}
+              currentPath={router.asPath}
+            />
+            : null
+          }
+          {children}
+        </Content>
+      </React.Fragment>
+    );
+  }
+}
 
 Layout.propTypes = {
-  children: PropTypes.oneOfType([
-    PropTypes.node,
-    PropTypes.object,
-  ]).isRequired,
-  documentTitle: PropTypes.string.isRequired,
-  isAuthenticated: PropTypes.bool.isRequired,
-  profile: PropTypes.shape({}),
+  children: PropTypes.node.isRequired,
+  HeaderProps: PropTypes.shape({}),
+  router: PropTypes.shape({}).isRequired,
 };
 
 Layout.defaultProps = {
-  profile: null,
+  HeaderProps: {},
 };
 
-const mapStateToProps = state => ({
-  documentTitle: viewSelectors.getDocumentTitle(state),
-  isAuthenticated: profileSelectors.isAuthenticated(state),
-  profile: profileSelectors.getProfile(state),
-});
-
-export default connect(mapStateToProps)(Layout);
+export default withRouter(Layout);

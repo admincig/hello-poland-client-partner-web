@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import withStyles from '@material-ui/core/styles/withStyles';
+import Button from '@material-ui/core/Button/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -11,11 +12,14 @@ import Typography from '@material-ui/core/Typography';
 import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
 import SwitchLabel from 'components/SwitchLabel';
+import formatPrice from 'utils/formatPrice';
 
 import plLocale from 'date-fns/locale/pl';
 
 import CalendarEventController from './CalendarEventController';
 import DateTimePicker from './DateTimePicker';
+import TicketDefinitionList from './TicketDefinitionList';
+import TicketDefinitionForm from '../TicketDefinitionForm/TicketDefinitionForm';
 
 const locale = {
   pl: plLocale,
@@ -115,9 +119,6 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
   },
-  frequencyCustomizer: {
-    marginTop: theme.spacing.unit * 3,
-  },
   frequencyTextfield: {
     marginLeft: theme.spacing.unit * 3,
     marginRight: theme.spacing.unit * 2,
@@ -129,6 +130,9 @@ const styles = theme => ({
   inline: {
     alignItems: 'center',
     display: 'inline-flex',
+  },
+  section: {
+    marginTop: theme.spacing.unit * 3,
   },
   vertical: {
     display: 'flex',
@@ -178,8 +182,12 @@ class CalendarEventForm extends React.Component {
       <div>
         <CalendarEventController formData={initialFormData} onChange={onChange}>
           {({
-              formData, frequencyType, handleDateChange, handleFormDataChange,
-              handleFrequencyDataChange, handleFrequencyItemChange, handleFullDayChange, isFullDay,
+              formData, frequencyType, selectedTicketDefinitionId, ticketDefinitionsList,
+              fetchTicketDefinitions, handleAvailableTicketsChange, handleDateChange,
+              handleDefinitionFormClose, handleDefinitionFormOpen, handleFormDataChange,
+              handleFrequencyDataChange, handleFrequencyItemChange, handleFullDayChange,
+              handlePropFromEventChange, handleTicketDefinitionAdd, handleTicketDefinitionChange,
+              handleTicketDefinitionDelete, isFullDay, isDefinitionFormVisible,
             }) => (
               <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
                 <Grid container>
@@ -193,13 +201,14 @@ class CalendarEventForm extends React.Component {
                   />
                   <TextField
                     fullWidth
-                    label="Liczba dostępnych biletów"
+                    label="Limit biletów w puli"
                     margin="normal"
                     name="availableTicketsNumber"
-                    onChange={handleFormDataChange}
+                    onChange={handleAvailableTicketsChange}
                     type="number"
                     value={
-                      formData.availableTicketsNumber != null ? formData.availableTicketsNumber : ''
+                      formData.availableTicketsNumber && formData.availableTicketsNumber > 0
+                        ? formData.availableTicketsNumber : ''
                     }
                   />
                   <div className={classNames(classes.columns, classes.fullWidth)}>
@@ -257,7 +266,7 @@ class CalendarEventForm extends React.Component {
                     </TextField>
                   </div>
                   {frequencyType === 'CUSTOM' &&
-                    <div className={classNames(classes.frequencyCustomizer, classes.fullWidth)}>
+                    <div className={classNames(classes.section, classes.fullWidth)}>
                       <Typography variant="title" gutterBottom>
                         Powtarzanie niestandardowe
                       </Typography>
@@ -299,7 +308,7 @@ class CalendarEventForm extends React.Component {
                         </TextField>
                       </div>
                       {formData.frequencyData && formData.frequencyData.frequencyType === 'WEEKLY' &&
-                        <div className={classNames(classes.frequencyCustomizer, classes.fullWidth)}>
+                        <div className={classNames(classes.section, classes.fullWidth)}>
                           <Typography>Powtarzaj w:</Typography>
                           {daysOfWeekDefinitions.map(({ label, value }) => (
                             <FormControlLabel
@@ -319,6 +328,76 @@ class CalendarEventForm extends React.Component {
                       }
                     </div>
                   }
+                  <div className={classNames(classes.section, classes.fullWidth)}>
+                    <Typography variant="title" gutterBottom>
+                      Bilety
+                    </Typography>
+                    <div className={classNames(classes.columns, classes.fullWidth)}>
+                      <TextField
+                        onChange={event => handlePropFromEventChange(event)}
+                        name="selectedTicketDefinitionId"
+                        select
+                        SelectProps={{
+                          displayEmpty: true,
+                        }}
+                        value={selectedTicketDefinitionId}
+                      >
+                        <MenuItem
+                          disabled
+                          value=""
+                        >
+                          Wybierz definicję biletu
+                        </MenuItem>
+                        {ticketDefinitionsList &&
+                          ticketDefinitionsList.map(({ id, name, price }) => (
+                            <MenuItem
+                              key={`${id}-${name}`}
+                              value={id}
+                            >
+                              {`${name} - ${formatPrice(price)}`}
+                            </MenuItem>
+                          ))
+                        }
+                      </TextField>
+                      <div>
+                        <Button
+                          onClick={() => handleTicketDefinitionAdd(+selectedTicketDefinitionId)}
+                          style={{ marginRight: '10px' }}
+                          variant="outlined"
+                        >
+                          Dodaj do puli
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          onClick={handleDefinitionFormOpen}
+                        >
+                          Zdefiniuj bilet
+                        </Button>
+                      </div>
+                    </div>
+                    <TicketDefinitionList
+                      ticketDefinitions={formData.ticketDefinitions}
+                      ticketDefinitionsList={ticketDefinitionsList}
+                      onAvailabilityChange={handleTicketDefinitionChange}
+                      onDeleteClick={handleTicketDefinitionDelete}
+                    />
+                    {isDefinitionFormVisible &&
+                      <div className={classNames(classes.section, classes.fullWidth)}>
+                        <Typography variant="title">
+                          Nowy rodzaj biletu
+                        </Typography>
+                        <TicketDefinitionForm
+                          onReset={handleDefinitionFormClose}
+                          onSubmitSuccess={(ticketDefinitionId) => {
+                            fetchTicketDefinitions();
+                            handleTicketDefinitionAdd(ticketDefinitionId);
+                            handleDefinitionFormClose();
+                          }}
+                        />
+                      </div>
+                    }
+                  </div>
                 </Grid>
               </MuiPickersUtilsProvider>
           )}
