@@ -7,6 +7,8 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
@@ -106,6 +108,7 @@ const basicFrequencies = [
   {
     frequencyData: {
       daysOfWeek: [],
+      endDate: '',
       frequency: 1,
       frequencyType: 'DAILY',
     },
@@ -118,6 +121,13 @@ const styles = theme => ({
   columns: {
     display: 'flex',
     justifyContent: 'space-between',
+  },
+  frequencyRadioWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  frequencyRadioLabel: {
+    marginRight: 40,
   },
   frequencyTextfield: {
     marginLeft: theme.spacing.unit * 3,
@@ -182,12 +192,14 @@ class CalendarEventForm extends React.Component {
       <div>
         <CalendarEventController formData={initialFormData} onChange={onChange}>
           {({
-              formData, frequencyType, selectedTicketDefinitionId, ticketDefinitionsList,
-              fetchTicketDefinitions, handleAvailableTicketsChange, handleDateChange,
-              handleDefinitionFormClose, handleDefinitionFormOpen, handleFormDataChange,
-              handleFrequencyDataChange, handleFrequencyItemChange, handleFullDayChange,
-              handlePropFromEventChange, handleTicketDefinitionAdd, handleTicketDefinitionChange,
-              handleTicketDefinitionDelete, isFullDay, isDefinitionFormVisible,
+              formData, frequencyEndDateType, frequencyType, selectedTicketDefinitionId,
+              ticketDefinitionsList, fetchTicketDefinitions,
+              handleAvailableTicketsChange, handleDateChange, handleDefinitionFormClose,
+              handleDefinitionFormOpen, handleFormDataChange, handleFrequencyDataChange,
+              handleFrequencyDataFieldChange, handleFrequencyEndDateTypeChange,
+              handleFrequencyItemChange, handleFullDayChange, handlePropFromEventChange,
+              handleTicketDefinitionAdd, handleTicketDefinitionChange, handleTicketDefinitionDelete,
+              isFullDay, isDefinitionFormVisible,
             }) => (
               <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
                 <Grid container>
@@ -225,6 +237,9 @@ class CalendarEventForm extends React.Component {
                       label="Do"
                       name="endDate"
                       onChange={handleDateChange}
+                      DatePickerProps={{
+                        minDate: formData.startDate,
+                      }}
                     />
                   </div>
                   <div className={classNames(classes.columns, classes.fullWidth)}>
@@ -241,6 +256,9 @@ class CalendarEventForm extends React.Component {
                       label="Wejście do"
                       name="entryEndDate"
                       onChange={handleDateChange}
+                      DatePickerProps={{
+                        minDate: formData.entryEndDate,
+                      }}
                     />
                   </div>
                   <div className={classNames(classes.vertical, classes.fullWidth)}>
@@ -326,6 +344,43 @@ class CalendarEventForm extends React.Component {
                           ))}
                         </div>
                       }
+                      <div className={classNames(classes.section, classes.fullWidth)}>
+                        <Typography>Kończy się:</Typography>
+                        <RadioGroup
+                          aria-label="Koniec puli"
+                          name="frequencyEndDateType"
+                          value={frequencyEndDateType}
+                          onChange={handleFrequencyEndDateTypeChange}
+                        >
+                          <FormControlLabel
+                            value="NONE"
+                            control={<Radio />}
+                            label="Nigdy"
+                          />
+                          <FormControlLabel
+                            value="SINGLE"
+                            control={<Radio />}
+                            label={
+                              <div className={classNames(classes.frequencyRadioWrapper)}>
+                                <Typography className={classNames(classes.frequencyRadioLabel)}>
+                                  W dniu
+                                </Typography>
+                                {frequencyEndDateType === 'SINGLE' &&
+                                  <DateTimePicker
+                                    date={formData.frequencyData.endDate}
+                                    fullDay
+                                    name="endDate"
+                                    onChange={handleFrequencyDataFieldChange}
+                                    DatePickerProps={{
+                                      minDate: formData.endDate,
+                                    }}
+                                  />
+                                }
+                              </div>
+                            }
+                          />
+                        </RadioGroup>
+                      </div>
                     </div>
                   }
                   <div className={classNames(classes.section, classes.fullWidth)}>
@@ -362,7 +417,7 @@ class CalendarEventForm extends React.Component {
                       <div>
                         <Button
                           onClick={() => handleTicketDefinitionAdd(+selectedTicketDefinitionId)}
-                          style={{ marginRight: '10px' }}
+                          style={{ marginRight: 10 }}
                           variant="outlined"
                         >
                           Dodaj do puli

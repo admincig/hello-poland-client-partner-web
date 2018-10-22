@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import _cloneDeep from 'lodash/cloneDeep';
 import _isNumber from 'lodash/isNumber';
 import addMinutes from 'date-fns/addMinutes';
+import addMonths from 'date-fns/addMonths';
 import format from 'date-fns/format';
 import setHours from 'date-fns/setHours';
 import setMinutes from 'date-fns/setMinutes';
@@ -37,6 +38,7 @@ class CalendarEventController extends React.Component {
         ...props.formData,
       },
       frequencyType: 'NONE',
+      frequencyEndDateType: 'NONE',
       selectedTicketDefinitionId: '',
     };
   }
@@ -132,6 +134,43 @@ class CalendarEventController extends React.Component {
         },
       },
       frequencyType: type,
+    });
+  };
+
+  handleFrequencyDataFieldChange = (...args) => {
+    const { formData } = this.state;
+    const key = this.getKeyFromEvent(...args);
+    const value = this.getValueFromEvent(...args);
+
+    this.handleChange({
+      formData: {
+        ...formData,
+        frequencyData: {
+          ...formData.frequencyData,
+          [key]: value,
+        },
+      },
+    });
+  };
+
+  handleFrequencyEndDateTypeChange = (...args) => {
+    const { formData } = this.state;
+    const type = this.getValueFromEvent(...args);
+    let endDate = null;
+
+    if (type === 'SINGLE') {
+      endDate = this.getFormattedDate(addMonths(formData.endDate, 3));
+    }
+
+    this.handleChange({
+      formData: {
+        ...formData,
+        frequencyData: {
+          ...formData.frequencyData,
+          endDate,
+        },
+      },
+      frequencyEndDateType: type,
     });
   };
 
@@ -257,6 +296,8 @@ class CalendarEventController extends React.Component {
       handleDefinitionFormOpen: this.handleDefinitionFormOpen,
       handleFormDataChange: this.handleFormDataChange,
       handleFrequencyDataChange: this.handleFrequencyDataChange,
+      handleFrequencyDataFieldChange: this.handleFrequencyDataFieldChange,
+      handleFrequencyEndDateTypeChange: this.handleFrequencyEndDateTypeChange,
       handleFrequencyItemChange: this.handleFrequencyItemChange,
       handleFullDayChange: this.handleFullDayChange,
       handlePropFromEventChange: this.handlePropFromEventChange,

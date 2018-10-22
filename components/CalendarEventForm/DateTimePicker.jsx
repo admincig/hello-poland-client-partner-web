@@ -89,6 +89,7 @@ DateTimePicker.propTypes = {
     PropTypes.shape({}),
     PropTypes.string,
   ]).isRequired,
+  disabled: PropTypes.bool,
   DatePickerProps: PropTypes.shape({}),
   fullDay: PropTypes.bool,
   label: PropTypes.string,
@@ -99,6 +100,7 @@ DateTimePicker.propTypes = {
 
 DateTimePicker.defaultProps = {
   DatePickerProps: undefined,
+  disabled: false,
   fullDay: false,
   label: undefined,
   name: undefined,
