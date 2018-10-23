@@ -8,9 +8,13 @@ import DesktopWindows from '@material-ui/icons/DesktopWindows';
 import AddIcon from '@material-ui/icons/Add';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import NotificationImportantIcon from '@material-ui/icons/NotificationImportant';
 import ListItem from '@material-ui/core/ListItem';
 
+
 const HomeListItem = ({
+  blocked,
   icon: Icon,
   primary,
   secondary,
@@ -22,6 +26,7 @@ const HomeListItem = ({
   onEditLabel,
   onViewClick,
   onViewLabel,
+  published,
 }) => (
   <ListItem>
     <ListItemIcon>
@@ -32,6 +37,12 @@ const HomeListItem = ({
       secondary={secondary}
     />
     <ListItemSecondaryAction>
+      {blocked &&
+        <NotificationImportantIcon color="error" style={{ verticalAlign: 'middle' }} />
+      }
+      {published &&
+        <VisibilityIcon color="primary" style={{ verticalAlign: 'middle' }} />
+      }
       {onViewClick &&
         <IconButton
           aria-label={onViewLabel}
@@ -72,6 +83,7 @@ const HomeListItem = ({
 );
 
 HomeListItem.propTypes = {
+  blocked: PropTypes.bool,
   icon: PropTypes.func.isRequired,
   onAddClick: PropTypes.func,
   onAddLabel: PropTypes.string,
@@ -82,10 +94,12 @@ HomeListItem.propTypes = {
   onViewClick: PropTypes.func,
   onViewLabel: PropTypes.string,
   primary: PropTypes.string.isRequired,
+  published: PropTypes.bool,
   secondary: PropTypes.string,
 };
 
 HomeListItem.defaultProps = {
+  blocked: false,
   onAddClick: null,
   onAddLabel: null,
   onDeleteClick: null,
@@ -94,6 +108,7 @@ HomeListItem.defaultProps = {
   onEditLabel: null,
   onViewClick: null,
   onViewLabel: null,
+  published: false,
   secondary: null,
 };
 
