@@ -21,6 +21,14 @@ export default [
   },
   {
     component: SwitchLabel,
+    key: 'published',
+    value: true,
+    props: {
+      label: 'Opublikowano',
+    },
+  },
+  {
+    component: SwitchLabel,
     key: 'generalAdmission',
     value: true,
     props: {

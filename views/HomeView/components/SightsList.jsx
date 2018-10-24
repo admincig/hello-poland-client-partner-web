@@ -319,27 +319,30 @@ class SightsList extends Component {
         </Button>
         {sightsList && sightsList.length ?
           <List>
-            {sightsList.map(({ id: sightId, name }) => (
-              <Fragment key={`sight-${sightId}-${name}`}>
+            {sightsList.map(sight => (
+              <Fragment key={`sight-${sight.id}-${sight.name}`}>
                 <HomeListItem
+                  blocked={sight.blocked}
                   icon={PlaceIcon}
-                  key={`${sightId}-${name}`}
-                  primary={name}
-                  onAddClick={() => this.handleSightEventEdit({ sightId })}
+                  key={`${sight.id}-${sight.name}`}
+                  primary={sight.name}
+                  onAddClick={() => this.handleSightEventEdit({ sightId: sight.id })}
                   onAddLabel="Dodaj wydarzenie"
-                  onDeleteClick={() => this.handleSightDelete(sightId)}
+                  onDeleteClick={() => this.handleSightDelete(sight.id)}
                   onDeleteLabel="Usuń atrakcję"
                   onEditClick={() => {
-                    this.handleSightEdit(sightsList.find(sight => sight.id === sightId));
+                    this.handleSightEdit(sightsList.find(sightItem => sightItem.id === sight.id));
                   }}
                   onEditLabel="Edytuj atrakcję"
+                  published={sight.published}
                 />
                 <List style={{ marginLeft: 55 }}>
                   {sightEventsList && sightEventsList
-                    .filter(item => item.sightId === sightId)
+                    .filter(item => item.sightId === sight.id)
                     .map(sightEvent => (
                       <Fragment key={`sightEvent-${sightEvent.id}-${sightEvent.name}`}>
                         <HomeListItem
+                          blocked={sightEvent.blocked}
                           icon={ImportContacts}
                           key={`${sightEvent.id}-${sightEvent.name}`}
                           primary={sightEvent.name}
@@ -351,6 +354,7 @@ class SightsList extends Component {
                           onDeleteLabel="Usuń wydarzenie"
                           onEditClick={() => this.handleSightEventEdit(sightEvent)}
                           onEditLabel="Edytuj wydarzenie"
+                          published={sightEvent.published}
                         />
                         <List style={{ marginLeft: 55 }}>
                           {sightEvent.ticketPoolDefinitions && sightEvent.ticketPoolDefinitions
