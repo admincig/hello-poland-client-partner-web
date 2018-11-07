@@ -54,6 +54,7 @@ class SightsList extends Component {
     formType: null,
     mediaManager: false,
     mediaManagerData: {},
+    mediaManagerSubmitting: false,
     schema: null,
     submitError: false,
     title: null,
@@ -148,7 +149,12 @@ class SightsList extends Component {
     });
   };
 
-  handleMediaManagerClose = () => this.setState({ mediaManager: false, mediaManagerData: {} });
+  handleMediaManagerClose = () => this.setState({
+    mediaManager: false,
+    mediaManagerData: {},
+    mediaManagerSubmitting: false,
+    submitError: false,
+  });
 
   handleMediaManagerOpen = ({ parentId, parentType, fileType }) => {
     this.setState({
@@ -185,9 +191,17 @@ class SightsList extends Component {
       id: parentId,
       data,
       options,
+      onFailure: this.handleMediaManagerSubmitFailure,
       onSuccess: this.handleMediaManagerSubmitSuccess,
     });
+
+    this.setState({ mediaManagerSubmitting: true, submitError: false });
   };
+
+  handleMediaManagerSubmitFailure = () => this.setState({
+    mediaManagerSubmitting: false,
+    submitError: true,
+  });
 
   handleMediaManagerSubmitSuccess = () => this.handleMediaManagerClose();
 
@@ -364,7 +378,7 @@ class SightsList extends Component {
   render() {
     const { sightEventsList, sightsList } = this.props;
     const {
-      dialog, formData, formType, mediaManager, schema, submitError, title,
+      dialog, formData, formType, mediaManager, mediaManagerSubmitting, schema, submitError, title,
     } = this.state;
 
     return (
@@ -489,9 +503,11 @@ class SightsList extends Component {
         </FormDialog>
         <MediaManager
           disableBackdropClick
+          error={submitError}
           onClose={this.handleMediaManagerClose}
           onSubmit={this.handleMediaManagerSubmit}
           open={mediaManager}
+          submitting={mediaManagerSubmitting}
           title="Dodaj multimedia"
         />
       </Fragment>

@@ -63,12 +63,13 @@ class MediaDropzone extends Component {
   }
 
   render() {
-    const { classes, onDrop, ...props } = this.props;
+    const { classes, disabled, onDrop, ...props } = this.props;
 
     return (
       <Dropzone
         activeClassName={classes.dropzoneActive}
         className={classes.dropzone}
+        disabled={disabled}
         ref={this.dropzoneRef}
         {...props}
         onDrop={this.handleDrop}
@@ -82,6 +83,7 @@ class MediaDropzone extends Component {
           </Typography>
           <Button
             color="primary"
+            disabled={disabled}
             onClick={() => this.dropzoneRef.current.open()}
             size="small"
             variant="contained"
@@ -96,7 +98,12 @@ class MediaDropzone extends Component {
 
 MediaDropzone.propTypes = {
   classes: PropTypes.shape({}).isRequired,
+  disabled: PropTypes.bool,
   onDrop: PropTypes.func.isRequired,
+};
+
+MediaDropzone.defaultProps = {
+  disabled: false,
 };
 
 export default withStyles(styles)(MediaDropzone);
