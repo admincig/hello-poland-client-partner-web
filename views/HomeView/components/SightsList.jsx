@@ -42,8 +42,9 @@ const PARENT_TYPES = {
 };
 
 const FILE_TYPES = {
-  MAIN_IMAGE: 'MAIN_IMAGE',
+  DOCUMENT: 'DOCUMENT',
   IMAGE: 'IMAGE',
+  MAIN_IMAGE: 'MAIN_IMAGE',
 };
 
 class SightsList extends Component {
@@ -162,23 +163,25 @@ class SightsList extends Component {
   };
 
   handleMediaManagerSubmit = ({ data, options }) => {
-    const { createMainSightImage, createMainSightEventImage } = this.props;
+    const { createMainSightImage, createMainSightEventImage, createPDF } = this.props;
     const { mediaManagerData } = this.state;
     const { fileType, parentId, parentType } = mediaManagerData;
     let action = null;
 
-    if (parentType === PARENT_TYPES.SIGHT) {
-      if (fileType === FILE_TYPES.MAIN_IMAGE) {
+    if (fileType === FILE_TYPES.MAIN_IMAGE) {
+      if (parentType === PARENT_TYPES.SIGHT) {
         action = createMainSightImage;
       } else {
-        action = null;
-      }
-    } else if (parentType === PARENT_TYPES.OFFER) {
-      if (fileType === FILE_TYPES.MAIN_IMAGE) {
         action = createMainSightEventImage;
+      }
+    } else if (fileType === FILE_TYPES.IMAGE) {
+      if (parentType === PARENT_TYPES.SIGHT) {
+        action = null;
       } else {
         action = null;
       }
+    } else if (fileType === FILE_TYPES.DOCUMENT) {
+      action = createPDF;
     }
 
     action({
@@ -396,7 +399,7 @@ class SightsList extends Component {
                       fileType: FILE_TYPES.MAIN_IMAGE,
                     });
                   }}
-                  onMainImageLable="Dodaj główny obrazek"
+                  onMainImageLabel="Dodaj główny obrazek"
                   published={sight.published}
                 />
                 <List style={{ marginLeft: 55 }}>
@@ -424,7 +427,15 @@ class SightsList extends Component {
                               fileType: FILE_TYPES.MAIN_IMAGE,
                             });
                           }}
-                          onMainImageLable="Dodaj główny obrazek"
+                          onMainImageLabel="Dodaj główny obrazek"
+                          onDocumentClick={() => {
+                            this.handleMediaManagerOpen({
+                              parentId: sightEvent.id,
+                              parentType: PARENT_TYPES.OFFER,
+                              fileType: FILE_TYPES.DOCUMENT,
+                            });
+                          }}
+                          onDocumentLabel="Dodaj broszurę PDF"
                           published={sightEvent.published}
                         />
                         <List style={{ marginLeft: 55 }}>
@@ -502,6 +513,7 @@ class SightsList extends Component {
 SightsList.propTypes = {
   createMainSightImage: PropTypes.func.isRequired,
   createMainSightEventImage: PropTypes.func.isRequired,
+  createPDF: PropTypes.func.isRequired,
   createSight: PropTypes.func.isRequired,
   createSightEvent: PropTypes.func.isRequired,
   createTicketPoolDefinition: PropTypes.func.isRequired,
@@ -539,6 +551,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   createMainSightImage: sightsActions.createMainImage,
   createMainSightEventImage: sightEventActions.createMainImage,
+  createPDF: sightEventActions.createPDF,
   createSight: sightsActions.createItem,
   createSightEvent: sightEventActions.createItem,
   createTicketPoolDefinition: ticketPoolDefinitionActions.createItem,

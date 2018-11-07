@@ -9,6 +9,7 @@ import AddIcon from '@material-ui/icons/Add';
 import AddAPhoto from '@material-ui/icons/AddAPhoto';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
+import NoteAdd from '@material-ui/icons/NoteAdd';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import NotificationImportantIcon from '@material-ui/icons/NotificationImportant';
 import ListItem from '@material-ui/core/ListItem';
@@ -23,6 +24,8 @@ const HomeListItem = ({
   onAddLabel,
   onDeleteClick,
   onDeleteLabel,
+  onDocumentClick,
+  onDocumentLabel,
   onEditClick,
   onEditLabel,
   onMainImageClick,
@@ -63,6 +66,15 @@ const HomeListItem = ({
           <AddAPhoto />
         </IconButton>
       }
+      {onDocumentClick &&
+        <IconButton
+          aria-label={onDocumentLabel}
+          onClick={onDocumentClick}
+          title={onDocumentLabel}
+        >
+          <NoteAdd />
+        </IconButton>
+      }
       {onAddClick &&
         <IconButton
           aria-label={onAddLabel}
@@ -101,6 +113,8 @@ HomeListItem.propTypes = {
   onAddLabel: PropTypes.string,
   onDeleteClick: PropTypes.func,
   onDeleteLabel: PropTypes.string,
+  onDocumentClick: PropTypes.func,
+  onDocumentLabel: PropTypes.string,
   onEditClick: PropTypes.func,
   onEditLabel: PropTypes.string,
   onMainImageClick: PropTypes.func,
@@ -118,6 +132,8 @@ HomeListItem.defaultProps = {
   onAddLabel: null,
   onDeleteClick: null,
   onDeleteLabel: null,
+  onDocumentClick: null,
+  onDocumentLabel: null,
   onEditClick: null,
   onEditLabel: null,
   onMainImageClick: null,
