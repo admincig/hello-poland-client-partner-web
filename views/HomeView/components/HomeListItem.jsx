@@ -6,6 +6,7 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import IconButton from '@material-ui/core/IconButton';
 import DesktopWindows from '@material-ui/icons/DesktopWindows';
 import AddIcon from '@material-ui/icons/Add';
+import AddAPhoto from '@material-ui/icons/AddAPhoto';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
 import VisibilityIcon from '@material-ui/icons/Visibility';
@@ -24,6 +25,8 @@ const HomeListItem = ({
   onDeleteLabel,
   onEditClick,
   onEditLabel,
+  onMainImageClick,
+  onMainImageLabel,
   onViewClick,
   onViewLabel,
   published,
@@ -49,6 +52,15 @@ const HomeListItem = ({
           title={onViewLabel}
         >
           <DesktopWindows />
+        </IconButton>
+      }
+      {onMainImageClick &&
+        <IconButton
+          aria-label={onMainImageLabel}
+          onClick={onMainImageClick}
+          title={onMainImageLabel}
+        >
+          <AddAPhoto />
         </IconButton>
       }
       {onAddClick &&
@@ -91,6 +103,8 @@ HomeListItem.propTypes = {
   onDeleteLabel: PropTypes.string,
   onEditClick: PropTypes.func,
   onEditLabel: PropTypes.string,
+  onMainImageClick: PropTypes.func,
+  onMainImageLabel: PropTypes.string,
   onViewClick: PropTypes.func,
   onViewLabel: PropTypes.string,
   primary: PropTypes.string.isRequired,
@@ -106,6 +120,8 @@ HomeListItem.defaultProps = {
   onDeleteLabel: null,
   onEditClick: null,
   onEditLabel: null,
+  onMainImageClick: null,
+  onMainImageLabel: null,
   onViewClick: null,
   onViewLabel: null,
   published: false,
