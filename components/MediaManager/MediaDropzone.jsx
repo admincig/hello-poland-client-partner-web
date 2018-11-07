@@ -63,7 +63,9 @@ class MediaDropzone extends Component {
   }
 
   render() {
-    const { classes, disabled, onDrop, ...props } = this.props;
+    const {
+      classes, disabled, onDrop, ...props
+    } = this.props;
 
     return (
       <Dropzone
