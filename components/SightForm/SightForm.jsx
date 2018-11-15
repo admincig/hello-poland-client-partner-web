@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
+import _isNumber from 'lodash/isNumber';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
@@ -12,17 +15,8 @@ import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import yupBoolen from 'yup/lib/boolean';
-
-const GridItem = ({ children, ...props }) => (
-  <Grid item md={12} sm={12} xs={12} {...props}>
-    {children}
-  </Grid>
-);
-
-GridItem.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
+import { actions as sightsActions } from '@hello-poland/commons/redux/sights';
+import GridItem from 'components/GridItem';
 
 const commonProps = {
   fullWidth: true,
@@ -101,13 +95,61 @@ class SightForm extends Component {
   };
 
   handleSubmit = (values, actions) => {
-    const { id, data } = values;
-    console.log('handleSubmit', values, actions);
+    const { onSubmit } = this.props;
+
+    if (onSubmit) {
+      onSubmit(values, actions);
+
+      return;
+    }
+
+    const { id, ...data } = values;
+    const { createItem, updateItem } = this.props;
+    let action = createItem;
+    const payload = {
+      data,
+      onFailure: this.handleSubmitFailure(actions),
+      onSuccess: this.handleSubmitSuccess(actions),
+    };
+
+    if (_isNumber(id)) {
+      action = updateItem;
+      payload.id = id;
+    }
+
+    action(payload);
+  };
+
+  handleSubmitFailure = actions => () => {
+    const { onSubmitFailure } = this.props;
+
+    if (onSubmitFailure) {
+      onSubmitFailure(actions);
+    }
+
+    const { setSubmitting } = actions;
+
+    setSubmitting(false);
+  };
+
+  handleSubmitSuccess = actions => (sightId) => {
+    const { onSubmitSuccess } = this.props;
+
+    if (onSubmitSuccess) {
+      onSubmitSuccess(sightId, actions);
+
+      return;
+    }
+
+    const { resetForm, setSubmitting } = actions;
+
+    setSubmitting(false);
+    resetForm();
   };
 
   render() {
     const { initialValues } = this.state;
-    const { classes, onSubmit, ...props } = this.props;
+    const { classes, onSubmit } = this.props;
 
     return (
       <Formik
@@ -182,7 +224,13 @@ class SightForm extends Component {
                 <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
               </GridItem>
             </Grid>
-            <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>ok</Button>
+            <Grid container spacing={16}>
+              <GridItem md={2} sm={2}>
+                <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
+                  Zapisz
+                </Button>
+              </GridItem>
+            </Grid>
           </Form>
         )}
       </Formik>
@@ -192,12 +240,29 @@ class SightForm extends Component {
 
 SightForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
+  createItem: PropTypes.func.isRequired,
   initialValues: PropTypes.shape({}),
+  onSubmit: PropTypes.func,
+  onSubmitFailure: PropTypes.func,
+  onSubmitSuccess: PropTypes.func,
+  updateItem: PropTypes.func.isRequired,
 };
 
 SightForm.defaultProps = {
   initialValues: null,
-  // onChange: null,
+  onSubmit: null,
+  onSubmitFailure: null,
+  onSubmitSuccess: null,
 };
 
-export default withStyles(styles)(SightForm);
+const mapStateToProps = () => ({});
+
+const mapDispatchToProps = {
+  createItem: sightsActions.createItem,
+  updateItem: sightsActions.updateItem,
+};
+
+export default compose(
+  withStyles(styles),
+  connect(mapStateToProps, mapDispatchToProps),
+)(SightForm);
