@@ -124,7 +124,6 @@ class SightFormDialog extends Component {
   };
 
   render() {
-    const { error, isSightFetching, isSubmitting } = this.state;
     const {
       fetchingError, isFetching, isSubmitting, submittingError,
     } = this.state;
