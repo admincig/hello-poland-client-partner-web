@@ -127,7 +127,7 @@ class SightEventForm extends Component {
       onSuccess: this.handleSubmitSuccess(actions),
     };
 
-    debugger;
+
     if (_isNumber(id)) {
       action = updateItem;
       payload.id = id;
