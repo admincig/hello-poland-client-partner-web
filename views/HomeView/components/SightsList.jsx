@@ -60,7 +60,7 @@ class SightsList extends Component {
     sightForm: false,
     sightId: null,
     submitError: false,
-    title: null,
+    title: '',
   };
 
   componentDidMount() {
@@ -131,7 +131,7 @@ class SightsList extends Component {
     formConfig: null,
     formType: null,
     schema: null,
-    title: null,
+    title: '',
   });
 
   handleFormDialogClose = () => this.setState({ dialog: false, submitError: false });
@@ -225,31 +225,8 @@ class SightsList extends Component {
   handleSightFormClose = () => this.setState({
     sightForm: false,
     sightId: null,
-    title: null,
+    title: '',
   });
-
-  handleSightEdit = (data = {}) => {
-    const { createSight, updateSight, fetchSight } = this.props;
-    const isPersisted = Number.isInteger(data.id);
-    const title = isPersisted ? 'Edytuj atrakcję' : 'Dodaj atrakcję';
-    const formConfig = {
-      action: createSight,
-    };
-
-    if (isPersisted) {
-      formConfig.action = updateSight;
-
-      fetchSight({ id: data.id });
-    }
-
-    this.handleFormDialogOpen({
-      data,
-      formConfig,
-      formType: 'FormGenerator',
-      schema: sightSchema,
-      title,
-    });
-  };
 
   handleSightEventDelete = (sightEventId) => {
     const { deleteSightEvent } = this.props;
@@ -416,7 +393,7 @@ class SightsList extends Component {
                   onDeleteClick={() => this.handleSightDelete(sight.id)}
                   onDeleteLabel="Usuń atrakcję"
                   onEditClick={() => {
-                    this.handleSightEdit(sightsList.find(sightItem => sightItem.id === sight.id));
+                    this.handleSightFormOpen({ sightId: sight.id, title: 'Edytuj atrakcję' });
                   }}
                   onEditLabel="Edytuj atrakcję"
                   onMainImageClick={() => {
@@ -527,7 +504,6 @@ class SightsList extends Component {
         </FormDialog>
         <SightFormDialog
           onClose={this.handleSightFormClose}
-          onSubmit={(...args) => console.log(...args)}
           open={sightForm}
           sightId={sightId}
           title={title}
@@ -556,7 +532,6 @@ SightsList.propTypes = {
   deleteSight: PropTypes.func.isRequired,
   deleteSightEvent: PropTypes.func.isRequired,
   deleteTicketPoolDefinition: PropTypes.func.isRequired,
-  fetchSight: PropTypes.func.isRequired,
   fetchSightEvent: PropTypes.func.isRequired,
   fetchTicketPoolDefinition: PropTypes.func.isRequired,
   fetchSightsList: PropTypes.func.isRequired,
@@ -565,7 +540,6 @@ SightsList.propTypes = {
   sightEvent: PropTypes.shape({}),
   sightsList: PropTypes.arrayOf(PropTypes.shape({})),
   sightEventsList: PropTypes.arrayOf(PropTypes.shape({})),
-  updateSight: PropTypes.func.isRequired,
   updateSightEvent: PropTypes.func.isRequired,
   updateTicketPoolDefinition: PropTypes.func.isRequired,
 };
@@ -594,12 +568,10 @@ const mapDispatchToProps = {
   deleteSight: sightsActions.deleteItem,
   deleteSightEvent: sightEventActions.deleteItem,
   deleteTicketPoolDefinition: ticketPoolDefinitionActions.deleteItem,
-  fetchSight: sightsActions.fetchItem,
   fetchSightEvent: sightEventActions.fetchItem,
   fetchTicketPoolDefinition: ticketPoolDefinitionActions.fetchItem,
   fetchSightsList: sightsActions.fetchList,
   fetchSightEventsList: sightEventActions.fetchList,
-  updateSight: sightsActions.updateItem,
   updateSightEvent: sightEventActions.updateItem,
   updateTicketPoolDefinition: ticketPoolDefinitionActions.updateItem,
 };

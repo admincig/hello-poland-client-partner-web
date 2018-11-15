@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+import _isEqual from 'lodash/isEqual';
 import _isNumber from 'lodash/isNumber';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
@@ -72,6 +73,15 @@ class SightForm extends Component {
     });
   }
 
+  componentDidUpdate(prevProps) {
+    const { initialValues: prevInitialValues } = prevProps;
+    const { initialValues } = this.props;
+
+    if (!_isEqual(prevInitialValues, initialValues)) {
+      this.setInitialValues(initialValues);
+    }
+  }
+
   getInitialValues = (initialValues) => {
     const { location: initialLocation, ...details } = initialValues || {};
     const location = initialLocation || {};
@@ -93,6 +103,10 @@ class SightForm extends Component {
       },
     };
   };
+
+  setInitialValues = initialValues => this.setState({
+    initialValues: this.getInitialValues(initialValues),
+  });
 
   handleSubmit = (values, actions) => {
     const { onSubmit } = this.props;
@@ -149,10 +163,11 @@ class SightForm extends Component {
 
   render() {
     const { initialValues } = this.state;
-    const { classes, onSubmit } = this.props;
+    const { buttons, classes, FormikProps } = this.props;
 
     return (
       <Formik
+        {...FormikProps}
         initialValues={initialValues}
         validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
@@ -224,7 +239,7 @@ class SightForm extends Component {
                 <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
               </GridItem>
             </Grid>
-            {!onSubmit &&
+            {buttons &&
               <Grid container spacing={16}>
                 <GridItem md={2} sm={2}>
                   <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
@@ -241,8 +256,10 @@ class SightForm extends Component {
 }
 
 SightForm.propTypes = {
+  buttons: PropTypes.bool,
   classes: PropTypes.shape({}).isRequired,
   createItem: PropTypes.func.isRequired,
+  FormikProps: PropTypes.shape({}),
   initialValues: PropTypes.shape({}),
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
@@ -251,6 +268,8 @@ SightForm.propTypes = {
 };
 
 SightForm.defaultProps = {
+  buttons: true,
+  FormikProps: null,
   initialValues: null,
   onSubmit: null,
   onSubmitFailure: null,
