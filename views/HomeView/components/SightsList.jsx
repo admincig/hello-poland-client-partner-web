@@ -2,7 +2,6 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import _isEqual from 'lodash/isEqual';
 import List from '@material-ui/core/List';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
@@ -23,6 +22,7 @@ import {
 import { actions as ticketPoolDefinitionActions } from '@hello-poland/commons/redux/ticketPoolDefinitions';
 import FormDialog from 'components/FormDialog';
 import SightFormDialog from 'components/SightForm/Dialog';
+import SightEventFormDialog from 'components/SightEventForm/Dialog';
 import MediaManager from 'components/MediaManager';
 import TicketPoolDefinitionForm from 'components/TicketPoolDefinitionForm';
 import { EmptyResultsMessage } from 'components/ViewMessage';
@@ -31,8 +31,6 @@ import populate from 'utils/form-generator/data/populate';
 import deserialize from 'utils/form-generator/data/deserialize';
 import serialize from 'utils/form-generator/data/serialize';
 import formatPrice from 'utils/formatPrice';
-import sightSchema from './sightSchema';
-import sightEventSchema from './sightEventSchema';
 import ticketPoolDefinitionSchema from './ticketPoolDefinitionSchema';
 import HomeListItem from './HomeListItem';
 
@@ -58,7 +56,7 @@ class SightsList extends Component {
     mediaManagerSubmitting: false,
     schema: null,
     sightForm: false,
-    sightId: null,
+    sightEventForm: false,
     submitError: false,
     title: '',
   };
@@ -68,20 +66,6 @@ class SightsList extends Component {
 
     fetchSightsList();
     fetchSightEventsList();
-  }
-
-  componentDidUpdate(prevProps) {
-    const { sight: prevSight, sightEvent: prevSightEvent } = prevProps;
-    const { sight, sightEvent } = this.props;
-    const { dialog } = this.state;
-
-    if (dialog) {
-      if (!_isEqual(prevSight, sight)) {
-        this.updateFormData(sightSchema, sight);
-      } else if (!_isEqual(prevSightEvent, sightEvent)) {
-        this.updateFormData(sightEventSchema, sightEvent);
-      }
-    }
   }
 
   getFormattedDate = (date) => {
@@ -216,16 +200,33 @@ class SightsList extends Component {
     }
   };
 
+  handleSightFormClose = () => this.setState({
+    sightForm: false,
+    formData: null,
+    title: '',
+  });
+
   handleSightFormOpen = ({ sightId, title }) => this.setState({
     sightForm: true,
-    sightId,
+    formData: {
+      itemId: sightId,
+    },
     title,
   });
 
-  handleSightFormClose = () => this.setState({
-    sightForm: false,
-    sightId: null,
+  handleSightEventFormClose = () => this.setState({
+    sightEventForm: false,
+    formData: null,
     title: '',
+  });
+
+  handleSightEventFormOpen = ({ sightEventId, sightId, title }) => this.setState({
+    sightEventForm: true,
+    formData: {
+      parentId: sightId,
+      itemId: sightEventId,
+    },
+    title,
   });
 
   handleSightEventDelete = (sightEventId) => {
@@ -234,30 +235,6 @@ class SightsList extends Component {
     if (Number.isInteger(sightEventId)) {
       deleteSightEvent({ id: sightEventId, onSuccess: this.handleFormSubmitSuccess });
     }
-  };
-
-  handleSightEventEdit = (data = {}) => {
-    const { createSightEvent, updateSightEvent, fetchSightEvent } = this.props;
-    const isPersisted = Number.isInteger(data.id);
-    const title = isPersisted ? 'Edytuj wydarzenie' : 'Dodaj wydarzenie';
-    const formType = 'FormGenerator';
-    const formConfig = {
-      action: createSightEvent,
-    };
-
-    if (isPersisted) {
-      formConfig.action = updateSightEvent;
-
-      fetchSightEvent({ id: data.id });
-    }
-
-    this.handleFormDialogOpen({
-      data,
-      formConfig,
-      formType,
-      schema: sightEventSchema,
-      title,
-    });
   };
 
   handleTicketPoolDelete = (ticketPoolDefinitionId) => {
@@ -370,8 +347,8 @@ class SightsList extends Component {
   render() {
     const { sightEventsList, sightsList } = this.props;
     const {
-      dialog, formData, formType, mediaManager, mediaManagerSubmitting, schema, sightForm, sightId,
-      submitError, title,
+      dialog, formData, formType, mediaManager, mediaManagerSubmitting, schema, sightForm,
+      sightEventForm, submitError, title,
     } = this.state;
 
     return (
@@ -388,7 +365,10 @@ class SightsList extends Component {
                   icon={PlaceIcon}
                   key={`${sight.id}-${sight.name}`}
                   primary={sight.name}
-                  onAddClick={() => this.handleSightEventEdit({ sightId: sight.id })}
+                  onAddClick={() => this.handleSightEventFormOpen({
+                    sightId: sight.id,
+                    title: 'Dodaj wydarzenie',
+                  })}
                   onAddLabel="Dodaj wydarzenie"
                   onDeleteClick={() => this.handleSightDelete(sight.id)}
                   onDeleteLabel="Usuń atrakcję"
@@ -422,7 +402,11 @@ class SightsList extends Component {
                           onAddLabel="Dodaj pulę biletów"
                           onDeleteClick={() => this.handleSightEventDelete(sightEvent.id)}
                           onDeleteLabel="Usuń wydarzenie"
-                          onEditClick={() => this.handleSightEventEdit(sightEvent)}
+                          onEditClick={() => this.handleSightEventFormOpen({
+                            sightId: sight.id,
+                            sightEventId: sightEvent.id,
+                            title: 'Edytuj wydarzenie',
+                          })}
                           onEditLabel="Edytuj wydarzenie"
                           onMainImageClick={() => {
                             this.handleMediaManagerOpen({
@@ -453,7 +437,9 @@ class SightsList extends Component {
                                   key={`${ticketPoolDefinition.id}-${ticketPoolDefinition.name}`}
                                   primary={ticketPoolDefinition.name}
                                   secondary={
-                                    `Liczba biletów: ${ticketPoolDefinition.availableTicketsNumber}`
+                                    `Liczba biletów: ${ticketPoolDefinition.availableTicketsNumber === -1 ?
+                                      'Nielimitowane' : ticketPoolDefinition.availableTicketsNumber
+                                    }`
                                   }
                                   onDeleteClick={
                                     () => this.handleTicketPoolDelete(ticketPoolDefinition.id)
@@ -503,10 +489,18 @@ class SightsList extends Component {
           }, formType)}
         </FormDialog>
         <SightFormDialog
+          disableBackdropClick
           onClose={this.handleSightFormClose}
           open={sightForm}
-          sightId={sightId}
           title={title}
+          {...formData}
+        />
+        <SightEventFormDialog
+          disableBackdropClick
+          onClose={this.handleSightEventFormClose}
+          open={sightEventForm}
+          title={title}
+          {...formData}
         />
         <MediaManager
           disableBackdropClick
@@ -526,8 +520,6 @@ SightsList.propTypes = {
   createMainSightImage: PropTypes.func.isRequired,
   createMainSightEventImage: PropTypes.func.isRequired,
   createPDF: PropTypes.func.isRequired,
-  createSight: PropTypes.func.isRequired,
-  createSightEvent: PropTypes.func.isRequired,
   createTicketPoolDefinition: PropTypes.func.isRequired,
   deleteSight: PropTypes.func.isRequired,
   deleteSightEvent: PropTypes.func.isRequired,
@@ -562,8 +554,6 @@ const mapDispatchToProps = {
   createMainSightImage: sightsActions.createMainImage,
   createMainSightEventImage: sightEventActions.createMainImage,
   createPDF: sightEventActions.createPDF,
-  createSight: sightsActions.createItem,
-  createSightEvent: sightEventActions.createItem,
   createTicketPoolDefinition: ticketPoolDefinitionActions.createItem,
   deleteSight: sightsActions.deleteItem,
   deleteSightEvent: sightEventActions.deleteItem,

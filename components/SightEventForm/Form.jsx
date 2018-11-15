@@ -16,7 +16,7 @@ import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import yupBoolen from 'yup/lib/boolean';
-import { actions as sightsActions } from '@hello-poland/commons/redux/sights';
+import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
 import GridItem from 'components/GridItem';
 
 const commonProps = {
@@ -44,7 +44,7 @@ const styles = () => ({
   },
 });
 
-class SightForm extends Component {
+class SightEventForm extends Component {
   constructor(props) {
     super(props);
 
@@ -88,6 +88,7 @@ class SightForm extends Component {
 
     return {
       id: details.id || '',
+      sightId: details.sightId || '',
       name: details.name || '',
       published: details.published || false,
       generalAdmission: details.generalAdmission || false,
@@ -126,6 +127,7 @@ class SightForm extends Component {
       onSuccess: this.handleSubmitSuccess(actions),
     };
 
+    debugger;
     if (_isNumber(id)) {
       action = updateItem;
       payload.id = id;
@@ -184,8 +186,13 @@ class SightForm extends Component {
                   <Field name="id" hidden component={TextField} {...commonProps} />
                 </GridItem>
               </Hidden>
+              <Hidden xsUp>
+                <GridItem>
+                  <Field name="sightId" hidden component={TextField} {...commonProps} />
+                </GridItem>
+              </Hidden>
               <GridItem>
-                <Field name="name" label="Nazwa atrakcji" component={TextField} {...commonProps} />
+                <Field name="name" label="Nazwa wydarzenia" component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
                 <Field
@@ -204,7 +211,7 @@ class SightForm extends Component {
                   render={switchProps => (
                     <FormControlLabel
                       control={<Switch {...fieldToSwitch(switchProps)} />}
-                      label="Dodaj wydarzenie ogólne"
+                      label="Wydarzenie ogólne"
                     />
                   )}
                 />
@@ -256,7 +263,7 @@ class SightForm extends Component {
   }
 }
 
-SightForm.propTypes = {
+SightEventForm.propTypes = {
   buttons: PropTypes.bool,
   classes: PropTypes.shape({}).isRequired,
   createItem: PropTypes.func.isRequired,
@@ -268,7 +275,7 @@ SightForm.propTypes = {
   updateItem: PropTypes.func.isRequired,
 };
 
-SightForm.defaultProps = {
+SightEventForm.defaultProps = {
   buttons: true,
   FormikProps: null,
   initialValues: null,
@@ -280,11 +287,11 @@ SightForm.defaultProps = {
 const mapStateToProps = () => ({});
 
 const mapDispatchToProps = {
-  createItem: sightsActions.createItem,
-  updateItem: sightsActions.updateItem,
+  createItem: sightEventsActions.createItem,
+  updateItem: sightEventsActions.updateItem,
 };
 
 export default compose(
   withStyles(styles),
   connect(mapStateToProps, mapDispatchToProps),
-)(SightForm);
+)(SightEventForm);

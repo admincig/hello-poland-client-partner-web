@@ -9,13 +9,12 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Typography from '@material-ui/core/Typography/Typography';
 import {
-  actions as sightsActions,
-  selectors as sightsSelectors,
-} from '@hello-poland/commons/redux/sights';
-import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
+  actions as sightEventsActions,
+  selectors as sightEventsSelectors,
+} from '@hello-poland/commons/redux/sightEvents';
 import SightForm from './Form';
 
-class SightFormDialog extends Component {
+class SightEventFormDialog extends Component {
   constructor(props) {
     super(props);
 
@@ -38,13 +37,18 @@ class SightFormDialog extends Component {
   }
 
   getInitialValues = (item) => {
-    const { itemId } = this.props;
+    const { itemId, parentId } = this.props;
 
     if (this.isItemLoaded(itemId, item)) {
-      return item;
+      const sightId = item.sightId || parentId;
+
+      return {
+        ...item,
+        sightId,
+      };
     }
 
-    return null;
+    return { sightId: parentId };
   };
 
   handleClose = () => {
@@ -95,14 +99,13 @@ class SightFormDialog extends Component {
   };
 
   handleSubmitSuccess = (sightId, actions) => {
-    const { fetchSightsList, fetchSightEventsList } = this.props;
+    const { fetchList } = this.props;
     const { resetForm, setSubmitting } = actions;
 
     setSubmitting(false);
     resetForm();
 
-    fetchSightsList();
-    fetchSightEventsList();
+    fetchList();
     this.setState({ isSubmitting: false, submittingError: false });
     this.handleClose();
   };
@@ -124,13 +127,11 @@ class SightFormDialog extends Component {
   };
 
   render() {
-    const { error, isSightFetching, isSubmitting } = this.state;
     const {
       fetchingError, isFetching, isSubmitting, submittingError,
     } = this.state;
     const {
-      clearItem, fetchItem, fetchSightsList, fetchSightEventsList, item, itemId, onClose, title,
-      ...rest
+      clearItem, fetchItem, fetchList, item, itemId, onClose, parentId, title, ...rest
     } = this.props;
 
     return (
@@ -170,35 +171,35 @@ class SightFormDialog extends Component {
   }
 }
 
-SightFormDialog.propTypes = {
+SightEventFormDialog.propTypes = {
   clearItem: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
-  fetchSightsList: PropTypes.func.isRequired,
-  fetchSightEventsList: PropTypes.func.isRequired,
-  onClose: PropTypes.func,
-  open: PropTypes.bool,
+  fetchList: PropTypes.func.isRequired,
   item: PropTypes.shape({}),
   itemId: PropTypes.number,
+  onClose: PropTypes.func,
+  open: PropTypes.bool,
+  parentId: PropTypes.number,
   title: PropTypes.string,
 };
 
-SightFormDialog.defaultProps = {
+SightEventFormDialog.defaultProps = {
   onClose: null,
   item: null,
   itemId: null,
   open: false,
+  parentId: null,
   title: null,
 };
 
 const mapStateToProps = state => ({
-  item: sightsSelectors.getSight(state),
+  item: sightEventsSelectors.getSightEvent(state),
 });
 
 const mapDispatchToProps = {
-  clearItem: sightsActions.clearItem,
-  fetchItem: sightsActions.fetchItem,
-  fetchSightsList: sightsActions.fetchList,
-  fetchSightEventsList: sightEventsActions.fetchList,
+  clearItem: sightEventsActions.clearItem,
+  fetchItem: sightEventsActions.fetchItem,
+  fetchList: sightEventsActions.fetchList,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(SightFormDialog);
+export default connect(mapStateToProps, mapDispatchToProps)(SightEventFormDialog);
