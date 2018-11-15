@@ -1,1 +1,1 @@
-export { default } from './SightForm';
+export { default } from './Form';

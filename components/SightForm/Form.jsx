@@ -161,7 +161,7 @@ class SightForm extends Component {
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <GridItem>
-                <Typography variant="title" className={classes.title}>Dane podstawowe</Typography>
+                <Typography variant="title">Dane podstawowe</Typography>
               </GridItem>
               <Hidden xsUp>
                 <GridItem>
@@ -182,7 +182,7 @@ class SightForm extends Component {
                   )}
                 />
               </GridItem>
-              <GridItem md={4} sm={4}>
+              <GridItem md={8} sm={8}>
                 <Field
                   name="generalAdmission"
                   render={switchProps => (
@@ -194,7 +194,7 @@ class SightForm extends Component {
                 />
               </GridItem>
               <GridItem>
-                <Field name="lead" label="Zajawka" component={TextField} {...commonProps} />
+                <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
                 <Field name="description" label="Opis atrakcji" component={TextField} {...commonProps} multiline rowsMax={20} />
@@ -224,13 +224,15 @@ class SightForm extends Component {
                 <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
               </GridItem>
             </Grid>
-            <Grid container spacing={16}>
-              <GridItem md={2} sm={2}>
-                <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
-                  Zapisz
-                </Button>
-              </GridItem>
-            </Grid>
+            {!onSubmit &&
+              <Grid container spacing={16}>
+                <GridItem md={2} sm={2}>
+                  <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
+                    Zapisz
+                  </Button>
+                </GridItem>
+              </Grid>
+            }
           </Form>
         )}
       </Formik>

@@ -22,6 +22,7 @@ import {
 } from '@hello-poland/commons/redux/sightEvents';
 import { actions as ticketPoolDefinitionActions } from '@hello-poland/commons/redux/ticketPoolDefinitions';
 import FormDialog from 'components/FormDialog';
+import SightFormDialog from 'components/SightForm/Dialog';
 import MediaManager from 'components/MediaManager';
 import TicketPoolDefinitionForm from 'components/TicketPoolDefinitionForm';
 import { EmptyResultsMessage } from 'components/ViewMessage';
@@ -34,7 +35,6 @@ import sightSchema from './sightSchema';
 import sightEventSchema from './sightEventSchema';
 import ticketPoolDefinitionSchema from './ticketPoolDefinitionSchema';
 import HomeListItem from './HomeListItem';
-// const IMG_URL = 'https://i.kinja-img.com/gawker-media/image/upload/t_original/wsgtilb9ibbxysybe3mu.png';
 
 const PARENT_TYPES = {
   SIGHT: 'SIGHT',
@@ -56,6 +56,8 @@ class SightsList extends Component {
     mediaManagerData: {},
     mediaManagerSubmitting: false,
     schema: null,
+    sightForm: false,
+    sightId: null,
     submitError: false,
     title: null,
   };
@@ -156,16 +158,14 @@ class SightsList extends Component {
     submitError: false,
   });
 
-  handleMediaManagerOpen = ({ parentId, parentType, fileType }) => {
-    this.setState({
-      mediaManager: true,
-      mediaManagerData: {
-        fileType,
-        parentId,
-        parentType,
-      },
-    });
-  };
+  handleMediaManagerOpen = ({ parentId, parentType, fileType }) => this.setState({
+    mediaManager: true,
+    mediaManagerData: {
+      fileType,
+      parentId,
+      parentType,
+    },
+  });
 
   handleMediaManagerSubmit = ({ data, options }) => {
     const { createMainSightImage, createMainSightEventImage } = this.props;
@@ -212,6 +212,18 @@ class SightsList extends Component {
       deleteSight({ id: sightId, onSuccess: this.handleFormSubmitSuccess });
     }
   };
+
+  handleSightFormOpen = ({ sightId, title }) => this.setState({
+    sightForm: true,
+    sightId,
+    title,
+  });
+
+  handleSightFormClose = () => this.setState({
+    sightForm: false,
+    sightId: null,
+    title: null,
+  });
 
   handleSightEdit = (data = {}) => {
     const { createSight, updateSight, fetchSight } = this.props;
@@ -378,12 +390,13 @@ class SightsList extends Component {
   render() {
     const { sightEventsList, sightsList } = this.props;
     const {
-      dialog, formData, formType, mediaManager, mediaManagerSubmitting, schema, submitError, title,
+      dialog, formData, formType, mediaManager, mediaManagerSubmitting, schema, sightForm, sightId,
+      submitError, title,
     } = this.state;
 
     return (
       <Fragment>
-        <Button onClick={() => this.handleSightEdit()}>
+        <Button onClick={() => this.handleSightFormOpen({ title: 'Dodaj atrakcję' })}>
           Dodaj atrakcję
         </Button>
         {sightsList && sightsList.length ?
@@ -501,6 +514,13 @@ class SightsList extends Component {
             schema,
           }, formType)}
         </FormDialog>
+        <SightFormDialog
+          onClose={this.handleSightFormClose}
+          onSubmit={(...args) => console.log(...args)}
+          open={sightForm}
+          sightId={sightId}
+          title={title}
+        />
         <MediaManager
           disableBackdropClick
           error={submitError}
