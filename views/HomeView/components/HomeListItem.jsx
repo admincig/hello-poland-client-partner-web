@@ -6,8 +6,10 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import IconButton from '@material-ui/core/IconButton';
 import DesktopWindows from '@material-ui/icons/DesktopWindows';
 import AddIcon from '@material-ui/icons/Add';
+import AddAPhoto from '@material-ui/icons/AddAPhoto';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
+import NoteAdd from '@material-ui/icons/NoteAdd';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import NotificationImportantIcon from '@material-ui/icons/NotificationImportant';
 import ListItem from '@material-ui/core/ListItem';
@@ -22,8 +24,12 @@ const HomeListItem = ({
   onAddLabel,
   onDeleteClick,
   onDeleteLabel,
+  onDocumentClick,
+  onDocumentLabel,
   onEditClick,
   onEditLabel,
+  onMainImageClick,
+  onMainImageLabel,
   onViewClick,
   onViewLabel,
   published,
@@ -49,6 +55,24 @@ const HomeListItem = ({
           title={onViewLabel}
         >
           <DesktopWindows />
+        </IconButton>
+      }
+      {onMainImageClick &&
+        <IconButton
+          aria-label={onMainImageLabel}
+          onClick={onMainImageClick}
+          title={onMainImageLabel}
+        >
+          <AddAPhoto />
+        </IconButton>
+      }
+      {onDocumentClick &&
+        <IconButton
+          aria-label={onDocumentLabel}
+          onClick={onDocumentClick}
+          title={onDocumentLabel}
+        >
+          <NoteAdd />
         </IconButton>
       }
       {onAddClick &&
@@ -89,8 +113,12 @@ HomeListItem.propTypes = {
   onAddLabel: PropTypes.string,
   onDeleteClick: PropTypes.func,
   onDeleteLabel: PropTypes.string,
+  onDocumentClick: PropTypes.func,
+  onDocumentLabel: PropTypes.string,
   onEditClick: PropTypes.func,
   onEditLabel: PropTypes.string,
+  onMainImageClick: PropTypes.func,
+  onMainImageLabel: PropTypes.string,
   onViewClick: PropTypes.func,
   onViewLabel: PropTypes.string,
   primary: PropTypes.string.isRequired,
@@ -104,8 +132,12 @@ HomeListItem.defaultProps = {
   onAddLabel: null,
   onDeleteClick: null,
   onDeleteLabel: null,
+  onDocumentClick: null,
+  onDocumentLabel: null,
   onEditClick: null,
   onEditLabel: null,
+  onMainImageClick: null,
+  onMainImageLabel: null,
   onViewClick: null,
   onViewLabel: null,
   published: false,

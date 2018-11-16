@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { bindActionCreators, compose } from 'redux';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import _isEqual from 'lodash/isEqual';
 import List from '@material-ui/core/List';
@@ -22,6 +22,7 @@ import {
 } from '@hello-poland/commons/redux/sightEvents';
 import { actions as ticketPoolDefinitionActions } from '@hello-poland/commons/redux/ticketPoolDefinitions';
 import FormDialog from 'components/FormDialog';
+import MediaManager from 'components/MediaManager';
 import TicketPoolDefinitionForm from 'components/TicketPoolDefinitionForm';
 import { EmptyResultsMessage } from 'components/ViewMessage';
 import FormGenerator from 'utils/form-generator';
@@ -33,8 +34,18 @@ import sightSchema from './sightSchema';
 import sightEventSchema from './sightEventSchema';
 import ticketPoolDefinitionSchema from './ticketPoolDefinitionSchema';
 import HomeListItem from './HomeListItem';
-
 // const IMG_URL = 'https://i.kinja-img.com/gawker-media/image/upload/t_original/wsgtilb9ibbxysybe3mu.png';
+
+const PARENT_TYPES = {
+  SIGHT: 'SIGHT',
+  OFFER: 'OFFER',
+};
+
+const FILE_TYPES = {
+  DOCUMENT: 'DOCUMENT',
+  IMAGE: 'IMAGE',
+  MAIN_IMAGE: 'MAIN_IMAGE',
+};
 
 class SightsList extends Component {
   state = {
@@ -42,6 +53,9 @@ class SightsList extends Component {
     formConfig: null,
     formData: null,
     formType: null,
+    mediaManager: false,
+    mediaManagerData: {},
+    mediaManagerSubmitting: false,
     schema: null,
     submitError: false,
     title: null,
@@ -135,6 +149,64 @@ class SightsList extends Component {
       title,
     });
   };
+
+  handleMediaManagerClose = () => this.setState({
+    mediaManager: false,
+    mediaManagerData: {},
+    mediaManagerSubmitting: false,
+    submitError: false,
+  });
+
+  handleMediaManagerOpen = ({ parentId, parentType, fileType }) => {
+    this.setState({
+      mediaManager: true,
+      mediaManagerData: {
+        fileType,
+        parentId,
+        parentType,
+      },
+    });
+  };
+
+  handleMediaManagerSubmit = ({ data, options }) => {
+    const { createMainSightImage, createMainSightEventImage, createPDF } = this.props;
+    const { mediaManagerData } = this.state;
+    const { fileType, parentId, parentType } = mediaManagerData;
+    let action = null;
+
+    if (fileType === FILE_TYPES.MAIN_IMAGE) {
+      if (parentType === PARENT_TYPES.SIGHT) {
+        action = createMainSightImage;
+      } else {
+        action = createMainSightEventImage;
+      }
+    } else if (fileType === FILE_TYPES.IMAGE) {
+      if (parentType === PARENT_TYPES.SIGHT) {
+        action = null;
+      } else {
+        action = null;
+      }
+    } else if (fileType === FILE_TYPES.DOCUMENT) {
+      action = createPDF;
+    }
+
+    action({
+      id: parentId,
+      data,
+      options,
+      onFailure: this.handleMediaManagerSubmitFailure,
+      onSuccess: this.handleMediaManagerSubmitSuccess,
+    });
+
+    this.setState({ mediaManagerSubmitting: true, submitError: false });
+  };
+
+  handleMediaManagerSubmitFailure = () => this.setState({
+    mediaManagerSubmitting: false,
+    submitError: true,
+  });
+
+  handleMediaManagerSubmitSuccess = () => this.handleMediaManagerClose();
 
   handleSightDelete = (sightId) => {
     const { deleteSight } = this.props;
@@ -309,7 +381,7 @@ class SightsList extends Component {
   render() {
     const { sightEventsList, sightsList } = this.props;
     const {
-      dialog, formData, formType, schema, submitError, title,
+      dialog, formData, formType, mediaManager, mediaManagerSubmitting, schema, submitError, title,
     } = this.state;
 
     return (
@@ -334,6 +406,14 @@ class SightsList extends Component {
                     this.handleSightEdit(sightsList.find(sightItem => sightItem.id === sight.id));
                   }}
                   onEditLabel="Edytuj atrakcję"
+                  onMainImageClick={() => {
+                    this.handleMediaManagerOpen({
+                      parentId: sight.id,
+                      parentType: PARENT_TYPES.SIGHT,
+                      fileType: FILE_TYPES.MAIN_IMAGE,
+                    });
+                  }}
+                  onMainImageLabel="Dodaj główny obrazek"
                   published={sight.published}
                 />
                 <List style={{ marginLeft: 55 }}>
@@ -354,6 +434,22 @@ class SightsList extends Component {
                           onDeleteLabel="Usuń wydarzenie"
                           onEditClick={() => this.handleSightEventEdit(sightEvent)}
                           onEditLabel="Edytuj wydarzenie"
+                          onMainImageClick={() => {
+                            this.handleMediaManagerOpen({
+                              parentId: sightEvent.id,
+                              parentType: PARENT_TYPES.OFFER,
+                              fileType: FILE_TYPES.MAIN_IMAGE,
+                            });
+                          }}
+                          onMainImageLabel="Dodaj główny obrazek"
+                          onDocumentClick={() => {
+                            this.handleMediaManagerOpen({
+                              parentId: sightEvent.id,
+                              parentType: PARENT_TYPES.OFFER,
+                              fileType: FILE_TYPES.DOCUMENT,
+                            });
+                          }}
+                          onDocumentLabel="Dodaj broszurę PDF"
                           published={sightEvent.published}
                         />
                         <List style={{ marginLeft: 55 }}>
@@ -416,13 +512,24 @@ class SightsList extends Component {
             schema,
           }, formType)}
         </FormDialog>
-
+        <MediaManager
+          disableBackdropClick
+          error={submitError}
+          onClose={this.handleMediaManagerClose}
+          onSubmit={this.handleMediaManagerSubmit}
+          open={mediaManager}
+          submitting={mediaManagerSubmitting}
+          title="Dodaj multimedia"
+        />
       </Fragment>
     );
   }
 }
 
 SightsList.propTypes = {
+  createMainSightImage: PropTypes.func.isRequired,
+  createMainSightEventImage: PropTypes.func.isRequired,
+  createPDF: PropTypes.func.isRequired,
   createSight: PropTypes.func.isRequired,
   createSightEvent: PropTypes.func.isRequired,
   createTicketPoolDefinition: PropTypes.func.isRequired,
@@ -457,22 +564,24 @@ const mapStateToProps = state => ({
   sightEventsList: sightEventSelectors.getSightEvents(state),
 });
 
-const mapDispatchToProps = dispatch =>
-  bindActionCreators({
-    createSight: sightsActions.createItem,
-    createSightEvent: sightEventActions.createItem,
-    createTicketPoolDefinition: ticketPoolDefinitionActions.createItem,
-    deleteSight: sightsActions.deleteItem,
-    deleteSightEvent: sightEventActions.deleteItem,
-    deleteTicketPoolDefinition: ticketPoolDefinitionActions.deleteItem,
-    fetchSight: sightsActions.fetchItem,
-    fetchSightEvent: sightEventActions.fetchItem,
-    fetchTicketPoolDefinition: ticketPoolDefinitionActions.fetchItem,
-    fetchSightsList: sightsActions.fetchList,
-    fetchSightEventsList: sightEventActions.fetchList,
-    updateSight: sightsActions.updateItem,
-    updateSightEvent: sightEventActions.updateItem,
-    updateTicketPoolDefinition: ticketPoolDefinitionActions.updateItem,
-  }, dispatch);
+const mapDispatchToProps = {
+  createMainSightImage: sightsActions.createMainImage,
+  createMainSightEventImage: sightEventActions.createMainImage,
+  createPDF: sightEventActions.createPDF,
+  createSight: sightsActions.createItem,
+  createSightEvent: sightEventActions.createItem,
+  createTicketPoolDefinition: ticketPoolDefinitionActions.createItem,
+  deleteSight: sightsActions.deleteItem,
+  deleteSightEvent: sightEventActions.deleteItem,
+  deleteTicketPoolDefinition: ticketPoolDefinitionActions.deleteItem,
+  fetchSight: sightsActions.fetchItem,
+  fetchSightEvent: sightEventActions.fetchItem,
+  fetchTicketPoolDefinition: ticketPoolDefinitionActions.fetchItem,
+  fetchSightsList: sightsActions.fetchList,
+  fetchSightEventsList: sightEventActions.fetchList,
+  updateSight: sightsActions.updateItem,
+  updateSightEvent: sightEventActions.updateItem,
+  updateTicketPoolDefinition: ticketPoolDefinitionActions.updateItem,
+};
 
 export default compose(connect(mapStateToProps, mapDispatchToProps))(SightsList);
