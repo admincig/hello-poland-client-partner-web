@@ -21,6 +21,8 @@ class SightFormDialog extends Component {
 
     this.formikRef = React.createRef();
 
+    this.intervalRef = null;
+
     this.state = {
       fetchingError: false,
       isFetching: false,
@@ -34,6 +36,12 @@ class SightFormDialog extends Component {
       const { itemId } = this.props;
 
       this.handleFetchItem(itemId);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.intervalRef) {
+      clearInterval(this.intervalRef);
     }
   }
 
@@ -84,6 +92,23 @@ class SightFormDialog extends Component {
     if (current && current.submitForm) {
       this.setState({ isSubmitting: true, submittingError: false });
       current.submitForm();
+
+      this.intervalRef = setInterval(this.handleSubmitChange, 200);
+    }
+  };
+
+  // hacking missing validation callback in Formik
+  handleSubmitChange = () => {
+    const { current } = this.formikRef;
+
+    if (current && current.getFormikBag) {
+      const { getFormikBag } = current;
+      const { isSubmitting } = getFormikBag();
+
+      if (!isSubmitting) {
+        this.setState({ isSubmitting });
+        clearInterval(this.intervalRef);
+      }
     }
   };
 
