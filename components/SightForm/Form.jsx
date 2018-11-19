@@ -164,10 +164,21 @@ class SightForm extends Component {
   });
 
   handleOpeningHoursChange = (day, keyName, keyValue) => {
-    console.log('handleOpeningHourChange', day, keyName, keyValue);
-    // find local state and replace prev keyValue with next keyValue
-    // find initialValues and replace prev keyValue with next keyValue
-    // this.setState();
+    const { initialValues, viewOpeningHours } = this.state;
+    const { openingHours } = initialValues;
+    const dayIndex = day - 1;
+    const entryIndex = openingHours.findIndex(o => o.day === day);
+
+    viewOpeningHours[dayIndex][keyName] = keyValue;
+    openingHours[entryIndex][keyName] = this.getFormattedTime(keyValue);
+
+    this.setState({
+      initialValues: {
+        ...initialValues,
+        openingHours,
+      },
+      viewOpeningHours,
+    });
   };
 
   handleOpeningHoursSelectionChange = day => (event) => {
@@ -186,11 +197,11 @@ class SightForm extends Component {
         openTime: this.getFormattedTime(openTime),
         closeTime: this.getFormattedTime(closeTime),
       });
+
+      openingHours.sort((a, b) => a.day - b.day);
     } else {
       openingHours = openingHours.filter(o => o.day !== day);
     }
-
-    openingHours.sort((a, b) => a.day - b.day);
 
     this.setState({
       initialValues: {
@@ -327,8 +338,8 @@ class SightForm extends Component {
                     <GridItem sm={3} md={3}>
                       <TimePicker
                         ampm={false}
-                        disabled={!item.checked}
                         className={classes.openingHoursTimepicker}
+                        disabled={!item.checked}
                         onChange={event => this.handleOpeningHoursChange(item.day, 'openTime', event)}
                         value={item.openTime}
                       />
@@ -336,8 +347,9 @@ class SightForm extends Component {
                     <GridItem sm={3} md={3}>
                       <TimePicker
                         ampm={false}
-                        disabled={!item.checked}
                         className={classes.openingHoursTimepicker}
+                        disabled={!item.checked}
+                        minDate={item.openTime}
                         onChange={event => this.handleOpeningHoursChange(item.day, 'closeTime', event)}
                         value={item.closeTime}
                       />
