@@ -1,9 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+import _find from 'lodash/find';
 import _isEqual from 'lodash/isEqual';
 import _isNumber from 'lodash/isNumber';
+import format from 'date-fns/format';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
@@ -11,6 +13,9 @@ import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
 import Switch from '@material-ui/core/Switch';
 import Typography from '@material-ui/core/Typography/Typography';
+import TimePicker from 'material-ui-pickers/TimePicker';
+import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
+import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
@@ -18,6 +23,18 @@ import yupString from 'yup/lib/string';
 import yupBoolen from 'yup/lib/boolean';
 import { actions as sightsActions } from '@hello-poland/commons/redux/sights';
 import GridItem from 'components/GridItem';
+
+const i18n = {
+  days: {
+    1: 'Poniedziałek',
+    2: 'Wtorek',
+    3: 'Środa',
+    4: 'Czwartek',
+    5: 'Piątek',
+    6: 'Sobota',
+    7: 'Niedziela',
+  },
+};
 
 const commonProps = {
   fullWidth: true,
@@ -42,6 +59,9 @@ const styles = () => ({
   title: {
     marginTop: 40,
   },
+  openingHoursTimepicker: {
+    width: 50,
+  },
 });
 
 class SightForm extends Component {
@@ -49,9 +69,11 @@ class SightForm extends Component {
     super(props);
 
     const { initialValues } = props;
+    const { openingHours } = initialValues || {};
 
     this.state = {
       initialValues: this.getInitialValues(initialValues),
+      viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
     };
 
     // TODO: nested validation seems not working
@@ -78,12 +100,40 @@ class SightForm extends Component {
     const { initialValues } = this.props;
 
     if (!_isEqual(prevInitialValues, initialValues)) {
+      const { openingHours } = initialValues || {};
+
       this.setInitialValues(initialValues);
+      this.setViewOpeningHours(openingHours, true);
     }
   }
 
+  getFormattedTime = (datetime, dateFormat = 'HH:mm') => format(datetime, dateFormat);
+
+  getInitialOpeningHours = (initialValues = [], viewValues = false) => {
+    let openingHours = [];
+
+    if (viewValues) {
+      for (let i = 1; i < 8; i += 1) {
+        const values = _find(initialValues, { day: i }) || {};
+        const { closeTime, openTime } = values;
+        const checked = !!Object.getOwnPropertyNames(values).length;
+
+        openingHours.push({
+          checked,
+          day: i,
+          openTime: openTime ? `1970-01-01T${openTime}` : '1970-01-01T09:00',
+          closeTime: closeTime ? `1970-01-01T${closeTime}` : '1970-01-01T18:00',
+        });
+      }
+    } else {
+      openingHours = initialValues;
+    }
+
+    return openingHours;
+  };
+
   getInitialValues = (initialValues) => {
-    const { location: initialLocation, ...details } = initialValues || {};
+    const { location: initialLocation, openingHours, ...details } = initialValues || {};
     const location = initialLocation || {};
 
     return {
@@ -95,6 +145,7 @@ class SightForm extends Component {
       description: details.description || '',
       email: details.email || '',
       phone: details.phone || '',
+      openingHours: this.getInitialOpeningHours(openingHours),
       location: {
         street: location.street || '',
         zipCode: location.zipCode || '',
@@ -107,6 +158,48 @@ class SightForm extends Component {
   setInitialValues = initialValues => this.setState({
     initialValues: this.getInitialValues(initialValues),
   });
+
+  setViewOpeningHours = openingHours => this.setState({
+    viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
+  });
+
+  handleOpeningHoursChange = (day, keyName, keyValue) => {
+    console.log('handleOpeningHourChange', day, keyName, keyValue);
+    // find local state and replace prev keyValue with next keyValue
+    // find initialValues and replace prev keyValue with next keyValue
+    // this.setState();
+  };
+
+  handleOpeningHoursSelectionChange = day => (event) => {
+    const { initialValues, viewOpeningHours } = this.state;
+    const { target } = event;
+    const dayIndex = day - 1;
+    let { openingHours } = initialValues;
+
+    viewOpeningHours[dayIndex].checked = target.checked;
+
+    if (target.checked) {
+      const { closeTime, openTime } = viewOpeningHours[dayIndex];
+
+      openingHours.push({
+        day: viewOpeningHours[dayIndex].day,
+        openTime: this.getFormattedTime(openTime),
+        closeTime: this.getFormattedTime(closeTime),
+      });
+    } else {
+      openingHours = openingHours.filter(o => o.day !== day);
+    }
+
+    openingHours.sort((a, b) => a.day - b.day);
+
+    this.setState({
+      initialValues: {
+        ...initialValues,
+        openingHours,
+      },
+      viewOpeningHours,
+    });
+  };
 
   handleSubmit = (values, actions) => {
     const { onSubmit } = this.props;
@@ -162,7 +255,7 @@ class SightForm extends Component {
   };
 
   render() {
-    const { initialValues } = this.state;
+    const { initialValues, viewOpeningHours } = this.state;
     const { buttons, classes, FormikProps } = this.props;
 
     return (
@@ -215,6 +308,43 @@ class SightForm extends Component {
               <GridItem>
                 <Field name="description" label="Opis atrakcji" component={TextField} {...commonProps} multiline rowsMax={20} />
               </GridItem>
+              <GridItem>
+                <Typography variant="title" className={classes.title}>Godziny otwarcia</Typography>
+              </GridItem>
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                {viewOpeningHours.map(item => (
+                  <Fragment key={`openingHours-list-${item.day}`}>
+                    <GridItem sm={6} md={6}>
+                      <FormControlLabel
+                        control={<Switch
+                          checked={item.checked}
+                          onChange={this.handleOpeningHoursSelectionChange(item.day)}
+                          value={`${item.day}`}
+                        />}
+                        label={i18n.days[item.day]}
+                      />
+                    </GridItem>
+                    <GridItem sm={3} md={3}>
+                      <TimePicker
+                        ampm={false}
+                        disabled={!item.checked}
+                        className={classes.openingHoursTimepicker}
+                        onChange={event => this.handleOpeningHoursChange(item.day, 'openTime', event)}
+                        value={item.openTime}
+                      />
+                    </GridItem>
+                    <GridItem sm={3} md={3}>
+                      <TimePicker
+                        ampm={false}
+                        disabled={!item.checked}
+                        className={classes.openingHoursTimepicker}
+                        onChange={event => this.handleOpeningHoursChange(item.day, 'closeTime', event)}
+                        value={item.closeTime}
+                      />
+                    </GridItem>
+                  </Fragment>
+                ))}
+              </MuiPickersUtilsProvider>
               <GridItem>
                 <Typography variant="title" className={classes.title}>Dane kontaktowe</Typography>
               </GridItem>
