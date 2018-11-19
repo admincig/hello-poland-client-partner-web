@@ -349,7 +349,6 @@ class SightForm extends Component {
                         ampm={false}
                         className={classes.openingHoursTimepicker}
                         disabled={!item.checked}
-                        minDate={item.openTime}
                         onChange={event => this.handleOpeningHoursChange(item.day, 'closeTime', event)}
                         value={item.closeTime}
                       />
