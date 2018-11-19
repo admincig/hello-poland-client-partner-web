@@ -12,16 +12,7 @@ import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import yupNumber from 'yup/lib/number';
 import { actions as ticketDefinitionsActions } from 'redux/ticketDefinitions';
-
-const GridItem = ({ children, ...props }) => (
-  <Grid item md={6} sm={6} xs={12} {...props}>
-    {children}
-  </Grid>
-);
-
-GridItem.propTypes = {
-  children: PropTypes.node.isRequired,
-};
+import GridItem from 'components/GridItem';
 
 const commonProps = {
   fullWidth: true,

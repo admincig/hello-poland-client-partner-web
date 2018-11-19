@@ -16,13 +16,14 @@ const SwitchLabel = ({
 SwitchLabel.propTypes = {
   FormControlLabelProps: PropTypes.shape({}),
   label: PropTypes.string,
-  name: PropTypes.string.isRequired,
+  name: PropTypes.string,
   value: PropTypes.bool,
 };
 
 SwitchLabel.defaultProps = {
   FormControlLabelProps: {},
   label: '',
+  name: '',
   value: false,
 };
 
