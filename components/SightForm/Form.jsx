@@ -203,7 +203,7 @@ class SightForm extends Component {
       openingHours = openingHours.filter(o => o.day !== day);
     }
 
-    debugger;
+
     this.setState({
       initialValues: {
         ...values,
