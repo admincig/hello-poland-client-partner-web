@@ -181,11 +181,11 @@ class SightForm extends Component {
     });
   };
 
-  handleOpeningHoursSelectionChange = day => (event) => {
-    const { initialValues, viewOpeningHours } = this.state;
+  handleOpeningHoursSelectionChange = (day, values) => (event) => {
+    const { viewOpeningHours } = this.state;
     const { target } = event;
     const dayIndex = day - 1;
-    let { openingHours } = initialValues;
+    let { openingHours } = values;
 
     viewOpeningHours[dayIndex].checked = target.checked;
 
@@ -203,9 +203,10 @@ class SightForm extends Component {
       openingHours = openingHours.filter(o => o.day !== day);
     }
 
+
     this.setState({
       initialValues: {
-        ...initialValues,
+        ...values,
         openingHours,
       },
       viewOpeningHours,
@@ -277,7 +278,7 @@ class SightForm extends Component {
         validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, values }) => (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <GridItem>
@@ -329,7 +330,7 @@ class SightForm extends Component {
                       <FormControlLabel
                         control={<Switch
                           checked={item.checked}
-                          onChange={this.handleOpeningHoursSelectionChange(item.day)}
+                          onChange={this.handleOpeningHoursSelectionChange(item.day, values)}
                           value={`${item.day}`}
                         />}
                         label={i18n.days[item.day]}
