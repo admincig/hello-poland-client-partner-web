@@ -303,17 +303,17 @@ class SightForm extends Component {
                   )}
                 />
               </GridItem>
-              {/*<GridItem md={8} sm={8}>*/}
-                {/*<Field*/}
-                  {/*name="generalAdmission"*/}
-                  {/*render={switchProps => (*/}
-                    {/*<FormControlLabel*/}
-                      {/*control={<Switch {...fieldToSwitch(switchProps)} />}*/}
-                      {/*label="Dodaj wydarzenie ogólne"*/}
-                    {/*/>*/}
-                  {/*)}*/}
-                {/*/>*/}
-              {/*</GridItem>*/}
+              {/* <GridItem md={8} sm={8}> */}
+              {/* <Field */}
+              {/* name="generalAdmission" */}
+              {/* render={switchProps => ( */}
+              {/* <FormControlLabel */}
+              {/* control={<Switch {...fieldToSwitch(switchProps)} />} */}
+              {/* label="Dodaj wydarzenie ogólne" */}
+              {/* /> */}
+              {/* )} */}
+              {/* /> */}
+              {/* </GridItem> */}
               <GridItem>
                 <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
               </GridItem>
