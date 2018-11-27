@@ -59,7 +59,7 @@ class SightEventForm extends Component {
     this.validationSchema = yupObject().shape({
       name: yupString().min(3).required(),
       published: yupBoolen(),
-      generalAdmission: yupBoolen(),
+      // generalAdmission: yupBoolen(),
       lead: yupString().min(10),
       description: yupString().min(10).required(),
       email: yupString().email().trim(),
@@ -91,7 +91,7 @@ class SightEventForm extends Component {
       sightId: details.sightId || '',
       name: details.name || '',
       published: details.published || false,
-      generalAdmission: details.generalAdmission || false,
+      // generalAdmission: details.generalAdmission || false,
       lead: details.lead || '',
       description: details.description || '',
       email: details.email || '',
@@ -205,17 +205,17 @@ class SightEventForm extends Component {
                   )}
                 />
               </GridItem>
-              <GridItem md={8} sm={8}>
-                <Field
-                  name="generalAdmission"
-                  render={switchProps => (
-                    <FormControlLabel
-                      control={<Switch {...fieldToSwitch(switchProps)} />}
-                      label="Wydarzenie ogólne"
-                    />
-                  )}
-                />
-              </GridItem>
+              {/*<GridItem md={8} sm={8}>*/}
+                {/*<Field*/}
+                  {/*name="generalAdmission"*/}
+                  {/*render={switchProps => (*/}
+                    {/*<FormControlLabel*/}
+                      {/*control={<Switch {...fieldToSwitch(switchProps)} />}*/}
+                      {/*label="Wydarzenie ogólne"*/}
+                    {/*/>*/}
+                  {/*)}*/}
+                {/*/>*/}
+              {/*</GridItem>*/}
               <GridItem>
                 <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
               </GridItem>
