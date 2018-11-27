@@ -14,7 +14,6 @@ import VisibilityIcon from '@material-ui/icons/Visibility';
 import NotificationImportantIcon from '@material-ui/icons/NotificationImportant';
 import ListItem from '@material-ui/core/ListItem';
 
-
 const HomeListItem = ({
   blocked,
   icon: Icon,
@@ -44,10 +43,22 @@ const HomeListItem = ({
     />
     <ListItemSecondaryAction>
       {blocked &&
-        <NotificationImportantIcon color="error" style={{ verticalAlign: 'middle' }} />
+        <IconButton
+          aria-label={onViewLabel}
+          style={{ cursor: 'default' }}
+          title="Zablokowane"
+        >
+          <NotificationImportantIcon color="error" />
+        </IconButton>
       }
       {published &&
-        <VisibilityIcon color="primary" style={{ verticalAlign: 'middle' }} />
+        <IconButton
+          aria-label={onViewLabel}
+          style={{ cursor: 'default' }}
+          title="Opublikowane"
+        >
+          <VisibilityIcon color="primary" />
+        </IconButton>
       }
       {onViewClick &&
         <IconButton
