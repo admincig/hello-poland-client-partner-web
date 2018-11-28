@@ -11,6 +11,7 @@ import ImportContacts from '@material-ui/icons/ImportContacts';
 import EventIcon from '@material-ui/icons/Event';
 import PlaceIcon from '@material-ui/icons/Place';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
+import formatDate from 'date-fns/format';
 import {
   actions as sightsActions,
   selectors as sightsSelectors,
@@ -31,6 +32,7 @@ import populate from 'utils/form-generator/data/populate';
 import deserialize from 'utils/form-generator/data/deserialize';
 import serialize from 'utils/form-generator/data/serialize';
 import formatPrice from 'utils/formatPrice';
+import config from 'config';
 import ticketPoolDefinitionSchema from './ticketPoolDefinitionSchema';
 import HomeListItem from './HomeListItem';
 
@@ -425,6 +427,13 @@ class SightsList extends Component {
                           }}
                           onDocumentLabel="Dodaj broszurę PDF"
                           published={sightEvent.published}
+                          onStatsClick={() => {
+                            const URI = config.public.availableTicketsURL;
+
+                            return URI
+                              .replace(':id', sightEvent.id)
+                              .replace(':date', formatDate(new Date(), 'YYYY-MM-DD'));
+                          }}
                         />
                         <List style={{ marginLeft: 55 }}>
                           {sightEvent.ticketPoolDefinitions && sightEvent.ticketPoolDefinitions
@@ -437,8 +446,8 @@ class SightsList extends Component {
                                   key={`${ticketPoolDefinition.id}-${ticketPoolDefinition.name}`}
                                   primary={ticketPoolDefinition.name}
                                   secondary={
-                                    `Liczba biletów: ${ticketPoolDefinition.availableTicketsNumber === -1 ?
-                                      'Nielimitowane' : ticketPoolDefinition.availableTicketsNumber
+                                    `Limit biletów: ${ticketPoolDefinition.availableTicketsNumber === -1 ?
+                                      'Brak' : `${ticketPoolDefinition.availableTicketsNumber} szt`
                                     }`
                                   }
                                   onDeleteClick={
@@ -453,9 +462,16 @@ class SightsList extends Component {
                                         icon={LocalOfferIcon}
                                         key={`ticketDefinition-${ticketDefinition.id}-${ticketDefinition.name}`}
                                         primary={ticketDefinition.name}
-                                        secondary={
-                                          `Cena: ${formatPrice(ticketDefinition.price)}`
-                                        }
+                                        secondary={(() => {
+                                          const { availableTicketsNumber } = ticketDefinition;
+                                          const availableTickets =
+                                            !availableTicketsNumber || availableTicketsNumber === -1
+                                            ? 'Brak'
+                                            : `${availableTicketsNumber} szt`;
+                                          const price = formatPrice(ticketDefinition.price);
+
+                                          return `Limit biletów: ${availableTickets} | Cena: ${price}`;
+                                        })()}
                                       />
                                     ))
                                   }
