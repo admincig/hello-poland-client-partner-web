@@ -7,13 +7,13 @@ import IconButton from '@material-ui/core/IconButton';
 import DesktopWindows from '@material-ui/icons/DesktopWindows';
 import AddIcon from '@material-ui/icons/Add';
 import AddAPhoto from '@material-ui/icons/AddAPhoto';
+import AssessmentIcon from '@material-ui/icons/Assessment';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
 import NoteAdd from '@material-ui/icons/NoteAdd';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import NotificationImportantIcon from '@material-ui/icons/NotificationImportant';
 import ListItem from '@material-ui/core/ListItem';
-
 
 const HomeListItem = ({
   blocked,
@@ -30,6 +30,7 @@ const HomeListItem = ({
   onEditLabel,
   onMainImageClick,
   onMainImageLabel,
+  onStatsClick,
   onViewClick,
   onViewLabel,
   published,
@@ -44,10 +45,22 @@ const HomeListItem = ({
     />
     <ListItemSecondaryAction>
       {blocked &&
-        <NotificationImportantIcon color="error" style={{ verticalAlign: 'middle' }} />
+        <IconButton
+          aria-label={onViewLabel}
+          style={{ cursor: 'default' }}
+          title="Zablokowane"
+        >
+          <NotificationImportantIcon color="error" />
+        </IconButton>
       }
       {published &&
-        <VisibilityIcon color="primary" style={{ verticalAlign: 'middle' }} />
+        <IconButton
+          aria-label={onViewLabel}
+          style={{ cursor: 'default' }}
+          title="Opublikowane"
+        >
+          <VisibilityIcon color="primary" />
+        </IconButton>
       }
       {onViewClick &&
         <IconButton
@@ -55,6 +68,17 @@ const HomeListItem = ({
           title={onViewLabel}
         >
           <DesktopWindows />
+        </IconButton>
+      }
+      {onStatsClick &&
+        <IconButton
+          aria-label="Pokaż dostępność biletów"
+          component="a"
+          href={onStatsClick()}
+          target="_blank"
+          title="Pokaż dostępność biletów"
+        >
+          <AssessmentIcon />
         </IconButton>
       }
       {onMainImageClick &&
@@ -119,6 +143,7 @@ HomeListItem.propTypes = {
   onEditLabel: PropTypes.string,
   onMainImageClick: PropTypes.func,
   onMainImageLabel: PropTypes.string,
+  onStatsClick: PropTypes.func,
   onViewClick: PropTypes.func,
   onViewLabel: PropTypes.string,
   primary: PropTypes.string.isRequired,
@@ -138,6 +163,7 @@ HomeListItem.defaultProps = {
   onEditLabel: null,
   onMainImageClick: null,
   onMainImageLabel: null,
+  onStatsClick: null,
   onViewClick: null,
   onViewLabel: null,
   published: false,
