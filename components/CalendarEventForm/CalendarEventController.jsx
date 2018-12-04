@@ -53,10 +53,6 @@ class CalendarEventController extends React.Component {
     }
   }
 
-  componentDidUpdate() {
-    console.log(this.state);
-  }
-
   getFormattedDate = dateObj => format(dateObj, DATE_FORMAT);
 
   getKeyFromEvent = event => event.target.name;
