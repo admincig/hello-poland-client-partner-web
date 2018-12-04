@@ -53,6 +53,10 @@ class CalendarEventController extends React.Component {
     }
   }
 
+  componentDidUpdate() {
+    console.log(this.state);
+  }
+
   getFormattedDate = dateObj => format(dateObj, DATE_FORMAT);
 
   getKeyFromEvent = event => event.target.name;
@@ -111,11 +115,12 @@ class CalendarEventController extends React.Component {
     });
   };
 
-  handleFrequencyDataChange = (frequencyData, frequencyType) => {
+  handleFrequencyDataChange = (nextFrequencyData, frequencyType) => {
     const { formData, frequencyType: stateFrequencyType } = this.state;
     const stateFrequencyData = _cloneDeep(formData.frequencyData || {});
     const { daysOfMonth, monthsOfYear } = stateFrequencyData;
     const type = frequencyType || stateFrequencyType;
+    let frequencyData = null;
 
     if (type !== 'WEEKLY' && daysOfMonth) {
       delete stateFrequencyData.daysOfMonth;
@@ -125,13 +130,18 @@ class CalendarEventController extends React.Component {
       delete stateFrequencyData.monthsOfYear;
     }
 
+    if (nextFrequencyData) {
+      frequencyData = {
+        ...stateFrequencyData,
+        ...nextFrequencyData,
+      };
+    }
+
     this.handleChange({
       formData: {
         ...formData,
-        frequencyData: {
-          ...stateFrequencyData,
-          ...frequencyData,
-        },
+        frequencyData,
+        isCyclic: !!frequencyData,
       },
       frequencyType: type,
     });
