@@ -15,7 +15,7 @@ import {
   selectors as ticketDefinitionsSelectors,
 } from 'redux/ticketDefinitions';
 
-const DATE_FORMAT = 'YYYY-MM-DDTHH:mmZ';
+const DATE_FORMAT = 'YYYY-MM-DDTHH:mm';
 
 class CalendarEventController extends React.Component {
   constructor(props) {
