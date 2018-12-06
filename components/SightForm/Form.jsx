@@ -306,7 +306,7 @@ class SightForm extends Component {
                   render={switchProps => (
                     <FormControlLabel
                       control={<Switch {...fieldToSwitch(switchProps)} />}
-                      label="Opublikowano"
+                      label="Publikuj"
                     />
                   )}
                 />
