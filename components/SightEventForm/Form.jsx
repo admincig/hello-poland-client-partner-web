@@ -57,11 +57,19 @@ class SightEventForm extends Component {
     // TODO: nested validation seems not working
     // TODO: see https://github.com/jaredpalmer/formik/issues/986
     this.validationSchema = yupObject().shape({
-      name: yupString().min(3).required(),
+      name: yupString()
+        .min(3)
+        .max(250)
+        .required(),
       published: yupBoolen(),
       // generalAdmission: yupBoolen(),
-      lead: yupString().min(10),
-      description: yupString().min(10).required(),
+      lead: yupString()
+        .min(10)
+        .max(250),
+      description: yupString()
+        .min(10)
+        .max(2500)
+        .required(),
       email: yupString().email().trim(),
       phone: yupString().min(9).trim(),
       // location: yupObject().shape({
@@ -192,7 +200,7 @@ class SightEventForm extends Component {
                 </GridItem>
               </Hidden>
               <GridItem>
-                <Field name="name" label="Nazwa wydarzenia" component={TextField} {...commonProps} />
+                <Field name="name" label="Nazwa wydarzenia" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
                 <Field
@@ -200,7 +208,7 @@ class SightEventForm extends Component {
                   render={switchProps => (
                     <FormControlLabel
                       control={<Switch {...fieldToSwitch(switchProps)} />}
-                      label="Opublikowano"
+                      label="Publikuj"
                     />
                   )}
                 />
@@ -220,7 +228,7 @@ class SightEventForm extends Component {
                 <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
-                <Field name="description" label="Opis atrakcji" component={TextField} {...commonProps} multiline rowsMax={20} />
+                <Field name="description" label="Opis atrakcji" required component={TextField} {...commonProps} multiline rowsMax={20} />
               </GridItem>
               <GridItem>
                 <Typography variant="title" className={classes.title}>Dane kontaktowe</Typography>
