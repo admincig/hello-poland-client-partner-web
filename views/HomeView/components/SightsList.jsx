@@ -369,9 +369,9 @@ class SightsList extends Component {
                   primary={sight.name}
                   onAddClick={() => this.handleSightEventFormOpen({
                     sightId: sight.id,
-                    title: 'Dodaj wydarzenie',
+                    title: 'Dodaj ofertę',
                   })}
-                  onAddLabel="Dodaj wydarzenie"
+                  onAddLabel="Dodaj ofertę"
                   onDeleteClick={() => this.handleSightDelete(sight.id)}
                   onDeleteLabel="Usuń atrakcję"
                   onEditClick={() => {
@@ -403,13 +403,13 @@ class SightsList extends Component {
                           }}
                           onAddLabel="Dodaj pulę biletów"
                           onDeleteClick={() => this.handleSightEventDelete(sightEvent.id)}
-                          onDeleteLabel="Usuń wydarzenie"
+                          onDeleteLabel="Usuń ofertę"
                           onEditClick={() => this.handleSightEventFormOpen({
                             sightId: sight.id,
                             sightEventId: sightEvent.id,
-                            title: 'Edytuj wydarzenie',
+                            title: 'Edytuj ofertę',
                           })}
-                          onEditLabel="Edytuj wydarzenie"
+                          onEditLabel="Edytuj ofertę"
                           onMainImageClick={() => {
                             this.handleMediaManagerOpen({
                               parentId: sightEvent.id,
