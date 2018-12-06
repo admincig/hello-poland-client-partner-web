@@ -58,17 +58,17 @@ class SightEventForm extends Component {
     // TODO: see https://github.com/jaredpalmer/formik/issues/986
     this.validationSchema = yupObject().shape({
       name: yupString()
-        .min(3, 'nazwa za krótka')
-        .max(250, 'nazwa za długa')
+        .min(3)
+        .max(250)
         .required(),
       published: yupBoolen(),
       // generalAdmission: yupBoolen(),
       lead: yupString()
-        .min(10, 'lead za krótki')
-        .max(250, 'lead za długi'),
+        .min(10)
+        .max(250),
       description: yupString()
-        .min(10, 'opis za krótki')
-        .max(2500, 'opis za długi')
+        .min(10)
+        .max(2500)
         .required(),
       email: yupString().email().trim(),
       phone: yupString().min(9).trim(),
