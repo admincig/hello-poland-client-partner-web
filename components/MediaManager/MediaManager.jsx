@@ -46,7 +46,7 @@ class MediaManager extends Component {
         <DialogActions>
           {error &&
             <Typography style={{ color: 'red' }}>
-              Wystąpił błąd podczas zapisywania.
+              Niewłaściwy format zdjęcia
             </Typography>
           }
           <Button onClick={onClose} color="primary">Zamknij</Button>
