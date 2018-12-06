@@ -200,7 +200,7 @@ class SightEventForm extends Component {
                 </GridItem>
               </Hidden>
               <GridItem>
-                <Field name="name" label="Nazwa ofery" required component={TextField} {...commonProps} />
+                <Field name="name" label="Nazwa wydarzenia" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
                 <Field
@@ -219,7 +219,7 @@ class SightEventForm extends Component {
               {/* render={switchProps => ( */}
               {/* <FormControlLabel */}
               {/* control={<Switch {...fieldToSwitch(switchProps)} />} */}
-              {/* label="Oferty ogólne" */}
+              {/* label="Wydarzenie ogólne" */}
               {/* /> */}
               {/* )} */}
               {/* /> */}

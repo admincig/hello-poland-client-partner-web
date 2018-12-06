@@ -317,7 +317,7 @@ class SightForm extends Component {
               {/* render={switchProps => ( */}
               {/* <FormControlLabel */}
               {/* control={<Switch {...fieldToSwitch(switchProps)} />} */}
-              {/* label="Dodaj ofertę ogólną" */}
+              {/* label="Dodaj wydarzenie ogólne" */}
               {/* /> */}
               {/* )} */}
               {/* /> */}
