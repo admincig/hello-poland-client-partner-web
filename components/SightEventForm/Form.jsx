@@ -228,7 +228,7 @@ class SightEventForm extends Component {
                 <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
-                <Field name="description" label="Opis atrakcji" required component={TextField} {...commonProps} multiline rowsMax={20} />
+                <Field name="description" label="Opis wydarzenia" required component={TextField} {...commonProps} multiline rowsMax={20} />
               </GridItem>
               <GridItem>
                 <Typography variant="title" className={classes.title}>Dane kontaktowe</Typography>
