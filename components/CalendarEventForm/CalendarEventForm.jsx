@@ -108,7 +108,7 @@ const basicFrequencies = [
   {
     frequencyData: {
       daysOfWeek: [],
-      endDate: '',
+      endDate: null,
       frequency: 1,
       frequencyType: 'DAILY',
     },
