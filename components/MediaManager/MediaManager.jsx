@@ -10,6 +10,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import MediaDropzone from './MediaDropzone';
 
 class MediaManager extends Component {
+  state = { fileType: null, fileName: null }
   handleDrop = (acceptedFiles) => {
     const { onSubmit } = this.props;
 
@@ -21,7 +22,7 @@ class MediaManager extends Component {
           'content-type': metadata.type,
         },
       };
-
+      this.setState({ fileType: acceptedFile.metadata.type, fileName: acceptedFile.metadata.name });
       onSubmit({ data, options });
     });
   };
@@ -30,7 +31,7 @@ class MediaManager extends Component {
     const {
       error, onClose, title, submitting, ...rest
     } = this.props;
-
+    const { fileType, fileName } = this.state;
     return (
       <Dialog onClose={onClose} aria-labelledby="form-dialog-title" {...rest}>
         <DialogTitle id="form-dialog-title">{title}</DialogTitle>
@@ -44,9 +45,12 @@ class MediaManager extends Component {
           {submitting && <LinearProgress />}
         </DialogContent>
         <DialogActions>
-          {error &&
+          { error &&
             <Typography style={{ color: 'red' }}>
-              Niewłaściwy format zdjęcia
+              {fileType !== 'image/jpeg'
+                ? `Niepoprawny format pliku ${fileName}`
+                : 'Wystąpił błąd podczas zapisywania.'
+              }
             </Typography>
           }
           <Button onClick={onClose} color="primary">Zamknij</Button>
