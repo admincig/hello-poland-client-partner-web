@@ -12,7 +12,19 @@ import MediaDropzone from './MediaDropzone';
 class MediaManager extends Component {
   state = {
     fileType: null,
-    fileName: null,
+  };
+
+  getErrorByFileType = (fileType) => {
+    const type = /image/.test(fileType) ? 'image' : fileType.toLowerCase();
+
+    switch (type) {
+      case 'image':
+        return 'Obrazek powinien być w formacie JPEG, a jego szerokość musi wynosić minimum 2000px.';
+      case 'application/pdf':
+        return 'Niepoprawny format dokumentu.';
+      default:
+        return 'Wystąpił błąd podczas zapisywania pliku.';
+    }
   };
 
   handleDrop = (acceptedFiles) => {
@@ -29,31 +41,17 @@ class MediaManager extends Component {
 
       this.setState({
         fileType: metadata.type,
-        fileName: metadata.name,
       });
 
       onSubmit({ data, options });
     });
   };
 
-  getErrorByFileType = (fileType) => {
-    const type = /image/.test(fileType) ? 'image' : fileType.toLowerCase();
-
-    switch (type) {
-      case 'image':
-        return 'Obrazek powinien być w formacie JPEG, a jego szerokość musi wynosić minimum 2000px.';
-      case 'application/pdf':
-        return 'Niepoprawny format dokumentu.';
-      default:
-        return 'Wystąpił błąd podczas zapisywania pliku.';
-    }
-  };
-
   render() {
     const {
       error, onClose, title, submitting, ...rest
     } = this.props;
-    const { fileType, fileName } = this.state;
+    const { fileType } = this.state;
 
     return (
       <Dialog onClose={onClose} aria-labelledby="form-dialog-title" {...rest}>
