@@ -10,6 +10,23 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import MediaDropzone from './MediaDropzone';
 
 class MediaManager extends Component {
+  state = {
+    fileType: null,
+  };
+
+  getErrorByFileType = (fileType) => {
+    const type = /image/.test(fileType) ? 'image' : fileType.toLowerCase();
+
+    switch (type) {
+      case 'image':
+        return 'Obrazek powinien być w formacie JPEG, a jego szerokość musi wynosić minimum 2000px.';
+      case 'application/pdf':
+        return 'Niepoprawny format dokumentu.';
+      default:
+        return 'Wystąpił błąd podczas zapisywania pliku.';
+    }
+  };
+
   handleDrop = (acceptedFiles) => {
     const { onSubmit } = this.props;
 
@@ -22,6 +39,10 @@ class MediaManager extends Component {
         },
       };
 
+      this.setState({
+        fileType: metadata.type,
+      });
+
       onSubmit({ data, options });
     });
   };
@@ -30,6 +51,7 @@ class MediaManager extends Component {
     const {
       error, onClose, title, submitting, ...rest
     } = this.props;
+    const { fileType } = this.state;
 
     return (
       <Dialog onClose={onClose} aria-labelledby="form-dialog-title" {...rest}>
@@ -44,9 +66,9 @@ class MediaManager extends Component {
           {submitting && <LinearProgress />}
         </DialogContent>
         <DialogActions>
-          {error &&
+          { error &&
             <Typography style={{ color: 'red' }}>
-              Wystąpił błąd podczas zapisywania.
+              {this.getErrorByFileType(fileType)}
             </Typography>
           }
           <Button onClick={onClose} color="primary">Zamknij</Button>
