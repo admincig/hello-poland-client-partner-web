@@ -186,13 +186,14 @@ class CalendarEventForm extends React.Component {
   isChecked = (data, element) => data && data.some(item => element === item);
 
   render() {
-    const { classes, formData: initialFormData, onChange } = this.props;
-
+    const {
+      classes, formData: initialFormData, formData, onChange, readOnly,
+    } = this.props;
     return (
       <div>
-        <CalendarEventController formData={initialFormData} onChange={onChange}>
+        <CalendarEventController formData={formData.item || initialFormData} onChange={onChange}>
           {({
-              formData, frequencyEndDateType, frequencyType, selectedTicketDefinitionId,
+              frequencyEndDateType, frequencyType, selectedTicketDefinitionId,
               ticketDefinitionsList, fetchTicketDefinitions,
               handleAvailableTicketsChange, handleDateChange, handleDefinitionFormClose,
               handleDefinitionFormOpen, handleFormDataChange, handleFrequencyDataChange,
@@ -204,6 +205,7 @@ class CalendarEventForm extends React.Component {
               <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
                 <Grid container>
                   <TextField
+                    disabled={readOnly}
                     fullWidth
                     label="Nazwa"
                     margin="normal"
@@ -213,6 +215,7 @@ class CalendarEventForm extends React.Component {
                   />
                   <TextField
                     fullWidth
+                    disabled={readOnly}
                     label="Limit biletów w puli"
                     margin="normal"
                     name="availableTicketsNumber"
@@ -225,6 +228,7 @@ class CalendarEventForm extends React.Component {
                   />
                   <div className={classNames(classes.columns, classes.fullWidth)}>
                     <DateTimePicker
+                      disabled={readOnly}
                       date={formData.startDate}
                       fullDay={isFullDay}
                       label="Od"
@@ -232,6 +236,7 @@ class CalendarEventForm extends React.Component {
                       onChange={handleDateChange}
                     />
                     <DateTimePicker
+                      disabled={readOnly}
                       date={formData.endDate}
                       fullDay={isFullDay}
                       label="Do"
@@ -244,6 +249,7 @@ class CalendarEventForm extends React.Component {
                   </div>
                   <div className={classNames(classes.columns, classes.fullWidth)}>
                     <DateTimePicker
+                      disabled={readOnly}
                       date={formData.entryStartDate}
                       fullDay={isFullDay}
                       label="Wejście od"
@@ -251,6 +257,7 @@ class CalendarEventForm extends React.Component {
                       onChange={handleDateChange}
                     />
                     <DateTimePicker
+                      disabled={readOnly}
                       date={formData.entryEndDate}
                       fullDay={isFullDay}
                       label="Wejście do"
@@ -264,6 +271,7 @@ class CalendarEventForm extends React.Component {
                   <div className={classNames(classes.vertical, classes.fullWidth)}>
                     <SwitchLabel
                       label="Cały dzień"
+                      disabled={readOnly}
                       name="isFullDay"
                       onChange={handleFullDayChange}
                       value={isFullDay}
@@ -414,30 +422,37 @@ class CalendarEventForm extends React.Component {
                           ))
                         }
                       </TextField>
-                      <div>
-                        <Button
-                          onClick={() => handleTicketDefinitionAdd(+selectedTicketDefinitionId)}
-                          style={{ marginRight: 10 }}
-                          variant="outlined"
-                        >
-                          Dodaj do puli
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          onClick={handleDefinitionFormOpen}
-                        >
-                          Zdefiniuj bilet
-                        </Button>
-                      </div>
+                      {
+                        !readOnly &&
+                          <div>
+                            <Button
+                              onClick={() => handleTicketDefinitionAdd(+selectedTicketDefinitionId)}
+                              style={{ marginRight: 10 }}
+                              variant="outlined"
+                            >
+                              Dodaj do puli
+                            </Button>
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              onClick={handleDefinitionFormOpen}
+                            >
+                              Zdefiniuj bilet
+                            </Button>
+                          </div>
+                      }
                     </div>
-                    <TicketDefinitionList
-                      ticketDefinitions={formData.ticketDefinitions}
-                      ticketDefinitionsList={ticketDefinitionsList}
-                      onAvailabilityChange={handleTicketDefinitionChange}
-                      onDeleteClick={handleTicketDefinitionDelete}
-                    />
-                    {isDefinitionFormVisible &&
+                    {
+                      formData.ticketDefinitions &&
+                        <TicketDefinitionList
+                          ticketDefinitions={formData.ticketDefinitions}
+                          ticketDefinitionsList={ticketDefinitionsList}
+                          onAvailabilityChange={handleTicketDefinitionChange}
+                          onDeleteClick={handleTicketDefinitionDelete}
+                          readOnly={readOnly}
+                        />
+                    }
+                    {isDefinitionFormVisible && !readOnly &&
                       <div className={classNames(classes.section, classes.fullWidth)}>
                         <Typography variant="title">
                           Nowy rodzaj biletu
@@ -466,11 +481,13 @@ CalendarEventForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   formData: PropTypes.shape({}),
   onChange: PropTypes.func,
+  readOnly: PropTypes.bool,
 };
 
 CalendarEventForm.defaultProps = {
   formData: null,
   onChange: null,
+  readOnly: false,
 };
 
 export default withStyles(styles)(CalendarEventForm);
