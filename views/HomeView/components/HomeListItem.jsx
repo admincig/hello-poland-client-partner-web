@@ -12,6 +12,7 @@ import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
 import NoteAdd from '@material-ui/icons/NoteAdd';
 import VisibilityIcon from '@material-ui/icons/Visibility';
+import Typography from '@material-ui/core/Typography';
 import NotificationImportantIcon from '@material-ui/icons/NotificationImportant';
 import ListItem from '@material-ui/core/ListItem';
 
@@ -40,8 +41,8 @@ const HomeListItem = ({
       <Icon />
     </ListItemIcon>
     <ListItemText
-      primary={primary}
-      secondary={secondary}
+      primary={<Typography noWrap="true" style={{ width: '60%' }}>{primary}</Typography>}
+      secondary={<Typography noWrap="true" style={{ width: '60%' }}>{secondary}</Typography>}
     />
     <ListItemSecondaryAction>
       {blocked &&
