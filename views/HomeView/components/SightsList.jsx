@@ -121,7 +121,11 @@ class SightsList extends Component {
     title: '',
   });
 
-  handleFormDialogClose = () => this.setState({ dialog: false, readOnly: false, submitError: false });
+  handleFormDialogClose = () => this.setState({
+    dialog: false,
+    readOnly: false,
+    submitError: false,
+  });
 
   handleFormDialogOpen = ({
     data, formConfig, formType, schema, title,
