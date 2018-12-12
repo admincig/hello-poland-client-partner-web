@@ -207,6 +207,7 @@ class CalendarEventForm extends React.Component {
                     fullWidth
                     label="Nazwa"
                     margin="normal"
+                    required
                     name="name"
                     onChange={handleFormDataChange}
                     value={formData.name != null ? formData.name : ''}

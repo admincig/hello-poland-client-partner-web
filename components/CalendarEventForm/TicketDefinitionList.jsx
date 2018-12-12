@@ -28,6 +28,7 @@ const TicketDefinitionList = ({
         <ListItem key={key}>
           <ListItemText
             primary={ticketDefinition.name}
+            required
             secondary={formatPrice(ticketDefinition.price) || ''}
           />
           <ListItemSecondaryAction>
