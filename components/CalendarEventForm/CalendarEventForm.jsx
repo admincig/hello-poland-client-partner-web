@@ -187,11 +187,12 @@ class CalendarEventForm extends React.Component {
 
   render() {
     const {
-      classes, formData: initialFormData, formData, onChange, readOnly,
+      classes, formData, onChange, readOnly,
     } = this.props;
+    const item = formData.item || {};
     return (
       <div>
-        <CalendarEventController formData={formData.item || initialFormData} onChange={onChange}>
+        <CalendarEventController formData={item} onChange={onChange}>
           {({
               frequencyEndDateType, frequencyType, selectedTicketDefinitionId,
               ticketDefinitionsList, fetchTicketDefinitions,
@@ -211,7 +212,7 @@ class CalendarEventForm extends React.Component {
                     margin="normal"
                     name="name"
                     onChange={handleFormDataChange}
-                    value={formData.name != null ? formData.name : ''}
+                    value={item.name}
                   />
                   <TextField
                     fullWidth
@@ -222,14 +223,14 @@ class CalendarEventForm extends React.Component {
                     onChange={handleAvailableTicketsChange}
                     type="number"
                     value={
-                      formData.availableTicketsNumber && formData.availableTicketsNumber > 0
-                        ? formData.availableTicketsNumber : ''
+                      item.availableTicketsNumber && item.availableTicketsNumber > 0
+                        ? item.availableTicketsNumber : ''
                     }
                   />
                   <div className={classNames(classes.columns, classes.fullWidth)}>
                     <DateTimePicker
                       disabled={readOnly}
-                      date={formData.startDate}
+                      date={item.startDate}
                       fullDay={isFullDay}
                       label="Od"
                       name="startDate"
@@ -237,20 +238,20 @@ class CalendarEventForm extends React.Component {
                     />
                     <DateTimePicker
                       disabled={readOnly}
-                      date={formData.endDate}
+                      date={item.endDate}
                       fullDay={isFullDay}
                       label="Do"
                       name="endDate"
                       onChange={handleDateChange}
                       DatePickerProps={{
-                        minDate: formData.startDate,
+                        minDate: item.startDate,
                       }}
                     />
                   </div>
                   <div className={classNames(classes.columns, classes.fullWidth)}>
                     <DateTimePicker
                       disabled={readOnly}
-                      date={formData.entryStartDate}
+                      date={item.entryStartDate}
                       fullDay={isFullDay}
                       label="Wejście od"
                       name="entryStartDate"
@@ -258,13 +259,13 @@ class CalendarEventForm extends React.Component {
                     />
                     <DateTimePicker
                       disabled={readOnly}
-                      date={formData.entryEndDate}
+                      date={item.entryEndDate}
                       fullDay={isFullDay}
                       label="Wejście do"
                       name="entryEndDate"
                       onChange={handleDateChange}
                       DatePickerProps={{
-                        minDate: formData.entryEndDate,
+                        minDate: item.entryEndDate,
                       }}
                     />
                   </div>
@@ -303,8 +304,8 @@ class CalendarEventForm extends React.Component {
                           onChange={this.handleFrequencyPropChange(handleFrequencyDataChange)}
                           name="frequency"
                           type="number"
-                          value={formData.frequencyData && formData.frequencyData.frequency != null
-                            ? formData.frequencyData.frequency
+                          value={item.frequencyData && item.frequencyData.frequency != null
+                            ? item.frequencyData.frequency
                             : ''
                           }
                         />
@@ -312,14 +313,14 @@ class CalendarEventForm extends React.Component {
                           onChange={
                             this.handleFrequencyPropChange(
                               handleFrequencyDataChange,
-                              formData.startDate,
+                              item.startDate,
                             )
                           }
                           name="frequencyType"
                           select
                           value={
-                            formData.frequencyData && formData.frequencyData.frequencyType != null
-                              ? formData.frequencyData.frequencyType
+                            item.frequencyData && item.frequencyData.frequencyType != null
+                              ? item.frequencyData.frequencyType
                               : frequencyTypes[0].value
                           }
                         >
@@ -333,7 +334,7 @@ class CalendarEventForm extends React.Component {
                           ))}
                         </TextField>
                       </div>
-                      {formData.frequencyData && formData.frequencyData.frequencyType === 'WEEKLY' &&
+                      {item.frequencyData && item.frequencyData.frequencyType === 'WEEKLY' &&
                         <div className={classNames(classes.section, classes.fullWidth)}>
                           <Typography>Powtarzaj w:</Typography>
                           {daysOfWeekDefinitions.map(({ label, value }) => (
@@ -341,7 +342,7 @@ class CalendarEventForm extends React.Component {
                               key={`${label}-${value}`}
                               control={
                                 <Checkbox
-                                  checked={this.isChecked(formData.frequencyData.daysOfWeek, value)}
+                                  checked={this.isChecked(item.frequencyData.daysOfWeek, value)}
                                   onChange={handleFrequencyItemChange}
                                   name="daysOfWeek"
                                   value={`${value}`}
@@ -375,12 +376,12 @@ class CalendarEventForm extends React.Component {
                                 </Typography>
                                 {frequencyEndDateType === 'SINGLE' &&
                                   <DateTimePicker
-                                    date={formData.frequencyData.endDate}
+                                    date={item.frequencyData.endDate}
                                     fullDay
                                     name="endDate"
                                     onChange={handleFrequencyDataFieldChange}
                                     DatePickerProps={{
-                                      minDate: formData.endDate,
+                                      minDate: item.endDate,
                                     }}
                                   />
                                 }
@@ -443,9 +444,9 @@ class CalendarEventForm extends React.Component {
                       }
                     </div>
                     {
-                      formData.ticketDefinitions &&
+                      item.ticketDefinitions &&
                         <TicketDefinitionList
-                          ticketDefinitions={formData.ticketDefinitions}
+                          ticketDefinitions={item.ticketDefinitions}
                           ticketDefinitionsList={ticketDefinitionsList}
                           onAvailabilityChange={handleTicketDefinitionChange}
                           onDeleteClick={handleTicketDefinitionDelete}

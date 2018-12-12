@@ -10,27 +10,30 @@ import Typography from '@material-ui/core/Typography/Typography';
 
 const FormDialog = ({
   children, error, onClose, onSubmit, title, readOnly, ...rest
-}) => (
-  <Dialog onClose={onClose} aria-labelledby="form-dialog-title" {...rest}>
-    <DialogTitle id="form-dialog-title">{title}</DialogTitle>
-    <DialogContent>
-      {children}
-    </DialogContent>
-    <DialogActions>
-      {error &&
-        <Typography style={{ color: 'red' }}>
-          Wystąpił błąd podczas zapisywania.
-        </Typography>
-      }
+}) => {
+  const buttonClose = readOnly ? 'Anuluj' : 'Zamknij';
+  return (
+    <Dialog onClose={onClose} aria-labelledby="form-dialog-title" {...rest}>
+      <DialogTitle id="form-dialog-title">{title}</DialogTitle>
+      <DialogContent>
+        {children}
+      </DialogContent>
+      <DialogActions>
+        {error &&
+          <Typography style={{ color: 'red' }}>
+            Wystąpił błąd podczas zapisywania.
+          </Typography>
+        }
 
-      <Button onClick={onClose} color="primary">{ !readOnly ? 'Anuluj' : 'Zamknij'}</Button>
-      {
-        !readOnly &&
-          <Button onClick={onSubmit} color="primary">Zapisz</Button>
-      }
-    </DialogActions>
-  </Dialog>
-);
+        <Button onClick={onClose} color="primary">{buttonClose}</Button>
+        {
+          !readOnly &&
+            <Button onClick={onSubmit} color="primary">Zapisz</Button>
+        }
+      </DialogActions>
+    </Dialog>
+  );
+};
 
 FormDialog.propTypes = {
   children: PropTypes.element,

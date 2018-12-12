@@ -121,7 +121,7 @@ class SightsList extends Component {
     title: '',
   });
 
-  handleFormDialogClose = () => this.setState({ dialog: false, submitError: false });
+  handleFormDialogClose = () => this.setState({ dialog: false, readOnly: false, submitError: false });
 
   handleFormDialogOpen = ({
     data, formConfig, formType, schema, title,
@@ -288,7 +288,7 @@ class SightsList extends Component {
       schema: ticketPoolDefinitionSchema,
       title: 'Podgląd puli',
     });
-  }
+  };
 
   handleFormChange = name => (event, value) => {
     const { formData } = this.state;
