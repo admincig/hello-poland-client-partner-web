@@ -22,7 +22,8 @@ class CalendarEventController extends React.Component {
     super(props);
     this.initialDate = new Date();
     const { formData, readOnly } = props;
-    const { isCyclic, frequencyData: { endDate } } = formData || {};
+    const { isCyclic } = formData || {};
+    const { endDate } = formData.frequencyData || {};
     this.state = {
       isFullDay: false,
       isDefinitionFormVisible: false,

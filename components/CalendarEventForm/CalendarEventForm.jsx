@@ -192,286 +192,288 @@ class CalendarEventForm extends React.Component {
       <div>
         <CalendarEventController readOnly={readOnly} formData={initialFormData} onChange={onChange}>
           {({
-              formData, frequencyEndDateType, frequencyType, selectedTicketDefinitionId,
-              ticketDefinitionsList, fetchTicketDefinitions,
-              handleAvailableTicketsChange, handleDateChange, handleDefinitionFormClose,
-              handleDefinitionFormOpen, handleFormDataChange, handleFrequencyDataChange,
-              handleFrequencyDataFieldChange, handleFrequencyEndDateTypeChange,
-              handleFrequencyItemChange, handleFullDayChange, handlePropFromEventChange,
-              handleTicketDefinitionAdd, handleTicketDefinitionChange, handleTicketDefinitionDelete,
-              isFullDay, isDefinitionFormVisible,
-            }) => (
-              <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
-                <Grid container>
-                  <TextField
-                    disabled={readOnly}
-                    fullWidth
-                    label="Nazwa"
-                    margin="normal"
-                    name="name"
-                    onChange={handleFormDataChange}
-                    value={formData.name}
-                  />
-                  <TextField
-                    fullWidth
-                    disabled={readOnly}
-                    label="Limit biletów w puli"
-                    margin="normal"
-                    name="availableTicketsNumber"
-                    onChange={handleAvailableTicketsChange}
-                    type="number"
-                    value={
+            formData, frequencyEndDateType, frequencyType, selectedTicketDefinitionId,
+            ticketDefinitionsList, fetchTicketDefinitions,
+            handleAvailableTicketsChange, handleDateChange, handleDefinitionFormClose,
+            handleDefinitionFormOpen, handleFormDataChange, handleFrequencyDataChange,
+            handleFrequencyDataFieldChange, handleFrequencyEndDateTypeChange,
+            handleFrequencyItemChange, handleFullDayChange, handlePropFromEventChange,
+            handleTicketDefinitionAdd, handleTicketDefinitionChange, handleTicketDefinitionDelete,
+            isFullDay, isDefinitionFormVisible,
+          }) => (
+            <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
+              <Grid container>
+                <TextField
+                  disabled={readOnly}
+                  fullWidth
+                  label="Nazwa"
+                  margin="normal"
+                  name="name"
+                  onChange={handleFormDataChange}
+                  value={formData.name}
+                />
+                <TextField
+                  fullWidth
+                  disabled={readOnly}
+                  label="Limit biletów w puli"
+                  margin="normal"
+                  name="availableTicketsNumber"
+                  onChange={handleAvailableTicketsChange}
+                  type="number"
+                  value={
                       formData.availableTicketsNumber && formData.availableTicketsNumber > 0
                         ? formData.availableTicketsNumber : ''
                     }
+                />
+                <div className={classNames(classes.columns, classes.fullWidth)}>
+                  <DateTimePicker
+                    disabled={readOnly}
+                    date={formData.startDate}
+                    fullDay={isFullDay}
+                    label="Od"
+                    name="startDate"
+                    onChange={handleDateChange}
                   />
-                  <div className={classNames(classes.columns, classes.fullWidth)}>
-                    <DateTimePicker
-                      disabled={readOnly}
-                      date={formData.startDate}
-                      fullDay={isFullDay}
-                      label="Od"
-                      name="startDate"
-                      onChange={handleDateChange}
-                    />
-                    <DateTimePicker
-                      disabled={readOnly}
-                      date={formData.endDate}
-                      fullDay={isFullDay}
-                      label="Do"
-                      name="endDate"
-                      onChange={handleDateChange}
-                      DatePickerProps={{
+                  <DateTimePicker
+                    disabled={readOnly}
+                    date={formData.endDate}
+                    fullDay={isFullDay}
+                    label="Do"
+                    name="endDate"
+                    onChange={handleDateChange}
+                    DatePickerProps={{
                         minDate: formData.startDate,
                       }}
-                    />
-                  </div>
-                  <div className={classNames(classes.columns, classes.fullWidth)}>
-                    <DateTimePicker
-                      disabled={readOnly}
-                      date={formData.entryStartDate}
-                      fullDay={isFullDay}
-                      label="Wejście od"
-                      name="entryStartDate"
-                      onChange={handleDateChange}
-                    />
-                    <DateTimePicker
-                      disabled={readOnly}
-                      date={formData.entryEndDate}
-                      fullDay={isFullDay}
-                      label="Wejście do"
-                      name="entryEndDate"
-                      onChange={handleDateChange}
-                      DatePickerProps={{
+                  />
+                </div>
+                <div className={classNames(classes.columns, classes.fullWidth)}>
+                  <DateTimePicker
+                    disabled={readOnly}
+                    date={formData.entryStartDate}
+                    fullDay={isFullDay}
+                    label="Wejście od"
+                    name="entryStartDate"
+                    onChange={handleDateChange}
+                  />
+                  <DateTimePicker
+                    disabled={readOnly}
+                    date={formData.entryEndDate}
+                    fullDay={isFullDay}
+                    label="Wejście do"
+                    name="entryEndDate"
+                    onChange={handleDateChange}
+                    DatePickerProps={{
                         minDate: formData.entryEndDate,
                       }}
-                    />
-                  </div>
-                  <div className={classNames(classes.vertical, classes.fullWidth)}>
-                    <SwitchLabel
-                      label="Cały dzień"
-                      disabled={readOnly}
-                      name="isFullDay"
-                      onChange={handleFullDayChange}
-                      value={isFullDay}
+                  />
+                </div>
+                <div className={classNames(classes.vertical, classes.fullWidth)}>
+                  <SwitchLabel
+                    label="Cały dzień"
+                    disabled={readOnly}
+                    name="isFullDay"
+                    onChange={handleFullDayChange}
+                    value={isFullDay}
+                  />
+                  <TextField
+                    onChange={this.handleBasicFrequencyChange(handleFrequencyDataChange)}
+                    select
+                    value={frequencyType}
+                    disabled={readOnly}
+                  >
+                    {basicFrequencies.map(({ label, value }) => (
+                      <MenuItem
+                        key={value}
+                        value={value}
+                      >
+                        {label}
+                      </MenuItem>
+                      ))}
+                  </TextField>
+                </div>
+                {frequencyType === 'CUSTOM' &&
+                <div className={classNames(classes.section, classes.fullWidth)}>
+                  <Typography variant="title" gutterBottom>
+                        Powtarzanie niestandardowe
+                  </Typography>
+                  <div className={classNames(classes.inline, classes.fullWidth)}>
+                    <Typography>Powtarzaj co:</Typography>
+                    <TextField
+                      className={classes.frequencyTextfield}
+                      onChange={this.handleFrequencyPropChange(handleFrequencyDataChange)}
+                      name="frequency"
+                      type="number"
+                      value={formData.frequencyData && formData.frequencyData.frequency != null
+                            ? formData.frequencyData.frequency
+                            : ''
+                          }
                     />
                     <TextField
-                      onChange={this.handleBasicFrequencyChange(handleFrequencyDataChange)}
+                      onChange={
+                            this.handleFrequencyPropChange(
+                              handleFrequencyDataChange,
+                              formData.startDate,
+                            )
+                          }
+                      name="frequencyType"
                       select
-                      value={frequencyType}
+                      value={
+                            formData.frequencyData && formData.frequencyData.frequencyType != null
+                              ? formData.frequencyData.frequencyType
+                              : frequencyTypes[0].value
+                          }
                     >
-                      {basicFrequencies.map(({ label, value }) => (
+                      {frequencyTypes.map(({ label, value }) => (
                         <MenuItem
                           key={value}
                           value={value}
                         >
                           {label}
                         </MenuItem>
-                      ))}
+                          ))}
                     </TextField>
                   </div>
-                  {frequencyType === 'CUSTOM' &&
-                    <div className={classNames(classes.section, classes.fullWidth)}>
-                      <Typography variant="title" gutterBottom>
-                        Powtarzanie niestandardowe
-                      </Typography>
-                      <div className={classNames(classes.inline, classes.fullWidth)}>
-                        <Typography>Powtarzaj co:</Typography>
-                        <TextField
-                          className={classes.frequencyTextfield}
-                          onChange={this.handleFrequencyPropChange(handleFrequencyDataChange)}
-                          name="frequency"
-                          type="number"
-                          value={formData.frequencyData && formData.frequencyData.frequency != null
-                            ? formData.frequencyData.frequency
-                            : ''
-                          }
-                        />
-                        <TextField
-                          onChange={
-                            this.handleFrequencyPropChange(
-                              handleFrequencyDataChange,
-                              formData.startDate,
-                            )
-                          }
-                          name="frequencyType"
-                          select
-                          value={
-                            formData.frequencyData && formData.frequencyData.frequencyType != null
-                              ? formData.frequencyData.frequencyType
-                              : frequencyTypes[0].value
-                          }
-                        >
-                          {frequencyTypes.map(({ label, value }) => (
-                            <MenuItem
-                              key={value}
-                              value={value}
-                            >
-                              {label}
-                            </MenuItem>
-                          ))}
-                        </TextField>
-                      </div>
-                      {formData.frequencyData && formData.frequencyData.frequencyType === 'WEEKLY' &&
-                        <div className={classNames(classes.section, classes.fullWidth)}>
-                          <Typography>Powtarzaj w:</Typography>
-                          {daysOfWeekDefinitions.map(({ label, value }) => (
-                            <FormControlLabel
-                              key={`${label}-${value}`}
-                              control={
-                                <Checkbox
-                                  checked={this.isChecked(formData.frequencyData.daysOfWeek, value)}
-                                  onChange={handleFrequencyItemChange}
-                                  name="daysOfWeek"
-                                  value={`${value}`}
-                                />
-                              }
-                              label={label}
-                            />
-                          ))}
-                        </div>
-                      }
-                      <div className={classNames(classes.section, classes.fullWidth)}>
-                        <Typography>Kończy się:</Typography>
-                        <RadioGroup
-                          aria-label="Koniec puli"
-                          name="frequencyEndDateType"
-                          value={frequencyEndDateType}
-                          onChange={handleFrequencyEndDateTypeChange}
-                        >
-                          <FormControlLabel
-                            value="NONE"
-                            control={<Radio />}
-                            disabled={readOnly}
-                            label="Nigdy"
+                  {formData.frequencyData && formData.frequencyData.frequencyType === 'WEEKLY' &&
+                  <div className={classNames(classes.section, classes.fullWidth)}>
+                    <Typography>Powtarzaj w:</Typography>
+                    {daysOfWeekDefinitions.map(({ label, value }) => (
+                      <FormControlLabel
+                        key={`${label}-${value}`}
+                        control={
+                          <Checkbox
+                            checked={this.isChecked(formData.frequencyData.daysOfWeek, value)}
+                            onChange={handleFrequencyItemChange}
+                            name="daysOfWeek"
+                            value={`${value}`}
                           />
-                          <FormControlLabel
-                            value="SINGLE"
-                            disabled={readOnly}
-                            control={<Radio />}
-                            label={
-                              <div className={classNames(classes.frequencyRadioWrapper)}>
-                                <Typography className={classNames(classes.frequencyRadioLabel)}>
+                              }
+                        label={label}
+                      />
+                          ))}
+                  </div>
+                      }
+                  <div className={classNames(classes.section, classes.fullWidth)}>
+                    <Typography>Kończy się:</Typography>
+                    <RadioGroup
+                      aria-label="Koniec puli"
+                      name="frequencyEndDateType"
+                      value={frequencyEndDateType}
+                      onChange={handleFrequencyEndDateTypeChange}
+                    >
+                      <FormControlLabel
+                        value="NONE"
+                        control={<Radio />}
+                        disabled={readOnly}
+                        label="Nigdy"
+                      />
+                      <FormControlLabel
+                        value="SINGLE"
+                        disabled={readOnly}
+                        control={<Radio />}
+                        label={
+                          <div className={classNames(classes.frequencyRadioWrapper)}>
+                            <Typography className={classNames(classes.frequencyRadioLabel)}>
                                   W dniu
-                                </Typography>
-                                {frequencyEndDateType === 'SINGLE' &&
-                                  <DateTimePicker
-                                    date={formData.frequencyData.endDate}
-                                    fullDay
-                                    name="endDate"
-                                    onChange={handleFrequencyDataFieldChange}
-                                    DatePickerProps={{
+                            </Typography>
+                            {frequencyEndDateType === 'SINGLE' &&
+                            <DateTimePicker
+                              date={formData.frequencyData.endDate}
+                              fullDay
+                              name="endDate"
+                              onChange={handleFrequencyDataFieldChange}
+                              DatePickerProps={{
                                       minDate: formData.endDate,
                                     }}
-                                  />
+                            />
                                 }
-                              </div>
+                          </div>
                             }
-                          />
-                        </RadioGroup>
-                      </div>
-                    </div>
+                      />
+                    </RadioGroup>
+                  </div>
+                </div>
                   }
-                  <div className={classNames(classes.section, classes.fullWidth)}>
-                    <Typography variant="title" gutterBottom>
+                <div className={classNames(classes.section, classes.fullWidth)}>
+                  <Typography variant="title" gutterBottom>
                       Bilety
-                    </Typography>
-                    <div className={classNames(classes.columns, classes.fullWidth)}>
-                      <TextField
-                        onChange={event => handlePropFromEventChange(event)}
-                        name="selectedTicketDefinitionId"
-                        select
-                        SelectProps={{
-                          displayEmpty: true,
-                        }}
-                        value={selectedTicketDefinitionId}
+                  </Typography>
+                  {!readOnly &&
+                  <div className={classNames(classes.columns, classes.fullWidth)}>
+
+                    <TextField
+                      onChange={event => handlePropFromEventChange(event)}
+                      name="selectedTicketDefinitionId"
+                      select
+                      SelectProps={{
+                              displayEmpty: true,
+                            }}
+                      value={selectedTicketDefinitionId}
+                    >
+                      <MenuItem
+                        disabled
+                        value=""
                       >
-                        <MenuItem
-                          disabled
-                          value=""
-                        >
-                          Wybierz definicję biletu
-                        </MenuItem>
-                        {ticketDefinitionsList &&
-                          ticketDefinitionsList.map(({ id, name, price }) => (
-                            <MenuItem
-                              key={`${id}-${name}`}
-                              value={id}
-                            >
-                              {`${name} - ${formatPrice(price)}`}
-                            </MenuItem>
-                          ))
-                        }
-                      </TextField>
-                      {
-                        !readOnly &&
-                          <span>
-                            <Button
-                              onClick={() => handleTicketDefinitionAdd(+selectedTicketDefinitionId)}
-                              style={{ marginRight: 10 }}
-                              variant="outlined"
-                            >
-                              Dodaj do puli
-                            </Button>
-                            <Button
-                              variant="outlined"
-                              color="primary"
-                              onClick={handleDefinitionFormOpen}
-                            >
-                              Zdefiniuj bilet
-                            </Button>
-                          </span>
-                      }
+                              Wybierz definicję biletu
+                      </MenuItem>
+                      {ticketDefinitionsList &&
+                              ticketDefinitionsList.map(({ id, name, price }) => (
+                                <MenuItem
+                                  key={`${id}-${name}`}
+                                  value={id}
+                                >
+                                  {`${name} - ${formatPrice(price)}`}
+                                </MenuItem>
+                              ))
+                            }
+                    </TextField>
+                    <div>
+                      <Button
+                        onClick={() => handleTicketDefinitionAdd(+selectedTicketDefinitionId)}
+                        style={{ marginRight: 10 }}
+                        variant="outlined"
+                      >
+                            Dodaj do puli
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={handleDefinitionFormOpen}
+                      >
+                            Zdefiniuj bilet
+                      </Button>
                     </div>
-                    {
-                      formData.ticketDefinitions &&
-                        <TicketDefinitionList
-                          ticketDefinitions={formData.ticketDefinitions}
-                          ticketDefinitionsList={ticketDefinitionsList}
-                          onAvailabilityChange={handleTicketDefinitionChange}
-                          onDeleteClick={handleTicketDefinitionDelete}
-                          readOnly={readOnly}
-                        />
+
+                  </div>
                     }
-                    {isDefinitionFormVisible && !readOnly &&
-                      <div className={classNames(classes.section, classes.fullWidth)}>
-                        <Typography variant="title">
+                  {
+                      formData.ticketDefinitions &&
+                      <TicketDefinitionList
+                        ticketDefinitions={formData.ticketDefinitions}
+                        ticketDefinitionsList={ticketDefinitionsList}
+                        onAvailabilityChange={handleTicketDefinitionChange}
+                        onDeleteClick={handleTicketDefinitionDelete}
+                        readOnly={readOnly}
+                      />
+                    }
+                  {isDefinitionFormVisible && !readOnly &&
+                  <div className={classNames(classes.section, classes.fullWidth)}>
+                    <Typography variant="title">
                           Nowy rodzaj biletu
-                        </Typography>
-                        <TicketDefinitionForm
-                          onReset={handleDefinitionFormClose}
-                          onSubmitSuccess={(ticketDefinitionId) => {
+                    </Typography>
+                    <TicketDefinitionForm
+                      onReset={handleDefinitionFormClose}
+                      onSubmitSuccess={(ticketDefinitionId) => {
                             fetchTicketDefinitions();
                             handleTicketDefinitionAdd(ticketDefinitionId);
                             handleDefinitionFormClose();
                           }}
-                        />
-                      </div>
-                    }
+                    />
                   </div>
-                </Grid>
-              </MuiPickersUtilsProvider>
-          )}
+                    }
+                </div>
+              </Grid>
+            </MuiPickersUtilsProvider>
+            )}
         </CalendarEventController>
       </div>
     );
