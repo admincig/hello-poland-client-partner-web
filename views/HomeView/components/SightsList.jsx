@@ -281,11 +281,9 @@ class SightsList extends Component {
     });
   };
 
-  handleTicketPoolPreview = (item) => {
+  handleTicketPoolPreview = (formData) => {
     this.setState({
-      formData: {
-        item,
-      },
+      formData,
       readOnly: true,
       dialog: true,
       formType: 'TicketPoolDefinitionForm',
