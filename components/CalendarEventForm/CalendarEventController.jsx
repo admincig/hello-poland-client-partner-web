@@ -20,9 +20,9 @@ const DATE_FORMAT = 'YYYY-MM-DDTHH:mm';
 class CalendarEventController extends React.Component {
   constructor(props) {
     super(props);
-
     this.initialDate = new Date();
-
+    const { formData, readOnly } = props;
+    const { isCyclic, frequencyData: { endDate } } = formData || {};
     this.state = {
       isFullDay: false,
       isDefinitionFormVisible: false,
@@ -33,12 +33,13 @@ class CalendarEventController extends React.Component {
         entryStartDate: this.getFormattedDate(subMinutes(this.initialDate, 10)),
         frequencyData: null,
         sightEventId: null,
+        isCyclic: false,
         startDate: this.getFormattedDate(this.initialDate),
         ticketDefinitions: [],
-        ...props.formData,
+        ...formData,
       },
-      frequencyType: 'NONE',
-      frequencyEndDateType: 'NONE',
+      frequencyType: this.getInitialFrequecyType(isCyclic, readOnly),
+      frequencyEndDateType: this.getInitialFrequecyType(endDate),
       selectedTicketDefinitionId: '',
     };
   }
@@ -54,6 +55,9 @@ class CalendarEventController extends React.Component {
   }
 
   getFormattedDate = dateObj => format(dateObj, DATE_FORMAT);
+
+  getInitialFrequecyType = (isCyclic, readOnly) => (isCyclic && readOnly ? 'CUSTOM' : 'NONE');
+  getInitialFrequencyTypeDate = endDate => (endDate ? 'SINGLE' : 'NONE');
 
   getKeyFromEvent = event => event.target.name;
 
@@ -319,6 +323,7 @@ CalendarEventController.propTypes = {
   fetchTicketDefinitions: PropTypes.func.isRequired,
   formData: PropTypes.shape({}),
   onChange: PropTypes.func,
+  readOnly: PropTypes.bool.isRequired,
   ticketDefinitionsList: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,

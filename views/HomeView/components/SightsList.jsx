@@ -123,7 +123,6 @@ class SightsList extends Component {
 
   handleFormDialogClose = () => this.setState({
     dialog: false,
-    readOnly: false,
     submitError: false,
   });
 
@@ -136,6 +135,7 @@ class SightsList extends Component {
     this.setState({
       dialog: true,
       formConfig,
+      readOnly: false,
       formData,
       formType,
       schema,

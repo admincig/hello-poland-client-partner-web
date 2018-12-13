@@ -173,7 +173,6 @@ class CalendarEventForm extends React.Component {
     const frequencyData = {
       [name]: value,
     };
-
     if (value === 'WEEKLY') {
       frequencyData.daysOfWeek = [
         getNormalizedDay(startDate),
@@ -191,7 +190,7 @@ class CalendarEventForm extends React.Component {
     } = this.props;
     return (
       <div>
-        <CalendarEventController formData={initialFormData} onChange={onChange}>
+        <CalendarEventController readOnly={readOnly} formData={initialFormData} onChange={onChange}>
           {({
               formData, frequencyEndDateType, frequencyType, selectedTicketDefinitionId,
               ticketDefinitionsList, fetchTicketDefinitions,
@@ -363,10 +362,12 @@ class CalendarEventForm extends React.Component {
                           <FormControlLabel
                             value="NONE"
                             control={<Radio />}
+                            disabled={readOnly}
                             label="Nigdy"
                           />
                           <FormControlLabel
                             value="SINGLE"
+                            disabled={readOnly}
                             control={<Radio />}
                             label={
                               <div className={classNames(classes.frequencyRadioWrapper)}>
@@ -424,7 +425,7 @@ class CalendarEventForm extends React.Component {
                       </TextField>
                       {
                         !readOnly &&
-                          <div>
+                          <span>
                             <Button
                               onClick={() => handleTicketDefinitionAdd(+selectedTicketDefinitionId)}
                               style={{ marginRight: 10 }}
@@ -439,7 +440,7 @@ class CalendarEventForm extends React.Component {
                             >
                               Zdefiniuj bilet
                             </Button>
-                          </div>
+                          </span>
                       }
                     </div>
                     {
