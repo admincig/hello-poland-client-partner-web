@@ -15,8 +15,7 @@ const TicketDefinitionList = ({
 }) => (ticketDefinitions && ticketDefinitions.length ?
   <List>
     {ticketDefinitions.map((selected) => {
-      const ticketDefinition = _find(ticketDefinitionsList, { id: selected.id });
-
+      const ticketDefinition = _find(ticketDefinitionsList, { id: selected.id }) || selected;
       if (!ticketDefinition) {
         return null;
       }
