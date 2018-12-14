@@ -148,6 +148,9 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'center',
   },
+  disabled: {
+    color: 'rgba(0, 0, 0, 0.38)',
+  },
 });
 
 function getNormalizedDay(dateObj) {
@@ -372,7 +375,10 @@ class CalendarEventForm extends React.Component {
                         control={<Radio />}
                         label={
                           <div className={classNames(classes.frequencyRadioWrapper)}>
-                            <Typography className={classNames(classes.frequencyRadioLabel)}>
+                            <Typography className={classNames(readOnly
+                              ? [classes.disabled, classes.frequencyRadioLabel]
+                              : classes.frequencyRadioLabel)}
+                            >
                                   W dniu
                             </Typography>
                             {frequencyEndDateType === 'SINGLE' &&
