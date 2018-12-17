@@ -233,7 +233,7 @@ class CalendarEventForm extends React.Component {
                     disabled={readOnly}
                     date={formData.startDate}
                     fullDay={isFullDay}
-                    label="Od"
+                    label="Wydarzenie od"
                     name="startDate"
                     onChange={handleDateChange}
                     DatePickerProps={{
@@ -247,7 +247,7 @@ class CalendarEventForm extends React.Component {
                     disabled={readOnly}
                     date={formData.endDate}
                     fullDay={isFullDay}
-                    label="Do"
+                    label="Wydarzenie do"
                     name="endDate"
                     onChange={handleDateChange}
                     DatePickerProps={{
@@ -298,6 +298,11 @@ class CalendarEventForm extends React.Component {
                     onChange={handleFullDayChange}
                     value={isFullDay}
                   />
+                </div>
+                <div>
+                  <Typography variant="title">
+                    Ustawienia powtarzalności wydarzenia
+                  </Typography>
                   <TextField
                     disabled={readOnly}
                     onChange={this.handleBasicFrequencyChange(handleFrequencyDataChange)}
