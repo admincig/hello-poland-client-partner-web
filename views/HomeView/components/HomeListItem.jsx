@@ -10,6 +10,7 @@ import AddAPhoto from '@material-ui/icons/AddAPhoto';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
+import DeleteSweep from '@material-ui/icons/DeleteSweep';
 import NoteAdd from '@material-ui/icons/NoteAdd';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import Typography from '@material-ui/core/Typography';
@@ -25,6 +26,8 @@ const HomeListItem = ({
   onAddLabel,
   onDeleteClick,
   onDeleteLabel,
+  onDeletePDFClick,
+  onDeletePDFLabel,
   onDocumentClick,
   onDocumentLabel,
   onEditClick,
@@ -100,6 +103,15 @@ const HomeListItem = ({
           <NoteAdd />
         </IconButton>
       }
+      {onDeletePDFClick &&
+        <IconButton
+          aria-label={onDeletePDFLabel}
+          onClick={onDeletePDFClick}
+          title={onDeletePDFLabel}
+        >
+          <DeleteSweep />
+        </IconButton>
+      }
       {onAddClick &&
         <IconButton
           aria-label={onAddLabel}
@@ -138,6 +150,8 @@ HomeListItem.propTypes = {
   onAddLabel: PropTypes.string,
   onDeleteClick: PropTypes.func,
   onDeleteLabel: PropTypes.string,
+  onDeletePDFClick: PropTypes.func,
+  onDeletePDFLabel: PropTypes.string,
   onDocumentClick: PropTypes.func,
   onDocumentLabel: PropTypes.string,
   onEditClick: PropTypes.func,
@@ -158,6 +172,8 @@ HomeListItem.defaultProps = {
   onAddLabel: null,
   onDeleteClick: null,
   onDeleteLabel: null,
+  onDeletePDFClick: null,
+  onDeletePDFLabel: null,
   onDocumentClick: null,
   onDocumentLabel: null,
   onEditClick: null,
