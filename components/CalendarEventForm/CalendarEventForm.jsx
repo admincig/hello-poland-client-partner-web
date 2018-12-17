@@ -213,7 +213,7 @@ class CalendarEventForm extends React.Component {
                   margin="normal"
                   name="name"
                   onChange={handleFormDataChange}
-                  value={formData.name}
+                  value={formData.name != null ? formData.name : ''}
                 />
                 <TextField
                   fullWidth
