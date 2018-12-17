@@ -20,10 +20,12 @@ const DATE_FORMAT = 'YYYY-MM-DDTHH:mm';
 class CalendarEventController extends React.Component {
   constructor(props) {
     super(props);
-    this.initialDate = new Date();
     const { formData, readOnly } = props;
-    const { isCyclic } = formData || {};
-    const { endDate } = formData.frequencyData || {};
+    const { frequencyData, isCyclic } = formData || {};
+    const { endDate } = frequencyData || {};
+
+    this.initialDate = new Date();
+
     this.state = {
       isFullDay: false,
       isDefinitionFormVisible: false,
@@ -40,7 +42,7 @@ class CalendarEventController extends React.Component {
         ...formData,
       },
       frequencyType: this.getInitialFrequecyType(isCyclic, readOnly),
-      frequencyEndDateType: this.getInitialFrequecyType(endDate),
+      frequencyEndDateType: this.getInitialFrequencyTypeDate(endDate),
       selectedTicketDefinitionId: '',
     };
   }
@@ -58,6 +60,7 @@ class CalendarEventController extends React.Component {
   getFormattedDate = dateObj => format(dateObj, DATE_FORMAT);
 
   getInitialFrequecyType = (isCyclic, readOnly) => (isCyclic && readOnly ? 'CUSTOM' : 'NONE');
+
   getInitialFrequencyTypeDate = endDate => (endDate ? 'SINGLE' : 'NONE');
 
   getKeyFromEvent = event => event.target.name;

@@ -52,7 +52,7 @@ class DateTimePicker extends Component {
 
   render() {
     const {
-      classes, date, DatePickerProps, fullDay, label, TimePickerProps, disabled,
+      classes, date, DatePickerProps, fullDay, label, TimePickerProps,
     } = this.props;
 
     return (
@@ -61,7 +61,6 @@ class DateTimePicker extends Component {
           className={classes.datePicker}
           disablePast
           format="DD MMM YYYY"
-          disabled={disabled}
           label={label}
           margin="normal"
           onChange={this.handleChange(changeTypes.DATE)}
@@ -73,7 +72,6 @@ class DateTimePicker extends Component {
             ampm={false}
             className={classes.timePicker}
             clearable
-            disabled={disabled}
             margin="normal"
             onChange={this.handleChange(changeTypes.TIME)}
             value={date}

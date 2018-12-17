@@ -24,11 +24,9 @@ const FormDialog = ({
             Wystąpił błąd podczas zapisywania.
           </Typography>
         }
-
         <Button onClick={onClose} color="primary">{buttonClose}</Button>
-        {
-          !readOnly &&
-            <Button onClick={onSubmit} color="primary">Zapisz</Button>
+        {!readOnly &&
+          <Button onClick={onSubmit} color="primary">Zapisz</Button>
         }
       </DialogActions>
     </Dialog>
