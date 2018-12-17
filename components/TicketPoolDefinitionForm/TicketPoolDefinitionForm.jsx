@@ -13,11 +13,12 @@ class TicketPoolDefinitionForm extends React.Component {
   };
 
   render() {
-    const { data, onChange } = this.props;
+    const { data, onChange, readOnly } = this.props;
 
     return (
       <CalendarEventForm
         formData={data}
+        readOnly={readOnly}
         onChange={onChange}
       />
     );
@@ -30,10 +31,12 @@ TicketPoolDefinitionForm.propTypes = {
     sightEventId: PropTypes.number,
   }),
   onChange: PropTypes.func.isRequired,
+  readOnly: PropTypes.bool,
 };
 
 TicketPoolDefinitionForm.defaultProps = {
   data: null,
+  readOnly: false,
 };
 
 export default TicketPoolDefinitionForm;
