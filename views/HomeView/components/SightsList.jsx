@@ -54,6 +54,7 @@ class SightsList extends Component {
     formData: null,
     formType: null,
     mediaManager: false,
+    readOnly: false,
     mediaManagerData: {},
     mediaManagerSubmitting: false,
     schema: null,
@@ -120,7 +121,10 @@ class SightsList extends Component {
     title: '',
   });
 
-  handleFormDialogClose = () => this.setState({ dialog: false, submitError: false });
+  handleFormDialogClose = () => this.setState({
+    dialog: false,
+    submitError: false,
+  });
 
   handleFormDialogOpen = ({
     data, formConfig, formType, schema, title,
@@ -131,6 +135,7 @@ class SightsList extends Component {
     this.setState({
       dialog: true,
       formConfig,
+      readOnly: false,
       formData,
       formType,
       schema,
@@ -276,6 +281,17 @@ class SightsList extends Component {
     });
   };
 
+  handleTicketPoolPreview = (formData) => {
+    this.setState({
+      formData,
+      readOnly: true,
+      dialog: true,
+      formType: 'TicketPoolDefinitionForm',
+      schema: ticketPoolDefinitionSchema,
+      title: 'Podgląd puli',
+    });
+  };
+
   handleFormChange = name => (event, value) => {
     const { formData } = this.state;
 
@@ -350,7 +366,7 @@ class SightsList extends Component {
     const { sightEventsList, sightsList } = this.props;
     const {
       dialog, formData, formType, mediaManager, mediaManagerSubmitting, schema, sightForm,
-      sightEventForm, submitError, title,
+      sightEventForm, submitError, title, readOnly,
     } = this.state;
 
     return (
@@ -450,6 +466,10 @@ class SightsList extends Component {
                                       'Brak' : `${ticketPoolDefinition.availableTicketsNumber} szt`
                                     }`
                                   }
+                                  onPreviewClick={
+                                    () => this.handleTicketPoolPreview(ticketPoolDefinition)
+                                  }
+                                  onPreviewLabel="Podgląd puli"
                                   onDeleteClick={
                                     () => this.handleTicketPoolDelete(ticketPoolDefinition.id)
                                   }
@@ -497,11 +517,13 @@ class SightsList extends Component {
           onSubmit={this.handleFormSubmit}
           open={dialog}
           error={submitError}
+          readOnly={readOnly}
           title={title}
         >
           {this.getFormComponent({
             data: formData,
             schema,
+            readOnly,
           }, formType)}
         </FormDialog>
         <SightFormDialog

@@ -9,24 +9,29 @@ import Typography from '@material-ui/core/Typography/Typography';
 
 
 const FormDialog = ({
-  children, error, onClose, onSubmit, title, ...rest
-}) => (
-  <Dialog onClose={onClose} aria-labelledby="form-dialog-title" {...rest}>
-    <DialogTitle id="form-dialog-title">{title}</DialogTitle>
-    <DialogContent>
-      {children}
-    </DialogContent>
-    <DialogActions>
-      {error &&
-        <Typography style={{ color: 'red' }}>
-          Wystąpił błąd podczas zapisywania.
-        </Typography>
-      }
-      <Button onClick={onClose} color="primary">Anuluj</Button>
-      <Button onClick={onSubmit} color="primary">Zapisz</Button>
-    </DialogActions>
-  </Dialog>
-);
+  children, error, onClose, onSubmit, title, readOnly, ...rest
+}) => {
+  const buttonClose = readOnly ? 'Anuluj' : 'Zamknij';
+  return (
+    <Dialog onClose={onClose} aria-labelledby="form-dialog-title" {...rest}>
+      <DialogTitle id="form-dialog-title">{title}</DialogTitle>
+      <DialogContent>
+        {children}
+      </DialogContent>
+      <DialogActions>
+        {error &&
+          <Typography style={{ color: 'red' }}>
+            Wystąpił błąd podczas zapisywania.
+          </Typography>
+        }
+        <Button onClick={onClose} color="primary">{buttonClose}</Button>
+        {!readOnly &&
+          <Button onClick={onSubmit} color="primary">Zapisz</Button>
+        }
+      </DialogActions>
+    </Dialog>
+  );
+};
 
 FormDialog.propTypes = {
   children: PropTypes.element,
@@ -34,6 +39,7 @@ FormDialog.propTypes = {
   onClose: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   title: PropTypes.string,
+  readOnly: PropTypes.bool,
 };
 
 FormDialog.defaultProps = {
@@ -41,6 +47,7 @@ FormDialog.defaultProps = {
   error: false,
   onClose: null,
   title: null,
+  readOnly: false,
 };
 
 export default FormDialog;
