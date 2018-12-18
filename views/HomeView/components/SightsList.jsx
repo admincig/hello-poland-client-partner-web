@@ -260,7 +260,7 @@ class SightsList extends Component {
       createTicketPoolDefinition, updateTicketPoolDefinition, fetchTicketPoolDefinition,
     } = this.props;
     const isPersisted = Number.isInteger(data.id);
-    const title = 'Szczegóły pojedyńczego wydarzenia';
+    const title = isPersisted ? 'Edytuj pulę biletów' : 'Dodaj pulę biletów';
     const formType = 'TicketPoolDefinitionForm';
     const formConfig = {
       action: createTicketPoolDefinition,
