@@ -206,6 +206,9 @@ class CalendarEventForm extends React.Component {
           }) => (
             <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
               <Grid container>
+                <Typography variant="title" gutterBottom>
+                  Szczegóły pojedynczego wydarzenia
+                </Typography>
                 <TextField
                   disabled={readOnly}
                   fullWidth
@@ -233,7 +236,7 @@ class CalendarEventForm extends React.Component {
                     disabled={readOnly}
                     date={formData.startDate}
                     fullDay={isFullDay}
-                    label="Od"
+                    label="Wydarzenie od"
                     name="startDate"
                     onChange={handleDateChange}
                     DatePickerProps={{
@@ -247,7 +250,7 @@ class CalendarEventForm extends React.Component {
                     disabled={readOnly}
                     date={formData.endDate}
                     fullDay={isFullDay}
-                    label="Do"
+                    label="Wydarzenie do"
                     name="endDate"
                     onChange={handleDateChange}
                     DatePickerProps={{
@@ -268,7 +271,7 @@ class CalendarEventForm extends React.Component {
                     name="entryStartDate"
                     onChange={handleDateChange}
                     DatePickerProps={{
-                      disabled: readOnly,
+                       disabled: readOnly,
                     }}
                     TimePickerProps={{
                       disabled: readOnly,
@@ -298,128 +301,135 @@ class CalendarEventForm extends React.Component {
                     onChange={handleFullDayChange}
                     value={isFullDay}
                   />
-                  <TextField
-                    disabled={readOnly}
-                    onChange={this.handleBasicFrequencyChange(handleFrequencyDataChange)}
-                    select
-                    value={frequencyType}
-                  >
-                    {basicFrequencies.map(({ label, value }) => (
-                      <MenuItem
-                        key={value}
-                        value={value}
-                      >
-                        {label}
-                      </MenuItem>
-                      ))}
-                  </TextField>
                 </div>
-                {frequencyType === 'CUSTOM' &&
-                  <div className={classNames(classes.section, classes.fullWidth)}>
+                <div className={classNames(classes.section, classes.fullWidth)}>
+                  <div>
                     <Typography variant="title" gutterBottom>
-                      Powtarzanie niestandardowe
+                      Ustawienia powtarzalności wydarzenia
                     </Typography>
-                    <div className={classNames(classes.inline, classes.fullWidth)}>
-                      <Typography>Powtarzaj co:</Typography>
-                      <TextField
-                        className={classes.frequencyTextfield}
-                        disabled={readOnly}
-                        onChange={this.handleFrequencyPropChange(handleFrequencyDataChange)}
-                        name="frequency"
-                        type="number"
-                        value={formData.frequencyData && formData.frequencyData.frequency != null
-                          ? formData.frequencyData.frequency
-                          : ''
-                          }
-                      />
-                      <TextField
-                        disabled={readOnly}
-                        onChange={
-                          this.handleFrequencyPropChange(
-                            handleFrequencyDataChange,
-                            formData.startDate,
-                          )
-                        }
-                        name="frequencyType"
-                        select
-                        value={
-                          formData.frequencyData && formData.frequencyData.frequencyType != null
-                            ? formData.frequencyData.frequencyType
-                            : frequencyTypes[0].value
-                        }
-                      >
-                        {frequencyTypes.map(({ label, value }) => (
-                          <MenuItem key={value} value={value}>
-                            {label}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </div>
-                    {formData.frequencyData && formData.frequencyData.frequencyType === 'WEEKLY' &&
-                      <div className={classNames(classes.section, classes.fullWidth)}>
-                        <Typography>Powtarzaj w:</Typography>
-                        {daysOfWeekDefinitions.map(({ label, value }) => (
-                          <FormControlLabel
-                            key={`${label}-${value}`}
-                            control={
-                              <Checkbox
-                                checked={this.isChecked(formData.frequencyData.daysOfWeek, value)}
-                                disabled={readOnly}
-                                onChange={handleFrequencyItemChange}
-                                name="daysOfWeek"
-                                value={`${value}`}
-                              />
-                            }
-                            label={label}
-                          />
-                        ))}
-                      </div>
-                    }
+                    <TextField
+                      disabled={readOnly}
+                      onChange={this.handleBasicFrequencyChange(handleFrequencyDataChange)}
+                      select
+                      value={frequencyType}
+                    >
+                      {basicFrequencies.map(({ label, value }) => (
+                        <MenuItem
+                          key={value}
+                          value={value}
+                        >
+                          {label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </div>
+                  {frequencyType === 'CUSTOM' &&
                     <div className={classNames(classes.section, classes.fullWidth)}>
-                      <Typography>Kończy się:</Typography>
-                      <RadioGroup
-                        aria-label="Koniec puli"
-                        name="frequencyEndDateType"
-                        value={frequencyEndDateType}
-                        onChange={handleFrequencyEndDateTypeChange}
-                      >
-                        <FormControlLabel
-                          value="NONE"
-                          control={<Radio />}
+                      <Typography variant="title" gutterBottom>
+                        Powtarzanie niestandardowe
+                      </Typography>
+                      <div className={classNames(classes.inline, classes.fullWidth)}>
+                        <Typography>Powtarzaj co:</Typography>
+                        <TextField
+                          className={classes.frequencyTextfield}
                           disabled={readOnly}
-                          label="Nigdy"
+                          onChange={this.handleFrequencyPropChange(handleFrequencyDataChange)}
+                          name="frequency"
+                          type="number"
+                          value={formData.frequencyData && formData.frequencyData.frequency != null
+                            ? formData.frequencyData.frequency
+                            : ''
+                            }
                         />
-                        <FormControlLabel
-                          value="SINGLE"
+                        <TextField
                           disabled={readOnly}
-                          control={<Radio />}
-                          label={
-                            <div className={classNames(classes.frequencyRadioWrapper)}>
-                              <Typography className={classNames(readOnly
-                                ? [classes.disabled, classes.frequencyRadioLabel]
-                                : classes.frequencyRadioLabel)}
-                              >
-                                W dniu
-                              </Typography>
-                              {frequencyEndDateType === 'SINGLE' &&
-                                <DateTimePicker
-                                  date={formData.frequencyData.endDate}
-                                  fullDay
-                                  name="endDate"
-                                  onChange={handleFrequencyDataFieldChange}
-                                  DatePickerProps={{
-                                    disabled: readOnly,
-                                    minDate: formData.endDate,
-                                  }}
+                          onChange={
+                            this.handleFrequencyPropChange(
+                              handleFrequencyDataChange,
+                              formData.startDate,
+                            )
+                          }
+                          name="frequencyType"
+                          select
+                          value={
+                            formData.frequencyData && formData.frequencyData.frequencyType != null
+                              ? formData.frequencyData.frequencyType
+                              : frequencyTypes[0].value
+                          }
+                        >
+                          {frequencyTypes.map(({ label, value }) => (
+                            <MenuItem key={value} value={value}>
+                              {label}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      </div>
+                      {formData.frequencyData && formData.frequencyData.frequencyType === 'WEEKLY' &&
+                        <div className={classNames(classes.section, classes.fullWidth)}>
+                          <Typography>Powtarzaj w:</Typography>
+                          {daysOfWeekDefinitions.map(({ label, value }) => (
+                            <FormControlLabel
+                              key={`${label}-${value}`}
+                              control={
+                                <Checkbox
+                                  checked={this.isChecked(formData.frequencyData.daysOfWeek, value)}
+                                  disabled={readOnly}
+                                  onChange={handleFrequencyItemChange}
+                                  name="daysOfWeek"
+                                  value={`${value}`}
                                 />
                               }
-                            </div>
-                          }
-                        />
-                      </RadioGroup>
+                              label={label}
+                            />
+                          ))}
+                        </div>
+                      }
+                      <div className={classNames(classes.section, classes.fullWidth)}>
+                        <Typography>Kończy się:</Typography>
+                        <RadioGroup
+                          aria-label="Koniec puli"
+                          name="frequencyEndDateType"
+                          value={frequencyEndDateType}
+                          onChange={handleFrequencyEndDateTypeChange}
+                        >
+                          <FormControlLabel
+                            value="NONE"
+                            control={<Radio />}
+                            disabled={readOnly}
+                            label="Nigdy"
+                          />
+                          <FormControlLabel
+                            value="SINGLE"
+                            disabled={readOnly}
+                            control={<Radio />}
+                            label={
+                              <div className={classNames(classes.frequencyRadioWrapper)}>
+                                <Typography className={classNames(readOnly
+                                  ? [classes.disabled, classes.frequencyRadioLabel]
+                                  : classes.frequencyRadioLabel)}
+                                >
+                                  W dniu
+                                </Typography>
+                                {frequencyEndDateType === 'SINGLE' &&
+                                  <DateTimePicker
+                                    date={formData.frequencyData.endDate}
+                                    fullDay
+                                    name="endDate"
+                                    onChange={handleFrequencyDataFieldChange}
+                                    DatePickerProps={{
+                                      disabled: readOnly,
+                                      minDate: formData.endDate,
+                                    }}
+                                  />
+                                }
+                              </div>
+                            }
+                          />
+                        </RadioGroup>
+                      </div>
                     </div>
-                  </div>
-                }
+                  }
+                </div>
                 {!readOnly &&
                   <div className={classNames(classes.section, classes.fullWidth)}>
                     <Typography variant="title" gutterBottom>
@@ -451,7 +461,7 @@ class CalendarEventForm extends React.Component {
                                 {`${name} - ${formatPrice(price)}`}
                               </MenuItem>
                             ))
-                          }
+                            }
                         </TextField>
                         <div>
                           <Button
@@ -499,7 +509,7 @@ class CalendarEventForm extends React.Component {
                 }
               </Grid>
             </MuiPickersUtilsProvider>
-            )}
+          )}
         </CalendarEventController>
       </div>
     );
