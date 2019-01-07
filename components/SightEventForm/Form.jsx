@@ -18,6 +18,10 @@ import yupString from 'yup/lib/string';
 import yupBoolen from 'yup/lib/boolean';
 import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
 import GridItem from 'components/GridItem';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
 
 const commonProps = {
   fullWidth: true,
@@ -41,6 +45,10 @@ const fieldToSwitch = ({
 const styles = () => ({
   title: {
     marginTop: 40,
+  },
+  link: {
+    textDecoration: 'none',
+    color: 'black',
   },
 });
 
@@ -91,9 +99,8 @@ class SightEventForm extends Component {
   }
 
   getInitialValues = (initialValues) => {
-    const { location: initialLocation, ...details } = initialValues || {};
+    const { location: initialLocation, pdfAttachment: files, ...details } = initialValues || {};
     const location = initialLocation || {};
-
     return {
       id: details.id || '',
       sightId: details.sightId || '',
@@ -110,6 +117,7 @@ class SightEventForm extends Component {
         city: location.city || '',
         country: location.country || 'Polska',
       },
+      files: files || {},
     };
   };
 
@@ -174,7 +182,8 @@ class SightEventForm extends Component {
   render() {
     const { initialValues } = this.state;
     const { buttons, classes, FormikProps } = this.props;
-
+    const { files } = initialValues;
+    const fileName = files.name && `${files.name}.${files.type.toLowerCase()}`;
     return (
       <Formik
         enableReinitialize
@@ -253,6 +262,22 @@ class SightEventForm extends Component {
               </GridItem>
               <GridItem>
                 <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
+              </GridItem>
+              <GridItem>
+                <Typography variant="title" className={classes.title}>Załączone pliki</Typography>
+              </GridItem>
+              <GridItem>
+                <List>
+                  <ListItem>
+                    <ListItemText>
+                      {
+                        fileName
+                        ? <a href={files.path} className={classes.link} target="_blank">{fileName}</a>
+                        : 'brak załączonych plików'
+                      }
+                    </ListItemText>
+                  </ListItem>
+                </List>
               </GridItem>
             </Grid>
             {buttons &&
