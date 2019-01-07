@@ -20,7 +20,6 @@ import { actions as sightEventsActions } from '@hello-poland/commons/redux/sight
 import GridItem from 'components/GridItem';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 
 const commonProps = {
@@ -182,7 +181,7 @@ class SightEventForm extends Component {
   render() {
     const { initialValues } = this.state;
     const { buttons, classes, FormikProps } = this.props;
-    const { files } = initialValues;
+    const { id, files } = initialValues;
     const fileName = files.name && `${files.name}.${files.type.toLowerCase()}`;
     return (
       <Formik
@@ -263,22 +262,28 @@ class SightEventForm extends Component {
               <GridItem>
                 <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
               </GridItem>
-              <GridItem>
-                <Typography variant="title" className={classes.title}>Załączone pliki</Typography>
-              </GridItem>
-              <GridItem>
-                <List>
-                  <ListItem>
-                    <ListItemText>
-                      {
-                        fileName
-                        ? <a href={files.path} className={classes.link} target="_blank">{fileName}</a>
-                        : 'brak załączonych plików'
-                      }
-                    </ListItemText>
-                  </ListItem>
-                </List>
-              </GridItem>
+              {
+                Number.isInteger(id) &&
+                <GridItem>
+                  <Typography variant="title" className={classes.title}>Załączone pliki</Typography>
+                </GridItem>
+              }
+              {
+                Number.isInteger(id) &&
+                <GridItem>
+                  <List>
+                    <ListItem>
+                      <ListItemText>
+                        {
+                          fileName
+                          ? <a href={files.path} className={classes.link} target="_blank">{fileName}</a>
+                          : 'brak załączonych plików'
+                        }
+                      </ListItemText>
+                    </ListItem>
+                  </List>
+                </GridItem>
+              }
             </Grid>
             {buttons &&
               <Grid container spacing={16}>
