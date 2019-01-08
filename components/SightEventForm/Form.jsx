@@ -18,12 +18,15 @@ import yupString from 'yup/lib/string';
 import yupBoolen from 'yup/lib/boolean';
 import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
 import GridItem from 'components/GridItem';
+import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import InsertDriveFile from '@material-ui/icons/InsertDriveFile';
-
-import HomeListItem from '../../components/HomeListItem';
+import GetApp from '@material-ui/icons/GetApp';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const commonProps = {
   fullWidth: true,
@@ -47,10 +50,6 @@ const fieldToSwitch = ({
 const styles = () => ({
   title: {
     marginTop: 40,
-  },
-  link: {
-    textDecoration: 'none',
-    color: 'black',
   },
 });
 
@@ -129,7 +128,7 @@ class SightEventForm extends Component {
 
   handleOpenFileLink = () => {
     const { initialValues: { files: { path } } } = this.state;
-    window.open(path, '_blank');
+    return path;
   }
 
   handleSubmit = (values, actions) => {
@@ -195,7 +194,6 @@ class SightEventForm extends Component {
       handleDeletePDF,
     } = this.props;
     const { id, files } = initialValues;
-    const fileName = files.name && `${files.name}.${files.type.toLowerCase()}`;
     return (
       <Formik
         enableReinitialize
@@ -278,7 +276,7 @@ class SightEventForm extends Component {
               {
                 _isNumber(id) &&
                 <GridItem>
-                  <Typography variant="title" className={classes.title}>Załączone pliki</Typography>
+                  <Typography variant="title" className={classes.title}>Multimedia</Typography>
                 </GridItem>
               }
               {
@@ -286,18 +284,34 @@ class SightEventForm extends Component {
                 <GridItem>
                   <List>
                     {
-                      fileName
+                      files.name
                       ? (
-                        <HomeListItem
-                          icon={InsertDriveFile}
-                          primary={fileName || ''}
-                          onDeletePDFLabel="Usuń broszurę PDF"
-                          onDeletePDFClick={() => {
-                            handleDeletePDF(id);
-                          }}
-                          onOpenFileLabel="Podgląd pliku"
-                          onOpenFileLink={this.handleOpenFileLink}
-                        />
+                        <ListItem>
+                          <ListItemIcon>
+                            <InsertDriveFile />
+                          </ListItemIcon>
+                          <ListItemText>
+                            {files.name}
+                          </ListItemText>
+                          <ListItemSecondaryAction>
+                            <IconButton
+                              component="a"
+                              href={files.path}
+                              aria-label="Podląd pliku"
+                              title="Podgląd pliku"
+                              target="_blank"
+                            >
+                              <GetApp />
+                            </IconButton>
+                            <IconButton
+                              aria-label="Usuń plik"
+                              title="Usuń plik"
+                              onClick={handleDeletePDF}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </ListItemSecondaryAction>
+                        </ListItem>
                         )
                       : (
                         <ListItem>

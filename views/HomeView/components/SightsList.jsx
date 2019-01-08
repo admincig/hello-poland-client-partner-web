@@ -34,7 +34,7 @@ import serialize from 'utils/form-generator/data/serialize';
 import formatPrice from 'utils/formatPrice';
 import config from 'config';
 import ticketPoolDefinitionSchema from './ticketPoolDefinitionSchema';
-import HomeListItem from '../../../components/HomeListItem';
+import HomeListItem from './HomeListItem';
 
 const PARENT_TYPES = {
   SIGHT: 'SIGHT',

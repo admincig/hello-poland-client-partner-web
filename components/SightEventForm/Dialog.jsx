@@ -32,9 +32,7 @@ class SightEventFormDialog extends Component {
 
   componentDidUpdate() {
     if (this.shouldComponentFetch()) {
-      const { itemId } = this.props;
-
-      this.handleFetchItem(itemId);
+      this.handleFetchItem();
     }
   }
 
@@ -74,22 +72,20 @@ class SightEventFormDialog extends Component {
     }
   };
 
-  handleDeletePDF = (sightEventId) => {
-    const { deletePDF } = this.props;
-    if (Number.isInteger(sightEventId)) {
-      const payload = {
-        id: sightEventId,
-        onSuccess: this.handleFetchItem,
-      };
-      deletePDF(payload);
-    }
+  handleDeletePDF = () => {
+    const { deletePDF, itemId } = this.props;
+    const payload = {
+      id: itemId,
+      onSuccess: this.handleFetchItem,
+    };
+    deletePDF(payload);
   }
 
-  handleFetchItem = (id) => {
+  handleFetchItem = () => {
     const { fetchItem, itemId } = this.props;
 
     fetchItem({
-      id: id || itemId,
+      id: itemId,
       onFailure: this.handleFetchItemFailure,
       onSuccess: this.handleFetchItemSuccess,
     });
