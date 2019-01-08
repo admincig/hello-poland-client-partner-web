@@ -74,11 +74,22 @@ class SightEventFormDialog extends Component {
     }
   };
 
+  handleDeletePDF = (sightEventId) => {
+    const { deletePDF } = this.props;
+    if (Number.isInteger(sightEventId)) {
+      const payload = {
+        id: sightEventId,
+        onSuccess: this.handleFetchItem,
+      };
+      deletePDF(payload);
+    }
+  }
+
   handleFetchItem = (id) => {
-    const { fetchItem } = this.props;
+    const { fetchItem, itemId } = this.props;
 
     fetchItem({
-      id,
+      id: id || itemId,
       onFailure: this.handleFetchItemFailure,
       onSuccess: this.handleFetchItemSuccess,
     });
@@ -156,7 +167,7 @@ class SightEventFormDialog extends Component {
       fetchingError, isFetching, isSubmitting, submittingError,
     } = this.state;
     const {
-      clearItem, fetchItem, fetchList, item, itemId, onClose, parentId, title, ...rest
+      clearItem, fetchItem, fetchList, item, itemId, onClose, parentId, title, deletePDF, ...rest
     } = this.props;
 
     return (
@@ -175,6 +186,7 @@ class SightEventFormDialog extends Component {
             initialValues={this.getInitialValues(item)}
             onSubmitFailure={this.handleSubmitFailure}
             onSubmitSuccess={this.handleSubmitSuccess}
+            handleDeletePDF={this.handleDeletePDF}
           />
         </DialogContent>
         <DialogActions>
@@ -198,6 +210,7 @@ class SightEventFormDialog extends Component {
 
 SightEventFormDialog.propTypes = {
   clearItem: PropTypes.func.isRequired,
+  deletePDF: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   fetchList: PropTypes.func.isRequired,
   item: PropTypes.shape({}),
@@ -225,6 +238,7 @@ const mapDispatchToProps = {
   clearItem: sightEventsActions.clearItem,
   fetchItem: sightEventsActions.fetchItem,
   fetchList: sightEventsActions.fetchList,
+  deletePDF: sightEventsActions.deletePDF,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SightEventFormDialog);

@@ -34,7 +34,7 @@ import serialize from 'utils/form-generator/data/serialize';
 import formatPrice from 'utils/formatPrice';
 import config from 'config';
 import ticketPoolDefinitionSchema from './ticketPoolDefinitionSchema';
-import HomeListItem from './HomeListItem';
+import HomeListItem from '../../../components/HomeListItem';
 
 const PARENT_TYPES = {
   SIGHT: 'SIGHT',
@@ -120,14 +120,6 @@ class SightsList extends Component {
     schema: null,
     title: '',
   });
-
-  handleDeletePDF = (sightEventId) => {
-    const { deletePDF } = this.props;
-
-    if (Number.isInteger(sightEventId)) {
-      deletePDF({ id: sightEventId });
-    }
-  }
 
   handleFormDialogClose = () => this.setState({ dialog: false, submitError: false });
 
@@ -446,10 +438,6 @@ class SightsList extends Component {
                               fileType: FILE_TYPES.DOCUMENT,
                             });
                           }}
-                          onDeletePDFLabel="Usuń broszurę PDF"
-                          onDeletePDFClick={() => {
-                            this.handleDeletePDF(sightEvent.id);
-                          }}
                           onDocumentLabel="Dodaj broszurę PDF"
                           published={sightEvent.published}
                           onStatsClick={() => {
@@ -571,7 +559,6 @@ SightsList.propTypes = {
   deleteSight: PropTypes.func.isRequired,
   deleteSightEvent: PropTypes.func.isRequired,
   deleteTicketPoolDefinition: PropTypes.func.isRequired,
-  deletePDF: PropTypes.func.isRequired,
   fetchSightEvent: PropTypes.func.isRequired,
   fetchTicketPoolDefinition: PropTypes.func.isRequired,
   fetchSightsList: PropTypes.func.isRequired,
@@ -605,7 +592,6 @@ const mapDispatchToProps = {
   createTicketPoolDefinition: ticketPoolDefinitionActions.createItem,
   deleteSight: sightsActions.deleteItem,
   deleteSightEvent: sightEventActions.deleteItem,
-  deletePDF: sightEventActions.deletePDF,
   deleteTicketPoolDefinition: ticketPoolDefinitionActions.deleteItem,
   fetchSightEvent: sightEventActions.fetchItem,
   fetchTicketPoolDefinition: ticketPoolDefinitionActions.fetchItem,

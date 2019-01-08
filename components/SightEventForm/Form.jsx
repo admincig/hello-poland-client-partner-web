@@ -21,6 +21,9 @@ import GridItem from 'components/GridItem';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import InsertDriveFile from '@material-ui/icons/InsertDriveFile';
+
+import HomeListItem from '../../components/HomeListItem';
 
 const commonProps = {
   fullWidth: true,
@@ -124,6 +127,11 @@ class SightEventForm extends Component {
     initialValues: this.getInitialValues(initialValues),
   });
 
+  handleOpenFileLink = () => {
+    const { initialValues: { files: { path } } } = this.state;
+    window.open(path, '_blank');
+  }
+
   handleSubmit = (values, actions) => {
     const { onSubmit } = this.props;
 
@@ -180,7 +188,12 @@ class SightEventForm extends Component {
 
   render() {
     const { initialValues } = this.state;
-    const { buttons, classes, FormikProps } = this.props;
+    const {
+      buttons,
+      classes,
+      FormikProps,
+      handleDeletePDF,
+    } = this.props;
     const { id, files } = initialValues;
     const fileName = files.name && `${files.name}.${files.type.toLowerCase()}`;
     return (
@@ -263,24 +276,37 @@ class SightEventForm extends Component {
                 <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
               </GridItem>
               {
-                Number.isInteger(id) &&
+                _isNumber(id) &&
                 <GridItem>
                   <Typography variant="title" className={classes.title}>Załączone pliki</Typography>
                 </GridItem>
               }
               {
-                Number.isInteger(id) &&
+                _isNumber(id) &&
                 <GridItem>
                   <List>
-                    <ListItem>
-                      <ListItemText>
-                        {
-                          fileName
-                          ? <a href={files.path} className={classes.link} target="_blank">{fileName}</a>
-                          : 'brak załączonych plików'
-                        }
-                      </ListItemText>
-                    </ListItem>
+                    {
+                      fileName
+                      ? (
+                        <HomeListItem
+                          icon={InsertDriveFile}
+                          primary={fileName || ''}
+                          onDeletePDFLabel="Usuń broszurę PDF"
+                          onDeletePDFClick={() => {
+                            handleDeletePDF(id);
+                          }}
+                          onOpenFileLabel="Podgląd pliku"
+                          onOpenFileLink={this.handleOpenFileLink}
+                        />
+                        )
+                      : (
+                        <ListItem>
+                          <ListItemText>
+                            Brak załączonych plików.
+                          </ListItemText>
+                        </ListItem>
+                        )
+                    }
                   </List>
                 </GridItem>
               }
@@ -305,6 +331,7 @@ SightEventForm.propTypes = {
   buttons: PropTypes.bool,
   classes: PropTypes.shape({}).isRequired,
   createItem: PropTypes.func.isRequired,
+  handleDeletePDF: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
   initialValues: PropTypes.shape({}),
   onSubmit: PropTypes.func,
@@ -327,6 +354,7 @@ const mapStateToProps = () => ({});
 const mapDispatchToProps = {
   createItem: sightEventsActions.createItem,
   updateItem: sightEventsActions.updateItem,
+  deletePDF: sightEventsActions.deletePDF,
 };
 
 export default compose(
