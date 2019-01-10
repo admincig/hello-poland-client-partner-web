@@ -206,9 +206,6 @@ class CalendarEventForm extends React.Component {
           }) => (
             <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
               <Grid container>
-                <Typography variant="title" gutterBottom>
-                  Szczegóły pojedynczego wydarzenia
-                </Typography>
                 <TextField
                   disabled={readOnly}
                   fullWidth

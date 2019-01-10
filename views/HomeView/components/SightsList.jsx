@@ -518,6 +518,7 @@ class SightsList extends Component {
           open={dialog}
           error={submitError}
           readOnly={readOnly}
+          title={title}
         >
           {this.getFormComponent({
             data: formData,
