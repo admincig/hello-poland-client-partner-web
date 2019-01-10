@@ -187,12 +187,10 @@ class CalendarEventForm extends React.Component {
 
   isChecked = (data, element) => data && data.some(item => element === item);
 
-  hasTicketAvailabilityLimit = (ticketDefinitions) => {
-    return ticketDefinitions.some(({ availableTicketsNumber }) => (
-      Number.isInteger(availableTicketsNumber)
-      && availableTicketsNumber > 0
+  hasTicketAvailabilityLimit = ticketDefinitions => ticketDefinitions
+    .some(({ availableTicketsNumber }) => (
+      Number.isInteger(availableTicketsNumber) && availableTicketsNumber > 0
     ));
-  };
 
   render() {
     const {
