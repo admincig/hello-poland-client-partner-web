@@ -13,6 +13,7 @@ import {
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
 import SightForm from './Form';
+import MultimediaList from './MultimediaList';
 
 class SightEventFormDialog extends Component {
   constructor(props) {
@@ -32,7 +33,9 @@ class SightEventFormDialog extends Component {
 
   componentDidUpdate() {
     if (this.shouldComponentFetch()) {
-      this.handleFetchItem();
+      const { itemId } = this.props;
+
+      this.handleFetchItem(itemId);
     }
   }
 
@@ -57,6 +60,18 @@ class SightEventFormDialog extends Component {
     return { sightId: parentId };
   };
 
+  getMultimedia = () => {
+    const { item } = this.props;
+    const { pdfAttachment } = item;
+    const multimediaList = [];
+
+    if (pdfAttachment) {
+      multimediaList.push({ ...pdfAttachment, sightEventId: item.id });
+    }
+
+    return multimediaList;
+  };
+
   handleClose = () => {
     const { clearItem, onClose } = this.props;
 
@@ -72,20 +87,21 @@ class SightEventFormDialog extends Component {
     }
   };
 
-  handleDeletePDF = () => {
-    const { deletePDF, itemId } = this.props;
+  handleDeletePDF = (sightEventId) => {
+    const { deletePDF } = this.props;
     const payload = {
-      id: itemId,
-      onSuccess: this.handleFetchItem,
+      id: sightEventId,
+      onSuccess: () => this.handleFetchItem(sightEventId),
     };
-    deletePDF(payload);
-  }
 
-  handleFetchItem = () => {
-    const { fetchItem, itemId } = this.props;
+    deletePDF(payload);
+  };
+
+  handleFetchItem = (id) => {
+    const { fetchItem } = this.props;
 
     fetchItem({
-      id: itemId,
+      id,
       onFailure: this.handleFetchItemFailure,
       onSuccess: this.handleFetchItemSuccess,
     });
@@ -166,6 +182,8 @@ class SightEventFormDialog extends Component {
       clearItem, fetchItem, fetchList, item, itemId, onClose, parentId, title, deletePDF, ...rest
     } = this.props;
 
+    const multimedia = this.getMultimedia();
+
     return (
       <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
         <DialogTitle id="form-dialog-title">
@@ -182,8 +200,8 @@ class SightEventFormDialog extends Component {
             initialValues={this.getInitialValues(item)}
             onSubmitFailure={this.handleSubmitFailure}
             onSubmitSuccess={this.handleSubmitSuccess}
-            handleDeletePDF={this.handleDeletePDF}
           />
+          <MultimediaList data={multimedia} onItemDelete={this.handleDeletePDF} />
         </DialogContent>
         <DialogActions>
           {submittingError &&

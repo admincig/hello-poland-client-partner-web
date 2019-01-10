@@ -18,15 +18,6 @@ import yupString from 'yup/lib/string';
 import yupBoolen from 'yup/lib/boolean';
 import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
 import GridItem from 'components/GridItem';
-import IconButton from '@material-ui/core/IconButton';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import InsertDriveFile from '@material-ui/icons/InsertDriveFile';
-import GetApp from '@material-ui/icons/GetApp';
-import DeleteIcon from '@material-ui/icons/Delete';
 
 const commonProps = {
   fullWidth: true,
@@ -118,18 +109,12 @@ class SightEventForm extends Component {
         city: location.city || '',
         country: location.country || 'Polska',
       },
-      files: files || {},
     };
   };
 
   setInitialValues = initialValues => this.setState({
     initialValues: this.getInitialValues(initialValues),
   });
-
-  handleOpenFileLink = () => {
-    const { initialValues: { files: { path } } } = this.state;
-    return path;
-  }
 
   handleSubmit = (values, actions) => {
     const { onSubmit } = this.props;
@@ -191,9 +176,7 @@ class SightEventForm extends Component {
       buttons,
       classes,
       FormikProps,
-      handleDeletePDF,
     } = this.props;
-    const { id, files } = initialValues;
     return (
       <Formik
         enableReinitialize
@@ -273,57 +256,6 @@ class SightEventForm extends Component {
               <GridItem>
                 <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
               </GridItem>
-              {
-                _isNumber(id) &&
-                <GridItem>
-                  <Typography variant="title" className={classes.title}>Multimedia</Typography>
-                </GridItem>
-              }
-              {
-                _isNumber(id) &&
-                <GridItem>
-                  <List>
-                    {
-                      files.name
-                      ? (
-                        <ListItem>
-                          <ListItemIcon>
-                            <InsertDriveFile />
-                          </ListItemIcon>
-                          <ListItemText>
-                            {files.name}
-                          </ListItemText>
-                          <ListItemSecondaryAction>
-                            <IconButton
-                              component="a"
-                              href={files.path}
-                              aria-label="Podląd pliku"
-                              title="Podgląd pliku"
-                              target="_blank"
-                            >
-                              <GetApp />
-                            </IconButton>
-                            <IconButton
-                              aria-label="Usuń plik"
-                              title="Usuń plik"
-                              onClick={handleDeletePDF}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </ListItemSecondaryAction>
-                        </ListItem>
-                        )
-                      : (
-                        <ListItem>
-                          <ListItemText>
-                            Brak załączonych plików.
-                          </ListItemText>
-                        </ListItem>
-                        )
-                    }
-                  </List>
-                </GridItem>
-              }
             </Grid>
             {buttons &&
               <Grid container spacing={16}>
@@ -345,7 +277,6 @@ SightEventForm.propTypes = {
   buttons: PropTypes.bool,
   classes: PropTypes.shape({}).isRequired,
   createItem: PropTypes.func.isRequired,
-  handleDeletePDF: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
   initialValues: PropTypes.shape({}),
   onSubmit: PropTypes.func,
@@ -368,7 +299,6 @@ const mapStateToProps = () => ({});
 const mapDispatchToProps = {
   createItem: sightEventsActions.createItem,
   updateItem: sightEventsActions.updateItem,
-  deletePDF: sightEventsActions.deletePDF,
 };
 
 export default compose(
