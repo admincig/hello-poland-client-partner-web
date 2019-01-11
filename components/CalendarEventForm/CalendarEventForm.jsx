@@ -223,6 +223,7 @@ class CalendarEventForm extends React.Component {
                 <TextField
                   fullWidth
                   disabled={readOnly || this.hasTicketAvailabilityLimit(formData.ticketDefinitions)}
+                  helperText="Puste pole oznacza brak limitu"
                   label="Limit biletów w puli"
                   margin="normal"
                   name="availableTicketsNumber"
