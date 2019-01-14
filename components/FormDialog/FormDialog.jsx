@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography/Typography';
 const FormDialog = ({
   children, error, onClose, onSubmit, title, readOnly, ...rest
 }) => {
-  const buttonClose = readOnly ? 'Anuluj' : 'Zamknij';
+  const buttonClose = readOnly ? 'Zamknij' : 'Anuluj';
   return (
     <Dialog onClose={onClose} aria-labelledby="form-dialog-title" {...rest}>
       <DialogTitle id="form-dialog-title">{title}</DialogTitle>
