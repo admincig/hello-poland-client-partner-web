@@ -42,7 +42,7 @@ MultimediaList.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   data: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string.isRequired,
-    path: PropTypes.string.isRequired,
+    downloadUrl: PropTypes.string.isRequired,
     sightEventId: PropTypes.number.isRequired,
     type: PropTypes.string.isRequired,
   })),

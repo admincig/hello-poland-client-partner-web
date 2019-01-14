@@ -14,7 +14,7 @@ const multimediaIcons = {
 };
 
 const MultimediaListItem = ({
-  name, onDelete, path, sightEventId, type,
+  name, onDelete, downloadUrl, sightEventId, type,
 }) => (
   <ListItem>
     <ListItemIcon>
@@ -26,7 +26,7 @@ const MultimediaListItem = ({
     <ListItemSecondaryAction>
       <IconButton
         component="a"
-        href={path}
+        href={downloadUrl}
         aria-label="Podgląd"
         title="Podgląd"
         target="_blank"
@@ -43,7 +43,7 @@ const MultimediaListItem = ({
 MultimediaListItem.propTypes = {
   name: PropTypes.string.isRequired,
   onDelete: PropTypes.func.isRequired,
-  path: PropTypes.string.isRequired,
+  downloadUrl: PropTypes.string.isRequired,
   sightEventId: PropTypes.number.isRequired,
   type: PropTypes.string.isRequired,
 };
