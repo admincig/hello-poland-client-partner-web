@@ -15,16 +15,20 @@ class MediaManager extends Component {
   };
 
   getErrorByFileType = (fileType) => {
-    const type = /image/.test(fileType) ? 'image' : fileType.toLowerCase();
+    if (fileType) {
+      const type = /image/.test(fileType) ? 'image' : fileType.toLowerCase();
 
-    switch (type) {
-      case 'image':
-        return 'Obrazek powinien być w formacie JPEG, a jego szerokość musi wynosić minimum 2000px.';
-      case 'application/pdf':
-        return 'Niepoprawny format dokumentu.';
-      default:
-        return 'Wystąpił błąd podczas zapisywania pliku.';
+      switch (type) {
+        case 'image':
+          return 'Obrazek powinien być w formacie JPEG, a jego szerokość musi wynosić minimum 2000px.';
+        case 'application/pdf':
+          return 'Niepoprawny format dokumentu.';
+        default:
+          return 'Wystąpił błąd podczas zapisywania pliku.';
+      }
     }
+
+    return '';
   };
 
   handleDrop = (acceptedFiles) => {
