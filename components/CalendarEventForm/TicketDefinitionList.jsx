@@ -11,7 +11,8 @@ import IconButton from '@material-ui/core/IconButton/IconButton';
 import formatPrice from 'utils/formatPrice';
 
 const TicketDefinitionList = ({
-  onAvailabilityChange, onDeleteClick, ticketDefinitions, ticketDefinitionsList, readOnly,
+  disableAvailability, onAvailabilityChange, onDeleteClick, ticketDefinitions,
+  ticketDefinitionsList, readOnly,
 }) => (ticketDefinitions && ticketDefinitions.length ?
   <List>
     {ticketDefinitions.map((selected) => {
@@ -34,7 +35,7 @@ const TicketDefinitionList = ({
             <TextField
               style={{ width: '150px' }}
               label="Limit biletów"
-              disabled={readOnly}
+              disabled={readOnly || disableAvailability}
               onChange={event => onAvailabilityChange(event, ticketDefinition.id)}
               name="availableTicketsNumber"
               type="number"
@@ -61,6 +62,7 @@ const TicketDefinitionList = ({
 );
 
 TicketDefinitionList.propTypes = {
+  disableAvailability: PropTypes.bool,
   onDeleteClick: PropTypes.func.isRequired,
   onAvailabilityChange: PropTypes.func.isRequired,
   ticketDefinitions: PropTypes.arrayOf(PropTypes.shape({
@@ -76,6 +78,7 @@ TicketDefinitionList.propTypes = {
 };
 
 TicketDefinitionList.defaultProps = {
+  disableAvailability: false,
   readOnly: false,
 };
 
