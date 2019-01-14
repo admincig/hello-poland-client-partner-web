@@ -44,8 +44,8 @@ const HomeListItem = ({
       <Icon />
     </ListItemIcon>
     <ListItemText
-      primary={<Typography noWrap="true" style={{ width: '60%' }}>{primary}</Typography>}
-      secondary={<Typography noWrap="true" style={{ width: '60%' }}>{secondary}</Typography>}
+      primary={<Typography noWrap style={{ width: '60%' }}>{primary}</Typography>}
+      secondary={<Typography noWrap style={{ width: '60%' }}>{secondary}</Typography>}
     />
     <ListItemSecondaryAction>
       {blocked &&

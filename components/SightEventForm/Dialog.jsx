@@ -13,6 +13,7 @@ import {
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
 import SightForm from './Form';
+import MultimediaList from './MultimediaList';
 
 class SightEventFormDialog extends Component {
   constructor(props) {
@@ -59,6 +60,18 @@ class SightEventFormDialog extends Component {
     return { sightId: parentId };
   };
 
+  getMultimedia = () => {
+    const { item } = this.props;
+    const { pdfAttachment } = item;
+    const multimediaList = [];
+
+    if (pdfAttachment) {
+      multimediaList.push({ ...pdfAttachment, sightEventId: item.id });
+    }
+
+    return multimediaList;
+  };
+
   handleClose = () => {
     const { clearItem, onClose } = this.props;
 
@@ -72,6 +85,16 @@ class SightEventFormDialog extends Component {
       });
       clearItem();
     }
+  };
+
+  handleDeletePDF = (sightEventId) => {
+    const { deletePDF } = this.props;
+    const payload = {
+      id: sightEventId,
+      onSuccess: () => this.handleFetchItem(sightEventId),
+    };
+
+    deletePDF(payload);
   };
 
   handleFetchItem = (id) => {
@@ -156,8 +179,10 @@ class SightEventFormDialog extends Component {
       fetchingError, isFetching, isSubmitting, submittingError,
     } = this.state;
     const {
-      clearItem, fetchItem, fetchList, item, itemId, onClose, parentId, title, ...rest
+      clearItem, fetchItem, fetchList, item, itemId, onClose, parentId, title, deletePDF, ...rest
     } = this.props;
+
+    const multimedia = this.getMultimedia();
 
     return (
       <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
@@ -176,6 +201,7 @@ class SightEventFormDialog extends Component {
             onSubmitFailure={this.handleSubmitFailure}
             onSubmitSuccess={this.handleSubmitSuccess}
           />
+          <MultimediaList data={multimedia} onItemDelete={this.handleDeletePDF} />
         </DialogContent>
         <DialogActions>
           {submittingError &&
@@ -198,6 +224,7 @@ class SightEventFormDialog extends Component {
 
 SightEventFormDialog.propTypes = {
   clearItem: PropTypes.func.isRequired,
+  deletePDF: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   fetchList: PropTypes.func.isRequired,
   item: PropTypes.shape({}),
@@ -225,6 +252,7 @@ const mapDispatchToProps = {
   clearItem: sightEventsActions.clearItem,
   fetchItem: sightEventsActions.fetchItem,
   fetchList: sightEventsActions.fetchList,
+  deletePDF: sightEventsActions.deletePDF,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SightEventFormDialog);
