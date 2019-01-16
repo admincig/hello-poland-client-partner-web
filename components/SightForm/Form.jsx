@@ -40,21 +40,6 @@ const commonProps = {
   fullWidth: true,
 };
 
-// TODO: remove this function and change Switch implementation after it's fixed.
-// TODO: see https://github.com/stackworx/formik-material-ui/pull/42
-const fieldToSwitch = ({
-  field,
-  form: { isSubmitting },
-  disabled = false,
-  ...props
-}) => ({
-  disabled: isSubmitting || disabled,
-  ...props,
-  ...field,
-  value: field.name,
-  checked: field.value,
-});
-
 const styles = () => ({
   title: {
     marginTop: 40,
@@ -69,37 +54,15 @@ class SightForm extends Component {
     super(props);
 
     const { initialValues } = props;
-    const { openingHours } = initialValues || {};
 
     this.state = {
       initialValues: this.getInitialValues(initialValues),
-      viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
     };
 
     // TODO: nested validation seems not working
     // TODO: see https://github.com/jaredpalmer/formik/issues/986
     this.validationSchema = yupObject().shape({
-      name: yupString()
-        .min(3)
-        .max(250)
-        .required(),
-      published: yupBoolen(),
-      // generalAdmission: yupBoolen(),
-      lead: yupString()
-        .min(10)
-        .max(250),
-      description: yupString()
-        .min(10)
-        .max(2500)
-        .required(),
-      email: yupString().email().trim(),
-      phone: yupString().min(9).trim(),
-      // location: yupObject().shape({
-      //   street: yupString().min(5),
-      //   zipCode: yupString().min(6).max(6),
-      //   city: yupString().min(3),
-      //   country: yupString().min(5),
-      // }),
+      date: yupString().required(),
     });
   }
 
@@ -108,118 +71,23 @@ class SightForm extends Component {
     const { initialValues } = this.props;
 
     if (!_isEqual(prevInitialValues, initialValues)) {
-      const { openingHours } = initialValues || {};
-
       this.setInitialValues(initialValues);
-      this.setViewOpeningHours(openingHours, true);
     }
   }
 
-  getFormattedTime = (datetime, dateFormat = 'HH:mm') => format(datetime, dateFormat);
-
-  getInitialOpeningHours = (initialValues = [], viewValues = false) => {
-    let openingHours = [];
-
-    if (viewValues) {
-      for (let i = 1; i < 8; i += 1) {
-        const values = _find(initialValues, { day: i }) || {};
-        const { closeTime, openTime } = values;
-        const checked = !!Object.getOwnPropertyNames(values).length;
-
-        openingHours.push({
-          checked,
-          day: i,
-          openTime: openTime ? `1970-01-01T${openTime}` : '1970-01-01T09:00',
-          closeTime: closeTime ? `1970-01-01T${closeTime}` : '1970-01-01T18:00',
-        });
-      }
-    } else {
-      openingHours = initialValues;
-    }
-
-    return openingHours;
-  };
-
   getInitialValues = (initialValues) => {
-    const { location: initialLocation, openingHours, ...details } = initialValues || {};
-    const location = initialLocation || {};
+    const { date, poolId, sightEventId } = initialValues || {};
 
     return {
-      id: details.id || '',
-      name: details.name || '',
-      published: details.published || false,
-      // generalAdmission: details.generalAdmission || false,
-      lead: details.lead || '',
-      description: details.description || '',
-      email: details.email || '',
-      phone: details.phone || '',
-      openingHours: this.getInitialOpeningHours(openingHours),
-      location: {
-        street: location.street || '',
-        zipCode: location.zipCode || '',
-        city: location.city || '',
-        country: location.country || 'Polska',
-      },
+      date: date || '',
+      poolId: poolId || '',
+      sightEventId: sightEventId || '',
     };
   };
 
   setInitialValues = initialValues => this.setState({
     initialValues: this.getInitialValues(initialValues),
   });
-
-  setViewOpeningHours = openingHours => this.setState({
-    viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
-  });
-
-  handleOpeningHoursChange = (day, keyName, keyValue) => {
-    const { initialValues, viewOpeningHours } = this.state;
-    const { openingHours } = initialValues;
-    const dayIndex = day - 1;
-    const entryIndex = openingHours.findIndex(o => o.day === day);
-
-    viewOpeningHours[dayIndex][keyName] = keyValue;
-    openingHours[entryIndex][keyName] = this.getFormattedTime(keyValue);
-
-    this.setState({
-      initialValues: {
-        ...initialValues,
-        openingHours,
-      },
-      viewOpeningHours,
-    });
-  };
-
-  handleOpeningHoursSelectionChange = (day, values) => (event) => {
-    const { viewOpeningHours } = this.state;
-    const { target } = event;
-    const dayIndex = day - 1;
-    let { openingHours } = values;
-
-    viewOpeningHours[dayIndex].checked = target.checked;
-
-    if (target.checked) {
-      const { closeTime, openTime } = viewOpeningHours[dayIndex];
-
-      openingHours.push({
-        day: viewOpeningHours[dayIndex].day,
-        openTime: this.getFormattedTime(openTime),
-        closeTime: this.getFormattedTime(closeTime),
-      });
-
-      openingHours.sort((a, b) => a.day - b.day);
-    } else {
-      openingHours = openingHours.filter(o => o.day !== day);
-    }
-
-
-    this.setState({
-      initialValues: {
-        ...values,
-        openingHours,
-      },
-      viewOpeningHours,
-    });
-  };
 
   handleSubmit = (values, actions) => {
     const { onSubmit } = this.props;
@@ -275,8 +143,8 @@ class SightForm extends Component {
   };
 
   render() {
-    const { initialValues, viewOpeningHours } = this.state;
-    const { buttons, classes, FormikProps } = this.props;
+    const { initialValues } = this.state;
+    const { buttons, FormikProps } = this.props;
 
     return (
       <Formik
@@ -289,106 +157,14 @@ class SightForm extends Component {
         {({ isSubmitting, values }) => (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
-              <GridItem>
-                <Typography variant="title">Dane podstawowe</Typography>
-              </GridItem>
               <Hidden xsUp>
                 <GridItem>
-                  <Field name="id" hidden component={TextField} {...commonProps} />
+                  <Field name="poolId" hidden component={TextField} {...commonProps} />
+                </GridItem>
+                <GridItem>
+                  <Field name="sightEventId" hidden component={TextField} {...commonProps} />
                 </GridItem>
               </Hidden>
-              <GridItem>
-                <Field name="name" label="Nazwa atrakcji" required component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem md={4} sm={4}>
-                <Field
-                  name="published"
-                  render={switchProps => (
-                    <FormControlLabel
-                      control={<Switch {...fieldToSwitch(switchProps)} />}
-                      label="Publikuj"
-                    />
-                  )}
-                />
-              </GridItem>
-              {/* <GridItem md={8} sm={8}> */}
-              {/* <Field */}
-              {/* name="generalAdmission" */}
-              {/* render={switchProps => ( */}
-              {/* <FormControlLabel */}
-              {/* control={<Switch {...fieldToSwitch(switchProps)} />} */}
-              {/* label="Dodaj ofertę ogólną" */}
-              {/* /> */}
-              {/* )} */}
-              {/* /> */}
-              {/* </GridItem> */}
-              <GridItem>
-                <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Field name="description" label="Opis atrakcji" required component={TextField} {...commonProps} multiline rowsMax={20} />
-              </GridItem>
-              <GridItem>
-                <Typography variant="title" className={classes.title}>Godziny otwarcia</Typography>
-              </GridItem>
-              <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                {viewOpeningHours.map(item => (
-                  <Fragment key={`openingHours-list-${item.day}`}>
-                    <GridItem sm={6} md={6}>
-                      <FormControlLabel
-                        control={<Switch
-                          checked={item.checked}
-                          onChange={this.handleOpeningHoursSelectionChange(item.day, values)}
-                          value={`${item.day}`}
-                        />}
-                        label={i18n.days[item.day]}
-                      />
-                    </GridItem>
-                    <GridItem sm={3} md={3}>
-                      <TimePicker
-                        ampm={false}
-                        className={classes.openingHoursTimepicker}
-                        disabled={!item.checked}
-                        onChange={event => this.handleOpeningHoursChange(item.day, 'openTime', event)}
-                        value={item.openTime}
-                      />
-                    </GridItem>
-                    <GridItem sm={3} md={3}>
-                      <TimePicker
-                        ampm={false}
-                        className={classes.openingHoursTimepicker}
-                        disabled={!item.checked}
-                        onChange={event => this.handleOpeningHoursChange(item.day, 'closeTime', event)}
-                        value={item.closeTime}
-                      />
-                    </GridItem>
-                  </Fragment>
-                ))}
-              </MuiPickersUtilsProvider>
-              <GridItem>
-                <Typography variant="title" className={classes.title}>Dane kontaktowe</Typography>
-              </GridItem>
-              <GridItem>
-                <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Typography variant="title" className={classes.title}>Lokalizacja</Typography>
-              </GridItem>
-              <GridItem>
-                <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem md={4} sm={4}>
-                <Field name="location.zipCode" label="Kod pocztowy" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem md={8} sm={8}>
-                <Field name="location.city" label="Miasto" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
-              </GridItem>
             </Grid>
             {buttons &&
               <Grid container spacing={16}>

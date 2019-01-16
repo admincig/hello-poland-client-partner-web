@@ -12,6 +12,7 @@ import CreateIcon from '@material-ui/icons/Create';
 import InfoIcon from '@material-ui/icons/Info';
 import DeleteIcon from '@material-ui/icons/Delete';
 import NoteAdd from '@material-ui/icons/NoteAdd';
+import RemoveShoppingCart from '@material-ui/icons/RemoveShoppingCart';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import Typography from '@material-ui/core/Typography';
 import NotificationImportantIcon from '@material-ui/icons/NotificationImportant';
@@ -35,6 +36,8 @@ const HomeListItem = ({
   onMainImageClick,
   onMainImageLabel,
   onStatsClick,
+  onStopSellClick,
+  onStopSellLabel,
   onViewClick,
   onViewLabel,
   published,
@@ -130,6 +133,16 @@ const HomeListItem = ({
           <InfoIcon />
         </IconButton>
       }
+
+      {onStopSellClick &&
+        <IconButton
+          aria-label={onPreviewLabel}
+          onClick={onStopSellClick}
+          title={onStopSellLabel}
+        >
+          <RemoveShoppingCart />
+        </IconButton>
+      }
       {onDeleteClick &&
         <IconButton
           aria-label={onDeleteLabel}
@@ -159,6 +172,8 @@ HomeListItem.propTypes = {
   onMainImageClick: PropTypes.func,
   onMainImageLabel: PropTypes.string,
   onStatsClick: PropTypes.func,
+  onStopSellClick: PropTypes.func,
+  onStopSellLabel: PropTypes.string,
   onViewClick: PropTypes.func,
   onViewLabel: PropTypes.string,
   primary: PropTypes.string.isRequired,
@@ -181,6 +196,8 @@ HomeListItem.defaultProps = {
   onMainImageClick: null,
   onMainImageLabel: null,
   onStatsClick: null,
+  onStopSellClick: null,
+  onStopSellLabel: null,
   onViewClick: null,
   onViewLabel: null,
   published: false,

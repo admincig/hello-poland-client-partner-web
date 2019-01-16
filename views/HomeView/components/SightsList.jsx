@@ -241,6 +241,10 @@ class SightsList extends Component {
     }
   };
 
+  handleStopSellClick = (sightEventId, poolDefinitionId) => {
+    console.log(sightEventId, poolDefinitionId);
+  };
+
   handleTicketPoolDelete = (ticketPoolDefinitionId) => {
     const { deleteTicketPoolDefinition } = this.props;
 
@@ -467,6 +471,13 @@ class SightsList extends Component {
                                     () => this.handleTicketPoolPreview(ticketPoolDefinition)
                                   }
                                   onPreviewLabel="Podgląd puli"
+                                  onStopSellClick={
+                                    () => this.handleStopSellClick(
+                                      sightEvent.id,
+                                      ticketPoolDefinition.id,
+                                    )
+                                  }
+                                  onStopSellLabel="Wstrzymaj sprzedaż"
                                   onDeleteClick={
                                     () => this.handleTicketPoolDelete(ticketPoolDefinition.id)
                                   }
