@@ -73,7 +73,7 @@ class SightEventForm extends Component {
       email: yupString().email().trim(),
       phone: yupString().min(9).trim(),
       // location: yupObject().shape({
-      //   description: yupString().min(5).max(255),
+      //   directions: yupString().min(5).max(255),
       //   street: yupString().min(5),
       //   zipCode: yupString().min(6).max(6),
       //   city: yupString().min(3),
@@ -106,7 +106,7 @@ class SightEventForm extends Component {
       email: details.email || '',
       phone: details.phone || '',
       location: {
-        description: location.description || '',
+        directions: location.directions || '',
         street: location.street || '',
         zipCode: location.zipCode || '',
         city: location.city || '',
@@ -257,7 +257,7 @@ class SightEventForm extends Component {
                 <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
-                <Field name="location.description" label="Opis lokalizacji" component={TextField} {...commonProps} multiline rowsMax={20} />
+                <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={20} />
               </GridItem>
             </Grid>
             {buttons &&
