@@ -187,6 +187,11 @@ class CalendarEventForm extends React.Component {
 
   isChecked = (data, element) => data && data.some(item => element === item);
 
+  hasTicketAvailabilityLimit = ticketDefinitions => ticketDefinitions
+    .some(({ availableTicketsNumber }) => (
+      Number.isInteger(availableTicketsNumber) && availableTicketsNumber > 0
+    ));
+
   render() {
     const {
       classes, formData: initialFormData, onChange, readOnly,
@@ -217,7 +222,8 @@ class CalendarEventForm extends React.Component {
                 />
                 <TextField
                   fullWidth
-                  disabled={readOnly}
+                  disabled={readOnly || this.hasTicketAvailabilityLimit(formData.ticketDefinitions)}
+                  helperText="Puste pole oznacza brak limitu"
                   label="Limit biletów w puli"
                   margin="normal"
                   name="availableTicketsNumber"
@@ -480,6 +486,10 @@ class CalendarEventForm extends React.Component {
                     }
                     {formData.ticketDefinitions &&
                       <TicketDefinitionList
+                        disableAvailability={
+                          Number.isInteger(formData.availableTicketsNumber)
+                          && formData.availableTicketsNumber > 0
+                        }
                         ticketDefinitions={formData.ticketDefinitions}
                         ticketDefinitionsList={ticketDefinitionsList}
                         onAvailabilityChange={handleTicketDefinitionChange}

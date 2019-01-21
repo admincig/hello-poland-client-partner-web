@@ -92,9 +92,8 @@ class SightEventForm extends Component {
   }
 
   getInitialValues = (initialValues) => {
-    const { location: initialLocation, ...details } = initialValues || {};
+    const { location: initialLocation, pdfAttachment: files, ...details } = initialValues || {};
     const location = initialLocation || {};
-
     return {
       id: details.id || '',
       sightId: details.sightId || '',
@@ -175,8 +174,11 @@ class SightEventForm extends Component {
 
   render() {
     const { initialValues } = this.state;
-    const { buttons, classes, FormikProps } = this.props;
-
+    const {
+      buttons,
+      classes,
+      FormikProps,
+    } = this.props;
     return (
       <Formik
         enableReinitialize
