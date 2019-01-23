@@ -24,6 +24,7 @@ import { actions as ticketPoolDefinitionActions } from '@hello-poland/commons/re
 import FormDialog from 'components/FormDialog';
 import SightFormDialog from 'components/SightForm/Dialog';
 import SightEventFormDialog from 'components/SightEventForm/Dialog';
+import StopSellDialog from 'components/StopSellForm/Dialog';
 import MediaManager from 'components/MediaManager';
 import TicketPoolDefinitionForm from 'components/TicketPoolDefinitionForm';
 import { EmptyResultsMessage } from 'components/ViewMessage';
@@ -60,6 +61,7 @@ class SightsList extends Component {
     schema: null,
     sightForm: false,
     sightEventForm: false,
+    stopSellForm: false,
     submitError: false,
     title: '',
   };
@@ -243,7 +245,12 @@ class SightsList extends Component {
 
   handleStopSellClick = (sightEventId, poolDefinitionId) => {
     console.log(sightEventId, poolDefinitionId);
+    this.setState({ stopSellForm: true, formData: { sightEventId, poolDefinitionId } });
   };
+
+  handleStopSellClose = () => {
+    this.setState({stopSellForm: false})
+  }
 
   handleTicketPoolDelete = (ticketPoolDefinitionId) => {
     const { deleteTicketPoolDefinition } = this.props;
@@ -367,7 +374,7 @@ class SightsList extends Component {
     const { sightEventsList, sightsList } = this.props;
     const {
       dialog, formData, formType, mediaManager, mediaManagerSubmitting, schema, sightForm,
-      sightEventForm, submitError, title, readOnly,
+      sightEventForm, stopSellForm, submitError, title, readOnly,
     } = this.state;
 
     return (
@@ -546,6 +553,12 @@ class SightsList extends Component {
           onClose={this.handleSightEventFormClose}
           open={sightEventForm}
           title={title}
+          {...formData}
+        />
+        <StopSellDialog
+          disableBackdropClick
+          onClose={this.handleStopSellClose}
+          open={stopSellForm}
           {...formData}
         />
         <MediaManager

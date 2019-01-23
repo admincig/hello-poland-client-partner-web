@@ -18,7 +18,7 @@ import SightForm from './Form';
 class SightFormDialog extends Component {
   constructor(props) {
     super(props);
-
+    console.log(props);
     this.formikRef = React.createRef();
 
     this.intervalRef = null;
@@ -153,10 +153,10 @@ class SightFormDialog extends Component {
       fetchingError, isFetching, isSubmitting, submittingError,
     } = this.state;
     const {
-      clearItem, fetchItem, fetchSightsList, fetchSightEventsList, item, itemId, onClose, title,
+      poolDefinitionId, sightEventId,
       ...rest
     } = this.props;
-
+    console.log(this.props)
     return (
       <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
         <DialogTitle id="form-dialog-title">
@@ -167,13 +167,6 @@ class SightFormDialog extends Component {
           }
         </DialogTitle>
         <DialogContent>
-          <SightForm
-            buttons={false}
-            FormikProps={{ ref: this.formikRef }}
-            initialValues={this.getInitialValues(item)}
-            onSubmitFailure={this.handleSubmitFailure}
-            onSubmitSuccess={this.handleSubmitSuccess}
-          />
         </DialogContent>
         <DialogActions>
           {submittingError &&
@@ -187,7 +180,7 @@ class SightFormDialog extends Component {
           </Typography>
           }
           <Button disabled={isSubmitting} onClick={this.handleClose} color="primary">Anuluj</Button>
-          <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>
+          <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zatrzymaj sprzedaż</Button>
         </DialogActions>
       </Dialog>
     );

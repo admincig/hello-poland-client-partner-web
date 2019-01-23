@@ -22,6 +22,8 @@ import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import yupBoolen from 'yup/lib/boolean';
 import { actions as sightsActions } from '@hello-poland/commons/redux/sights';
+import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
+
 import GridItem from 'components/GridItem';
 
 const i18n = {
@@ -273,11 +275,14 @@ class SightForm extends Component {
     setSubmitting(false);
     resetForm();
   };
+  handleStopSell = () => {
 
+    this.props.stopSell({sightEventId: 6, ticketPoolId: 6, date: "2019-06-17T12:31"})
+  }
   render() {
     const { initialValues, viewOpeningHours } = this.state;
-    const { buttons, classes, FormikProps } = this.props;
-
+    const { buttons, classes, FormikProps, poolDefinitionId, sightEventId } = this.props;
+    console.log(this.props);
     return (
       <Formik
         enableReinitialize
@@ -390,6 +395,9 @@ class SightForm extends Component {
                 <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
               </GridItem>
             </Grid>
+            <Button variant="contained" color="primary" onClick={this.handleStopSell} disabled={isSubmitting}>
+                   STOP HAMMER TIME
+            </Button>
             {buttons &&
               <Grid container spacing={16}>
                 <GridItem md={2} sm={2}>
@@ -432,6 +440,7 @@ const mapStateToProps = () => ({});
 const mapDispatchToProps = {
   createItem: sightsActions.createItem,
   updateItem: sightsActions.updateItem,
+  stopSell: sightEventsActions.stopSell,
 };
 
 export default compose(
