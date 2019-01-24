@@ -238,7 +238,7 @@ class CalendarEventForm extends React.Component {
                   <DateTimePicker
                     disabled={readOnly}
                     date={formData.startDate}
-                    fullDay={isFullDay}
+                    fullDay={formData.wholeDay}
                     label="Wydarzenie od"
                     name="startDate"
                     onChange={handleDateChange}
@@ -252,7 +252,7 @@ class CalendarEventForm extends React.Component {
                   <DateTimePicker
                     disabled={readOnly}
                     date={formData.endDate}
-                    fullDay={isFullDay}
+                    fullDay={formData.wholeDay}
                     label="Wydarzenie do"
                     name="endDate"
                     onChange={handleDateChange}
@@ -269,7 +269,7 @@ class CalendarEventForm extends React.Component {
                   <DateTimePicker
                     disabled={readOnly}
                     date={formData.entryStartDate}
-                    fullDay={isFullDay}
+                    fullDay={formData.wholeDay}
                     label="Wejście od"
                     name="entryStartDate"
                     onChange={handleDateChange}
@@ -283,7 +283,7 @@ class CalendarEventForm extends React.Component {
                   <DateTimePicker
                     disabled={readOnly}
                     date={formData.entryEndDate}
-                    fullDay={isFullDay}
+                    fullDay={formData.wholeDay}
                     label="Wejście do"
                     name="entryEndDate"
                     onChange={handleDateChange}
@@ -300,9 +300,9 @@ class CalendarEventForm extends React.Component {
                   <SwitchLabel
                     label="Cały dzień"
                     disabled={readOnly}
-                    name="isFullDay"
+                    name="wholeDay"
                     onChange={handleFullDayChange}
-                    value={isFullDay}
+                    value={formData.wholeDay}
                   />
                 </div>
                 <div className={classNames(classes.section, classes.fullWidth)}>
