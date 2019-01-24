@@ -207,7 +207,7 @@ class CalendarEventForm extends React.Component {
             handleFrequencyDataFieldChange, handleFrequencyEndDateTypeChange,
             handleFrequencyItemChange, handleFullDayChange, handlePropFromEventChange,
             handleTicketDefinitionAdd, handleTicketDefinitionChange, handleTicketDefinitionDelete,
-            isFullDay, isDefinitionFormVisible,
+            isDefinitionFormVisible,
           }) => (
             <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
               <Grid container>
