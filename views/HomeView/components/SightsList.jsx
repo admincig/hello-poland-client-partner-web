@@ -25,7 +25,7 @@ import AlertDialog from 'components/AlertDialog';
 import FormDialog from 'components/FormDialog';
 import SightFormDialog from 'components/SightForm/Dialog';
 import SightEventFormDialog from 'components/SightEventForm/Dialog';
-import StopSellDialog from 'components/StopSellForm/Dialog';
+import StopSellDialog from 'components/StopSellForm';
 import MediaManager from 'components/MediaManager';
 import TicketPoolDefinitionForm from 'components/TicketPoolDefinitionForm';
 import { EmptyResultsMessage } from 'components/ViewMessage';
@@ -398,7 +398,7 @@ class SightsList extends Component {
     const { sightEventsList, sightsList } = this.props;
     const {
       alertDialog, dialog, formData, formType, mediaManager, mediaManagerSubmitting, schema,
-      sightForm, sightEventForm, submitError, title, readOnly,
+      sightForm, sightEventForm, stopSellForm, submitError, title, readOnly,
     } = this.state;
 
     return (
@@ -517,6 +517,13 @@ class SightsList extends Component {
                                   onPreviewClick={
                                     () => this.handleTicketPoolPreview(ticketPoolDefinition)
                                   }
+                                  onStopSellClick={
+                                    () => this.handleStopSellClick(
+                                      sightEvent.id,
+                                      ticketPoolDefinition.id,
+                                    )
+                                  }
+                                  onStopSellLabel="Wstrzymaj sprzedaż"
                                   onPreviewLabel="Podgląd puli"
                                   onDeleteClick={
                                     () => this.handleTicketPoolDelete(ticketPoolDefinition.id)

@@ -1,40 +1,19 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import _find from 'lodash/find';
 import _isEqual from 'lodash/isEqual';
 import _isNumber from 'lodash/isNumber';
-import format from 'date-fns/format';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
-import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
-import Switch from '@material-ui/core/Switch';
-import Typography from '@material-ui/core/Typography/Typography';
-import TimePicker from 'material-ui-pickers/TimePicker';
-import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
-import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
-import yupBoolen from 'yup/lib/boolean';
 import { actions as sightsActions } from '@hello-poland/commons/redux/sights';
 import GridItem from 'components/GridItem';
-
-const i18n = {
-  days: {
-    1: 'Poniedziałek',
-    2: 'Wtorek',
-    3: 'Środa',
-    4: 'Czwartek',
-    5: 'Piątek',
-    6: 'Sobota',
-    7: 'Niedziela',
-  },
-};
 
 const commonProps = {
   fullWidth: true,
@@ -154,7 +133,7 @@ class SightForm extends Component {
         validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
       >
-        {({ isSubmitting, values }) => (
+        {({ isSubmitting }) => (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <Hidden xsUp>
