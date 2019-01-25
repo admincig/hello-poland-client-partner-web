@@ -244,12 +244,11 @@ class SightsList extends Component {
   };
 
   handleStopSellClick = (sightEventId, poolDefinitionId) => {
-    console.log(sightEventId, poolDefinitionId);
-    this.setState({ stopSellForm: true, formData: { sightEventId, poolDefinitionId } });
+    this.setState({ stopSellForm: true, formData: { sightEventId, poolDefinitionId }, title: 'Zatrzymaj sprzedaż biletów' });
   };
 
   handleStopSellClose = () => {
-    this.setState({stopSellForm: false})
+    this.setState({ stopSellForm: false, formData: null });
   }
 
   handleTicketPoolDelete = (ticketPoolDefinitionId) => {
@@ -559,6 +558,7 @@ class SightsList extends Component {
           disableBackdropClick
           onClose={this.handleStopSellClose}
           open={stopSellForm}
+          title={title}
           {...formData}
         />
         <MediaManager

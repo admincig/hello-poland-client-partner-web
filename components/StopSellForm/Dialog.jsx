@@ -8,178 +8,87 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Typography from '@material-ui/core/Typography/Typography';
+import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
+import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
+import DatePicker from 'material-ui-pickers/DatePicker';
+import plLocale from 'date-fns/locale/pl';
 import {
-  actions as sightsActions,
-  selectors as sightsSelectors,
-} from '@hello-poland/commons/redux/sights';
-import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
-import SightForm from './Form';
+  actions as sightEventsActions,
+  selectors as sightEventsSelectors,
+} from '@hello-poland/commons/redux/sightEvents';
+import { format } from 'date-fns';
+
+const locale = {
+  pl: plLocale,
+};
 
 class SightFormDialog extends Component {
   constructor(props) {
     super(props);
-    console.log(props);
-    this.formikRef = React.createRef();
-
-    this.intervalRef = null;
-
     this.state = {
-      fetchingError: false,
-      isFetching: false,
       isSubmitting: false,
       submittingError: false,
+      date: Date.now(),
     };
   }
-
-  componentDidUpdate() {
-    if (this.shouldComponentFetch()) {
-      const { itemId } = this.props;
-
-      this.handleFetchItem(itemId);
-    }
+  handleDateChange = (e) => {
+    this.setState({ date: e, submittingError: false });
   }
-
-  componentWillUnmount() {
-    if (this.intervalRef) {
-      clearInterval(this.intervalRef);
-    }
-  }
-
-  getInitialValues = (item) => {
-    const { itemId } = this.props;
-
-    if (this.isItemLoaded(itemId, item)) {
-      return item;
-    }
-
-    return null;
-  };
-
-  handleClose = () => {
-    const { clearItem, onClose } = this.props;
-
-    if (onClose) {
-      onClose();
-      this.setState({
-        fetchingError: false,
-        isFetching: false,
-        isSubmitting: false,
-        submittingError: false,
-      });
-      clearItem();
-    }
-  };
-
-  handleFetchItem = (id) => {
-    const { fetchItem } = this.props;
-
-    fetchItem({
-      id,
-      onFailure: this.handleFetchItemFailure,
-      onSuccess: this.handleFetchItemSuccess,
-    });
-
-    this.setState({ fetchingError: false, isFetching: true });
-  };
-
-  handleFetchItemFailure = () => this.setState({ fetchingError: true, isFetching: false });
-
-  handleFetchItemSuccess = () => this.setState({ fetchingError: false, isFetching: false });
 
   handleSubmit = () => {
-    const { current } = this.formikRef;
-
-    if (current && current.submitForm) {
-      this.setState({ isSubmitting: true, submittingError: false });
-      current.submitForm();
-
-      this.intervalRef = setInterval(this.handleSubmitChange, 200);
-    }
-  };
-
-  // hacking missing validation callback in Formik
-  handleSubmitChange = () => {
-    const { current } = this.formikRef;
-
-    if (current && current.getFormikBag) {
-      const { getFormikBag } = current;
-      const { isSubmitting } = getFormikBag();
-
-      if (!isSubmitting) {
-        this.setState({ isSubmitting });
-        clearInterval(this.intervalRef);
-      }
-    }
-  };
-
-  handleSubmitFailure = (actions) => {
-    const { setSubmitting } = actions;
-
-    this.setState({ isSubmitting: false, submittingError: false });
-    setSubmitting(false);
-  };
-
-  handleSubmitSuccess = (sightId, actions) => {
-    const { fetchSightsList, fetchSightEventsList } = this.props;
-    const { resetForm, setSubmitting } = actions;
-
-    setSubmitting(false);
-    resetForm();
-
-    fetchSightsList();
-    fetchSightEventsList();
-    this.setState({ isSubmitting: false, submittingError: false });
-    this.handleClose();
-  };
-
-  isItemLoaded = (itemId, item) =>
-    item
-    && Object.getOwnPropertyNames(item).length
-    && item.id === itemId;
-
-  shouldComponentFetch = () => {
-    const { fetchingError, isFetching } = this.state;
-    const { item, itemId, open } = this.props;
-
-    return open
-      && !fetchingError
-      && !isFetching
-      && itemId !== null
-      && !this.isItemLoaded(itemId, item);
-  };
+    const { poolDefinitionId, sightEventId, stopSell } = this.props;
+    const { date } = this.state;
+    this.setState({ isSubmitting: true });
+    const onSuccess = () => {
+      const { onClose } = this.props;
+      this.setState({ isSubmitting: false, date: Date.now() });
+      onClose();
+    };
+    const onFailure = () => {
+      const { error: { data: { message } } } = this.props;
+      this.setState({ isSubmitting: false, submittingError: message });
+    };
+    stopSell({
+      sightEventId, ticketPoolId: poolDefinitionId, date: format(date, 'YYYY-MM-DDTHH:mm'), onSuccess, onFailure,
+    });
+  }
 
   render() {
     const {
-      fetchingError, isFetching, isSubmitting, submittingError,
+      isSubmitting, submittingError, date,
     } = this.state;
     const {
-      poolDefinitionId, sightEventId,
+      poolDefinitionId, sightEventId, title, stopSell, onClose,
       ...rest
     } = this.props;
-    console.log(this.props)
     return (
       <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
         <DialogTitle id="form-dialog-title">
           {title}
-          {isFetching || isSubmitting
+          {isSubmitting
             ? <CircularProgress size={18} style={{ marginLeft: 20 }} />
             : null
           }
         </DialogTitle>
         <DialogContent>
-        </DialogContent>
-        <DialogActions>
-          {submittingError &&
+          <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
+            <DatePicker
+              format="DD MMM YYYY"
+              label="Wybierz date"
+              margin="normal"
+              onChange={this.handleDateChange}
+              value={date}
+            />
+          </MuiPickersUtilsProvider>
+          {
+            submittingError &&
             <Typography style={{ color: 'red' }}>
-              Wystąpił błąd podczas zapisywania.
+              {submittingError}
             </Typography>
           }
-          {fetchingError &&
-          <Typography style={{ color: 'red' }}>
-            Wystąpił błąd podczas pobierania danych.
-          </Typography>
-          }
-          <Button disabled={isSubmitting} onClick={this.handleClose} color="primary">Anuluj</Button>
+        </DialogContent>
+        <DialogActions>
+          <Button disabled={isSubmitting} onClick={onClose} color="primary">Anuluj</Button>
           <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zatrzymaj sprzedaż</Button>
         </DialogActions>
       </Dialog>
@@ -188,34 +97,33 @@ class SightFormDialog extends Component {
 }
 
 SightFormDialog.propTypes = {
-  clearItem: PropTypes.func.isRequired,
-  fetchItem: PropTypes.func.isRequired,
-  fetchSightsList: PropTypes.func.isRequired,
-  fetchSightEventsList: PropTypes.func.isRequired,
   onClose: PropTypes.func,
   open: PropTypes.bool,
-  item: PropTypes.shape({}),
-  itemId: PropTypes.number,
   title: PropTypes.string,
+  poolDefinitionId: PropTypes.number,
+  sightEventId: PropTypes.number,
+  stopSell: PropTypes.func,
+  error: PropTypes.shape({}),
 };
 
 SightFormDialog.defaultProps = {
   onClose: null,
-  item: null,
-  itemId: null,
   open: false,
   title: null,
+  poolDefinitionId: null,
+  sightEventId: null,
+  stopSell: null,
+  error: null,
 };
 
 const mapStateToProps = state => ({
-  item: sightsSelectors.getSight(state),
+  error: sightEventsSelectors.getError(state),
 });
 
+
 const mapDispatchToProps = {
-  clearItem: sightsActions.clearItem,
-  fetchItem: sightsActions.fetchItem,
-  fetchSightsList: sightsActions.fetchList,
-  fetchSightEventsList: sightEventsActions.fetchList,
+  stopSell: sightEventsActions.stopSell,
 };
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(SightFormDialog);
