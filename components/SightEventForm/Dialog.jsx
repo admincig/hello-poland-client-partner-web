@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
@@ -12,6 +12,7 @@ import {
   actions as sightEventsActions,
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
+import AlertDialog from 'components/AlertDialog';
 import SightForm from './Form';
 import MultimediaList from './MultimediaList';
 
@@ -24,6 +25,12 @@ class SightEventFormDialog extends Component {
     this.intervalRef = null;
 
     this.state = {
+      alertDialog: {
+        content: null,
+        onSubmit: null,
+        open: false,
+        title: null,
+      },
       fetchingError: false,
       isFetching: false,
       isSubmitting: false,
@@ -71,6 +78,34 @@ class SightEventFormDialog extends Component {
 
     return multimediaList;
   };
+
+  handleAlertDialogClear = () => this.setState({
+    alertDialog: {
+      content: null,
+      onSubmit: null,
+      open: false,
+      title: null,
+    },
+  });
+
+  handleAlertDialogClose = () => this.setState(state => ({
+    alertDialog: {
+      ...state.alertDialog,
+      open: false,
+    },
+  }));
+
+  handleAlertDialogOpen = (sightEventId, name) => this.setState({
+    alertDialog: {
+      content: `Plik ${name} zostanie trwale usunięty i nie będzie można go przywrócic.`,
+      onSubmit: () => {
+        this.handleDeletePDF(sightEventId);
+        this.handleAlertDialogClose();
+      },
+      open: true,
+      title: 'Czy na pewno usunąć wybrany plik?',
+    },
+  });
 
   handleClose = () => {
     const { clearItem, onClose } = this.props;
@@ -176,7 +211,7 @@ class SightEventFormDialog extends Component {
 
   render() {
     const {
-      fetchingError, isFetching, isSubmitting, submittingError,
+      alertDialog, fetchingError, isFetching, isSubmitting, submittingError,
     } = this.state;
     const {
       clearItem, fetchItem, fetchList, item, itemId, onClose, parentId, title, deletePDF, ...rest
@@ -185,39 +220,46 @@ class SightEventFormDialog extends Component {
     const multimedia = this.getMultimedia();
 
     return (
-      <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
-        <DialogTitle id="form-dialog-title">
-          {title}
-          {isFetching || isSubmitting
-            ? <CircularProgress size={18} style={{ marginLeft: 20 }} />
-            : null
-          }
-        </DialogTitle>
-        <DialogContent>
-          <SightForm
-            buttons={false}
-            FormikProps={{ ref: this.formikRef }}
-            initialValues={this.getInitialValues(item)}
-            onSubmitFailure={this.handleSubmitFailure}
-            onSubmitSuccess={this.handleSubmitSuccess}
-          />
-          <MultimediaList data={multimedia} onItemDelete={this.handleDeletePDF} />
-        </DialogContent>
-        <DialogActions>
-          {submittingError &&
+      <Fragment>
+        <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
+          <DialogTitle id="form-dialog-title">
+            {title}
+            {isFetching || isSubmitting
+              ? <CircularProgress size={18} style={{ marginLeft: 20 }} />
+              : null
+            }
+          </DialogTitle>
+          <DialogContent>
+            <SightForm
+              buttons={false}
+              FormikProps={{ ref: this.formikRef }}
+              initialValues={this.getInitialValues(item)}
+              onSubmitFailure={this.handleSubmitFailure}
+              onSubmitSuccess={this.handleSubmitSuccess}
+            />
+            <MultimediaList data={multimedia} onItemDelete={this.handleAlertDialogOpen} />
+          </DialogContent>
+          <DialogActions>
+            {submittingError &&
+              <Typography style={{ color: 'red' }}>
+                Wystąpił błąd podczas zapisywania.
+              </Typography>
+            }
+            {fetchingError &&
             <Typography style={{ color: 'red' }}>
-              Wystąpił błąd podczas zapisywania.
+              Wystąpił błąd podczas pobierania danych.
             </Typography>
-          }
-          {fetchingError &&
-          <Typography style={{ color: 'red' }}>
-            Wystąpił błąd podczas pobierania danych.
-          </Typography>
-          }
-          <Button disabled={isSubmitting} onClick={this.handleClose} color="primary">Anuluj</Button>
-          <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>
-        </DialogActions>
-      </Dialog>
+            }
+            <Button disabled={isSubmitting} onClick={this.handleClose} color="primary">Anuluj</Button>
+            <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>
+          </DialogActions>
+        </Dialog>
+        <AlertDialog
+          onClose={this.handleAlertDialogClose}
+          onExited={this.handleAlertDialogClear}
+          {...alertDialog}
+        />
+      </Fragment>
     );
   }
 }
