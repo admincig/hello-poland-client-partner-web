@@ -33,7 +33,7 @@ const MultimediaListItem = ({
       >
         <GetAppIcon />
       </IconButton>
-      <IconButton aria-label="Usuń" title="Usuń" onClick={() => onDelete(sightEventId)}>
+      <IconButton aria-label="Usuń" title="Usuń" onClick={() => onDelete(sightEventId, name)}>
         <DeleteIcon />
       </IconButton>
     </ListItemSecondaryAction>

@@ -21,6 +21,7 @@ import {
   selectors as sightEventSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
 import { actions as ticketPoolDefinitionActions } from '@hello-poland/commons/redux/ticketPoolDefinitions';
+import AlertDialog from 'components/AlertDialog';
 import FormDialog from 'components/FormDialog';
 import SightFormDialog from 'components/SightForm/Dialog';
 import SightEventFormDialog from 'components/SightEventForm/Dialog';
@@ -49,6 +50,12 @@ const FILE_TYPES = {
 
 class SightsList extends Component {
   state = {
+    alertDialog: {
+      content: null,
+      onSubmit: null,
+      open: false,
+      title: null,
+    },
     dialog: false,
     formConfig: null,
     formData: null,
@@ -120,6 +127,24 @@ class SightsList extends Component {
     schema: null,
     title: '',
   });
+
+  handleAlertDialogClear = () => this.setState({
+    alertDialog: {
+      content: null,
+      onSubmit: null,
+      open: false,
+      title: null,
+    },
+  });
+
+  handleAlertDialogClose = () => this.setState(state => ({
+    alertDialog: {
+      ...state.alertDialog,
+      open: false,
+    },
+  }));
+
+  handleAlertDialogOpen = alertDialog => this.setState({ alertDialog });
 
   handleFormDialogClose = () => this.setState({ dialog: false, submitError: false });
 
@@ -362,8 +387,8 @@ class SightsList extends Component {
   render() {
     const { sightEventsList, sightsList } = this.props;
     const {
-      dialog, formData, formType, mediaManager, mediaManagerSubmitting, schema, sightForm,
-      sightEventForm, submitError, title, readOnly,
+      alertDialog, dialog, formData, formType, mediaManager, mediaManagerSubmitting, schema,
+      sightForm, sightEventForm, submitError, title, readOnly,
     } = this.state;
 
     return (
@@ -385,7 +410,15 @@ class SightsList extends Component {
                     title: 'Dodaj ofertę',
                   })}
                   onAddLabel="Dodaj ofertę"
-                  onDeleteClick={() => this.handleSightDelete(sight.id)}
+                  onDeleteClick={() => this.handleAlertDialogOpen({
+                    content: '',
+                    onSubmit: () => {
+                      this.handleSightDelete(sight.id);
+                      this.handleAlertDialogClose();
+                    },
+                    open: true,
+                    title: 'Czy na pewno usunąć wybraną atrakcję?',
+                  })}
                   onDeleteLabel="Usuń atrakcję"
                   onEditClick={() => {
                     this.handleSightFormOpen({ sightId: sight.id, title: 'Edytuj atrakcję' });
@@ -415,7 +448,15 @@ class SightsList extends Component {
                             this.handleTicketPoolEdit({ sightEventId: sightEvent.id });
                           }}
                           onAddLabel="Dodaj pulę biletów"
-                          onDeleteClick={() => this.handleSightEventDelete(sightEvent.id)}
+                          onDeleteClick={() => this.handleAlertDialogOpen({
+                            content: '',
+                            onSubmit: () => {
+                              this.handleSightEventDelete(sightEvent.id);
+                              this.handleAlertDialogClose();
+                            },
+                            open: true,
+                            title: 'Czy na pewno usunąć wybraną ofertę?',
+                          })}
                           onDeleteLabel="Usuń ofertę"
                           onEditClick={() => this.handleSightEventFormOpen({
                             sightId: sight.id,
@@ -467,9 +508,15 @@ class SightsList extends Component {
                                     () => this.handleTicketPoolPreview(ticketPoolDefinition)
                                   }
                                   onPreviewLabel="Podgląd puli"
-                                  onDeleteClick={
-                                    () => this.handleTicketPoolDelete(ticketPoolDefinition.id)
-                                  }
+                                  onDeleteClick={() => this.handleAlertDialogOpen({
+                                    content: '',
+                                    onSubmit: () => {
+                                      this.handleTicketPoolDelete(ticketPoolDefinition.id);
+                                      this.handleAlertDialogClose();
+                                    },
+                                    open: true,
+                                    title: 'Czy na pewno usunąć wybraną pulę biletów?',
+                                  })}
                                   onAddLabel="Usuń pulę biletów"
                                 />
                                 <List style={{ marginLeft: 55 }}>
@@ -507,6 +554,11 @@ class SightsList extends Component {
           :
           <EmptyResultsMessage message="Brak elementów do wyświetlenia" />
         }
+        <AlertDialog
+          onClose={this.handleAlertDialogClose}
+          onExited={this.handleAlertDialogClear}
+          {...alertDialog}
+        />
         <FormDialog
           disableBackdropClick
           onClose={this.handleFormDialogClose}
