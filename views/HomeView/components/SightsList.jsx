@@ -395,10 +395,6 @@ class SightsList extends Component {
     },
   }));
 
-  handleStatsDialogSubmit = (data) => {
-    console.log(data);
-  };
-
   updateFormData = (schema, data) => {
     const serializedData = serialize(schema);
     const formData = populate(serializedData, data);
@@ -409,8 +405,8 @@ class SightsList extends Component {
   render() {
     const { sightEventsList, sightsList } = this.props;
     const {
-      alertDialog, dialog, formData, formType, mediaManager, mediaManagerSubmitting, schema, sightForm,
-      sightEventForm, stats, submitError, title, readOnly,
+      alertDialog, dialog, formData, formType, mediaManager, mediaManagerSubmitting, schema,
+      sightForm, sightEventForm, stats, submitError, title, readOnly,
     } = this.state;
 
     return (
@@ -625,7 +621,6 @@ class SightsList extends Component {
         />
         <StatsDialog
           onClose={this.handleStatsDialogClose}
-          onSubmit={this.handleStatsDialogSubmit}
           {...stats}
         />
       </Fragment>
