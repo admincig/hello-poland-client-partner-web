@@ -53,10 +53,12 @@ class StatsDialog extends React.Component {
     httpClient
       .get(href, { responseType: 'blob' })
       .then((response) => {
+        const hiddenAnchor = this.csvRef.current;
         const blob = new Blob([response.data], { type: 'application/octet-stream' });
-        this.csvRef.current.href = URL.createObjectURL(blob);
-        this.csvRef.current.download = `hp-sales_${formattedFromDate}-${formattedToDate}.csv`;
-        this.csvRef.current.click();
+
+        hiddenAnchor.href = URL.createObjectURL(blob);
+        hiddenAnchor.download = `hp-sales_${formattedFromDate}-${formattedToDate}.csv`;
+        hiddenAnchor.click();
       });
   };
 
@@ -106,7 +108,7 @@ class StatsDialog extends React.Component {
                 >
                   Pobierz
                 </Button>
-                <a style={{ display: 'none' }} href="" ref={this.csvRef}>ref</a>
+                <a style={{ display: 'none' }} href="/" ref={this.csvRef}>ref</a>
               </Grid>
             </DialogContent>
             <DialogActions>
