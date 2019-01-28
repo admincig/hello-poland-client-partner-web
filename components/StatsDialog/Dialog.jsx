@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { compose } from 'redux';
+import { connect, ReactReduxContext } from 'react-redux';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -13,7 +15,6 @@ import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsPr
 import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import format from 'date-fns/format';
 import plLocale from 'date-fns/locale/pl';
-import Link from 'next/link';
 
 const locale = {
   pl: plLocale,
@@ -36,86 +37,101 @@ class StatsDialog extends React.Component {
     toDate: new Date(),
   };
 
+  csvRef = React.createRef();
+
   handleDateChange = (key, value) => this.setState({ [key]: value });
 
-  handleSubmit = () => {
-    const { onSubmit } = this.props;
+  handleSubmit = (store) => {
+    const { logicMiddleware } = store;
+    const { httpClient } = logicMiddleware || {};
+    const { fromDate, toDate } = this.state;
 
-    onSubmit({ ...this.state });
+    const formattedFromDate = format(fromDate, 'YYYY-MM-DD');
+    const formattedToDate = format(toDate, 'YYYY-MM-DD');
+    const href = `/analytics/orders?fromDate=${formattedFromDate}&toDate=${formattedToDate}`;
+
+    httpClient
+      .get(href, { responseType: 'blob' })
+      .then((response) => {
+        const blob = new Blob([response.data], { type: 'application/octet-stream' });
+        this.csvRef.current.href = URL.createObjectURL(blob);
+        this.csvRef.current.download = `hp-sales_${formattedFromDate}-${formattedToDate}.csv`;
+        this.csvRef.current.click();
+      });
   };
 
   render() {
     const { fromDate, toDate } = this.state;
     const {
-      classes, onClose, onSubmit, ...props
+      classes, dispatch, onClose, ...props
     } = this.props;
 
-    const formattedFromDate = format(fromDate, 'YYYY-MM-DD');
-    const formattedToDate = format(toDate, 'YYYY-MM-DD');
-    const href = `/api/partner/analytics/orders?fromDate=${formattedFromDate}&toDate=${formattedToDate}`;
-
     return (
-      <Dialog
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        onClose={onClose}
-        {...props}
-      >
-        <DialogTitle id="alert-dialog-title">Statystyki sprzedaży</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
+      <ReactReduxContext.Consumer>
+        {({ store }) => (
+          <Dialog
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+            onClose={onClose}
+            {...props}
+          >
+            <DialogTitle id="alert-dialog-title">Statystyki sprzedaży</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
             Wybierz okres, z którego ma zostać wygenerowany raport:
-          </DialogContentText>
-          <Grid container>
-            <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
-              <DatePicker
-                className={classes.datePicker}
-                format="DD MMM YYYY"
-                label="Od"
-                margin="normal"
-                onChange={date => this.handleDateChange('fromDate', date)}
-                value={fromDate}
-              />
-              <DatePicker
-                className={classes.datePicker}
-                format="DD MMM YYYY"
-                label="Do"
-                margin="normal"
-                onChange={date => this.handleDateChange('toDate', date)}
-                value={toDate}
-              />
-            </MuiPickersUtilsProvider>
-            <Link href={href} passHref prefetch>
-              <Button
-                className={classes.downloadBtn}
-                color="secondary"
-                component="a"
-                onClick={this.handleSubmit}
-              >
-                Pobierz
+              </DialogContentText>
+              <Grid container>
+                <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
+                  <DatePicker
+                    className={classes.datePicker}
+                    format="DD MMM YYYY"
+                    label="Od"
+                    margin="normal"
+                    onChange={date => this.handleDateChange('fromDate', date)}
+                    value={fromDate}
+                  />
+                  <DatePicker
+                    className={classes.datePicker}
+                    format="DD MMM YYYY"
+                    label="Do"
+                    margin="normal"
+                    onChange={date => this.handleDateChange('toDate', date)}
+                    value={toDate}
+                  />
+                </MuiPickersUtilsProvider>
+                <Button
+                  className={classes.downloadBtn}
+                  color="secondary"
+                  onClick={() => this.handleSubmit(store)}
+                >
+                  Pobierz
+                </Button>
+                <a style={{ display: 'none' }} href="" ref={this.csvRef}>ref</a>
+              </Grid>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={onClose} color="primary">
+                Zamknij
               </Button>
-            </Link>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose} color="primary">
-            Zamknij
-          </Button>
-        </DialogActions>
-      </Dialog>
+            </DialogActions>
+          </Dialog>
+        )}
+      </ReactReduxContext.Consumer>
     );
   }
 }
 
 StatsDialog.propTypes = {
   classes: PropTypes.shape({}).isRequired,
+  dispatch: PropTypes.func.isRequired,
   onClose: PropTypes.func,
-  onSubmit: PropTypes.func,
 };
 
 StatsDialog.defaultProps = {
   onClose: null,
-  onSubmit: null,
 };
 
-export default withStyles(styles)(StatsDialog);
+export default compose(
+  connect(() => ({})),
+  withStyles(styles),
+)(StatsDialog);
