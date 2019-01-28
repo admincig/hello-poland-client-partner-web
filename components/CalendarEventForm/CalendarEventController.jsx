@@ -27,7 +27,6 @@ class CalendarEventController extends React.Component {
     this.initialDate = new Date();
 
     this.state = {
-      isFullDay: false,
       isDefinitionFormVisible: false,
       formData: {
         availableTicketsNumber: -1,
@@ -39,6 +38,7 @@ class CalendarEventController extends React.Component {
         isCyclic: false,
         startDate: this.getFormattedDate(this.initialDate),
         ticketDefinitions: [],
+        wholeDay: false,
         ...formData,
       },
       frequencyType: this.getInitialFrequecyType(isCyclic, readOnly),
@@ -215,13 +215,13 @@ class CalendarEventController extends React.Component {
     const value = this.getValueFromEvent(...args);
 
     this.handleChange({
-      [key]: value,
       formData: {
         ...formData,
         endDate: this.getFormattedDate(setMinutes(setHours(endDate, 23), 59)),
         entryEndDate: this.getFormattedDate(setMinutes(setHours(entryEndDate, 23), 59)),
         entryStartDate: this.getFormattedDate(setMinutes(setHours(entryStartDate, 0), 0)),
         startDate: this.getFormattedDate(setMinutes(setHours(startDate, 0), 0)),
+        [key]: value,
       },
     });
   };
