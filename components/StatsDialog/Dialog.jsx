@@ -89,6 +89,7 @@ class StatsDialog extends React.Component {
                     format="DD MMM YYYY"
                     label="Od"
                     margin="normal"
+                    maxDate={toDate}
                     onChange={date => this.handleDateChange('fromDate', date)}
                     value={fromDate}
                   />
@@ -97,6 +98,7 @@ class StatsDialog extends React.Component {
                     format="DD MMM YYYY"
                     label="Do"
                     margin="normal"
+                    minDate={fromDate}
                     onChange={date => this.handleDateChange('toDate', date)}
                     value={toDate}
                   />
