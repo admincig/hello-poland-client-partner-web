@@ -20,6 +20,7 @@ import {
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
 import { format } from 'date-fns';
+import AlertDialog from 'components/AlertDialog';
 
 const locale = {
   pl: plLocale,
@@ -39,19 +40,52 @@ class SightFormDialog extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      alertDialog: {
+        content: null,
+        onSubmit: null,
+        open: false,
+        title: null,
+      },
       isSubmitting: false,
       submittingError: false,
       date: Date.now(),
     };
   }
 
+  handleAlertDialogClear = () => this.setState({
+    alertDialog: {
+      content: null,
+      onSubmit: null,
+      open: false,
+      title: null,
+    },
+  });
+
+  handleAlertDialogClose = () => this.setState(state => ({
+    alertDialog: {
+      ...state.alertDialog,
+      open: false,
+    },
+  }));
+
+  handleAlertDialogOpen = ({ date, poolDefinitionId, sightEventId }, name) => this.setState({
+    alertDialog: {
+      content: `Sprzedaż biletów na pulę "${name}" w dniu ${format(date, 'DD.MM.YYYY')} zostanie zatrzymana. Kontynuować`,
+      onSubmit: () => {
+        this.handleSubmit({ date, poolDefinitionId, sightEventId });
+        this.handleAlertDialogClose();
+      },
+      open: true,
+      title: 'Czy na pewno zablokować sprzedaż?',
+    },
+  });
+
   handleDateChange = (date) => {
     this.setState({ date, submittingError: false });
   };
 
-  handleSubmit = () => {
-    const { poolDefinitionId, sightEventId, stopSell } = this.props;
-    const { date } = this.state;
+  handleSubmit = ({ date, poolDefinitionId, sightEventId }) => {
+    const { stopSell } = this.props;
 
     this.setState({ isSubmitting: true });
 
@@ -80,10 +114,10 @@ class SightFormDialog extends Component {
 
   render() {
     const {
-      isSubmitting, submittingError, date,
+      alertDialog, isSubmitting, submittingError, date,
     } = this.state;
     const {
-      classes, poolDefinitionId, sightEventId, title, stopSell, onClose,
+      classes, poolDefinitionId, poolDefinitionName, sightEventId, title, stopSell, onClose,
       ...rest
     } = this.props;
 
@@ -104,6 +138,7 @@ class SightFormDialog extends Component {
                 format="DD MMM YYYY"
                 label="Data"
                 margin="normal"
+                minDate={date}
                 onChange={this.handleDateChange}
                 value={date}
               />
@@ -116,8 +151,24 @@ class SightFormDialog extends Component {
         </DialogContent>
         <DialogActions>
           <Button disabled={isSubmitting} onClick={onClose} color="primary">Anuluj</Button>
-          <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zatrzymaj sprzedaż</Button>
+          <Button
+            color="primary"
+            disabled={isSubmitting}
+            onClick={() => {
+              this.handleAlertDialogOpen(
+                { date, poolDefinitionId, sightEventId },
+                poolDefinitionName,
+              );
+            }}
+          >
+            Zatrzymaj sprzedaż
+          </Button>
         </DialogActions>
+        <AlertDialog
+          onClose={this.handleAlertDialogClose}
+          onExited={this.handleAlertDialogClear}
+          {...alertDialog}
+        />
       </Dialog>
     );
   }
@@ -128,6 +179,7 @@ SightFormDialog.propTypes = {
   error: PropTypes.shape({}),
   onClose: PropTypes.func.isRequired,
   poolDefinitionId: PropTypes.number,
+  poolDefinitionName: PropTypes.string,
   sightEventId: PropTypes.number,
   stopSell: PropTypes.func,
   title: PropTypes.string,
@@ -136,6 +188,7 @@ SightFormDialog.propTypes = {
 SightFormDialog.defaultProps = {
   title: null,
   poolDefinitionId: null,
+  poolDefinitionName: null,
   sightEventId: null,
   stopSell: null,
   error: null,
