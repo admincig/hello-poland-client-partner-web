@@ -80,7 +80,7 @@ class StatsDialog extends React.Component {
             <DialogTitle id="alert-dialog-title">Statystyki sprzedaży</DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
-            Wybierz okres, z którego ma zostać wygenerowany raport:
+                Wybierz okres, z którego ma zostać wygenerowany raport:
               </DialogContentText>
               <Grid container>
                 <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
