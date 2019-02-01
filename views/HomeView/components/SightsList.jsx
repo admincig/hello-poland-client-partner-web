@@ -25,6 +25,7 @@ import AlertDialog from 'components/AlertDialog';
 import FormDialog from 'components/FormDialog';
 import SightFormDialog from 'components/SightForm/Dialog';
 import SightEventFormDialog from 'components/SightEventForm/Dialog';
+import StatsDialog from 'components/StatsDialog';
 import StopSellDialog from 'components/StopSellForm';
 import MediaManager from 'components/MediaManager';
 import TicketPoolDefinitionForm from 'components/TicketPoolDefinitionForm';
@@ -68,6 +69,9 @@ class SightsList extends Component {
     schema: null,
     sightForm: false,
     sightEventForm: false,
+    stats: {
+      open: false,
+    },
     stopSellForm: false,
     submitError: false,
     title: '',
@@ -387,6 +391,20 @@ class SightsList extends Component {
     }
   };
 
+  handleStatsDialogClose = () => this.setState(state => ({
+    stats: {
+      ...state.stats,
+      open: false,
+    },
+  }));
+
+  handleStatsDialogOpen = () => this.setState(state => ({
+    stats: {
+      ...state.stats,
+      open: true,
+    },
+  }));
+
   updateFormData = (schema, data) => {
     const serializedData = serialize(schema);
     const formData = populate(serializedData, data);
@@ -398,13 +416,16 @@ class SightsList extends Component {
     const { sightEventsList, sightsList } = this.props;
     const {
       alertDialog, dialog, formData, formType, mediaManager, mediaManagerSubmitting, schema,
-      sightForm, sightEventForm, stopSellForm, submitError, title, readOnly,
+      sightForm, sightEventForm, stats, stopSellForm, submitError, title, readOnly,
     } = this.state;
 
     return (
       <Fragment>
         <Button onClick={() => this.handleSightFormOpen({ title: 'Dodaj atrakcję' })}>
           Dodaj atrakcję
+        </Button>
+        <Button onClick={this.handleStatsDialogOpen}>
+          Statystyki
         </Button>
         {sightsList && sightsList.length ?
           <List>
@@ -615,6 +636,10 @@ class SightsList extends Component {
           open={mediaManager}
           submitting={mediaManagerSubmitting}
           title="Dodaj multimedia"
+        />
+        <StatsDialog
+          onClose={this.handleStatsDialogClose}
+          {...stats}
         />
       </Fragment>
     );
