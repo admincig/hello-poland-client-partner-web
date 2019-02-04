@@ -16,6 +16,11 @@ import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import format from 'date-fns/format';
 import plLocale from 'date-fns/locale/pl';
 
+const REPORT_TYPES = {
+  INSTANCE: 'INSTANCE',
+  PERIOD: 'PERIOD',
+};
+
 const locale = {
   pl: plLocale,
 };
@@ -29,41 +34,60 @@ const styles = theme => ({
     alignSelf: 'flex-end',
     marginBottom: theme.spacing.unit / 2,
   },
+  spacer: {
+    height: theme.spacing.unit * 4,
+  },
 });
 
 class StatsDialog extends React.Component {
   state = {
     fromDate: (new Date()).setMonth((new Date()).getMonth() - 1),
     toDate: new Date(),
+    instanceFromDate: new Date(),
   };
 
-  csvRef = React.createRef();
+  csvPeriodRef = React.createRef();
+
+  csvInstanceRef = React.createRef();
 
   handleDateChange = (key, value) => this.setState({ [key]: value });
 
-  handleSubmit = (store) => {
+  handleSubmit = (type, csvRef, store) => {
     const { logicMiddleware } = store;
     const { httpClient } = logicMiddleware || {};
-    const { fromDate, toDate } = this.state;
 
-    const formattedFromDate = format(fromDate, 'YYYY-MM-DD');
-    const formattedToDate = format(toDate, 'YYYY-MM-DD');
-    const href = `/analytics/orders?fromDate=${formattedFromDate}&toDate=${formattedToDate}`;
+    let href = '/analytics/orders';
+    let downloadSuffix = '';
+
+    if (type === REPORT_TYPES.INSTANCE) {
+      const { instanceFromDate } = this.state;
+      const formattedFromDate = format(instanceFromDate, 'YYYY-MM-DD');
+
+      href = `${href}?fromDate=${formattedFromDate}`;
+      downloadSuffix = formattedFromDate.replace(/-/g, '');
+    } else {
+      const { fromDate, toDate } = this.state;
+      const formattedFromDate = format(fromDate, 'YYYY-MM-DD');
+      const formattedToDate = format(toDate, 'YYYY-MM-DD');
+
+      href = `${href}?fromDate=${formattedFromDate}&toDate=${formattedToDate}`;
+      downloadSuffix = `${formattedFromDate.replace(/-/g, '')}-${formattedToDate.replace(/-/g, '')}`;
+    }
 
     httpClient
       .get(href, { responseType: 'blob' })
       .then((response) => {
-        const hiddenAnchor = this.csvRef.current;
+        const hiddenAnchor = csvRef.current;
         const blob = new Blob([response.data], { type: 'application/octet-stream' });
 
         hiddenAnchor.href = URL.createObjectURL(blob);
-        hiddenAnchor.download = `hp-sales_${formattedFromDate}-${formattedToDate}.csv`;
+        hiddenAnchor.download = `hp-sales_${downloadSuffix}.csv`;
         hiddenAnchor.click();
       });
   };
 
   render() {
-    const { fromDate, toDate } = this.state;
+    const { fromDate, instanceFromDate, toDate } = this.state;
     const {
       classes, dispatch, onClose, ...props
     } = this.props;
@@ -79,11 +103,11 @@ class StatsDialog extends React.Component {
           >
             <DialogTitle id="alert-dialog-title">Statystyki sprzedaży</DialogTitle>
             <DialogContent>
-              <DialogContentText id="alert-dialog-description">
-                Wybierz okres, z którego ma zostać wygenerowany raport:
-              </DialogContentText>
-              <Grid container>
-                <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
+              <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
+                <DialogContentText>
+                  Wybierz okres, z którego ma zostać wygenerowany raport:
+                </DialogContentText>
+                <Grid container>
                   <DatePicker
                     className={classes.datePicker}
                     format="DD MMM YYYY"
@@ -102,16 +126,41 @@ class StatsDialog extends React.Component {
                     onChange={date => this.handleDateChange('toDate', date)}
                     value={toDate}
                   />
-                </MuiPickersUtilsProvider>
-                <Button
-                  className={classes.downloadBtn}
-                  color="secondary"
-                  onClick={() => this.handleSubmit(store)}
-                >
-                  Pobierz
-                </Button>
-                <a style={{ display: 'none' }} href="/" ref={this.csvRef}>ref</a>
-              </Grid>
+                  <Button
+                    className={classes.downloadBtn}
+                    color="secondary"
+                    onClick={() => {
+                      this.handleSubmit(REPORT_TYPES.PERIOD, this.csvPeriodRef, store);
+                    }}
+                  >
+                    Pobierz
+                  </Button>
+                  <a style={{ display: 'none' }} href="/" ref={this.csvPeriodRef}>ref</a>
+                </Grid>
+                <div className={classes.spacer} />
+                <DialogContentText>
+                  Wybierz dzień, dla którego ma zostać wygenerowany raport:
+                </DialogContentText>
+                <Grid container>
+                  <DatePicker
+                    className={classes.datePicker}
+                    format="DD MMM YYYY"
+                    margin="normal"
+                    onChange={date => this.handleDateChange('instanceFromDate', date)}
+                    value={instanceFromDate}
+                  />
+                  <Button
+                    className={classes.downloadBtn}
+                    color="secondary"
+                    onClick={() => {
+                      this.handleSubmit(REPORT_TYPES.INSTANCE, this.csvInstanceRef, store);
+                    }}
+                  >
+                    Pobierz
+                  </Button>
+                  <a style={{ display: 'none' }} href="/" ref={this.csvInstanceRef}>ref</a>
+                </Grid>
+              </MuiPickersUtilsProvider>
             </DialogContent>
             <DialogActions>
               <Button onClick={onClose} color="primary">
