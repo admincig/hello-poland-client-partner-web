@@ -26,6 +26,7 @@ import FormDialog from 'components/FormDialog';
 import SightFormDialog from 'components/SightForm/Dialog';
 import SightEventFormDialog from 'components/SightEventForm/Dialog';
 import StatsDialog from 'components/StatsDialog';
+import StopSellDialog from 'components/StopSellForm';
 import MediaManager from 'components/MediaManager';
 import TicketPoolDefinitionForm from 'components/TicketPoolDefinitionForm';
 import { EmptyResultsMessage } from 'components/ViewMessage';
@@ -71,6 +72,7 @@ class SightsList extends Component {
     stats: {
       open: false,
     },
+    stopSellForm: false,
     submitError: false,
     title: '',
   };
@@ -270,6 +272,14 @@ class SightsList extends Component {
     }
   };
 
+  handleStopSellClick = (sightEventId, poolDefinitionId, poolDefinitionName) => {
+    this.setState({ stopSellForm: true, formData: { sightEventId, poolDefinitionId, poolDefinitionName }, title: 'Zatrzymaj sprzedaż biletów' });
+  };
+
+  handleStopSellClose = () => {
+    this.setState({ stopSellForm: false, formData: null });
+  };
+
   handleTicketPoolDelete = (ticketPoolDefinitionId) => {
     const { deleteTicketPoolDefinition } = this.props;
 
@@ -406,7 +416,7 @@ class SightsList extends Component {
     const { sightEventsList, sightsList } = this.props;
     const {
       alertDialog, dialog, formData, formType, mediaManager, mediaManagerSubmitting, schema,
-      sightForm, sightEventForm, stats, submitError, title, readOnly,
+      sightForm, sightEventForm, stats, stopSellForm, submitError, title, readOnly,
     } = this.state;
 
     return (
@@ -528,16 +538,18 @@ class SightsList extends Component {
                                   onPreviewClick={
                                     () => this.handleTicketPoolPreview(ticketPoolDefinition)
                                   }
+                                  onStopSellClick={
+                                    () => this.handleStopSellClick(
+                                      sightEvent.id,
+                                      ticketPoolDefinition.id,
+                                      ticketPoolDefinition.name,
+                                    )
+                                  }
+                                  onStopSellLabel="Wstrzymaj sprzedaż"
                                   onPreviewLabel="Podgląd puli"
-                                  onDeleteClick={() => this.handleAlertDialogOpen({
-                                    content: '',
-                                    onSubmit: () => {
-                                      this.handleTicketPoolDelete(ticketPoolDefinition.id);
-                                      this.handleAlertDialogClose();
-                                    },
-                                    open: true,
-                                    title: 'Czy na pewno usunąć wybraną pulę biletów?',
-                                  })}
+                                  onDeleteClick={
+                                    () => this.handleTicketPoolDelete(ticketPoolDefinition.id)
+                                  }
                                   onAddLabel="Usuń pulę biletów"
                                 />
                                 <List style={{ marginLeft: 55 }}>
@@ -607,6 +619,13 @@ class SightsList extends Component {
           disableBackdropClick
           onClose={this.handleSightEventFormClose}
           open={sightEventForm}
+          title={title}
+          {...formData}
+        />
+        <StopSellDialog
+          disableBackdropClick
+          onClose={this.handleStopSellClose}
+          open={stopSellForm}
           title={title}
           {...formData}
         />

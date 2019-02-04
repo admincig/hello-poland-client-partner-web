@@ -391,13 +391,13 @@ class SightForm extends Component {
               </GridItem>
             </Grid>
             {buttons &&
-              <Grid container spacing={16}>
-                <GridItem md={2} sm={2}>
-                  <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
-                    Zapisz
-                  </Button>
-                </GridItem>
-              </Grid>
+            <Grid container spacing={16}>
+              <GridItem md={2} sm={2}>
+                <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
+                  Zapisz
+                </Button>
+              </GridItem>
+            </Grid>
             }
           </Form>
         )}
