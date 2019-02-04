@@ -70,7 +70,7 @@ class SightFormDialog extends Component {
 
   handleAlertDialogOpen = ({ date, poolDefinitionId, sightEventId }, name) => this.setState({
     alertDialog: {
-      content: `Sprzedaż biletów na pulę "${name}" w dniu ${format(date, 'DD.MM.YYYY')} zostanie zatrzymana. Kontynuować`,
+      content: `Sprzedaż biletów na pulę "${name}" w dniu ${format(date, 'DD.MM.YYYY')} zostanie zatrzymana.`,
       onSubmit: () => {
         this.handleSubmit({ date, poolDefinitionId, sightEventId });
         this.handleAlertDialogClose();
@@ -138,7 +138,7 @@ class SightFormDialog extends Component {
                 format="DD MMM YYYY"
                 label="Data"
                 margin="normal"
-                minDate={date}
+                minDate={format(new Date(), 'YYYY-MM-DD')}
                 onChange={this.handleDateChange}
                 value={date}
               />
