@@ -15,8 +15,8 @@ import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
 import SwitchLabel from 'components/SwitchLabel';
 import formatPrice from 'utils/formatPrice';
-
 import plLocale from 'date-fns/locale/pl';
+import AlertDialog from 'components/AlertDialog';
 
 import CalendarEventController from './CalendarEventController';
 import DateTimePicker from './DateTimePicker';
@@ -164,6 +164,33 @@ function getNormalizedDay(dateObj) {
 }
 
 class CalendarEventForm extends React.Component {
+  state = {
+    alertDialog: {
+      content: null,
+      onSubmit: null,
+      open: false,
+      title: null,
+    },
+  };
+
+  handleAlertDialogClear = () => this.setState({
+    alertDialog: {
+      content: null,
+      onSubmit: null,
+      open: false,
+      title: null,
+    },
+  });
+
+  handleAlertDialogClose = () => this.setState(state => ({
+    alertDialog: {
+      ...state.alertDialog,
+      open: false,
+    },
+  }));
+
+  handleAlertDialogOpen = alertDialog => this.setState({ alertDialog });
+
   handleBasicFrequencyChange = callback => (event) => {
     const type = event.target.value;
     const item = basicFrequencies.find(({ value }) => type === value);
@@ -193,6 +220,7 @@ class CalendarEventForm extends React.Component {
     ));
 
   render() {
+    const { alertDialog } = this.state;
     const {
       classes, formData: initialFormData, onChange, readOnly,
     } = this.props;
@@ -207,7 +235,7 @@ class CalendarEventForm extends React.Component {
             handleFrequencyDataFieldChange, handleFrequencyEndDateTypeChange,
             handleFrequencyItemChange, handleFullDayChange, handlePropFromEventChange,
             handleTicketDefinitionAdd, handleTicketDefinitionChange, handleTicketDefinitionDelete,
-            isFullDay, isDefinitionFormVisible,
+            isDefinitionFormVisible,
           }) => (
             <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
               <Grid container>
@@ -238,7 +266,7 @@ class CalendarEventForm extends React.Component {
                   <DateTimePicker
                     disabled={readOnly}
                     date={formData.startDate}
-                    fullDay={isFullDay}
+                    fullDay={formData.wholeDay}
                     label="Wydarzenie od"
                     name="startDate"
                     onChange={handleDateChange}
@@ -252,7 +280,7 @@ class CalendarEventForm extends React.Component {
                   <DateTimePicker
                     disabled={readOnly}
                     date={formData.endDate}
-                    fullDay={isFullDay}
+                    fullDay={formData.wholeDay}
                     label="Wydarzenie do"
                     name="endDate"
                     onChange={handleDateChange}
@@ -269,7 +297,7 @@ class CalendarEventForm extends React.Component {
                   <DateTimePicker
                     disabled={readOnly}
                     date={formData.entryStartDate}
-                    fullDay={isFullDay}
+                    fullDay={formData.wholeDay}
                     label="Wejście od"
                     name="entryStartDate"
                     onChange={handleDateChange}
@@ -283,7 +311,7 @@ class CalendarEventForm extends React.Component {
                   <DateTimePicker
                     disabled={readOnly}
                     date={formData.entryEndDate}
-                    fullDay={isFullDay}
+                    fullDay={formData.wholeDay}
                     label="Wejście do"
                     name="entryEndDate"
                     onChange={handleDateChange}
@@ -300,9 +328,9 @@ class CalendarEventForm extends React.Component {
                   <SwitchLabel
                     label="Cały dzień"
                     disabled={readOnly}
-                    name="isFullDay"
+                    name="wholeDay"
                     onChange={handleFullDayChange}
-                    value={isFullDay}
+                    value={formData.wholeDay}
                   />
                 </div>
                 <div className={classNames(classes.section, classes.fullWidth)}>
@@ -493,7 +521,15 @@ class CalendarEventForm extends React.Component {
                         ticketDefinitions={formData.ticketDefinitions}
                         ticketDefinitionsList={ticketDefinitionsList}
                         onAvailabilityChange={handleTicketDefinitionChange}
-                        onDeleteClick={handleTicketDefinitionDelete}
+                        onDeleteClick={(ticketDefinitionId, name) => this.handleAlertDialogOpen({
+                          content: `Próbujesz usunąć bilet o nazwie "${name}". Kontynuować?`,
+                          onSubmit: () => {
+                            handleTicketDefinitionDelete(ticketDefinitionId);
+                            this.handleAlertDialogClose();
+                          },
+                          open: true,
+                          title: 'Czy na pewno usunąć wybrany bilet?',
+                        })}
                         readOnly={readOnly}
                       />
                     }
@@ -518,6 +554,11 @@ class CalendarEventForm extends React.Component {
             </MuiPickersUtilsProvider>
           )}
         </CalendarEventController>
+        <AlertDialog
+          onClose={this.handleAlertDialogClose}
+          onExited={this.handleAlertDialogClear}
+          {...alertDialog}
+        />
       </div>
     );
   }

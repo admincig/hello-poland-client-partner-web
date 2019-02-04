@@ -47,7 +47,7 @@ const TicketDefinitionList = ({
             {!readOnly &&
               <IconButton
                 aria-label="Usuń bilet z puli"
-                onClick={() => onDeleteClick(selected.id)}
+                onClick={() => onDeleteClick(selected.id, ticketDefinition.name)}
                 title="Usuń bilet z puli"
               >
                 <DeleteIcon />
