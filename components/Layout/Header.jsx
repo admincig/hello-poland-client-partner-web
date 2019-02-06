@@ -125,6 +125,13 @@ class Header extends Component {
                     onClose={this.handleMenuClose}
                   >
                     <MenuItem disabled>{name || email}</MenuItem>
+                    <li>
+                      <Link href="/settings" passHref>
+                        <MenuItem component="a">
+                          Ustawienia
+                        </MenuItem>
+                      </Link>
+                    </li>
                     <MenuItem onClick={this.handleLogout}>Wyloguj</MenuItem>
                   </Menu>
                 </React.Fragment>
@@ -148,7 +155,6 @@ Header.propTypes = {
   onMenuButtonClick: PropTypes.func.isRequired,
   profile: PropTypes.shape({
     email: PropTypes.string,
-    name: PropTypes.string,
   }).isRequired,
 };
 

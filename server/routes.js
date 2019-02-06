@@ -4,11 +4,11 @@
 
 module.exports = [
   {
-    page: '/movies',
-    path: '/movies/:id',
+    page: '/index',
+    path: '/',
   },
   {
-    page: '/movies/edit',
-    path: '/movies/:id/edit',
+    page: '/settings',
+    path: '/settings',
   },
 ];
