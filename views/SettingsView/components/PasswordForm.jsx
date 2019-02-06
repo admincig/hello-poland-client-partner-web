@@ -39,7 +39,7 @@ class PasswordForm extends Component {
     } = schemaRegExp;
     this.validationSchema = object().shape({
       oldPassword: string()
-        .test('valid-password', 'Nieprawidłowe hasło', () => this.state.wrongPassword === true)
+        .test('valid-password', 'Nieprawidłowe hasło', () => this.state.wrongPassword === false)
         .required(),
       newPassword: string()
         .notOneOf([ref('oldPassword')], 'Nowe hasło musi się różnić od poprzedniego')
