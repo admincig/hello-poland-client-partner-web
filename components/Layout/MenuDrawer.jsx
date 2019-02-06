@@ -19,7 +19,6 @@ const MenuDrawer = ({
             label, href, Icon, ...other
           }) => (
             <li key={label}>
-              mordo
               <Link href={href} passHref prefetch={!other.disabled}>
                 <ListItem button component="a" selected={currentPath === href} onClick={onClose} {...other}>
                   {Icon
