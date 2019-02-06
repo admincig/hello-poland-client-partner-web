@@ -105,7 +105,7 @@ class StatsDialog extends React.Component {
             <DialogContent>
               <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
                 <DialogContentText>
-                  Wybierz okres, z którego ma zostać wygenerowany raport:
+                  Pobierz raport sprzedaży w okresie:
                 </DialogContentText>
                 <Grid container>
                   <DatePicker
@@ -139,7 +139,7 @@ class StatsDialog extends React.Component {
                 </Grid>
                 <div className={classes.spacer} />
                 <DialogContentText>
-                  Wybierz dzień, dla którego ma zostać wygenerowany raport:
+                  Sprawdź oferty sprzedane na dany dzień:
                 </DialogContentText>
                 <Grid container>
                   <DatePicker
