@@ -50,12 +50,11 @@ class TicketDefinitionForm extends Component {
     const payload = {
       data: {
         ...data,
-        price: parseInt(data.price * 100, 10),
+        price: Math.round(`${data.price}e2`),
       },
       onFailure: this.handleSubmitFailure(formikActions),
       onSuccess: this.handleSubmitSuccess(formikActions),
     };
-
     if (id) {
       action = updateItem;
       payload.id = id;
