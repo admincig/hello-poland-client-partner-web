@@ -317,7 +317,7 @@ class CalendarEventForm extends React.Component {
                     onChange={handleDateChange}
                     DatePickerProps={{
                       disabled: readOnly,
-                      minDate: formData.entryEndDate,
+                      disablePast: true,
                     }}
                     TimePickerProps={{
                       disabled: readOnly,
