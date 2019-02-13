@@ -8,20 +8,20 @@ import Grid from '@material-ui/core/Grid';
 import UserProfile from './components/UserProfile';
 import PasswordForm from './components/PasswordForm';
 
-const SettingsView = ({ profile }) => (
+const AccountView = ({ profile }) => (
   <Layout>
-    <Grid container justify="center" spacing={30} style={{ padding: 30 }}>
-      <Grid item md={5} xs={12}>
+    <Grid container justify="flex-start" spacing={32} style={{ padding: 30 }}>
+      <Grid item md={3} xs={12}>
         <UserProfile profile={profile} />
       </Grid>
-      <Grid item md={5} xs={12}>
+      <Grid item md={4} xs={12}>
         <PasswordForm />
       </Grid>
     </Grid>
   </Layout>
 );
 
-SettingsView.propTypes = {
+AccountView.propTypes = {
   profile: PropTypes.shape({
     email: PropTypes.string,
   }).isRequired,
@@ -31,4 +31,4 @@ const mapStateToProps = state => ({
   profile: profileSelectors.getProfile(state),
 });
 
-export default connect(mapStateToProps)(SettingsView);
+export default connect(mapStateToProps)(AccountView);

@@ -8,7 +8,7 @@ module.exports = [
     path: '/',
   },
   {
-    page: '/settings',
-    path: '/settings',
+    page: '/account',
+    path: '/account',
   },
 ];

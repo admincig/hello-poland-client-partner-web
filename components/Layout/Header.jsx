@@ -126,9 +126,9 @@ class Header extends Component {
                   >
                     <MenuItem disabled>{name || email}</MenuItem>
                     <li>
-                      <Link href="/settings" passHref>
+                      <Link href="/account" passHref>
                         <MenuItem component="a">
-                          Ustawienia
+                          Profil
                         </MenuItem>
                       </Link>
                     </li>
