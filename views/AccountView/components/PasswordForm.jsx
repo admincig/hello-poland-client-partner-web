@@ -78,9 +78,9 @@ class PasswordForm extends Component {
 
   render() {
     const { failure, success } = this.state;
-    const { FormikProps } = this.props;
+    const { FormikProps, ...rest } = this.props;
     return (
-      <Paper style={{ padding: 20 }}>
+      <Paper style={{ padding: 20, minHeight: 360 }}>
         <Formik
           enableReinitialize
           {...FormikProps}
@@ -90,7 +90,7 @@ class PasswordForm extends Component {
         >
           {({ isSubmitting }) => (
             <Form>
-              <Grid container spacing={16}>
+              <Grid container spacing={16} {...rest}>
                 {
                   failure &&
                   <GridItem>

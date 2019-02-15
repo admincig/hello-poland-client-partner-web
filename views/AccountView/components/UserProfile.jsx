@@ -12,7 +12,7 @@ import IconMail from '@material-ui/icons/Mail';
 const styles = theme => ({
   paper: {
     width: '100%',
-    height: 150,
+    height: '100%',
     padding: 20,
   },
   avatar: {
@@ -33,11 +33,10 @@ const styles = theme => ({
   },
 });
 
-const UserProfile = ({ profile: { email, name, picture }, classes }) => (
-  <Grid container direction="column">
+const UserProfile = ({ profile: { email, name, picture }, classes, ...rest }) => (
+  <Grid container direction="column" {...rest}>
     <Paper className={classes.paper}>
-      <Typography variant="title">Profil</Typography>
-      <Grid container direction="row" spacing={8}>
+      <Grid container direction="column" justify="center" spacing={8}>
         <Avatar src={picture} className={classes.avatar}>
           {
             !picture && <AccountCircle className={classes.avatarSvg} />
@@ -45,11 +44,11 @@ const UserProfile = ({ profile: { email, name, picture }, classes }) => (
         </Avatar>
         {
           name &&
-          <Typography variant="caption" className={classes.profileInfo}>
+          <Typography variant="caption" align="center" className={classes.profileInfo}>
             <IconAccountBox fontSize="small" className={classes.iconProfile} />&nbsp;{name}
           </Typography>
         }
-        <Typography variant="caption" className={classes.profileInfo}>
+        <Typography variant="caption" align="center" className={classes.profileInfo}>
           <IconMail fontSize="small" className={classes.iconProfile} />&nbsp;{email}
         </Typography>
       </Grid>
