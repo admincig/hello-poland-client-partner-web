@@ -9,10 +9,8 @@ import AccountViewWrapper from './components/AccountViewWrapper';
 import PasswordForm from './components/PasswordForm';
 
 
-
 class PasswordView extends Component {
   handleSubmit = (values, actions) => {
-    console.log(values, actions);
     const { oldPassword, password } = values;
     const { setStatus } = actions;
     const { changePassword } = this.props;

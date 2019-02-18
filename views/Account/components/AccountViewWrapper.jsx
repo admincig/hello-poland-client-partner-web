@@ -24,7 +24,7 @@ const AccountViewWrapper = ({
         </NoSsr>
       </Grid>
       <Grid item sm={9} xs={12}>
-        <TabWrapper active={activeTab} onChange={console.log}>
+        <TabWrapper active={activeTab} onChange={() => {}}>
           {children}
         </TabWrapper>
       </Grid>

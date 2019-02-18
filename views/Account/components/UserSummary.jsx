@@ -9,19 +9,17 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import DefaultAvatar from 'components/Layout/DefaultAvatar';
 
-const styles = (theme) => {
-  console.log(theme); return ({
-    avatar: {
-      fontSize: theme.spacing.unit * 10,
-    },
-    avatarDefault: {
-      color: theme.palette.grey[500],
-    },
-    content: {
-      margin: [[theme.spacing.unit * 3, 0]],
-    },
-  });
-};
+const styles = theme => ({
+  avatar: {
+    fontSize: theme.spacing.unit * 10,
+  },
+  avatarDefault: {
+    color: theme.palette.grey[500],
+  },
+  content: {
+    margin: [[theme.spacing.unit * 3, 0]],
+  },
+});
 
 const UserSummary = ({ classes, profile }) => {
   const { email, name, picture } = profile;
