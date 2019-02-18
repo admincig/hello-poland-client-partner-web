@@ -19,6 +19,9 @@ const styles = theme => ({
   content: {
     margin: [[theme.spacing.unit * 3, 0]],
   },
+  profile: {
+    textAlign: 'center',
+  },
 });
 
 const UserSummary = ({ classes, profile }) => {
@@ -27,7 +30,7 @@ const UserSummary = ({ classes, profile }) => {
     <Card>
       <CardContent className={classes.content}>
         <Grid container direction="row" justify="center">
-          <Grid item>
+          <Grid item className={classes.profile}>
             {picture
               ? <Avatar src={picture} className={classes.avatar} />
               : <DefaultAvatar className={classNames(classes.avatar, classes.avatarDefault)} />

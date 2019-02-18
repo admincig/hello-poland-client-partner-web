@@ -39,12 +39,14 @@ class PasswordForm extends Component {
 
     this.validationSchema = object().shape({
       oldPassword: string()
-        .required(),
+        .required('Field is required.'),
       password: string()
         .notOneOf([ref('oldPassword')], 'New password must be different from the current one.')
-        .min(8, 'Should be at least 8 characters long.'),
+        .min(8, 'Should be at least 8 characters long.')
+        .required('Field is required.'),
       passwordConfirm: string()
-        .oneOf([ref('password')], 'Given passwords are different.'),
+        .oneOf([ref('password')], 'Given passwords are different.')
+        .required('Field is required.'),
     });
   }
 

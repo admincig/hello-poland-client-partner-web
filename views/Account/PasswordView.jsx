@@ -15,7 +15,6 @@ class PasswordView extends Component {
     const { setStatus } = actions;
     const { changePassword } = this.props;
 
-    console.log(actions);
     setStatus(null);
 
     changePassword({
