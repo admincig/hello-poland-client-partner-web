@@ -15,6 +15,7 @@ class PasswordView extends Component {
     const { setStatus } = actions;
     const { changePassword } = this.props;
 
+    console.log(actions);
     setStatus(null);
 
     changePassword({
@@ -35,8 +36,9 @@ class PasswordView extends Component {
   };
 
   handleSubmitSuccess = formikActions => () => {
-    const { setStatus, setSubmitting } = formikActions;
+    const { resetForm, setStatus, setSubmitting } = formikActions;
 
+    resetForm();
     setSubmitting(false);
     setStatus({ type: 'success', message: 'Hasło zostało zmienione.' });
   };
