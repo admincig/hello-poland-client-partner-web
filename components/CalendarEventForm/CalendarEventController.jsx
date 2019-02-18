@@ -261,7 +261,13 @@ class CalendarEventController extends React.Component {
   handleFrequencyDataFieldChange = (...args) => {
     const { formData } = this.state;
     const key = this.getKeyFromEvent(...args);
-    const value = this.getValueFromEvent(...args);
+    let value = this.getValueFromEvent(...args);
+    
+    if (key === 'endDate') {
+      const endDate = setMinutes(setHours(value, 23), 59);
+
+      value = this.getFormattedDate(endDate);
+    }
 
     this.handleChange({
       formData: {
