@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+import Link from 'next/link';
 import List from '@material-ui/core/List';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
@@ -427,6 +428,11 @@ class SightsList extends Component {
         <Button onClick={this.handleStatsDialogOpen}>
           Statystyki
         </Button>
+        <Link href="/ushers" passHref prefetch>
+          <Button component="a">
+            Bileterzy
+          </Button>
+        </Link>
         {sightsList && sightsList.length ?
           <List>
             {sightsList.map(sight => (
