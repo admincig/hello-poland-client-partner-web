@@ -11,4 +11,8 @@ module.exports = [
     page: '/movies/edit',
     path: '/movies/:id/edit',
   },
+  {
+    page: '/ticketers',
+    path: '/ticketers',
+  },
 ];
