@@ -34,6 +34,7 @@ const TicketDefinitionList = ({
           <ListItemSecondaryAction>
             <TextField
               style={{ width: '150px' }}
+              helperText="Puste pole - brak limitu"
               label="Limit biletów"
               disabled={readOnly || disableAvailability}
               onChange={event => onAvailabilityChange(event, ticketDefinition.id)}

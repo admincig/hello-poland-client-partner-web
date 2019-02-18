@@ -137,6 +137,11 @@ const styles = theme => ({
   fullWidth: {
     width: '100%',
   },
+  horizontal: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
   inline: {
     alignItems: 'center',
     display: 'inline-flex',
@@ -228,21 +233,28 @@ class CalendarEventForm extends React.Component {
       <div>
         <CalendarEventController readOnly={readOnly} formData={initialFormData} onChange={onChange}>
           {({
-            formData, frequencyEndDateType, frequencyType, selectedTicketDefinitionId,
-            ticketDefinitionsList, fetchTicketDefinitions,
+            formData, entryStartDateOffset, frequencyEndDateType, frequencyType,
+            selectedTicketDefinitionId, ticketDefinitionsList, fetchTicketDefinitions,
             handleAvailableTicketsChange, handleDateChange, handleDefinitionFormClose,
-            handleDefinitionFormOpen, handleFormDataChange, handleFrequencyDataChange,
-            handleFrequencyDataFieldChange, handleFrequencyEndDateTypeChange,
-            handleFrequencyItemChange, handleFullDayChange, handlePropFromEventChange,
-            handleTicketDefinitionAdd, handleTicketDefinitionChange, handleTicketDefinitionDelete,
-            isDefinitionFormVisible,
+            handleDefinitionFormOpen, handleFormDataChange, handleEntryStartDateOffsetChange,
+            handleFrequencyDataChange, handleFrequencyDataFieldChange,
+            handleFrequencyEndDateTypeChange, handleFrequencyItemChange, handleFullDayChange,
+            handlePropFromEventChange, handleTicketDefinitionAdd, handleTicketDefinitionChange,
+            handleTicketDefinitionDelete, isDefinitionFormVisible,
           }) => (
             <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
               <Grid container>
+                <Typography>
+                  Aby Twoja oferta była widoczna dla kupujących, musisz zdefiniować termin
+                  i rodzaje biletów.
+                </Typography>
+                <Typography>
+                  Dla każdej oferty możesz stworzyć kilka pul biletów.
+                </Typography>
                 <TextField
                   disabled={readOnly}
                   fullWidth
-                  label="Nazwa"
+                  label="Nazwa puli"
                   margin="normal"
                   name="name"
                   onChange={handleFormDataChange}
@@ -251,7 +263,7 @@ class CalendarEventForm extends React.Component {
                 <TextField
                   fullWidth
                   disabled={readOnly || this.hasTicketAvailabilityLimit(formData.ticketDefinitions)}
-                  helperText="Puste pole oznacza brak limitu"
+                  helperText="Puste pole - brak limitu"
                   label="Limit biletów w puli"
                   margin="normal"
                   name="availableTicketsNumber"
@@ -262,69 +274,46 @@ class CalendarEventForm extends React.Component {
                       ? formData.availableTicketsNumber : ''
                   }
                 />
-                <div className={classNames(classes.columns, classes.fullWidth)}>
-                  <DateTimePicker
-                    disabled={readOnly}
-                    date={formData.startDate}
-                    fullDay={formData.wholeDay}
-                    label="Wydarzenie od"
-                    name="startDate"
-                    onChange={handleDateChange}
-                    DatePickerProps={{
-                      disabled: readOnly,
-                    }}
-                    TimePickerProps={{
-                      disabled: readOnly,
-                    }}
-                  />
-                  <DateTimePicker
-                    disabled={readOnly}
-                    date={formData.endDate}
-                    fullDay={formData.wholeDay}
-                    label="Wydarzenie do"
-                    name="endDate"
-                    onChange={handleDateChange}
-                    DatePickerProps={{
-                      disabled: readOnly,
-                      minDate: formData.startDate,
-                    }}
-                    TimePickerProps={{
-                      disabled: readOnly,
-                    }}
-                  />
+                <div className={classNames(classes.section, classes.fullWidth)}>
+                  <Typography variant="subheading" gutterBottom>
+                    Termin:
+                  </Typography>
                 </div>
                 <div className={classNames(classes.columns, classes.fullWidth)}>
-                  <DateTimePicker
-                    disabled={readOnly}
-                    date={formData.entryStartDate}
-                    fullDay={formData.wholeDay}
-                    label="Wejście od"
-                    name="entryStartDate"
-                    onChange={handleDateChange}
-                    DatePickerProps={{
-                       disabled: readOnly,
-                    }}
-                    TimePickerProps={{
-                      disabled: readOnly,
-                    }}
-                  />
-                  <DateTimePicker
-                    disabled={readOnly}
-                    date={formData.entryEndDate}
-                    fullDay={formData.wholeDay}
-                    label="Wejście do"
-                    name="entryEndDate"
-                    onChange={handleDateChange}
-                    DatePickerProps={{
-                      disabled: readOnly,
-                      disablePast: true,
-                    }}
-                    TimePickerProps={{
-                      disabled: readOnly,
-                    }}
-                  />
-                </div>
-                <div className={classNames(classes.vertical, classes.fullWidth)}>
+                  <div className={classes.horizontal}>
+                    <DateTimePicker
+                      disabled={readOnly}
+                      date={formData.startDate}
+                      fullDay={formData.wholeDay}
+                      name="startDate"
+                      onChange={handleDateChange}
+                      DatePickerProps={{
+                        disabled: readOnly,
+                        margin: 'dense',
+                      }}
+                      TimePickerProps={{
+                        disabled: readOnly,
+                        margin: 'dense',
+                      }}
+                    />
+                    {!formData.wholeDay &&
+                      <Typography>
+                        &nbsp;&nbsp;do
+                      </Typography>
+                    }
+                    <DateTimePicker
+                      disabled={readOnly}
+                      date={formData.endDate}
+                      fullDay={formData.wholeDay}
+                      hasDate={false}
+                      name="endDate"
+                      onChange={handleDateChange}
+                      TimePickerProps={{
+                        disabled: readOnly,
+                        margin: 'dense',
+                      }}
+                    />
+                  </div>
                   <SwitchLabel
                     label="Cały dzień"
                     disabled={readOnly}
@@ -335,8 +324,8 @@ class CalendarEventForm extends React.Component {
                 </div>
                 <div className={classNames(classes.section, classes.fullWidth)}>
                   <div>
-                    <Typography variant="title" gutterBottom>
-                      Ustawienia powtarzalności
+                    <Typography variant="subheading" gutterBottom>
+                      Powtarzaj co:
                     </Typography>
                     <TextField
                       disabled={readOnly}
@@ -356,7 +345,7 @@ class CalendarEventForm extends React.Component {
                   </div>
                   {frequencyType === 'CUSTOM' &&
                     <div className={classNames(classes.section, classes.fullWidth)}>
-                      <Typography variant="title" gutterBottom>
+                      <Typography variant="subheading" gutterBottom>
                         Powtarzanie niestandardowe
                       </Typography>
                       <div className={classNames(classes.inline, classes.fullWidth)}>
@@ -370,7 +359,7 @@ class CalendarEventForm extends React.Component {
                           value={formData.frequencyData && formData.frequencyData.frequency != null
                             ? formData.frequencyData.frequency
                             : ''
-                            }
+                          }
                         />
                         <TextField
                           disabled={readOnly}
@@ -415,49 +404,51 @@ class CalendarEventForm extends React.Component {
                           ))}
                         </div>
                       }
-                      <div className={classNames(classes.section, classes.fullWidth)}>
-                        <Typography>Kończy się:</Typography>
-                        <RadioGroup
-                          aria-label="Koniec puli"
-                          name="frequencyEndDateType"
-                          value={frequencyEndDateType}
-                          onChange={handleFrequencyEndDateTypeChange}
-                        >
-                          <FormControlLabel
-                            value="NONE"
-                            control={<Radio />}
-                            disabled={readOnly}
-                            label="Nigdy"
-                          />
-                          <FormControlLabel
-                            value="SINGLE"
-                            disabled={readOnly}
-                            control={<Radio />}
-                            label={
-                              <div className={classNames(classes.frequencyRadioWrapper)}>
-                                <Typography className={classNames(readOnly
-                                  ? [classes.disabled, classes.frequencyRadioLabel]
-                                  : classes.frequencyRadioLabel)}
-                                >
-                                  W dniu
-                                </Typography>
-                                {frequencyEndDateType === 'SINGLE' &&
-                                  <DateTimePicker
-                                    date={formData.frequencyData.endDate}
-                                    fullDay
-                                    name="endDate"
-                                    onChange={handleFrequencyDataFieldChange}
-                                    DatePickerProps={{
-                                      disabled: readOnly,
-                                      minDate: formData.endDate,
-                                    }}
-                                  />
-                                }
-                              </div>
-                            }
-                          />
-                        </RadioGroup>
-                      </div>
+                    </div>
+                  }
+                  {frequencyType !== 'NONE' &&
+                    <div className={classNames(classes.section, classes.fullWidth)}>
+                      <Typography variant="subheading">Kończy się:</Typography>
+                      <RadioGroup
+                        aria-label="Koniec puli"
+                        name="frequencyEndDateType"
+                        value={frequencyEndDateType}
+                        onChange={handleFrequencyEndDateTypeChange}
+                      >
+                        <FormControlLabel
+                          value="NONE"
+                          control={<Radio />}
+                          disabled={readOnly}
+                          label="Nigdy"
+                        />
+                        <FormControlLabel
+                          value="SINGLE"
+                          disabled={readOnly}
+                          control={<Radio />}
+                          label={
+                            <div className={classNames(classes.frequencyRadioWrapper)}>
+                              <Typography className={classNames(readOnly
+                                ? [classes.disabled, classes.frequencyRadioLabel]
+                                : classes.frequencyRadioLabel)}
+                              >
+                                W dniu
+                              </Typography>
+                              {frequencyEndDateType === 'SINGLE' &&
+                              <DateTimePicker
+                                date={formData.frequencyData.endDate}
+                                fullDay
+                                name="endDate"
+                                onChange={handleFrequencyDataFieldChange}
+                                DatePickerProps={{
+                                  disabled: readOnly,
+                                  minDate: formData.endDate,
+                                }}
+                              />
+                              }
+                            </div>
+                          }
+                        />
+                      </RadioGroup>
                     </div>
                   }
                 </div>
@@ -481,7 +472,7 @@ class CalendarEventForm extends React.Component {
                             disabled
                             value=""
                           >
-                            Wybierz definicję biletu
+                            Wybierz rodzaj biletu
                           </MenuItem>
                           {ticketDefinitionsList &&
                             ticketDefinitionsList.map(({ id, name, price }) => (
@@ -507,7 +498,7 @@ class CalendarEventForm extends React.Component {
                             color="primary"
                             onClick={handleDefinitionFormOpen}
                           >
-                            Zdefiniuj bilet
+                            Nowy bilet
                           </Button>
                         </div>
                       </div>
@@ -550,6 +541,29 @@ class CalendarEventForm extends React.Component {
                     }
                   </div>
                 }
+                <div className={classNames(classes.section, classes.fullWidth)}>
+                  <Typography variant="subheading">Sprawdzanie biletów:</Typography>
+                  <TextField
+                    disabled={readOnly}
+                    onChange={handleEntryStartDateOffsetChange}
+                    name="entryStartDateOffset"
+                    select
+                    value={entryStartDateOffset}
+                  >
+                    <MenuItem value={0}>
+                      równo z godziną otwarcia
+                    </MenuItem>
+                    <MenuItem value={15}>
+                      15 minut wcześniej
+                    </MenuItem>
+                    <MenuItem value={30}>
+                      30 minut wcześniej
+                    </MenuItem>
+                    <MenuItem value={60}>
+                      60 minut wcześniej
+                    </MenuItem>
+                  </TextField>
+                </div>
               </Grid>
             </MuiPickersUtilsProvider>
           )}

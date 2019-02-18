@@ -52,22 +52,24 @@ class DateTimePicker extends Component {
 
   render() {
     const {
-      classes, date, DatePickerProps, fullDay, label, TimePickerProps,
+      classes, date, DatePickerProps, fullDay, hasDate, hasTime, label, TimePickerProps,
     } = this.props;
 
     return (
       <div className={classes.wrapper}>
-        <DatePicker
-          className={classes.datePicker}
-          disablePast
-          format="DD MMM YYYY"
-          label={label}
-          margin="normal"
-          onChange={this.handleChange(changeTypes.DATE)}
-          value={date}
-          {...DatePickerProps}
-        />
-        {!fullDay &&
+        {hasDate &&
+          <DatePicker
+            className={classes.datePicker}
+            disablePast
+            format="DD MMM YYYY"
+            label={label}
+            margin="normal"
+            onChange={this.handleChange(changeTypes.DATE)}
+            value={date}
+            {...DatePickerProps}
+          />
+        }
+        {!fullDay && hasTime &&
           <TimePicker
             ampm={false}
             className={classes.timePicker}
@@ -92,6 +94,8 @@ DateTimePicker.propTypes = {
   disabled: PropTypes.bool,
   DatePickerProps: PropTypes.shape({}),
   fullDay: PropTypes.bool,
+  hasDate: PropTypes.bool,
+  hasTime: PropTypes.bool,
   label: PropTypes.string,
   name: PropTypes.string,
   onChange: PropTypes.func.isRequired,
@@ -102,6 +106,8 @@ DateTimePicker.defaultProps = {
   DatePickerProps: undefined,
   disabled: false,
   fullDay: false,
+  hasDate: true,
+  hasTime: true,
   label: undefined,
   name: undefined,
   TimePickerProps: undefined,
