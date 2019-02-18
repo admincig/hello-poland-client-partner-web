@@ -254,6 +254,7 @@ class CalendarEventForm extends React.Component {
                 <TextField
                   disabled={readOnly}
                   fullWidth
+                  helperText="Będzie widoczna tylko w przypadku wielu pul w jednym dniu"
                   label="Nazwa puli"
                   margin="normal"
                   name="name"
