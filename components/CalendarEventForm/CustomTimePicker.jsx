@@ -1,12 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from '@material-ui/core/styles/withStyles';
-import DatePicker from 'material-ui-pickers/DatePicker';
 import TimePicker from 'material-ui-pickers/TimePicker';
-import getHours from 'date-fns/getHours';
-import getMinutes from 'date-fns/getMinutes';
-import setHours from 'date-fns/setHours';
-import setMinutes from 'date-fns/setMinutes';
 
 const styles = {
   datePicker: {
@@ -27,25 +22,16 @@ const changeTypes = {
   TIME: 'TIME',
 };
 
-class DateTimePicker extends Component {
-  handleChange = type => (dateObj) => {
+class CustomTimePicker extends Component {
+  handleChange = type => (value) => {
     const { name } = this.props;
-    let nextDateObj;
-
-    if (type === changeTypes.DATE) {
-      const { date } = this.props;
-
-      nextDateObj = new Date(dateObj);
-      nextDateObj = setMinutes(nextDateObj, getMinutes(date));
-      nextDateObj = setHours(nextDateObj, getHours(date));
-    }
 
     if (this.props.onChange) {
       this.props.onChange({
         target: {
           name,
           type,
-          value: nextDateObj || dateObj,
+          value,
         },
       });
     }
@@ -53,24 +39,12 @@ class DateTimePicker extends Component {
 
   render() {
     const {
-      classes, date, DatePickerProps, fullDay, hasDate, hasTime, label, TimePickerProps,
+      classes, date, fullDay, TimePickerProps,
     } = this.props;
 
     return (
       <div className={classes.wrapper}>
-        {hasDate &&
-          <DatePicker
-            className={classes.datePicker}
-            disablePast
-            format="DD MMM YYYY"
-            label={label}
-            margin="normal"
-            onChange={this.handleChange(changeTypes.DATE)}
-            value={date}
-            {...DatePickerProps}
-          />
-        }
-        {!fullDay && hasTime &&
+        {!fullDay &&
           <TimePicker
             ampm={false}
             className={classes.timePicker}
@@ -86,14 +60,13 @@ class DateTimePicker extends Component {
   }
 }
 
-DateTimePicker.propTypes = {
+CustomTimePicker.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   date: PropTypes.oneOfType([
     PropTypes.shape({}),
     PropTypes.string,
   ]).isRequired,
   disabled: PropTypes.bool,
-  DatePickerProps: PropTypes.shape({}),
   fullDay: PropTypes.bool,
   hasDate: PropTypes.bool,
   hasTime: PropTypes.bool,
@@ -103,8 +76,7 @@ DateTimePicker.propTypes = {
   TimePickerProps: PropTypes.shape({}),
 };
 
-DateTimePicker.defaultProps = {
-  DatePickerProps: undefined,
+CustomTimePicker.defaultProps = {
   disabled: false,
   fullDay: false,
   hasDate: true,
@@ -114,4 +86,4 @@ DateTimePicker.defaultProps = {
   TimePickerProps: undefined,
 };
 
-export default withStyles(styles)(DateTimePicker);
+export default withStyles(styles)(CustomTimePicker);

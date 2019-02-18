@@ -20,6 +20,7 @@ import AlertDialog from 'components/AlertDialog';
 
 import CalendarEventController from './CalendarEventController';
 import DateTimePicker from './DateTimePicker';
+import CustomTimePicker from './CustomTimePicker';
 import TicketDefinitionList from './TicketDefinitionList';
 import TicketDefinitionForm from '../TicketDefinitionForm/TicketDefinitionForm';
 
@@ -234,13 +235,13 @@ class CalendarEventForm extends React.Component {
         <CalendarEventController readOnly={readOnly} formData={initialFormData} onChange={onChange}>
           {({
             formData, entryStartDateOffset, frequencyEndDateType, frequencyType,
-            selectedTicketDefinitionId, ticketDefinitionsList, fetchTicketDefinitions,
+            selectedTicketDefinitionId, ticketDefinitionsList, poolDate, fetchTicketDefinitions,
             handleAvailableTicketsChange, handleDateChange, handleDefinitionFormClose,
             handleDefinitionFormOpen, handleFormDataChange, handleEntryStartDateOffsetChange,
             handleFrequencyDataChange, handleFrequencyDataFieldChange,
             handleFrequencyEndDateTypeChange, handleFrequencyItemChange, handleFullDayChange,
-            handlePropFromEventChange, handleTicketDefinitionAdd, handleTicketDefinitionChange,
-            handleTicketDefinitionDelete, isDefinitionFormVisible,
+            handlePoolDateChange, handlePropFromEventChange, handleTicketDefinitionAdd,
+            handleTicketDefinitionChange, handleTicketDefinitionDelete, isDefinitionFormVisible,
           }) => (
             <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
               <Grid container>
@@ -284,14 +285,23 @@ class CalendarEventForm extends React.Component {
                   <div className={classes.horizontal}>
                     <DateTimePicker
                       disabled={readOnly}
+                      date={poolDate}
+                      fullDay={formData.wholeDay}
+                      hasTime={false}
+                      name="poolDate"
+                      onChange={handlePoolDateChange}
+                      DatePickerProps={{
+                        disabled: readOnly,
+                        disablePast: !readOnly,
+                        margin: 'dense',
+                      }}
+                    />
+                    <CustomTimePicker
+                      disabled={readOnly}
                       date={formData.startDate}
                       fullDay={formData.wholeDay}
                       name="startDate"
                       onChange={handleDateChange}
-                      DatePickerProps={{
-                        disabled: readOnly,
-                        margin: 'dense',
-                      }}
                       TimePickerProps={{
                         disabled: readOnly,
                         margin: 'dense',
@@ -302,11 +312,10 @@ class CalendarEventForm extends React.Component {
                         &nbsp;&nbsp;do
                       </Typography>
                     }
-                    <DateTimePicker
+                    <CustomTimePicker
                       disabled={readOnly}
                       date={formData.endDate}
                       fullDay={formData.wholeDay}
-                      hasDate={false}
                       name="endDate"
                       onChange={handleDateChange}
                       TimePickerProps={{
