@@ -262,7 +262,7 @@ class CalendarEventController extends React.Component {
     const { formData } = this.state;
     const key = this.getKeyFromEvent(...args);
     let value = this.getValueFromEvent(...args);
-    
+
     if (key === 'endDate') {
       const endDate = setMinutes(setHours(value, 23), 59);
 
