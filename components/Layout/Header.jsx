@@ -12,7 +12,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import HomeIcon from '@material-ui/icons/Home';
 import NoSsr from '@material-ui/core/NoSsr';
 import Avatar from '@material-ui/core/Avatar';
@@ -20,6 +19,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Link from 'next/link';
 import Router from 'next/router';
 import classNames from 'classnames';
+import DefaultAvatar from './DefaultAvatar';
 
 const styles = () => ({
   root: {
@@ -106,7 +106,7 @@ class Header extends Component {
                   >
                     {picture
                       ? <Avatar src={picture} />
-                      : <AccountCircle style={{ fontSize: 36 }} />
+                      : <DefaultAvatar style={{ fontSize: 36 }} />
                     }
                   </IconButton>
                   <Menu
@@ -155,6 +155,7 @@ Header.propTypes = {
   onMenuButtonClick: PropTypes.func.isRequired,
   profile: PropTypes.shape({
     email: PropTypes.string,
+    name: PropTypes.string,
   }).isRequired,
 };
 
