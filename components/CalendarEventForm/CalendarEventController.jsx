@@ -6,9 +6,20 @@ import _cloneDeep from 'lodash/cloneDeep';
 import _isNumber from 'lodash/isNumber';
 import addMinutes from 'date-fns/addMinutes';
 import addMonths from 'date-fns/addMonths';
+import differenceInMinutes from 'date-fns/differenceInMinutes';
 import format from 'date-fns/format';
+import getDate from 'date-fns/getDate';
+import getMonth from 'date-fns/getMonth';
+import getYear from 'date-fns/getYear';
+import isAfter from 'date-fns/isAfter';
+import isBefore from 'date-fns/isBefore';
+import isSameDay from 'date-fns/isSameDay';
+import setDate from 'date-fns/setDate';
 import setHours from 'date-fns/setHours';
 import setMinutes from 'date-fns/setMinutes';
+import setMonth from 'date-fns/setMonth';
+import setYear from 'date-fns/setYear';
+import subDays from 'date-fns/subDays';
 import subMinutes from 'date-fns/subMinutes';
 import {
   actions as ticketDefinitionsActions,
@@ -16,33 +27,42 @@ import {
 } from 'redux/ticketDefinitions';
 
 const DATE_FORMAT = 'YYYY-MM-DDTHH:mm';
+const MIN_TIME_INTERVAL = 30;
 
 class CalendarEventController extends React.Component {
   constructor(props) {
     super(props);
     const { formData, readOnly } = props;
-    const { frequencyData, isCyclic } = formData || {};
-    const { endDate } = frequencyData || {};
+    const {
+      endDate, entryEndDate, entryStartDate, frequencyData, isCyclic, startDate,
+    } = formData || {};
+    const { endDate: frequencyEndDate } = frequencyData || {};
 
-    this.initialDate = new Date();
+    this.initialDate = this.getInitialDate(startDate);
+
+    const initialStartDate = this.getValidStartDate(this.initialDate);
+    const iED = addMinutes(this.initialDate, MIN_TIME_INTERVAL * 2);
+    const initialEndDate = this.getValidEndDate(iED);
 
     this.state = {
       isDefinitionFormVisible: false,
       formData: {
         availableTicketsNumber: -1,
-        endDate: this.getFormattedDate(addMinutes(this.initialDate, 60)),
-        entryEndDate: this.getFormattedDate(addMinutes(this.initialDate, 10)),
-        entryStartDate: this.getFormattedDate(subMinutes(this.initialDate, 10)),
+        endDate: endDate || initialEndDate,
+        entryEndDate: entryEndDate || initialEndDate,
+        entryStartDate: entryStartDate || initialStartDate,
         frequencyData: null,
         sightEventId: null,
         isCyclic: false,
-        startDate: this.getFormattedDate(this.initialDate),
+        startDate: startDate || initialStartDate,
         ticketDefinitions: [],
         wholeDay: false,
         ...formData,
       },
+      entryStartDateOffset: this.getInitialEntryStartDateOffset(entryStartDate, startDate),
       frequencyType: this.getInitialFrequecyType(isCyclic, readOnly),
-      frequencyEndDateType: this.getInitialFrequencyTypeDate(endDate),
+      frequencyEndDateType: this.getInitialFrequencyTypeDate(frequencyEndDate),
+      poolDate: startDate || initialStartDate,
       selectedTicketDefinitionId: '',
     };
   }
@@ -59,11 +79,66 @@ class CalendarEventController extends React.Component {
 
   getFormattedDate = dateObj => format(dateObj, DATE_FORMAT);
 
+  getInitialDate = (startDate) => {
+    let initialDate = startDate;
+
+    if (!initialDate) {
+      initialDate = new Date();
+      const evening = setMinutes(setHours(new Date(), 23), 29);
+
+      if (isAfter(initialDate, evening)) {
+        initialDate = addMinutes(initialDate, 60 * 8);
+      }
+    }
+
+    return this.getFormattedDate(initialDate);
+  };
+
+  getInitialEntryStartDateOffset = (entryStartDate, startDate) => {
+    if (entryStartDate && startDate) {
+      return differenceInMinutes(startDate, entryStartDate);
+    }
+
+    return 0;
+  };
+
   getInitialFrequecyType = (isCyclic, readOnly) => (isCyclic && readOnly ? 'CUSTOM' : 'NONE');
 
   getInitialFrequencyTypeDate = endDate => (endDate ? 'SINGLE' : 'NONE');
 
   getKeyFromEvent = event => event.target.name;
+
+  getValidEndDate = (endDate) => {
+    let date = endDate;
+    const morning = setMinutes(setHours(new Date(), 0), 30);
+    const today = setMinutes(setHours(new Date(), 23), 59);
+
+    if (isBefore(date, morning)) {
+      date = morning;
+    }
+
+    if (isAfter(date, today)) {
+      date = today;
+    }
+
+    return this.getFormattedDate(date);
+  };
+
+  getValidStartDate = (startDate) => {
+    let date = startDate;
+    const evening = setMinutes(setHours(new Date(), 23), 29);
+    const today = setMinutes(setHours(new Date(), 0), 0);
+
+    if (isAfter(date, evening)) {
+      date = evening;
+    }
+
+    if (isBefore(date, today)) {
+      date = today;
+    }
+
+    return this.getFormattedDate(date);
+  };
 
   getValueFromEvent = (event, value) => {
     let fieldValue = value !== undefined ? value : null;
@@ -81,14 +156,6 @@ class CalendarEventController extends React.Component {
     return fieldValue;
   };
 
-  handleChange = (props) => {
-    this.setState(props, () => {
-      if (this.props.onChange) {
-        this.props.onChange(this.state.formData);
-      }
-    });
-  };
-
   handleAvailableTicketsChange = (...args) => {
     const { formData } = this.state;
     const key = this.getKeyFromEvent(...args);
@@ -102,9 +169,57 @@ class CalendarEventController extends React.Component {
     });
   };
 
+  handleChange = (props) => {
+    this.setState(props, () => {
+      if (this.props.onChange) {
+        this.props.onChange(this.state.formData);
+      }
+    });
+  };
+
+  handleDateChange = (event) => {
+    const { entryStartDateOffset, formData } = this.state;
+    const key = this.getKeyFromEvent(event);
+    const dateObj = this.getValueFromEvent(event);
+    const dates = {};
+
+    if (key === 'startDate') {
+      dates.startDate = this.getFormattedDate(dateObj);
+
+      const entryStartDateWithOffset = subMinutes(dates.startDate, entryStartDateOffset);
+      dates.entryStartDate = this.getFormattedDate(entryStartDateWithOffset);
+    } else {
+      dates.endDate = this.getFormattedDate(dateObj);
+      dates.entryEndDate = this.getFormattedDate(dateObj);
+    }
+
+    this.handleChange({
+      formData: {
+        ...formData,
+        ...dates,
+      },
+    });
+  };
+
   handleDefinitionFormClose = () => this.setState({ isDefinitionFormVisible: false });
 
   handleDefinitionFormOpen = () => this.setState({ isDefinitionFormVisible: true });
+
+  handleEntryStartDateOffsetChange = (event) => {
+    const { formData } = this.state;
+    const { startDate } = formData;
+    const value = this.getValueFromEvent(event);
+    const entryStartDate = this.getFormattedDate(subMinutes(startDate, value));
+
+
+    this.handleChange({
+      entryStartDateOffset: value,
+      formData: {
+        ...formData,
+        entryStartDate,
+      },
+    });
+  };
 
   handleFormDataChange = (...args) => {
     const { formData } = this.state;
@@ -154,7 +269,13 @@ class CalendarEventController extends React.Component {
   handleFrequencyDataFieldChange = (...args) => {
     const { formData } = this.state;
     const key = this.getKeyFromEvent(...args);
-    const value = this.getValueFromEvent(...args);
+    let value = this.getValueFromEvent(...args);
+
+    if (key === 'endDate') {
+      const endDate = setMinutes(setHours(value, 23), 59);
+
+      value = this.getFormattedDate(endDate);
+    }
 
     this.handleChange({
       formData: {
@@ -173,7 +294,7 @@ class CalendarEventController extends React.Component {
     let endDate = null;
 
     if (type === 'SINGLE') {
-      endDate = this.getFormattedDate(addMonths(formData.endDate, 3));
+      endDate = this.getFormattedDate(addMonths(setMinutes(setHours(formData.endDate, 23), 59), 3));
     }
 
     this.handleChange({
@@ -226,6 +347,43 @@ class CalendarEventController extends React.Component {
     });
   };
 
+  handlePoolDateChange = (event) => {
+    const dateObj = this.getValueFromEvent(event);
+    const poolDate = this.getFormattedDate(dateObj);
+    const { formData } = this.state;
+    const {
+      endDate, entryEndDate, entryStartDate, startDate,
+    } = formData;
+
+    const year = getYear(poolDate);
+    const month = getMonth(poolDate);
+    const date = getDate(poolDate);
+
+    const eD = setYear(setMonth(setDate(endDate, date), month), year);
+    const eED = setYear(setMonth(setDate(entryEndDate, date), month), year);
+    const sD = setYear(setMonth(setDate(startDate, date), month), year);
+    const eSD = setYear(setMonth(setDate(entryStartDate, date), month), year);
+
+    const dates = {
+      endDate: this.getFormattedDate(eD),
+      entryEndDate: this.getFormattedDate(eED),
+      entryStartDate: this.getFormattedDate(eSD),
+      startDate: this.getFormattedDate(sD),
+    };
+
+    if (!isSameDay(entryStartDate, startDate)) {
+      dates.entryStartDate = this.getFormattedDate(subDays(dates.entryStartDate, 1));
+    }
+
+    this.handleChange({
+      formData: {
+        ...formData,
+        ...dates,
+      },
+      poolDate,
+    });
+  };
+
   handlePropFromEventChange = (...args) => {
     const key = this.getKeyFromEvent(...args);
     const value = this.getValueFromEvent(...args);
@@ -233,28 +391,23 @@ class CalendarEventController extends React.Component {
     this.handleChange({ [key]: value });
   };
 
-  handleDateChange = (event) => {
-    const dateObj = this.getValueFromEvent(event);
-    const date = format(dateObj, DATE_FORMAT);
-
-    this.handleFormDataChange(event, date);
-  };
-
   handleTicketDefinitionAdd = (ticketDefinitionId) => {
-    const { formData } = this.state;
-    const ticketDefinition = _find(formData.ticketDefinitions, { id: ticketDefinitionId });
+    if (ticketDefinitionId) {
+      const { formData } = this.state;
+      const ticketDefinition = _find(formData.ticketDefinitions, { id: ticketDefinitionId });
 
-    if (!ticketDefinition) {
-      this.handleChange(({
-        formData: {
-          ...formData,
-          ticketDefinitions: [
-            ...formData.ticketDefinitions,
-            { id: ticketDefinitionId, availableTicketsNumber: -1 },
-          ],
-        },
-        selectedTicketDefinitionId: '',
-      }));
+      if (!ticketDefinition) {
+        this.handleChange(({
+          formData: {
+            ...formData,
+            ticketDefinitions: [
+              ...formData.ticketDefinitions,
+              { id: ticketDefinitionId, availableTicketsNumber: -1 },
+            ],
+          },
+          selectedTicketDefinitionId: '',
+        }));
+      }
     }
   };
 
@@ -308,12 +461,14 @@ class CalendarEventController extends React.Component {
       handleDateChange: this.handleDateChange,
       handleDefinitionFormClose: this.handleDefinitionFormClose,
       handleDefinitionFormOpen: this.handleDefinitionFormOpen,
+      handleEntryStartDateOffsetChange: this.handleEntryStartDateOffsetChange,
       handleFormDataChange: this.handleFormDataChange,
       handleFrequencyDataChange: this.handleFrequencyDataChange,
       handleFrequencyDataFieldChange: this.handleFrequencyDataFieldChange,
       handleFrequencyEndDateTypeChange: this.handleFrequencyEndDateTypeChange,
       handleFrequencyItemChange: this.handleFrequencyItemChange,
       handleFullDayChange: this.handleFullDayChange,
+      handlePoolDateChange: this.handlePoolDateChange,
       handlePropFromEventChange: this.handlePropFromEventChange,
       handleTicketDefinitionAdd: this.handleTicketDefinitionAdd,
       handleTicketDefinitionChange: this.handleTicketDefinitionChange,

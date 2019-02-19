@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+import Link from 'next/link';
 import List from '@material-ui/core/List';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
@@ -296,7 +297,7 @@ class SightsList extends Component {
       createTicketPoolDefinition, updateTicketPoolDefinition, fetchTicketPoolDefinition,
     } = this.props;
     const isPersisted = Number.isInteger(data.id);
-    const title = isPersisted ? 'Edytuj pulę biletów' : 'Dodaj pulę biletów';
+    let title = isPersisted ? 'Edytuj pulę biletów' : 'Dodaj pulę biletów';
     const formType = 'TicketPoolDefinitionForm';
     const formConfig = {
       action: createTicketPoolDefinition,
@@ -307,6 +308,8 @@ class SightsList extends Component {
 
       fetchTicketPoolDefinition(data.id);
     }
+
+    title += ' - ustaw dostępność biletów dla oferty';
 
     this.handleFormDialogOpen({
       data,
@@ -427,6 +430,11 @@ class SightsList extends Component {
         <Button onClick={this.handleStatsDialogOpen}>
           Statystyki
         </Button>
+        <Link href="/ushers" passHref prefetch>
+          <Button component="a">
+            Bileterzy
+          </Button>
+        </Link>
         {sightsList && sightsList.length ?
           <List>
             {sightsList.map(sight => (
@@ -531,7 +539,7 @@ class SightsList extends Component {
                                   key={`${ticketPoolDefinition.id}-${ticketPoolDefinition.name}`}
                                   primary={ticketPoolDefinition.name}
                                   secondary={
-                                    `Limit biletów: ${ticketPoolDefinition.availableTicketsNumber === -1 ?
+                                    `Limit biletów w puli: ${ticketPoolDefinition.availableTicketsNumber === -1 ?
                                       'Brak' : `${ticketPoolDefinition.availableTicketsNumber} szt`
                                     }`
                                   }
