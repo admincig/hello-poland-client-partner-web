@@ -193,7 +193,7 @@ class CalendarEventController extends React.Component {
       dates.entryEndDate = this.getFormattedDate(dateObj);
     }
 
-    this.setState({
+    this.handleChange({
       formData: {
         ...formData,
         ...dates,
@@ -212,7 +212,7 @@ class CalendarEventController extends React.Component {
     const entryStartDate = this.getFormattedDate(subMinutes(startDate, value));
 
 
-    this.setState({
+    this.handleChange({
       entryStartDateOffset: value,
       formData: {
         ...formData,
@@ -375,7 +375,7 @@ class CalendarEventController extends React.Component {
       dates.entryStartDate = this.getFormattedDate(subDays(dates.entryStartDate, 1));
     }
 
-    this.setState({
+    this.handleChange({
       formData: {
         ...formData,
         ...dates,
