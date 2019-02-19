@@ -539,7 +539,7 @@ class SightsList extends Component {
                                   key={`${ticketPoolDefinition.id}-${ticketPoolDefinition.name}`}
                                   primary={ticketPoolDefinition.name}
                                   secondary={
-                                    `Limit biletów: ${ticketPoolDefinition.availableTicketsNumber === -1 ?
+                                    `Limit biletów w puli: ${ticketPoolDefinition.availableTicketsNumber === -1 ?
                                       'Brak' : `${ticketPoolDefinition.availableTicketsNumber} szt`
                                     }`
                                   }

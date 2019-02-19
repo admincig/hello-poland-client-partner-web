@@ -247,19 +247,17 @@ class CalendarEventForm extends React.Component {
               <Grid container>
                 <Typography>
                   Aby Twoja oferta była widoczna dla kupujących, musisz zdefiniować termin
-                  i rodzaje biletów.
-                </Typography>
-                <Typography>
-                  Dla każdej oferty możesz stworzyć kilka pul biletów.
+                  i rodzaje biletów. Dla każdej oferty możesz stworzyć kilka pul biletów.
                 </Typography>
                 <TextField
                   disabled={readOnly}
                   fullWidth
-                  helperText="Będzie widoczna tylko w przypadku wielu pul w jednym dniu"
+                  helperText="Nazwa puli będzie widoczna tylko w przypadku wielu pul w jednym dniu"
                   label="Nazwa puli"
                   margin="normal"
                   name="name"
                   onChange={handleFormDataChange}
+                  required
                   value={formData.name != null ? formData.name : ''}
                 />
                 <TextField
@@ -561,7 +559,7 @@ class CalendarEventForm extends React.Component {
                     value={entryStartDateOffset}
                   >
                     <MenuItem value={0}>
-                      równo z godziną otwarcia
+                      równo z godziną rozpoczęcia
                     </MenuItem>
                     <MenuItem value={15}>
                       15 minut wcześniej
