@@ -19,7 +19,11 @@ import {
   actions as sightEventsActions,
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
-import { format } from 'date-fns';
+import format from 'date-fns/format';
+import getHours from 'date-fns/getHours';
+import getMinutes from 'date-fns/getMinutes';
+import setHours from 'date-fns/setHours';
+import setMinutes from 'date-fns/setMinutes';
 import AlertDialog from 'components/AlertDialog';
 
 const locale = {
@@ -85,14 +89,19 @@ class SightFormDialog extends Component {
   };
 
   handleSubmit = ({ date, poolDefinitionId, sightEventId }) => {
-    const { stopSell } = this.props;
+    const { stopSell, startDate } = this.props;
+
+    const hours = getHours(startDate);
+    const minutes = getMinutes(startDate);
 
     this.setState({ isSubmitting: true });
+
+    const poolStartDate = setMinutes(setHours(date, hours), minutes);
 
     stopSell({
       sightEventId,
       ticketPoolId: poolDefinitionId,
-      date: format(date, 'YYYY-MM-DDTHH:mm'),
+      date: format(poolStartDate, 'YYYY-MM-DDTHH:mm'),
       onFailure: this.handleSubmitFailure,
       onSuccess: this.handleSubmitSuccess,
     });
@@ -181,6 +190,7 @@ SightFormDialog.propTypes = {
   poolDefinitionId: PropTypes.number,
   poolDefinitionName: PropTypes.string,
   sightEventId: PropTypes.number,
+  startDate: PropTypes.string.isRequired,
   stopSell: PropTypes.func,
   title: PropTypes.string,
 };
