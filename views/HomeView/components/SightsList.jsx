@@ -273,8 +273,14 @@ class SightsList extends Component {
     }
   };
 
-  handleStopSellClick = (sightEventId, poolDefinitionId, poolDefinitionName) => {
-    this.setState({ stopSellForm: true, formData: { sightEventId, poolDefinitionId, poolDefinitionName }, title: 'Zatrzymaj sprzedaż biletów' });
+  handleStopSellClick = (sightEventId, poolDefinitionId, poolDefinitionName, startDate) => {
+    this.setState({
+      stopSellForm: true,
+      formData: {
+        sightEventId, poolDefinitionId, poolDefinitionName, startDate,
+      },
+      title: 'Zatrzymaj sprzedaż biletów',
+    });
   };
 
   handleStopSellClose = () => {
@@ -551,6 +557,7 @@ class SightsList extends Component {
                                       sightEvent.id,
                                       ticketPoolDefinition.id,
                                       ticketPoolDefinition.name,
+                                      ticketPoolDefinition.startDate,
                                     )
                                   }
                                   onStopSellLabel="Wstrzymaj sprzedaż"
