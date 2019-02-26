@@ -1,23 +1,15 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import NoSsr from '@material-ui/core/NoSsr';
-import Layout from 'components/Layout';
 import UserSummary from './UserSummary';
 import TabWrapper from './TabWrapper';
 
-const styles = theme => ({
-  root: {
-    marginTop: theme.spacing.unit * 2,
-  },
-});
-
-const AccountViewWrapper = ({
-  activeTab, children, classes, profile,
+const ProfileComponent = ({
+  activeTab, children, profile,
 }) => (
-  <Layout>
-    <Grid container spacing={16} className={classes.root}>
+  <Fragment>
+    <Grid container spacing={16}>
       <Grid item sm={3} xs={12}>
         <NoSsr>
           <UserSummary profile={profile} />
@@ -29,15 +21,13 @@ const AccountViewWrapper = ({
         </TabWrapper>
       </Grid>
     </Grid>
-  </Layout>
+  </Fragment>
 );
 
-AccountViewWrapper.propTypes = {
+ProfileComponent.propTypes = {
   activeTab: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
-  classes: PropTypes.shape({}).isRequired,
   profile: PropTypes.shape({}).isRequired,
 };
 
-export default withStyles(styles)(AccountViewWrapper);
-
+export default ProfileComponent;

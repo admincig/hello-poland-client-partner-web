@@ -5,22 +5,37 @@ import Link from 'next/link';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import {
-  actions as profileActions,
-  selectors as profileSelectors,
-} from '@hello-poland/commons/redux/profile';
+  actions as ushersActions,
+  selectors as ushersSelectors,
+} from 'redux/ushers';
 import Layout from 'components/Layout';
 import ProfileComponent from 'components/ProfileComponent/ProfileComponent';
 import PasswordForm from 'components/ProfileComponent/PasswordForm';
 
 class PasswordView extends Component {
+  componentDidMount() {
+    const { usherId } = this.props;
+
+    this.fetchProfile(usherId);
+  }
+
+  fetchProfile = (userId) => {
+    // const { fetchUsher } = this.props;
+    const { fetchUshers } = this.props;
+
+    // fetchUsher({ id: userId });
+    fetchUshers({ id: userId });
+  };
+
   handleSubmit = (values, actions) => {
     const { oldPassword, password } = values;
     const { setStatus } = actions;
-    const { changePassword } = this.props;
+    const { changePassword, usherId } = this.props;
 
     setStatus(null);
 
     changePassword({
+      id: usherId,
       data: {
         oldPassword,
         password,
@@ -46,7 +61,9 @@ class PasswordView extends Component {
   };
 
   render() {
-    const { profile } = this.props;
+    const { activeTab, usherId, ushers } = this.props;
+    const profile = ushers.find(usher => usher.id === usherId) || {};
+
     return (
       <Layout>
         <Link href="/" passHref prefetch>
@@ -57,8 +74,8 @@ class PasswordView extends Component {
             Bileterzy
           </Button>
         </Link>
-        <Typography variant="title" gutterBottom>Profil</Typography>
-        <ProfileComponent activeTab="password" profile={profile}>
+        <Typography variant="title" gutterBottom>Bileterzy / {profile.email}</Typography>
+        <ProfileComponent activeTab={activeTab} profile={profile}>
           <PasswordForm onSubmit={this.handleSubmit} />
         </ProfileComponent>
       </Layout>
@@ -67,20 +84,32 @@ class PasswordView extends Component {
 }
 
 PasswordView.propTypes = {
+  activeTab: PropTypes.string,
   changePassword: PropTypes.func.isRequired,
-  profile: PropTypes.shape({
-    email: PropTypes.string,
-    name: PropTypes.string,
-  }).isRequired,
+  // fetchUsher: PropTypes.func.isRequired,
+  fetchUshers: PropTypes.func.isRequired,
+  // profile: PropTypes.shape({
+  //   email: PropTypes.string,
+  //   name: PropTypes.string,
+  // }),
+  usherId: PropTypes.number.isRequired,
+  ushers: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+};
+
+PasswordView.defaultProps = {
+  activeTab: 'password',
+  // profile: {},
 };
 
 const mapStateToProps = state => ({
-  profile: profileSelectors.getProfile(state),
+// profile: ushersSelectors.getUsher(state),
+  ushers: ushersSelectors.getUshers(state),
 });
 
 const mapDispatchToProps = {
-  changePassword: profileActions.changePassword,
+  fetchUsher: ushersActions.fetchItem,
+  fetchUshers: ushersActions.fetchList,
+  changePassword: ushersActions.changePassword,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(PasswordView);
-

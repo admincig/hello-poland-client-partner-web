@@ -2,4 +2,9 @@
  * Route definitions
  */
 
-module.exports = [];
+module.exports = [
+  {
+    page: '/ushers/password',
+    path: '/ushers/:usherId/password',
+  },
+];

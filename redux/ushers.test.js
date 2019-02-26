@@ -61,72 +61,207 @@ function generateAppState(data) {
  */
 
 describe('actions', () => {
-  it('should create an action to make list request', () => {
-    const { fetchList } = actions;
-    const { FETCH_LIST } = types;
-    const data = { a: 1 };
-    const options = { b: 2 };
-    const expectedValue = {
-      type: FETCH_LIST,
-      payload: {
-        url: apiURL,
-        method: 'get',
-      },
-    };
+  describe('using change password action', () => {
+    it('should create an action to make password change request', () => {
+      const { changePassword } = actions;
+      const { CHANGE_PASSWORD } = types;
+      const id = 1;
+      const data = {
+        oldPassword: 'password',
+        newPassword: 'password123',
+      };
+      const expectedValue = {
+        type: CHANGE_PASSWORD,
+        payload: {
+          url: `/ushers/${id}/password`,
+          method: 'patch',
+          data,
+        },
+      };
 
-    expect(fetchList()).toEqual(expectedValue);
+      expect(changePassword({ id, data })).toEqual(expectedValue);
 
-    expectedValue.payload = {
-      ...expectedValue.payload,
-      data,
-      ...options,
-    };
+      expectedValue.onFailure = onFailure;
+      expectedValue.onSuccess = onSuccess;
 
-    expect(fetchList({ data, options })).toEqual(expectedValue);
+      expect(changePassword({
+        id, data, onFailure, onSuccess,
+      })).toEqual(expectedValue);
+    });
 
-    expectedValue.onFailure = onFailure;
-    expectedValue.onSuccess = onSuccess;
+    it('should create an action to cancel password change request', () => {
+      const { changePasswordCancel } = actions;
+      const { CHANGE_PASSWORD_CANCEL } = types;
+      const expectedValue = {
+        type: CHANGE_PASSWORD_CANCEL,
+      };
 
-    expect(fetchList({
-      data, options, onFailure, onSuccess,
-    })).toEqual(expectedValue);
+      expect(changePasswordCancel()).toEqual(expectedValue);
+    });
+
+    it('should create an action to fail password change request', () => {
+      const { changePasswordFailure } = actions;
+      const { CHANGE_PASSWORD_FAILURE } = types;
+      const expectedValue = {
+        type: CHANGE_PASSWORD_FAILURE,
+        error: {},
+      };
+
+      expect(changePasswordFailure()).toEqual(expectedValue);
+
+      expectedValue.error = axiosResponseError;
+
+      expect(changePasswordFailure(axiosResponseError)).toEqual(expectedValue);
+    });
+
+    it('should create an action to succeed password change request', () => {
+      const { changePasswordSuccess } = actions;
+      const { CHANGE_PASSWORD_SUCCESS } = types;
+      const expectedValue = {
+        type: CHANGE_PASSWORD_SUCCESS,
+      };
+
+      expect(changePasswordSuccess()).toEqual(expectedValue);
+    });
   });
 
-  it('should create an action to cancel list request', () => {
-    const { fetchListCancel } = actions;
-    const { FETCH_LIST_CANCEL } = types;
-    const expectedValue = {
-      type: FETCH_LIST_CANCEL,
-    };
+  describe('using item action', () => {
+    it('should create an action to make request', () => {
+      const { fetchItem } = actions;
+      const { FETCH_ITEM } = types;
+      const id = 1;
+      const options = { a: 1 };
+      const expectedValue = {
+        type: FETCH_ITEM,
+        payload: {
+          url: `${apiURL}/${id}`,
+          method: 'get',
+        },
+      };
 
-    expect(fetchListCancel()).toEqual(expectedValue);
+      expect(fetchItem({ id })).toEqual(expectedValue);
+
+      expectedValue.payload = {
+        ...expectedValue.payload,
+        ...options,
+      };
+
+      expect(fetchItem({ id, options })).toEqual(expectedValue);
+
+      expectedValue.onFailure = onFailure;
+      expectedValue.onSuccess = onSuccess;
+
+      expect(fetchItem({
+        id, options, onFailure, onSuccess,
+      })).toEqual(expectedValue);
+    });
+
+    it('should create an action to cancel request', () => {
+      const { fetchItemCancel } = actions;
+      const { FETCH_ITEM_CANCEL } = types;
+      const expectedValue = {
+        type: FETCH_ITEM_CANCEL,
+      };
+
+      expect(fetchItemCancel()).toEqual(expectedValue);
+    });
+
+    it('should create an action to fail request', () => {
+      const { fetchItemFailure } = actions;
+      const { FETCH_ITEM_FAILURE } = types;
+      const expectedValue = {
+        type: FETCH_ITEM_FAILURE,
+        error: {},
+      };
+
+      expect(fetchItemFailure()).toEqual(expectedValue);
+
+      expectedValue.error = axiosResponseError;
+
+      expect(fetchItemFailure(axiosResponseError)).toEqual(expectedValue);
+    });
+
+    it('should create an action to succeed request', () => {
+      const { fetchItemSuccess } = actions;
+      const { FETCH_ITEM_SUCCESS } = types;
+      const data = { a: 1 };
+      const expectedValue = {
+        type: FETCH_ITEM_SUCCESS,
+        data,
+      };
+
+      expect(fetchItemSuccess(data)).toEqual(expectedValue);
+    });
   });
 
-  it('should create an action to fail list request', () => {
-    const { fetchListFailure } = actions;
-    const { FETCH_LIST_FAILURE } = types;
-    const expectedValue = {
-      type: FETCH_LIST_FAILURE,
-      error: {},
-    };
+  describe('using list action', () => {
+    it('should create an action to make request', () => {
+      const { fetchList } = actions;
+      const { FETCH_LIST } = types;
+      const data = { a: 1 };
+      const options = { b: 2 };
+      const expectedValue = {
+        type: FETCH_LIST,
+        payload: {
+          url: apiURL,
+          method: 'get',
+        },
+      };
 
-    expect(fetchListFailure()).toEqual(expectedValue);
+      expect(fetchList()).toEqual(expectedValue);
 
-    expectedValue.error = axiosResponseError;
+      expectedValue.payload = {
+        ...expectedValue.payload,
+        data,
+        ...options,
+      };
 
-    expect(fetchListFailure(axiosResponseError)).toEqual(expectedValue);
-  });
+      expect(fetchList({ data, options })).toEqual(expectedValue);
 
-  it('should create an action to succeed list request', () => {
-    const { fetchListSuccess } = actions;
-    const { FETCH_LIST_SUCCESS } = types;
-    const data = { a: 1 };
-    const expectedValue = {
-      type: FETCH_LIST_SUCCESS,
-      data,
-    };
+      expectedValue.onFailure = onFailure;
+      expectedValue.onSuccess = onSuccess;
 
-    expect(fetchListSuccess(data)).toEqual(expectedValue);
+      expect(fetchList({
+        data, options, onFailure, onSuccess,
+      })).toEqual(expectedValue);
+    });
+
+    it('should create an action to cancel request', () => {
+      const { fetchListCancel } = actions;
+      const { FETCH_LIST_CANCEL } = types;
+      const expectedValue = {
+        type: FETCH_LIST_CANCEL,
+      };
+
+      expect(fetchListCancel()).toEqual(expectedValue);
+    });
+
+    it('should create an action to fail request', () => {
+      const { fetchListFailure } = actions;
+      const { FETCH_LIST_FAILURE } = types;
+      const expectedValue = {
+        type: FETCH_LIST_FAILURE,
+        error: {},
+      };
+
+      expect(fetchListFailure()).toEqual(expectedValue);
+
+      expectedValue.error = axiosResponseError;
+
+      expect(fetchListFailure(axiosResponseError)).toEqual(expectedValue);
+    });
+
+    it('should create an action to succeed request', () => {
+      const { fetchListSuccess } = actions;
+      const { FETCH_LIST_SUCCESS } = types;
+      const data = { a: 1 };
+      const expectedValue = {
+        type: FETCH_LIST_SUCCESS,
+        data,
+      };
+
+      expect(fetchListSuccess(data)).toEqual(expectedValue);
+    });
   });
 });
 
@@ -153,6 +288,23 @@ describe('selectors', () => {
       expect(getError(state)).toEqual(error);
     });
   });
+
+  describe('using getUsher', () => {
+    it('should return null if there is no item data', () => {
+      const { getUsher } = selectors;
+
+      expect(getUsher(appState)).toBeNull();
+    });
+
+    it('should return item data', () => {
+      const { getUsher } = selectors;
+      const expectedValue = { id: 1 };
+      const state = generateAppState({ item: expectedValue });
+
+      expect(getUsher(state)).toEqual(expectedValue);
+    });
+  });
+
 
   describe('using getUshers', () => {
     const { getUshers } = selectors;
@@ -186,18 +338,65 @@ describe('reducer', () => {
     expect(reducer()(undefined, { type: 'INVALID_TYPE' })).toEqual(defaultInitialState);
   });
 
-  it('should handle FETCH_LIST_FAILURE', () => {
-    let action = actions.fetchListFailure();
-    const expectedValue = {
-      ...defaultInitialState,
-      error: {},
-    };
+  describe('using item reducers', () => {
+    it('should handle FETCH_ITEM_FAILURE', () => {
+      let action = actions.fetchItemFailure();
+      const expectedValue = {
+        ...defaultInitialState,
+        error: {},
+      };
 
-    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+      expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
 
-    action = actions.fetchListFailure(axiosResponseError);
-    expectedValue.error = axiosResponseError;
+      action = actions.fetchItemFailure(axiosResponseError);
+      expectedValue.error = axiosResponseError;
 
-    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+      expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+    });
+
+    it('should handle FETCH_ITEM_SUCCESS', () => {
+      const data = { id: 1 };
+      const action = actions.fetchItemSuccess(data);
+      const expectedValue = {
+        ...defaultInitialState,
+        item: data,
+      };
+
+      expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+    });
+  });
+
+  describe('using list reducers', () => {
+    it('should handle FETCH_LIST_FAILURE', () => {
+      let action = actions.fetchListFailure();
+      const expectedValue = {
+        ...defaultInitialState,
+        error: {},
+      };
+
+      expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+
+      action = actions.fetchListFailure(axiosResponseError);
+      expectedValue.error = axiosResponseError;
+
+      expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+    });
+
+    it('should handle FETCH_LIST_SUCCESS', () => {
+      const data = {
+        config: {},
+        items: [
+          { id: 1 },
+          { id: 2 },
+        ],
+      };
+      const action = actions.fetchListSuccess(data);
+      const expectedValue = {
+        ...defaultInitialState,
+        list: data.items,
+      };
+
+      expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+    });
   });
 });

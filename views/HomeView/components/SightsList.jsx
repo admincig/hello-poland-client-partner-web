@@ -433,14 +433,14 @@ class SightsList extends Component {
         <Button onClick={() => this.handleSightFormOpen({ title: 'Dodaj atrakcję' })}>
           Dodaj atrakcję
         </Button>
-        <Button onClick={this.handleStatsDialogOpen}>
-          Statystyki
-        </Button>
         <Link href="/ushers" passHref prefetch>
           <Button component="a">
             Bileterzy
           </Button>
         </Link>
+        <Button onClick={this.handleStatsDialogOpen}>
+          Statystyki
+        </Button>
         {sightsList && sightsList.length ?
           <List>
             {sightsList.map(sight => (
