@@ -190,7 +190,7 @@ SightFormDialog.propTypes = {
   poolDefinitionId: PropTypes.number,
   poolDefinitionName: PropTypes.string,
   sightEventId: PropTypes.number,
-  startDate: PropTypes.string.isRequired,
+  startDate: PropTypes.string,
   stopSell: PropTypes.func,
   title: PropTypes.string,
 };
@@ -200,6 +200,7 @@ SightFormDialog.defaultProps = {
   poolDefinitionId: null,
   poolDefinitionName: null,
   sightEventId: null,
+  startDate: null,
   stopSell: null,
   error: null,
 };

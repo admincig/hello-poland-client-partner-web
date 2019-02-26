@@ -5,11 +5,20 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import withStyles from '@material-ui/core/styles/withStyles';
+
+const styles = theme => ({
+  listItem: {
+    '& + &': {
+      borderTop: `1px solid ${theme.palette.divider}`,
+    },
+  },
+});
 
 const UshersListItem = ({
-  name, email, picture,
+  name, email, picture, classes, ...rest
 }) => (
-  <ListItem>
+  <ListItem {...rest} className={classes.listItem}>
     <ListItemIcon>
       {picture
           ? <Avatar src={picture} />
@@ -24,10 +33,11 @@ UshersListItem.propTypes = {
   name: PropTypes.string.isRequired,
   email: PropTypes.string.isRequired,
   picture: PropTypes.string,
+  classes: PropTypes.shape({}).isRequired,
 };
 
 UshersListItem.defaultProps = {
   picture: null,
 };
 
-export default UshersListItem;
+export default withStyles(styles)(UshersListItem);
