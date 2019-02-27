@@ -23,7 +23,7 @@ class PasswordView extends Component {
     const { fetchUsher } = this.props;
     fetchUsher({
       id: userId,
-      onFailure: () => Router.push('/ushers'),
+      onFailure: () => Router.push('/404'),
     });
   };
 
