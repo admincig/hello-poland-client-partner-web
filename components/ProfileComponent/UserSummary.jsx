@@ -8,7 +8,6 @@ import CardContent from '@material-ui/core/CardContent';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import DefaultAvatar from 'components/Layout/DefaultAvatar';
-import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 const styles = theme => ({
@@ -32,22 +31,15 @@ const UserSummary = ({ classes, profile }) => {
     <Card>
       <CardContent className={classes.content}>
         <Grid container direction="row" justify="center">
-          {
-            profile.email &&
-            <Grid item className={classes.profile}>
-              {picture
-                ? <Avatar src={picture} className={classes.avatar} />
-                : <DefaultAvatar className={classNames(classes.avatar, classes.avatarDefault)} />
-              }
-              <Typography>
-                {name || email}
-              </Typography>
-            </Grid>
-          }
-          {
-            !profile.email &&
-            <CircularProgress />
-          }
+          <Grid item className={classes.profile}>
+            {picture
+              ? <Avatar src={picture} className={classes.avatar} />
+              : <DefaultAvatar className={classNames(classes.avatar, classes.avatarDefault)} />
+            }
+            <Typography>
+              {name || email}
+            </Typography>
+          </Grid>
         </Grid>
       </CardContent>
     </Card>
