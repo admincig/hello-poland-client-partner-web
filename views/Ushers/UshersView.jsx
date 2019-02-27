@@ -26,11 +26,6 @@ class UshersView extends Component {
         <Link href="/" passHref prefetch>
           <Button component="a">Strona główna</Button>
         </Link>
-        <Link href="/ushers" passHref prefetch>
-          <Button component="a">
-            Bileterzy
-          </Button>
-        </Link>
         <Typography variant="title" gutterBottom>Bileterzy</Typography>
         <UshersList ushers={ushers} />
       </Layout>
@@ -40,7 +35,11 @@ class UshersView extends Component {
 
 UshersView.propTypes = {
   fetchUshers: PropTypes.func.isRequired,
-  ushers: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  ushers: PropTypes.arrayOf(PropTypes.shape({})),
+};
+
+UshersView.defaultProps = {
+  ushers: [],
 };
 
 const mapStateToProps = state => ({

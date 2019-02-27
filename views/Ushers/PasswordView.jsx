@@ -11,20 +11,20 @@ import {
 import Layout from 'components/Layout';
 import ProfileComponent from 'components/ProfileComponent/ProfileComponent';
 import PasswordForm from 'components/ProfileComponent/PasswordForm';
+import Router from 'next/router';
 
 class PasswordView extends Component {
   componentDidMount() {
     const { usherId } = this.props;
-
     this.fetchProfile(usherId);
   }
 
   fetchProfile = (userId) => {
-    // const { fetchUsher } = this.props;
-    const { fetchUshers } = this.props;
-
-    // fetchUsher({ id: userId });
-    fetchUshers({ id: userId });
+    const { fetchUsher } = this.props;
+    fetchUsher({
+      id: userId,
+      onFailure: () => Router.push('/ushers'),
+    });
   };
 
   handleSubmit = (values, actions) => {
@@ -61,8 +61,7 @@ class PasswordView extends Component {
   };
 
   render() {
-    const { activeTab, usherId, ushers } = this.props;
-    const profile = ushers.find(usher => usher.id === usherId) || {};
+    const { activeTab, profile } = this.props;
 
     return (
       <Layout>
@@ -86,29 +85,25 @@ class PasswordView extends Component {
 PasswordView.propTypes = {
   activeTab: PropTypes.string,
   changePassword: PropTypes.func.isRequired,
-  // fetchUsher: PropTypes.func.isRequired,
-  fetchUshers: PropTypes.func.isRequired,
-  // profile: PropTypes.shape({
-  //   email: PropTypes.string,
-  //   name: PropTypes.string,
-  // }),
+  fetchUsher: PropTypes.func.isRequired,
+  profile: PropTypes.shape({
+    email: PropTypes.string,
+    name: PropTypes.string,
+  }).isRequired,
   usherId: PropTypes.number.isRequired,
-  ushers: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };
 
 PasswordView.defaultProps = {
   activeTab: 'password',
-  // profile: {},
 };
 
 const mapStateToProps = state => ({
-// profile: ushersSelectors.getUsher(state),
+  profile: ushersSelectors.getUsher(state),
   ushers: ushersSelectors.getUshers(state),
 });
 
 const mapDispatchToProps = {
   fetchUsher: ushersActions.fetchItem,
-  fetchUshers: ushersActions.fetchList,
   changePassword: ushersActions.changePassword,
 };
 

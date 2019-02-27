@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import NoSsr from '@material-ui/core/NoSsr';
 import UserSummary from './UserSummary';
@@ -10,10 +11,17 @@ const ProfileComponent = ({
 }) => (
   <Fragment>
     <Grid container spacing={16}>
-      <Grid item sm={3} xs={12}>
-        <NoSsr>
-          <UserSummary profile={profile} />
-        </NoSsr>
+      <Grid item sm={3} xs={12} style={{ textAlign: 'center' }}>
+        {
+          profile.email ? (
+            <NoSsr>
+              <UserSummary profile={profile} />
+            </NoSsr>
+          )
+          : (
+            <CircularProgress size={170} thickness={1.6} />
+          )
+        }
       </Grid>
       <Grid item sm={9} xs={12}>
         <TabWrapper active={activeTab} onChange={() => {}}>
