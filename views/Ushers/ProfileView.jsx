@@ -25,7 +25,7 @@ class ProfileView extends Component {
     const { fetchUsher } = this.props;
     fetchUsher({
       id: userId,
-      onFailure: () => Router.push('/404'),
+      onFailure: () => console.log('elo'),
     });
   };
 
@@ -42,24 +42,9 @@ class ProfileView extends Component {
         oldPassword,
         password,
       },
-      onFailure: this.handlePasswordSubmitFailure(actions),
-      onSuccess: this.handlePasswordSubmitSuccess(actions),
+      onFailure: this.handleSubmitCallback('failure')(actions)('Wystąpił błąd podczas próby zmiany hasła.')(null),
+      onSuccess: this.handleSubmitCallback('success')(actions)('Zmieniono hasło')(() => actions.resetForm()),
     });
-  };
-
-  handlePasswordSubmitFailure = formikActions => () => {
-    const { setStatus, setSubmitting } = formikActions;
-
-    setSubmitting(false);
-    setStatus({ type: 'failure', message: 'Wystąpił błąd podczas próby zmiany hasła.' });
-  };
-
-  handlePasswordSubmitSuccess = formikActions => () => {
-    const { resetForm, setStatus, setSubmitting } = formikActions;
-
-    resetForm();
-    setSubmitting(false);
-    setStatus({ type: 'success', message: 'Hasło zostało zmienione.' });
   };
 
   handleProfileSubmit = (values, actions) => {
@@ -74,30 +59,21 @@ class ProfileView extends Component {
       data: {
         name,
       },
-      onFailure: this.handleProfileSubmitFailure(actions),
-      onSuccess: this.handleProfileSubmitSuccess(actions),
+      onFailure: this.handleSubmitCallback('failure')(actions)('Wystąpił błąd przy zmianie profilu')(null),
+      onSuccess: this.handleSubmitCallback('success')(actions)('Zmieniono profil')(() => this.fetchProfile(usherId)),
     });
   }
 
-  handleProfileSubmitFailure = formikActions => () => {
+  handleSubmitCallback = type => formikActions => message => callback => () => {
     const { setStatus, setSubmitting } = formikActions;
-
     setSubmitting(false);
-    setStatus({ type: 'failure', message: 'Wystąpił błąd podczas próby zmiany profilu.' });
-  }
-
-  handleProfileSubmitSuccess = formikActions => () => {
-    const { setStatus, setSubmitting } = formikActions;
-    const { fetchUsher, usherId } = this.props;
-
-    setSubmitting(false);
-    setStatus({ type: 'success', message: 'Profil został zmieniony.' });
-    fetchUsher({ id: usherId });
-  }
+    if (callback) callback();
+    setStatus({ type, message });
+  };
 
   handleTabChange = (activeTab) => {
     const { usherId } = this.props;
-    Router.push(`/ushers/${usherId}/${activeTab}`);
+    Router.replace(`/ushers/${usherId}/${activeTab}`);
   }
 
   render() {
@@ -119,7 +95,7 @@ class ProfileView extends Component {
           handleTabChange={this.handleTabChange}
         >
           {
-            activeTab === 'profile' && profile.email &&
+            activeTab === 'profile' &&
             <ProfileForm profile={profile} onSubmit={this.handleProfileSubmit} />
           }
           {
