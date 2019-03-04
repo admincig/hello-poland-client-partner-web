@@ -54,6 +54,30 @@ const CHANGE_PASSWORD_FAILURE = `${prefix}CHANGE_PASSWORD_FAILURE`;
 const CHANGE_PASSWORD_SUCCESS = `${prefix}CHANGE_PASSWORD_SUCCESS`;
 
 /**
+ * Type used for handling change profile data request.
+ * @type {string}
+ */
+const CHANGE_PROFILE = `${prefix}CHANGE_PROFILE`;
+
+/**
+ * Type used for handling change profile data request cancellation.
+ * @type {string}
+ */
+const CHANGE_PROFILE_CANCEL = `${prefix}CHANGE_PROFILE_CANCEL`;
+
+/**
+ * Type used for handling change profile data request failure.
+ * @type {string}
+ */
+const CHANGE_PROFILE_FAILURE = `${prefix}CHANGE_PROFILE_FAILURE`;
+
+/**
+ * Type used for handling change profile data request success.
+ * @type {string}
+ */
+const CHANGE_PROFILE_SUCCESS = `${prefix}CHANGE_PROFILE_SUCCESS`;
+
+/**
  * Type used for handling entity fetching.
  * @type {string}
  */
@@ -107,6 +131,10 @@ export const types = {
   CHANGE_PASSWORD_CANCEL,
   CHANGE_PASSWORD_FAILURE,
   CHANGE_PASSWORD_SUCCESS,
+  CHANGE_PROFILE,
+  CHANGE_PROFILE_CANCEL,
+  CHANGE_PROFILE_FAILURE,
+  CHANGE_PROFILE_SUCCESS,
   FETCH_ITEM,
   FETCH_ITEM_CANCEL,
   FETCH_ITEM_FAILURE,
@@ -189,6 +217,72 @@ const changePasswordSuccess = () => ({
   type: CHANGE_PASSWORD_SUCCESS,
 });
 
+/**
+ * Creates action for profile change request.
+ * @method
+ * @callback failureCallback
+ * @callback successCallback
+ * @param {Object} params
+ * @param {Object} [params.options] - request config
+ * @param {failureCallback} [params.onFailure] - failure callback
+ * @param {successCallback} [params.onSuccess] - success callback
+ * @return {{
+ *   type: string,
+ *   payload: {url: string, method: string, data: *, options: *},
+ *   onFailure: failureCallback,
+ *   onSuccess: successCallback
+ * }}
+ */
+const changeProfile = ({
+  id, options, data, onFailure, onSuccess,
+} = {}) => ({
+  type: CHANGE_PROFILE,
+  payload: {
+    url: `${apiURL}/${id}`,
+    method: 'patch',
+    ...options,
+    data,
+  },
+  onFailure,
+  onSuccess,
+});
+
+/**
+ * Creates action for password change request cancelling.
+ * @method
+ * @return {{type: string}}
+ */
+const changeProfileCancel = () => ({
+  type: CHANGE_PROFILE_CANCEL,
+});
+
+/**
+ * Creates action for password change request failing.
+ * @method
+ * @param {Object} params - axios response schema
+ * @param params.data - response body
+ * @param params.status - response status
+ * @return {{
+ *   type: string,
+ *   error: {data, status: number}
+ * }}
+ */
+const changeProfileFailure = ({ data, status } = {}) => ({
+  type: CHANGE_PROFILE_FAILURE,
+  error: {
+    data,
+    status,
+  },
+});
+
+/**
+ * Creates action for successful password change request.
+ * @method
+ * @return {{type: string}}
+ */
+const changeProfileSuccess = () => ({
+  type: CHANGE_PROFILE_SUCCESS,
+});
 
 /**
  * Creates action with item request details.
@@ -332,6 +426,10 @@ export const actions = {
   changePasswordCancel,
   changePasswordFailure,
   changePasswordSuccess,
+  changeProfile,
+  changeProfileCancel,
+  changeProfileFailure,
+  changeProfileSuccess,
   fetchItem,
   fetchItemCancel,
   fetchItemFailure,
@@ -424,6 +522,48 @@ const changePasswordLogic = createLogic({
       }
     } catch ({ response }) {
       dispatch(changePasswordFailure(response));
+
+      if (onFailure) {
+        onFailure();
+      }
+    }
+
+    done();
+  },
+});
+
+/**
+ * Logic used for handling profile change request.
+ * @method
+ */
+const changeProfileLogic = createLogic({
+  type: [
+    CHANGE_PROFILE,
+  ],
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { status } = response;
+
+      if (status === 200 || status === 204) {
+        dispatch(changeProfileSuccess());
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        dispatch(changeProfileFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch ({ response }) {
+      dispatch(changeProfileFailure(response));
 
       if (onFailure) {
         onFailure();
@@ -531,6 +671,7 @@ const fetchListLogic = createLogic({
 
 export const logic = {
   changePasswordLogic,
+  changeProfileLogic,
   fetchItemLogic,
   fetchListLogic,
 };

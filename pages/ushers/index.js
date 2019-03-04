@@ -5,7 +5,7 @@ UshersView.getInitialProps = ({ query }) => {
   const { usherId } = query;
 
   if (usherId) {
-    Router.push(`/ushers/${usherId}/password`);
+    Router.push(`/ushers/${usherId}/profile`);
   }
 
   return {};

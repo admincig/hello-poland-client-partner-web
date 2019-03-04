@@ -7,7 +7,7 @@ import UserSummary from './UserSummary';
 import TabWrapper from './TabWrapper';
 
 const ProfileComponent = ({
-  activeTab, children, profile,
+  activeTab, children, profile, handleTabChange,
 }) => (
   <Fragment>
     <Grid container spacing={16}>
@@ -24,7 +24,7 @@ const ProfileComponent = ({
         }
       </Grid>
       <Grid item sm={9} xs={12}>
-        <TabWrapper active={activeTab} onChange={() => {}}>
+        <TabWrapper active={activeTab} onChange={handleTabChange}>
           {children}
         </TabWrapper>
       </Grid>
@@ -36,6 +36,7 @@ ProfileComponent.propTypes = {
   activeTab: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
   profile: PropTypes.shape({}).isRequired,
+  handleTabChange: PropTypes.func.isRequired,
 };
 
 export default ProfileComponent;

@@ -37,7 +37,6 @@ class TabWrapper extends Component {
 
     const nextTabType = Object.entries(TAB_TYPES).filter((type) => {
       const [k, v] = type;
-
       return k.length && value === v;
     });
 
@@ -47,7 +46,6 @@ class TabWrapper extends Component {
   render() {
     const { selectedTab } = this.state;
     const { children, classes } = this.props;
-
     return (
       <Paper>
         <Tabs
@@ -57,7 +55,7 @@ class TabWrapper extends Component {
           textColor="primary"
           value={selectedTab}
         >
-          <Tab label="Profil" disabled />
+          <Tab label="Profil" />
           <Tab label="Hasło" />
         </Tabs>
         <div className={classes.childrenRoot}>
