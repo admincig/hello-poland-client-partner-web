@@ -12,7 +12,6 @@ import ImportContacts from '@material-ui/icons/ImportContacts';
 import EventIcon from '@material-ui/icons/Event';
 import PlaceIcon from '@material-ui/icons/Place';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
-import formatDate from 'date-fns/format';
 import {
   actions as sightsActions,
   selectors as sightsSelectors,
@@ -534,13 +533,6 @@ class SightsList extends Component {
                             }
                             : null
                           }
-                          onStatsClick={() => {
-                            const URI = config.public.availableTicketsURL;
-
-                            return URI
-                              .replace(':id', sightEvent.id)
-                              .replace(':date', formatDate(new Date(), 'YYYY-MM-DD'));
-                          }}
                         />
                         <List style={{ marginLeft: 55 }}>
                           {sightEvent.ticketPoolDefinitions && sightEvent.ticketPoolDefinitions
