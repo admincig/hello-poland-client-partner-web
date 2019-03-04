@@ -87,11 +87,12 @@ class ProfileView extends Component {
   }
 
   handleProfileSubmitSuccess = formikActions => () => {
-    const { resetForm, setStatus, setSubmitting } = formikActions;
+    const { setStatus, setSubmitting } = formikActions;
+    const { fetchUsher, usherId } = this.props;
 
-    resetForm();
     setSubmitting(false);
     setStatus({ type: 'success', message: 'Profil został zmieniony.' });
+    fetchUsher({ id: usherId });
   }
 
   handleTabChange = (activeTab) => {
