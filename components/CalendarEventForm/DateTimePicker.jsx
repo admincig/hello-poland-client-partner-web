@@ -29,7 +29,7 @@ const changeTypes = {
 
 class DateTimePicker extends Component {
   handleChange = type => (dateObj) => {
-    const { name } = this.props;
+    const { name, onChange } = this.props;
     let nextDateObj;
 
     if (type === changeTypes.DATE) {
@@ -40,13 +40,9 @@ class DateTimePicker extends Component {
       nextDateObj = setHours(nextDateObj, getHours(date));
     }
 
-    if (this.props.onChange) {
-      this.props.onChange({
-        target: {
-          name,
-          type,
-          value: nextDateObj || dateObj,
-        },
+    if (onChange) {
+      onChange({
+        target: { name, type, value: nextDateObj || dateObj },
       });
     }
   };
@@ -58,7 +54,8 @@ class DateTimePicker extends Component {
 
     return (
       <div className={classes.wrapper}>
-        {hasDate &&
+        {hasDate
+          && (
           <DatePicker
             className={classes.datePicker}
             disablePast
@@ -69,8 +66,10 @@ class DateTimePicker extends Component {
             value={date}
             {...DatePickerProps}
           />
+          )
         }
-        {!fullDay && hasTime &&
+        {!fullDay && hasTime
+          && (
           <TimePicker
             ampm={false}
             className={classes.timePicker}
@@ -80,6 +79,7 @@ class DateTimePicker extends Component {
             value={date}
             {...TimePickerProps}
           />
+          )
         }
       </div>
     );

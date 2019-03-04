@@ -13,39 +13,41 @@ import formatPrice from 'utils/formatPrice';
 const TicketDefinitionList = ({
   disableAvailability, onAvailabilityChange, onDeleteClick, ticketDefinitions,
   ticketDefinitionsList, readOnly,
-}) => (ticketDefinitions && ticketDefinitions.length ?
-  <List>
-    {ticketDefinitions.map((selected) => {
-      const ticketDefinition = _find(ticketDefinitionsList, { id: selected.id }) || selected;
-      if (!ticketDefinition) {
-        return null;
-      }
+}) => (ticketDefinitions && ticketDefinitions.length
+  ? (
+    <List>
+      {ticketDefinitions.map((selected) => {
+        const ticketDefinition = _find(ticketDefinitionsList, { id: selected.id }) || selected;
+        if (!ticketDefinition) {
+          return null;
+        }
 
-      const { availableTicketsNumber } = selected;
-      const key = `${ticketDefinition.name}-${ticketDefinition.id}`;
+        const { availableTicketsNumber } = selected;
+        const key = `${ticketDefinition.name}-${ticketDefinition.id}`;
 
-      return (
-        <ListItem key={key}>
-          <ListItemText
-            primary={ticketDefinition.name}
-            required
-            secondary={formatPrice(ticketDefinition.price) || ''}
-          />
-          <ListItemSecondaryAction>
-            <TextField
-              style={{ width: '150px' }}
-              helperText="Puste pole - brak limitu"
-              label="Limit biletów"
-              disabled={readOnly || disableAvailability}
-              onChange={event => onAvailabilityChange(event, ticketDefinition.id)}
-              name="availableTicketsNumber"
-              type="number"
-              value={availableTicketsNumber && availableTicketsNumber > 0
-                ? availableTicketsNumber
-                : ''
-              }
+        return (
+          <ListItem key={key}>
+            <ListItemText
+              primary={ticketDefinition.name}
+              required
+              secondary={formatPrice(ticketDefinition.price) || ''}
             />
-            {!readOnly &&
+            <ListItemSecondaryAction>
+              <TextField
+                style={{ width: '150px' }}
+                helperText="Puste pole - brak limitu"
+                label="Limit biletów"
+                disabled={readOnly || disableAvailability}
+                onChange={event => onAvailabilityChange(event, ticketDefinition.id)}
+                name="availableTicketsNumber"
+                type="number"
+                value={availableTicketsNumber && availableTicketsNumber > 0
+                  ? availableTicketsNumber
+                  : ''
+              }
+              />
+              {!readOnly
+              && (
               <IconButton
                 aria-label="Usuń bilet z puli"
                 onClick={() => onDeleteClick(selected.id, ticketDefinition.name)}
@@ -53,12 +55,14 @@ const TicketDefinitionList = ({
               >
                 <DeleteIcon />
               </IconButton>
+              )
             }
-          </ListItemSecondaryAction>
-        </ListItem>
-      );
-    })}
-  </List>
+            </ListItemSecondaryAction>
+          </ListItem>
+        );
+      })}
+    </List>
+  )
   : null
 );
 

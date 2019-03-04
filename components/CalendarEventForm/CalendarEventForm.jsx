@@ -305,10 +305,12 @@ class CalendarEventForm extends React.Component {
                         margin: 'dense',
                       }}
                     />
-                    {!formData.wholeDay &&
+                    {!formData.wholeDay
+                      && (
                       <Typography>
                         &nbsp;&nbsp;do
                       </Typography>
+                      )
                     }
                     <CustomTimePicker
                       disabled={readOnly}
@@ -351,7 +353,8 @@ class CalendarEventForm extends React.Component {
                       ))}
                     </TextField>
                   </div>
-                  {frequencyType === 'CUSTOM' &&
+                  {frequencyType === 'CUSTOM'
+                    && (
                     <div className={classNames(classes.section, classes.fullWidth)}>
                       <Typography variant="subtitle1" gutterBottom>
                         Powtarzanie niestandardowe
@@ -392,13 +395,14 @@ class CalendarEventForm extends React.Component {
                           ))}
                         </TextField>
                       </div>
-                      {formData.frequencyData && formData.frequencyData.frequencyType === 'WEEKLY' &&
+                      {formData.frequencyData && formData.frequencyData.frequencyType === 'WEEKLY'
+                        && (
                         <div className={classNames(classes.section, classes.fullWidth)}>
                           <Typography>Powtarzaj w:</Typography>
                           {daysOfWeekDefinitions.map(({ label, value }) => (
                             <FormControlLabel
                               key={`${label}-${value}`}
-                              control={
+                              control={(
                                 <Checkbox
                                   checked={this.isChecked(formData.frequencyData.daysOfWeek, value)}
                                   disabled={readOnly}
@@ -406,15 +410,18 @@ class CalendarEventForm extends React.Component {
                                   name="daysOfWeek"
                                   value={`${value}`}
                                 />
-                              }
+)}
                               label={label}
                             />
                           ))}
                         </div>
+                        )
                       }
                     </div>
+                    )
                   }
-                  {frequencyType !== 'NONE' &&
+                  {frequencyType !== 'NONE'
+                    && (
                     <div className={classNames(classes.section, classes.fullWidth)}>
                       <Typography variant="subtitle1">Kończy się:</Typography>
                       <RadioGroup
@@ -433,7 +440,7 @@ class CalendarEventForm extends React.Component {
                           value="SINGLE"
                           disabled={readOnly}
                           control={<Radio />}
-                          label={
+                          label={(
                             <div className={classNames(classes.frequencyRadioWrapper)}>
                               <Typography className={classNames(readOnly
                                 ? [classes.disabled, classes.frequencyRadioLabel]
@@ -441,7 +448,8 @@ class CalendarEventForm extends React.Component {
                               >
                                 W dniu
                               </Typography>
-                              {frequencyEndDateType === 'SINGLE' &&
+                              {frequencyEndDateType === 'SINGLE'
+                              && (
                               <DateTimePicker
                                 date={formData.frequencyData.endDate}
                                 fullDay
@@ -452,20 +460,24 @@ class CalendarEventForm extends React.Component {
                                   minDate: formData.endDate,
                                 }}
                               />
+                              )
                               }
                             </div>
-                          }
+)}
                         />
                       </RadioGroup>
                     </div>
+                    )
                   }
                 </div>
-                {!readOnly &&
+                {!readOnly
+                  && (
                   <div className={classNames(classes.section, classes.fullWidth)}>
                     <Typography variant="h6" gutterBottom>
                       Bilety
                     </Typography>
-                    {!readOnly &&
+                    {!readOnly
+                      && (
                       <div className={classNames(classes.columns, classes.fullWidth)}>
                         <TextField
                           onChange={event => handlePropFromEventChange(event)}
@@ -482,8 +494,8 @@ class CalendarEventForm extends React.Component {
                           >
                             Wybierz rodzaj biletu
                           </MenuItem>
-                          {ticketDefinitionsList &&
-                            ticketDefinitionsList.map(({ id, name, price }) => (
+                          {ticketDefinitionsList
+                            && ticketDefinitionsList.map(({ id, name, price }) => (
                               <MenuItem
                                 key={`${id}-${name}`}
                                 value={id}
@@ -510,8 +522,10 @@ class CalendarEventForm extends React.Component {
                           </Button>
                         </div>
                       </div>
+                      )
                     }
-                    {formData.ticketDefinitions &&
+                    {formData.ticketDefinitions
+                      && (
                       <TicketDefinitionList
                         disableAvailability={
                           Number.isInteger(formData.availableTicketsNumber)
@@ -531,8 +545,10 @@ class CalendarEventForm extends React.Component {
                         })}
                         readOnly={readOnly}
                       />
+                      )
                     }
-                    {isDefinitionFormVisible && !readOnly &&
+                    {isDefinitionFormVisible && !readOnly
+                      && (
                       <div className={classNames(classes.section, classes.fullWidth)}>
                         <Typography variant="h6">
                           Nowy rodzaj biletu
@@ -546,8 +562,10 @@ class CalendarEventForm extends React.Component {
                           }}
                         />
                       </div>
+                      )
                     }
                   </div>
+                  )
                 }
                 <div className={classNames(classes.section, classes.fullWidth)}>
                   <Typography variant="subtitle1">Sprawdzanie biletów:</Typography>

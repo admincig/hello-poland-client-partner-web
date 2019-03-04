@@ -154,8 +154,8 @@ class SightFormDialog extends Component {
             </Grid>
           </MuiPickersUtilsProvider>
           {
-            submittingError &&
-            <Typography className={classes.error}>{submittingError}</Typography>
+            submittingError
+            && <Typography className={classes.error}>{submittingError}</Typography>
           }
         </DialogContent>
         <DialogActions>

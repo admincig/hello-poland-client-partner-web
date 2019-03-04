@@ -440,118 +440,119 @@ class SightsList extends Component {
         <Button onClick={this.handleStatsDialogOpen}>
           Statystyki
         </Button>
-        {sightsList && sightsList.length ?
-          <List>
-            {sightsList.map(sight => (
-              <Fragment key={`sight-${sight.id}-${sight.name}`}>
-                <HomeListItem
-                  blocked={sight.blocked}
-                  icon={PlaceIcon}
-                  key={`${sight.id}-${sight.name}`}
-                  primary={sight.name}
-                  onAddClick={() => this.handleSightEventFormOpen({
-                    sightId: sight.id,
-                    title: 'Dodaj ofertę',
-                  })}
-                  onAddLabel="Dodaj ofertę"
-                  onDeleteClick={() => this.handleAlertDialogOpen({
-                    content: '',
-                    onSubmit: () => {
-                      this.handleSightDelete(sight.id);
-                      this.handleAlertDialogClose();
-                    },
-                    open: true,
-                    title: 'Czy na pewno usunąć wybraną atrakcję?',
-                  })}
-                  onDeleteLabel="Usuń atrakcję"
-                  onEditClick={() => {
-                    this.handleSightFormOpen({ sightId: sight.id, title: 'Edytuj atrakcję' });
-                  }}
-                  onEditLabel="Edytuj atrakcję"
-                  onMainImageClick={() => {
-                    this.handleMediaManagerOpen({
-                      parentId: sight.id,
-                      parentType: PARENT_TYPES.SIGHT,
-                      fileType: FILE_TYPES.MAIN_IMAGE,
-                    });
-                  }}
-                  onMainImageLabel="Dodaj główny obrazek"
-                  published={sight.published}
-                />
-                <List style={{ marginLeft: 55 }}>
-                  {sightEventsList && sightEventsList
-                    .filter(item => item.sightId === sight.id)
-                    .map(sightEvent => (
-                      <Fragment key={`sightEvent-${sightEvent.id}-${sightEvent.name}`}>
-                        <HomeListItem
-                          blocked={sightEvent.blocked}
-                          icon={ImportContacts}
-                          key={`${sightEvent.id}-${sightEvent.name}`}
-                          primary={sightEvent.name}
-                          onAddClick={() => {
-                            this.handleTicketPoolEdit({ sightEventId: sightEvent.id });
-                          }}
-                          onAddLabel="Dodaj pulę biletów"
-                          onDeleteClick={() => this.handleAlertDialogOpen({
-                            content: '',
-                            onSubmit: () => {
-                              this.handleSightEventDelete(sightEvent.id);
-                              this.handleAlertDialogClose();
-                            },
-                            open: true,
-                            title: 'Czy na pewno usunąć wybraną ofertę?',
-                          })}
-                          onDeleteLabel="Usuń ofertę"
-                          onEditClick={() => this.handleSightEventFormOpen({
-                            sightId: sight.id,
-                            sightEventId: sightEvent.id,
-                            title: 'Edytuj ofertę',
-                          })}
-                          onEditLabel="Edytuj ofertę"
-                          onMainImageClick={() => {
-                            this.handleMediaManagerOpen({
-                              parentId: sightEvent.id,
-                              parentType: PARENT_TYPES.OFFER,
-                              fileType: FILE_TYPES.MAIN_IMAGE,
-                            });
-                          }}
-                          onMainImageLabel="Dodaj główny obrazek"
-                          onDocumentClick={() => {
-                            this.handleMediaManagerOpen({
-                              parentId: sightEvent.id,
-                              parentType: PARENT_TYPES.OFFER,
-                              fileType: FILE_TYPES.DOCUMENT,
-                            });
-                          }}
-                          onDocumentLabel="Dodaj broszurę PDF"
-                          published={sightEvent.published}
-                          affiliation={sightEvent.partnerAffiliateCode
-                            ? {
-                              code: sightEvent.partnerAffiliateCode,
-                              slug: createSlug(sightEvent.name, sightEvent.id),
-                            }
-                            : null
+        {sightsList && sightsList.length
+          ? (
+            <List>
+              {sightsList.map(sight => (
+                <Fragment key={`sight-${sight.id}-${sight.name}`}>
+                  <HomeListItem
+                    blocked={sight.blocked}
+                    icon={PlaceIcon}
+                    key={`${sight.id}-${sight.name}`}
+                    primary={sight.name}
+                    onAddClick={() => this.handleSightEventFormOpen({
+                      sightId: sight.id,
+                      title: 'Dodaj ofertę',
+                    })}
+                    onAddLabel="Dodaj ofertę"
+                    onDeleteClick={() => this.handleAlertDialogOpen({
+                      content: '',
+                      onSubmit: () => {
+                        this.handleSightDelete(sight.id);
+                        this.handleAlertDialogClose();
+                      },
+                      open: true,
+                      title: 'Czy na pewno usunąć wybraną atrakcję?',
+                    })}
+                    onDeleteLabel="Usuń atrakcję"
+                    onEditClick={() => {
+                      this.handleSightFormOpen({ sightId: sight.id, title: 'Edytuj atrakcję' });
+                    }}
+                    onEditLabel="Edytuj atrakcję"
+                    onMainImageClick={() => {
+                      this.handleMediaManagerOpen({
+                        parentId: sight.id,
+                        parentType: PARENT_TYPES.SIGHT,
+                        fileType: FILE_TYPES.MAIN_IMAGE,
+                      });
+                    }}
+                    onMainImageLabel="Dodaj główny obrazek"
+                    published={sight.published}
+                  />
+                  <List style={{ marginLeft: 55 }}>
+                    {sightEventsList && sightEventsList
+                      .filter(item => item.sightId === sight.id)
+                      .map(sightEvent => (
+                        <Fragment key={`sightEvent-${sightEvent.id}-${sightEvent.name}`}>
+                          <HomeListItem
+                            blocked={sightEvent.blocked}
+                            icon={ImportContacts}
+                            key={`${sightEvent.id}-${sightEvent.name}`}
+                            primary={sightEvent.name}
+                            onAddClick={() => {
+                              this.handleTicketPoolEdit({ sightEventId: sightEvent.id });
+                            }}
+                            onAddLabel="Dodaj pulę biletów"
+                            onDeleteClick={() => this.handleAlertDialogOpen({
+                              content: '',
+                              onSubmit: () => {
+                                this.handleSightEventDelete(sightEvent.id);
+                                this.handleAlertDialogClose();
+                              },
+                              open: true,
+                              title: 'Czy na pewno usunąć wybraną ofertę?',
+                            })}
+                            onDeleteLabel="Usuń ofertę"
+                            onEditClick={() => this.handleSightEventFormOpen({
+                              sightId: sight.id,
+                              sightEventId: sightEvent.id,
+                              title: 'Edytuj ofertę',
+                            })}
+                            onEditLabel="Edytuj ofertę"
+                            onMainImageClick={() => {
+                              this.handleMediaManagerOpen({
+                                parentId: sightEvent.id,
+                                parentType: PARENT_TYPES.OFFER,
+                                fileType: FILE_TYPES.MAIN_IMAGE,
+                              });
+                            }}
+                            onMainImageLabel="Dodaj główny obrazek"
+                            onDocumentClick={() => {
+                              this.handleMediaManagerOpen({
+                                parentId: sightEvent.id,
+                                parentType: PARENT_TYPES.OFFER,
+                                fileType: FILE_TYPES.DOCUMENT,
+                              });
+                            }}
+                            onDocumentLabel="Dodaj broszurę PDF"
+                            published={sightEvent.published}
+                            affiliation={sightEvent.partnerAffiliateCode
+                              ? {
+                                code: sightEvent.partnerAffiliateCode,
+                                slug: createSlug(sightEvent.name, sightEvent.id),
+                              }
+                              : null
                           }
-                        />
-                        <List style={{ marginLeft: 55 }}>
-                          {sightEvent.ticketPoolDefinitions && sightEvent.ticketPoolDefinitions
-                            .filter(({ deleted }) => !deleted).map(ticketPoolDefinition => (
-                              <Fragment
-                                key={`ticketPoolDefinition-${ticketPoolDefinition.id}-${ticketPoolDefinition.name}`}
-                              >
-                                <HomeListItem
-                                  icon={EventIcon}
-                                  key={`${ticketPoolDefinition.id}-${ticketPoolDefinition.name}`}
-                                  primary={ticketPoolDefinition.name}
-                                  secondary={
-                                    `Limit biletów w puli: ${ticketPoolDefinition.availableTicketsNumber === -1 ?
-                                      'Brak' : `${ticketPoolDefinition.availableTicketsNumber} szt`
+                          />
+                          <List style={{ marginLeft: 55 }}>
+                            {sightEvent.ticketPoolDefinitions && sightEvent.ticketPoolDefinitions
+                              .filter(({ deleted }) => !deleted).map(ticketPoolDefinition => (
+                                <Fragment
+                                  key={`ticketPoolDefinition-${ticketPoolDefinition.id}-${ticketPoolDefinition.name}`}
+                                >
+                                  <HomeListItem
+                                    icon={EventIcon}
+                                    key={`${ticketPoolDefinition.id}-${ticketPoolDefinition.name}`}
+                                    primary={ticketPoolDefinition.name}
+                                    secondary={
+                                    `Limit biletów w puli: ${ticketPoolDefinition.availableTicketsNumber === -1
+                                      ? 'Brak' : `${ticketPoolDefinition.availableTicketsNumber} szt`
                                     }`
                                   }
-                                  onPreviewClick={
+                                    onPreviewClick={
                                     () => this.handleTicketPoolPreview(ticketPoolDefinition)
                                   }
-                                  onStopSellClick={
+                                    onStopSellClick={
                                     () => this.handleStopSellClick(
                                       sightEvent.id,
                                       ticketPoolDefinition.id,
@@ -559,47 +560,50 @@ class SightsList extends Component {
                                       ticketPoolDefinition.startDate,
                                     )
                                   }
-                                  onStopSellLabel="Wstrzymaj sprzedaż"
-                                  onPreviewLabel="Podgląd puli"
-                                  onDeleteClick={
+                                    onStopSellLabel="Wstrzymaj sprzedaż"
+                                    onPreviewLabel="Podgląd puli"
+                                    onDeleteClick={
                                     () => this.handleTicketPoolDelete(ticketPoolDefinition.id)
                                   }
-                                  onAddLabel="Usuń pulę biletów"
-                                />
-                                <List style={{ marginLeft: 55 }}>
-                                  {ticketPoolDefinition.ticketDefinitions &&
-                                    ticketPoolDefinition.ticketDefinitions.map(ticketDefinition => (
-                                      <HomeListItem
-                                        icon={LocalOfferIcon}
-                                        key={`ticketDefinition-${ticketDefinition.id}-${ticketDefinition.name}`}
-                                        primary={ticketDefinition.name}
-                                        secondary={(() => {
-                                          const { availableTicketsNumber } = ticketDefinition;
-                                          const availableTickets =
-                                            !availableTicketsNumber || availableTicketsNumber === -1
-                                            ? 'Brak'
-                                            : `${availableTicketsNumber} szt`;
-                                          const price = formatPrice(ticketDefinition.price);
+                                    onAddLabel="Usuń pulę biletów"
+                                  />
+                                  <List style={{ marginLeft: 55 }}>
+                                    {ticketPoolDefinition.ticketDefinitions
+                                    && ticketPoolDefinition.ticketDefinitions
+                                      .map(ticketDefinition => (
+                                        <HomeListItem
+                                          icon={LocalOfferIcon}
+                                          key={`ticketDefinition-${ticketDefinition.id}-${ticketDefinition.name}`}
+                                          primary={ticketDefinition.name}
+                                          secondary={(() => {
+                                            const { availableTicketsNumber } = ticketDefinition;
+                                            const availableTickets = !availableTicketsNumber
+                                              || availableTicketsNumber === -1
+                                              ? 'Brak'
+                                              : `${availableTicketsNumber} szt`;
+                                            const price = formatPrice(ticketDefinition.price);
 
-                                          return `Limit biletów: ${availableTickets} | Cena: ${price}`;
-                                        })()}
-                                      />
-                                    ))
+                                            return (
+                                              `Limit biletów: ${availableTickets} | Cena: ${price}`
+                                            );
+                                          })()}
+                                        />
+                                      ))
                                   }
-                                </List>
-                              </Fragment>
-                            ))
+                                  </List>
+                                </Fragment>
+                              ))
                           }
-                        </List>
-                      </Fragment>
-                    ))
+                          </List>
+                        </Fragment>
+                      ))
                   }
-                </List>
-              </Fragment>
-            ))}
-          </List>
-          :
-          <EmptyResultsMessage message="Brak elementów do wyświetlenia" />
+                  </List>
+                </Fragment>
+              ))}
+            </List>
+          )
+          : <EmptyResultsMessage message="Brak elementów do wyświetlenia" />
         }
         <AlertDialog
           onClose={this.handleAlertDialogClose}

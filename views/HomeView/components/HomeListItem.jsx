@@ -93,7 +93,8 @@ class HomeListItem extends Component {
           secondary={<Typography noWrap style={{ width: '60%' }}>{secondary}</Typography>}
         />
         <ListItemSecondaryAction>
-          {blocked &&
+          {blocked
+          && (
           <IconButton
             aria-label={onViewLabel}
             style={{ cursor: 'default' }}
@@ -101,8 +102,10 @@ class HomeListItem extends Component {
           >
             <NotificationImportantIcon color="error" />
           </IconButton>
+          )
           }
-          {published &&
+          {published
+          && (
           <IconButton
             aria-label={onViewLabel}
             style={{ cursor: 'default' }}
@@ -110,16 +113,20 @@ class HomeListItem extends Component {
           >
             <VisibilityIcon color="primary" />
           </IconButton>
+          )
           }
-          {onViewClick &&
+          {onViewClick
+          && (
           <IconButton
             aria-label={onViewLabel}
             title={onViewLabel}
           >
             <DesktopWindows />
           </IconButton>
+          )
           }
-          {affiliation &&
+          {affiliation
+            && (
             <Fragment>
               <IconButton
                 aria-label="Pokaż link afiliacyjny"
@@ -156,8 +163,10 @@ class HomeListItem extends Component {
                 )}
               </Popper>
             </Fragment>
+            )
           }
-          {onMainImageClick &&
+          {onMainImageClick
+          && (
           <IconButton
             aria-label={onMainImageLabel}
             onClick={onMainImageClick}
@@ -165,8 +174,10 @@ class HomeListItem extends Component {
           >
             <AddAPhoto />
           </IconButton>
+          )
           }
-          {onDocumentClick &&
+          {onDocumentClick
+          && (
           <IconButton
             aria-label={onDocumentLabel}
             onClick={onDocumentClick}
@@ -174,8 +185,10 @@ class HomeListItem extends Component {
           >
             <NoteAdd />
           </IconButton>
+          )
           }
-          {onAddClick &&
+          {onAddClick
+          && (
           <IconButton
             aria-label={onAddLabel}
             onClick={onAddClick}
@@ -183,8 +196,10 @@ class HomeListItem extends Component {
           >
             <AddIcon />
           </IconButton>
+          )
           }
-          {onEditClick &&
+          {onEditClick
+          && (
           <IconButton
             aria-label={onEditLabel}
             onClick={onEditClick}
@@ -192,8 +207,10 @@ class HomeListItem extends Component {
           >
             <CreateIcon />
           </IconButton>
+          )
           }
-          {onPreviewClick &&
+          {onPreviewClick
+          && (
           <IconButton
             aria-label={onPreviewLabel}
             onClick={onPreviewClick}
@@ -201,9 +218,11 @@ class HomeListItem extends Component {
           >
             <InfoIcon />
           </IconButton>
+          )
           }
 
-          {onStopSellClick &&
+          {onStopSellClick
+          && (
           <IconButton
             aria-label={onPreviewLabel}
             onClick={onStopSellClick}
@@ -211,8 +230,10 @@ class HomeListItem extends Component {
           >
             <RemoveShoppingCart />
           </IconButton>
+          )
           }
-          {onDeleteClick &&
+          {onDeleteClick
+          && (
           <IconButton
             aria-label={onDeleteLabel}
             onClick={onDeleteClick}
@@ -220,6 +241,7 @@ class HomeListItem extends Component {
           >
             <DeleteIcon />
           </IconButton>
+          )
           }
         </ListItemSecondaryAction>
       </ListItem>

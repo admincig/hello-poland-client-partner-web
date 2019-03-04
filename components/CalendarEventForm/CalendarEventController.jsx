@@ -171,8 +171,11 @@ class CalendarEventController extends React.Component {
 
   handleChange = (props) => {
     this.setState(props, () => {
-      if (this.props.onChange) {
-        this.props.onChange(this.state.formData);
+      const { formData } = this.state;
+      const { onChange } = this.props;
+
+      if (onChange) {
+        onChange(formData);
       }
     });
   };

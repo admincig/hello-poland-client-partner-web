@@ -68,9 +68,8 @@ const mapStateToProps = state => ({
   isAuthenticated: profileSelectors.isAuthenticated(state),
 });
 
-const mapDispatchToProps = dispatch =>
-  bindActionCreators({
-    logout: profileActions.logout,
-  }, dispatch);
+const mapDispatchToProps = dispatch => bindActionCreators({
+  logout: profileActions.logout,
+}, dispatch);
 
 export default compose(connect(mapStateToProps, mapDispatchToProps))(LogoutView);

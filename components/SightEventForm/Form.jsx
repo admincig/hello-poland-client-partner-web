@@ -262,7 +262,8 @@ class SightEventForm extends Component {
                 <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={20} />
               </GridItem>
             </Grid>
-            {buttons &&
+            {buttons
+              && (
               <Grid container spacing={16}>
                 <GridItem md={2} sm={2}>
                   <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
@@ -270,6 +271,7 @@ class SightEventForm extends Component {
                   </Button>
                 </GridItem>
               </Grid>
+              )
             }
           </Form>
         )}

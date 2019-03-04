@@ -336,11 +336,13 @@ class SightForm extends Component {
                   <Fragment key={`openingHours-list-${item.day}`}>
                     <GridItem sm={6} md={6}>
                       <FormControlLabel
-                        control={<Switch
-                          checked={item.checked}
-                          onChange={this.handleOpeningHoursSelectionChange(item.day, values)}
-                          value={`${item.day}`}
-                        />}
+                        control={(
+                          <Switch
+                            checked={item.checked}
+                            onChange={this.handleOpeningHoursSelectionChange(item.day, values)}
+                            value={`${item.day}`}
+                          />
+)}
                         label={i18n.days[item.day]}
                       />
                     </GridItem>
@@ -390,7 +392,8 @@ class SightForm extends Component {
                 <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
               </GridItem>
             </Grid>
-            {buttons &&
+            {buttons
+            && (
             <Grid container spacing={16}>
               <GridItem md={2} sm={2}>
                 <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
@@ -398,6 +401,7 @@ class SightForm extends Component {
                 </Button>
               </GridItem>
             </Grid>
+            )
             }
           </Form>
         )}
