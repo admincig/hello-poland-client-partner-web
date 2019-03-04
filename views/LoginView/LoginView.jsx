@@ -96,7 +96,7 @@ class LoginView extends Component {
                     </Typography>
                   )}
                   <Button
-                    variant="raised"
+                    variant="contained"
                     color="primary"
                     className={classes.button}
                     onClick={() => this.handleFormSubmit()}

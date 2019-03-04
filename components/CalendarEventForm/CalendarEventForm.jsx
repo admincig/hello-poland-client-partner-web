@@ -12,7 +12,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
-import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
+import MuiPickersUtilsProvider from 'material-ui-pickers/MuiPickersUtilsProvider';
 import SwitchLabel from 'components/SwitchLabel';
 import formatPrice from 'utils/formatPrice';
 import plLocale from 'date-fns/locale/pl';
@@ -275,7 +275,7 @@ class CalendarEventForm extends React.Component {
                   }
                 />
                 <div className={classNames(classes.section, classes.fullWidth)}>
-                  <Typography variant="subheading" gutterBottom>
+                  <Typography variant="subtitle1" gutterBottom>
                     Termin:
                   </Typography>
                 </div>
@@ -332,7 +332,7 @@ class CalendarEventForm extends React.Component {
                 </div>
                 <div className={classNames(classes.section, classes.fullWidth)}>
                   <div>
-                    <Typography variant="subheading" gutterBottom>
+                    <Typography variant="subtitle1" gutterBottom>
                       Powtarzaj co:
                     </Typography>
                     <TextField
@@ -353,7 +353,7 @@ class CalendarEventForm extends React.Component {
                   </div>
                   {frequencyType === 'CUSTOM' &&
                     <div className={classNames(classes.section, classes.fullWidth)}>
-                      <Typography variant="subheading" gutterBottom>
+                      <Typography variant="subtitle1" gutterBottom>
                         Powtarzanie niestandardowe
                       </Typography>
                       <div className={classNames(classes.inline, classes.fullWidth)}>
@@ -416,7 +416,7 @@ class CalendarEventForm extends React.Component {
                   }
                   {frequencyType !== 'NONE' &&
                     <div className={classNames(classes.section, classes.fullWidth)}>
-                      <Typography variant="subheading">Kończy się:</Typography>
+                      <Typography variant="subtitle1">Kończy się:</Typography>
                       <RadioGroup
                         aria-label="Koniec puli"
                         name="frequencyEndDateType"
@@ -462,7 +462,7 @@ class CalendarEventForm extends React.Component {
                 </div>
                 {!readOnly &&
                   <div className={classNames(classes.section, classes.fullWidth)}>
-                    <Typography variant="title" gutterBottom>
+                    <Typography variant="h6" gutterBottom>
                       Bilety
                     </Typography>
                     {!readOnly &&
@@ -534,7 +534,7 @@ class CalendarEventForm extends React.Component {
                     }
                     {isDefinitionFormVisible && !readOnly &&
                       <div className={classNames(classes.section, classes.fullWidth)}>
-                        <Typography variant="title">
+                        <Typography variant="h6">
                           Nowy rodzaj biletu
                         </Typography>
                         <TicketDefinitionForm
@@ -550,7 +550,7 @@ class CalendarEventForm extends React.Component {
                   </div>
                 }
                 <div className={classNames(classes.section, classes.fullWidth)}>
-                  <Typography variant="subheading">Sprawdzanie biletów:</Typography>
+                  <Typography variant="subtitle1">Sprawdzanie biletów:</Typography>
                   <TextField
                     disabled={readOnly}
                     onChange={handleEntryStartDateOffsetChange}

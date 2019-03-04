@@ -31,7 +31,7 @@ class UshersView extends Component {
             Bileterzy
           </Button>
         </Link>
-        <Typography variant="title" gutterBottom>Bileterzy</Typography>
+        <Typography variant="h6" gutterBottom>Bileterzy</Typography>
         <UshersList ushers={ushers} />
       </Layout>
     );

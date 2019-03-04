@@ -26,7 +26,7 @@ const ViewMessage = ({
     <Grid item className={classes.content} xs={8}>
       {Icon}
       {message && message.length ?
-        <Typography align="center" variant="headline">
+        <Typography align="center" variant="h5">
           {message}
         </Typography>
         :

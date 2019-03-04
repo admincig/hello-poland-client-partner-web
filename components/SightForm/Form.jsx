@@ -14,7 +14,7 @@ import Hidden from '@material-ui/core/Hidden';
 import Switch from '@material-ui/core/Switch';
 import Typography from '@material-ui/core/Typography/Typography';
 import TimePicker from 'material-ui-pickers/TimePicker';
-import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
+import MuiPickersUtilsProvider from 'material-ui-pickers/MuiPickersUtilsProvider';
 import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
@@ -290,7 +290,7 @@ class SightForm extends Component {
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <GridItem>
-                <Typography variant="title">Dane podstawowe</Typography>
+                <Typography variant="h6">Dane podstawowe</Typography>
               </GridItem>
               <Hidden xsUp>
                 <GridItem>
@@ -329,7 +329,7 @@ class SightForm extends Component {
                 <Field name="description" label="Opis atrakcji" required component={TextField} {...commonProps} multiline rowsMax={20} />
               </GridItem>
               <GridItem>
-                <Typography variant="title" className={classes.title}>Godziny otwarcia</Typography>
+                <Typography variant="h6" className={classes.title}>Godziny otwarcia</Typography>
               </GridItem>
               <MuiPickersUtilsProvider utils={DateFnsUtils}>
                 {viewOpeningHours.map(item => (
@@ -366,7 +366,7 @@ class SightForm extends Component {
                 ))}
               </MuiPickersUtilsProvider>
               <GridItem>
-                <Typography variant="title" className={classes.title}>Dane kontaktowe</Typography>
+                <Typography variant="h6" className={classes.title}>Dane kontaktowe</Typography>
               </GridItem>
               <GridItem>
                 <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
@@ -375,7 +375,7 @@ class SightForm extends Component {
                 <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
-                <Typography variant="title" className={classes.title}>Lokalizacja</Typography>
+                <Typography variant="h6" className={classes.title}>Lokalizacja</Typography>
               </GridItem>
               <GridItem>
                 <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />

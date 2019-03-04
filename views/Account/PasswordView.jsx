@@ -57,7 +57,7 @@ class PasswordView extends Component {
             Bileterzy
           </Button>
         </Link>
-        <Typography variant="title" gutterBottom>Profil</Typography>
+        <Typography variant="h6" gutterBottom>Profil</Typography>
         <ProfileComponent activeTab="password" profile={profile}>
           <PasswordForm onSubmit={this.handleSubmit} />
         </ProfileComponent>

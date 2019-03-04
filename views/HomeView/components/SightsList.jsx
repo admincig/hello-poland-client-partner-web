@@ -37,6 +37,7 @@ import deserialize from 'utils/form-generator/data/deserialize';
 import serialize from 'utils/form-generator/data/serialize';
 import formatPrice from 'utils/formatPrice';
 import config from 'config';
+import createSlug from 'utils/createSlug';
 import ticketPoolDefinitionSchema from './ticketPoolDefinitionSchema';
 import HomeListItem from './HomeListItem';
 
@@ -114,7 +115,7 @@ class SightsList extends Component {
             renderGroup={({ children, item }) => (
               <FormControl key={item.key} component="fieldset" fullWidth>
                 <FormLabel component="legend">
-                  <Typography variant="title" style={{ marginTop: 40 }}>{item.label}</Typography>
+                  <Typography variant="h6" style={{ marginTop: 40 }}>{item.label}</Typography>
                 </FormLabel>
                 {children}
               </FormControl>
@@ -526,6 +527,13 @@ class SightsList extends Component {
                           }}
                           onDocumentLabel="Dodaj broszurę PDF"
                           published={sightEvent.published}
+                          affiliation={sightEvent.partnerAffiliateCode
+                            ? {
+                              code: sightEvent.partnerAffiliateCode,
+                              slug: createSlug(sightEvent.name, sightEvent.id),
+                            }
+                            : null
+                          }
                           onStatsClick={() => {
                             const URI = config.public.availableTicketsURL;
 
