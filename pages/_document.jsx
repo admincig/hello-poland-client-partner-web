@@ -2,17 +2,14 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import Document, { Head, Main, NextScript } from 'next/document';
 import flush from 'styled-jsx/server';
-import config from 'config';
 
 class MyDocument extends Document {
   render() {
-    const { pageContext } = this.props;
-    const { name } = config.public;
+    const { pageContext, nonce } = this.props;
 
     return (
       <html lang="en">
-        <Head>
-          <title>{name}</title>
+        <Head nonce={nonce}>
           <meta charSet="utf-8" />
           {/* Use minimum-scale=1 to enable GPU rasterization */}
           <meta
@@ -35,7 +32,7 @@ class MyDocument extends Document {
         </Head>
         <body>
           <Main />
-          <NextScript />
+          <NextScript nonce={nonce} />
         </body>
       </html>
     );

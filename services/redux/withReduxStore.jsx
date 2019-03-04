@@ -16,41 +16,41 @@ function getOrCreateStore(initialState) {
   if (!window[__NEXT_REDUX_STORE__]) {
     window[__NEXT_REDUX_STORE__] = initializeStore(initialState);
   }
-
   return window[__NEXT_REDUX_STORE__];
 }
 
-export default App => class AppWithRedux extends React.Component {
-  static async getInitialProps(appContext) {
-    // Get or Create the store with `undefined` as initialState
-    // This allows you to set a custom default initialState
-    const reduxStore = getOrCreateStore();
+export default App => (
+  class AppWithRedux extends React.Component {
+    static async getInitialProps(appContext) {
+      // Get or Create the store with `undefined` as initialState
+      // This allows you to set a custom default initialState
+      const reduxStore = getOrCreateStore();
 
-    // Provide the store to getInitialProps of pages
-    const extendedAppContext = {
-      ...appContext,
-      ctx: {
-        ...appContext.ctx,
-        store: reduxStore,
-      },
-    };
+      // Provide the store to getInitialProps of pages
+      const extendedAppContext = {
+        ...appContext,
+        ctx: {
+          ...appContext.ctx,
+          store: reduxStore,
+        },
+      };
 
-    let appProps = {};
-    if (typeof App.getInitialProps === 'function') {
-      appProps = await App.getInitialProps.call(App, extendedAppContext);
+      let appProps = {};
+      if (typeof App.getInitialProps === 'function') {
+        appProps = await App.getInitialProps.call(App, extendedAppContext);
+      }
+
+      const getProps = () => ({
+        ...appProps,
+        initialReduxState: reduxStore.getState(),
+      });
+
+      if (isServer) {
+        return reduxStore.logicMiddleware.whenComplete(getProps);
+      }
+
+      return getProps();
     }
-
-    const getProps = () => ({
-      ...appProps,
-      initialReduxState: reduxStore.getState(),
-    });
-
-    if (isServer) {
-      return reduxStore.logicMiddleware.whenComplete(getProps);
-    }
-
-    return getProps();
-  }
 
     static propTypes = {
       initialReduxState: PropTypes.shape({}).isRequired,
@@ -64,4 +64,5 @@ export default App => class AppWithRedux extends React.Component {
     render() {
       return <App {...this.props} reduxStore={this.reduxStore} />;
     }
-};
+  }
+);

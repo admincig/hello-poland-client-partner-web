@@ -8,13 +8,13 @@ export const subscribers = [
 ];
 
 function getPersistedState(initialState) {
-  if (isServer) {
-    return {};
+  if (!isServer) {
+    return {
+      [profileName]: getPersistedProfileState() || initialState[profileName],
+    };
   }
 
-  return {
-    [profileName]: getPersistedProfileState() || initialState[profileName],
-  };
+  return {};
 }
 
 export default getPersistedState;
