@@ -10,7 +10,6 @@ import CardContent from '@material-ui/core/CardContent';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import { selectors as configSelectors } from 'redux/config';
 import {
   actions as profileActions,
   selectors as profileSelectors,
@@ -42,10 +41,10 @@ class LoginView extends Component {
   };
 
   componentDidUpdate() {
-    const { assetPrefix, isAuthenticated } = this.props;
+    const { isAuthenticated } = this.props;
 
     if (isAuthenticated) {
-      Router.push(`${assetPrefix}/`);
+      Router.push(`/`);
     }
   }
 
@@ -114,7 +113,6 @@ class LoginView extends Component {
 }
 
 LoginView.propTypes = {
-  assetPrefix: PropTypes.string.isRequired,
   classes: PropTypes.shape({}).isRequired,
   error: PropTypes.shape({}),
   isAuthenticated: PropTypes.bool.isRequired,
@@ -126,7 +124,6 @@ LoginView.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-  assetPrefix: configSelectors.getAppConfig(state).public.assetPrefix || '',
   isAuthenticated: profileSelectors.isAuthenticated(state),
   error: profileSelectors.getError(state),
 });

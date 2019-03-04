@@ -54,7 +54,7 @@ class Header extends Component {
       this.handleMenuClose();
     }
 
-    logout({ onSuccess: () => Router.push('/') });
+    logout({ onSuccess: () => window.location.reload() });
   };
 
   handleMenuOpen = (event) => {
