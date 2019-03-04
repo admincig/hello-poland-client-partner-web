@@ -32,7 +32,7 @@ const styles = theme => ({
     paddingBottom: theme.spacing.unit,
   },
   link: {
-    backgroundColor: (() => { console.log(theme.palette.grey); return theme.palette.grey[100]; })(),
+    backgroundColor: theme.palette.grey[100],
   },
   paper: {
     maxWidth: 350,

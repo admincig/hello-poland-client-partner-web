@@ -35,7 +35,6 @@ import populate from 'utils/form-generator/data/populate';
 import deserialize from 'utils/form-generator/data/deserialize';
 import serialize from 'utils/form-generator/data/serialize';
 import formatPrice from 'utils/formatPrice';
-import config from 'config';
 import createSlug from 'utils/createSlug';
 import ticketPoolDefinitionSchema from './ticketPoolDefinitionSchema';
 import HomeListItem from './HomeListItem';
