@@ -70,10 +70,12 @@ class MediaManager extends Component {
           {submitting && <LinearProgress />}
         </DialogContent>
         <DialogActions>
-          { error &&
+          { error
+            && (
             <Typography style={{ color: 'red' }}>
               {this.getErrorByFileType(fileType)}
             </Typography>
+            )
           }
           <Button onClick={onClose} color="primary">Zamknij</Button>
         </DialogActions>

@@ -11,27 +11,27 @@ const UshersList = ({ ushers }) => (
   <Fragment>
     {
       ushers && ushers.length > 0
-      ? (
-        <Paper elevation={1}>
-          <List>
-            {ushers.map(({
-              name, picture, email, id,
-            }) => (
-              <Link key={`${id}-${email}`} href={`/ushers?usherId=${id}`} as={`/ushers/${id}`} passHref prefetch>
-                <UshersListItem
-                  name={name}
-                  picture={picture}
-                  email={email}
-                  component="a"
-                />
-              </Link>
-            ))}
-          </List>
-        </Paper>
-      )
-      : (
-        <EmptyResultsMessage message="Brak bileterów do wyświetlenia" />
-      )
+        ? (
+          <Paper elevation={1}>
+            <List>
+              {ushers.map(({
+                name, picture, email, id,
+              }) => (
+                <Link key={`${id}-${email}`} href={`/ushers?usherId=${id}`} as={`/ushers/${id}`} passHref prefetch>
+                  <UshersListItem
+                    name={name}
+                    picture={picture}
+                    email={email}
+                    component="a"
+                  />
+                </Link>
+              ))}
+            </List>
+          </Paper>
+        )
+        : (
+          <EmptyResultsMessage message="Brak bileterów do wyświetlenia" />
+        )
     }
   </Fragment>
 );

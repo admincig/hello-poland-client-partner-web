@@ -24,15 +24,11 @@ const changeTypes = {
 
 class CustomTimePicker extends Component {
   handleChange = type => (value) => {
-    const { name } = this.props;
+    const { name, onChange } = this.props;
 
-    if (this.props.onChange) {
-      this.props.onChange({
-        target: {
-          name,
-          type,
-          value,
-        },
+    if (onChange) {
+      onChange({
+        target: { name, type, value },
       });
     }
   };
@@ -44,7 +40,8 @@ class CustomTimePicker extends Component {
 
     return (
       <div className={classes.wrapper}>
-        {!fullDay &&
+        {!fullDay
+          && (
           <TimePicker
             ampm={false}
             className={classes.timePicker}
@@ -54,6 +51,7 @@ class CustomTimePicker extends Component {
             value={date}
             {...TimePickerProps}
           />
+          )
         }
       </div>
     );

@@ -132,8 +132,7 @@ class SightFormDialog extends Component {
     this.handleClose();
   };
 
-  isItemLoaded = (itemId, item) =>
-    item
+  isItemLoaded = (itemId, item) => item
     && Object.getOwnPropertyNames(item).length
     && item.id === itemId;
 
@@ -176,15 +175,19 @@ class SightFormDialog extends Component {
           />
         </DialogContent>
         <DialogActions>
-          {submittingError &&
+          {submittingError
+            && (
             <Typography style={{ color: 'red' }}>
               Wystąpił błąd podczas zapisywania.
             </Typography>
+            )
           }
-          {fetchingError &&
+          {fetchingError
+          && (
           <Typography style={{ color: 'red' }}>
             Wystąpił błąd podczas pobierania danych.
           </Typography>
+          )
           }
           <Button disabled={isSubmitting} onClick={this.handleClose} color="primary">Anuluj</Button>
           <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>

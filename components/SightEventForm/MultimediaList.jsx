@@ -17,7 +17,7 @@ const styles = () => ({
 const MultimediaList = ({ classes, data, onItemDelete }) => (
   <Fragment>
     <GridItem>
-      <Typography variant="title" className={classes.title}>Multimedia</Typography>
+      <Typography variant="h6" className={classes.title}>Multimedia</Typography>
     </GridItem>
     <GridItem>
       <List>

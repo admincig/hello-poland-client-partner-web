@@ -16,11 +16,10 @@ function getOrCreateStore(initialState) {
   if (!window[__NEXT_REDUX_STORE__]) {
     window[__NEXT_REDUX_STORE__] = initializeStore(initialState);
   }
-
   return window[__NEXT_REDUX_STORE__];
 }
 
-export default App =>
+export default App => (
   class AppWithRedux extends React.Component {
     static async getInitialProps(appContext) {
       // Get or Create the store with `undefined` as initialState
@@ -65,4 +64,5 @@ export default App =>
     render() {
       return <App {...this.props} reduxStore={this.reduxStore} />;
     }
-  };
+  }
+);

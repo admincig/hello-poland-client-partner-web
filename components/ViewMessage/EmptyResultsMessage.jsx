@@ -16,10 +16,12 @@ const styles = theme => ({
 
 const EmptyResultsMessage = ({ classes, message, onRefresh }) => (
   <ViewMessage icon={<BlockIcon className={classes.icon} />} message={message}>
-    {onRefresh &&
+    {onRefresh
+      && (
       <IconButton onClick={() => onRefresh()}>
         <RefreshIcon />
       </IconButton>
+      )
     }
   </ViewMessage>
 );

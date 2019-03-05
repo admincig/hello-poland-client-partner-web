@@ -33,12 +33,14 @@ class Layout extends Component {
         <Header onMenuButtonClick={this.openMenu} {...HeaderProps} />
         <Content>
           {MENU_ITEMS.length
-            ? <MenuDrawer
-              menuItems={MENU_ITEMS}
-              open={isMenuOpened}
-              onClose={this.closeMenu}
-              currentPath={router.asPath}
-            />
+            ? (
+              <MenuDrawer
+                menuItems={MENU_ITEMS}
+                open={isMenuOpened}
+                onClose={this.closeMenu}
+                currentPath={router.asPath}
+              />
+            )
             : null
           }
           {children}
