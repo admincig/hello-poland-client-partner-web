@@ -26,7 +26,7 @@ import {
   selectors as ticketDefinitionsSelectors,
 } from 'redux/ticketDefinitions';
 
-const DATE_FORMAT = 'YYYY-MM-DDTHH:mm';
+const DATE_FORMAT = 'yyyy-MM-dd\'T\'HH:mm';
 const MIN_TIME_INTERVAL = 30;
 
 class CalendarEventController extends React.Component {
@@ -82,6 +82,7 @@ class CalendarEventController extends React.Component {
   getInitialDate = (startDate) => {
     let initialDate = startDate;
 
+    debugger;
     if (!initialDate) {
       initialDate = new Date();
       const evening = setMinutes(setHours(new Date(), 23), 29);
@@ -456,6 +457,7 @@ class CalendarEventController extends React.Component {
   render() {
     const { children } = this.props;
 
+    console.log(this.state);
     return children({
       ...this.props,
       ...this.state,

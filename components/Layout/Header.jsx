@@ -17,7 +17,6 @@ import NoSsr from '@material-ui/core/NoSsr';
 import Avatar from '@material-ui/core/Avatar';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Link from 'next/link';
-import Router from 'next/router';
 import classNames from 'classnames';
 import DefaultAvatar from './DefaultAvatar';
 

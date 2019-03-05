@@ -15,7 +15,7 @@ import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import MuiPickersUtilsProvider from 'material-ui-pickers/MuiPickersUtilsProvider';
 import SwitchLabel from 'components/SwitchLabel';
 import formatPrice from 'utils/formatPrice';
-import plLocale from 'date-fns/locale/pl';
+// import plLocale from 'date-fns/locale/pl';
 import AlertDialog from 'components/AlertDialog';
 
 import CalendarEventController from './CalendarEventController';
@@ -24,9 +24,9 @@ import CustomTimePicker from './CustomTimePicker';
 import TicketDefinitionList from './TicketDefinitionList';
 import TicketDefinitionForm from '../TicketDefinitionForm/TicketDefinitionForm';
 
-const locale = {
-  pl: plLocale,
-};
+// const locale = {
+//   pl: plLocale,
+// };
 
 const frequencyTypes = [
   {
@@ -243,7 +243,7 @@ class CalendarEventForm extends React.Component {
             handlePoolDateChange, handlePropFromEventChange, handleTicketDefinitionAdd,
             handleTicketDefinitionChange, handleTicketDefinitionDelete, isDefinitionFormVisible,
           }) => (
-            <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <Grid container>
                 <Typography>
                   Aby Twoja oferta była widoczna dla kupujących, musisz zdefiniować termin

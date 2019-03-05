@@ -26,6 +26,7 @@ import NoteAdd from '@material-ui/icons/NoteAdd';
 import NotificationImportantIcon from '@material-ui/icons/NotificationImportant';
 import RemoveShoppingCart from '@material-ui/icons/RemoveShoppingCart';
 import VisibilityIcon from '@material-ui/icons/Visibility';
+import config from 'config';
 
 const styles = theme => ({
   dialogActions: {
@@ -39,7 +40,9 @@ const styles = theme => ({
   },
 });
 
-const getAffiliationURL = (slug, affiliationCode) => `https://hello-poland.pl/sight-events/${slug}?a=${affiliationCode}`;
+const { baseAffiliationURL } = config.public || {};
+
+const getAffiliationURL = (slug, affiliationCode) => `${baseAffiliationURL}/${slug}?a=${affiliationCode}`;
 
 const getAffiliationLink = (slug, affiliationCode) => `
   <a href="${getAffiliationURL(slug, affiliationCode)}"

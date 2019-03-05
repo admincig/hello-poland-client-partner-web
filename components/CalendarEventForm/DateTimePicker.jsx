@@ -59,7 +59,7 @@ class DateTimePicker extends Component {
           <DatePicker
             className={classes.datePicker}
             disablePast
-            format="DD MMM YYYY"
+            format="dd MMM yyyy"
             label={label}
             margin="normal"
             onChange={this.handleChange(changeTypes.DATE)}

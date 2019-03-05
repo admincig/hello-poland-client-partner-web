@@ -44,7 +44,7 @@ class LoginView extends Component {
     const { isAuthenticated } = this.props;
 
     if (isAuthenticated) {
-      Router.push(`/`);
+      Router.push('/');
     }
   }
 
