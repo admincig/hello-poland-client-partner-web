@@ -11,19 +11,21 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Grid from '@material-ui/core/Grid';
 import DatePicker from 'material-ui-pickers/DatePicker';
-import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
+import MuiPickersUtilsProvider from 'material-ui-pickers/MuiPickersUtilsProvider';
 import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import format from 'date-fns/format';
-import plLocale from 'date-fns/locale/pl';
+// import plLocale from 'date-fns/locale/pl';
 
 const REPORT_TYPES = {
   INSTANCE: 'INSTANCE',
   PERIOD: 'PERIOD',
 };
 
-const locale = {
-  pl: plLocale,
-};
+const DATE_FORMAT = 'yyyy-MM-dd';
+
+// const locale = {
+//   pl: plLocale,
+// };
 
 const styles = theme => ({
   datePicker: {
@@ -61,14 +63,14 @@ class StatsDialog extends React.Component {
 
     if (type === REPORT_TYPES.INSTANCE) {
       const { instanceFromDate } = this.state;
-      const formattedFromDate = format(instanceFromDate, 'YYYY-MM-DD');
+      const formattedFromDate = format(instanceFromDate, DATE_FORMAT);
 
       href = `${href}?fromDate=${formattedFromDate}`;
       downloadSuffix = formattedFromDate.replace(/-/g, '');
     } else {
       const { fromDate, toDate } = this.state;
-      const formattedFromDate = format(fromDate, 'YYYY-MM-DD');
-      const formattedToDate = format(toDate, 'YYYY-MM-DD');
+      const formattedFromDate = format(fromDate, DATE_FORMAT);
+      const formattedToDate = format(toDate, DATE_FORMAT);
 
       href = `${href}?fromDate=${formattedFromDate}&toDate=${formattedToDate}`;
       downloadSuffix = `${formattedFromDate.replace(/-/g, '')}-${formattedToDate.replace(/-/g, '')}`;
@@ -103,14 +105,14 @@ class StatsDialog extends React.Component {
           >
             <DialogTitle id="alert-dialog-title">Statystyki sprzedaży</DialogTitle>
             <DialogContent>
-              <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
                 <DialogContentText>
                   Pobierz raport sprzedaży w okresie:
                 </DialogContentText>
                 <Grid container>
                   <DatePicker
                     className={classes.datePicker}
-                    format="DD MMM YYYY"
+                    format="dd MMM yyyy"
                     label="Od"
                     margin="normal"
                     maxDate={toDate}
@@ -119,7 +121,7 @@ class StatsDialog extends React.Component {
                   />
                   <DatePicker
                     className={classes.datePicker}
-                    format="DD MMM YYYY"
+                    format="dd MMM yyyy"
                     label="Do"
                     margin="normal"
                     minDate={fromDate}
@@ -144,7 +146,7 @@ class StatsDialog extends React.Component {
                 <Grid container>
                   <DatePicker
                     className={classes.datePicker}
-                    format="DD MMM YYYY"
+                    format="dd MMM yyyy"
                     margin="normal"
                     onChange={date => this.handleDateChange('instanceFromDate', date)}
                     value={instanceFromDate}

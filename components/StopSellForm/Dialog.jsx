@@ -12,9 +12,9 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography/Typography';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
-import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
+import MuiPickersUtilsProvider from 'material-ui-pickers/MuiPickersUtilsProvider';
 import DatePicker from 'material-ui-pickers/DatePicker';
-import plLocale from 'date-fns/locale/pl';
+// import plLocale from 'date-fns/locale/pl';
 import {
   actions as sightEventsActions,
   selectors as sightEventsSelectors,
@@ -26,9 +26,9 @@ import setHours from 'date-fns/setHours';
 import setMinutes from 'date-fns/setMinutes';
 import AlertDialog from 'components/AlertDialog';
 
-const locale = {
-  pl: plLocale,
-};
+// const locale = {
+//   pl: plLocale,
+// };
 
 const styles = () => ({
   datePicker: {
@@ -74,7 +74,7 @@ class SightFormDialog extends Component {
 
   handleAlertDialogOpen = ({ date, poolDefinitionId, sightEventId }, name) => this.setState({
     alertDialog: {
-      content: `Sprzedaż biletów na pulę "${name}" w dniu ${format(date, 'DD.MM.YYYY')} zostanie zatrzymana.`,
+      content: `Sprzedaż biletów na pulę "${name}" w dniu ${format(date, 'dd.MM.yyyy')} zostanie zatrzymana.`,
       onSubmit: () => {
         this.handleSubmit({ date, poolDefinitionId, sightEventId });
         this.handleAlertDialogClose();
@@ -101,7 +101,7 @@ class SightFormDialog extends Component {
     stopSell({
       sightEventId,
       ticketPoolId: poolDefinitionId,
-      date: format(poolStartDate, 'YYYY-MM-DDTHH:mm'),
+      date: format(poolStartDate, 'yyyy-MM-dd\'T\'HH:mm'),
       onFailure: this.handleSubmitFailure,
       onSuccess: this.handleSubmitSuccess,
     });
@@ -140,22 +140,22 @@ class SightFormDialog extends Component {
           }
         </DialogTitle>
         <DialogContent>
-          <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
+          <MuiPickersUtilsProvider utils={DateFnsUtils}>
             <Grid container justify="center">
               <DatePicker
                 className={classes.datePicker}
-                format="DD MMM YYYY"
+                format="dd MMM yyyy"
                 label="Data"
                 margin="normal"
-                minDate={format(new Date(), 'YYYY-MM-DD')}
+                minDate={format(new Date(), 'yyyy-MM-dd')}
                 onChange={this.handleDateChange}
                 value={date}
               />
             </Grid>
           </MuiPickersUtilsProvider>
           {
-            submittingError &&
-            <Typography className={classes.error}>{submittingError}</Typography>
+            submittingError
+            && <Typography className={classes.error}>{submittingError}</Typography>
           }
         </DialogContent>
         <DialogActions>

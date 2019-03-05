@@ -21,8 +21,8 @@ const UshersListItem = ({
   <ListItem {...rest} className={classes.listItem}>
     <ListItemIcon>
       {picture
-          ? <Avatar src={picture} />
-          : <AccountCircle style={{ fontSize: 42 }} />
+        ? <Avatar src={picture} />
+        : <AccountCircle style={{ fontSize: 42 }} />
       }
     </ListItemIcon>
     <ListItemText primary={name} secondary={email} />

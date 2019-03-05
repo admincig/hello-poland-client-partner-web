@@ -12,10 +12,10 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
-import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
+import MuiPickersUtilsProvider from 'material-ui-pickers/MuiPickersUtilsProvider';
 import SwitchLabel from 'components/SwitchLabel';
 import formatPrice from 'utils/formatPrice';
-import plLocale from 'date-fns/locale/pl';
+// import plLocale from 'date-fns/locale/pl';
 import AlertDialog from 'components/AlertDialog';
 
 import CalendarEventController from './CalendarEventController';
@@ -24,9 +24,9 @@ import CustomTimePicker from './CustomTimePicker';
 import TicketDefinitionList from './TicketDefinitionList';
 import TicketDefinitionForm from '../TicketDefinitionForm/TicketDefinitionForm';
 
-const locale = {
-  pl: plLocale,
-};
+// const locale = {
+//   pl: plLocale,
+// };
 
 const frequencyTypes = [
   {
@@ -243,7 +243,7 @@ class CalendarEventForm extends React.Component {
             handlePoolDateChange, handlePropFromEventChange, handleTicketDefinitionAdd,
             handleTicketDefinitionChange, handleTicketDefinitionDelete, isDefinitionFormVisible,
           }) => (
-            <MuiPickersUtilsProvider locale={locale.pl} utils={DateFnsUtils}>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <Grid container>
                 <Typography>
                   Aby Twoja oferta była widoczna dla kupujących, musisz zdefiniować termin
@@ -275,7 +275,7 @@ class CalendarEventForm extends React.Component {
                   }
                 />
                 <div className={classNames(classes.section, classes.fullWidth)}>
-                  <Typography variant="subheading" gutterBottom>
+                  <Typography variant="subtitle1" gutterBottom>
                     Termin:
                   </Typography>
                 </div>
@@ -305,10 +305,12 @@ class CalendarEventForm extends React.Component {
                         margin: 'dense',
                       }}
                     />
-                    {!formData.wholeDay &&
+                    {!formData.wholeDay
+                      && (
                       <Typography>
                         &nbsp;&nbsp;do
                       </Typography>
+                      )
                     }
                     <CustomTimePicker
                       disabled={readOnly}
@@ -332,7 +334,7 @@ class CalendarEventForm extends React.Component {
                 </div>
                 <div className={classNames(classes.section, classes.fullWidth)}>
                   <div>
-                    <Typography variant="subheading" gutterBottom>
+                    <Typography variant="subtitle1" gutterBottom>
                       Powtarzaj co:
                     </Typography>
                     <TextField
@@ -351,9 +353,10 @@ class CalendarEventForm extends React.Component {
                       ))}
                     </TextField>
                   </div>
-                  {frequencyType === 'CUSTOM' &&
+                  {frequencyType === 'CUSTOM'
+                    && (
                     <div className={classNames(classes.section, classes.fullWidth)}>
-                      <Typography variant="subheading" gutterBottom>
+                      <Typography variant="subtitle1" gutterBottom>
                         Powtarzanie niestandardowe
                       </Typography>
                       <div className={classNames(classes.inline, classes.fullWidth)}>
@@ -392,13 +395,14 @@ class CalendarEventForm extends React.Component {
                           ))}
                         </TextField>
                       </div>
-                      {formData.frequencyData && formData.frequencyData.frequencyType === 'WEEKLY' &&
+                      {formData.frequencyData && formData.frequencyData.frequencyType === 'WEEKLY'
+                        && (
                         <div className={classNames(classes.section, classes.fullWidth)}>
                           <Typography>Powtarzaj w:</Typography>
                           {daysOfWeekDefinitions.map(({ label, value }) => (
                             <FormControlLabel
                               key={`${label}-${value}`}
-                              control={
+                              control={(
                                 <Checkbox
                                   checked={this.isChecked(formData.frequencyData.daysOfWeek, value)}
                                   disabled={readOnly}
@@ -406,17 +410,20 @@ class CalendarEventForm extends React.Component {
                                   name="daysOfWeek"
                                   value={`${value}`}
                                 />
-                              }
+)}
                               label={label}
                             />
                           ))}
                         </div>
+                        )
                       }
                     </div>
+                    )
                   }
-                  {frequencyType !== 'NONE' &&
+                  {frequencyType !== 'NONE'
+                    && (
                     <div className={classNames(classes.section, classes.fullWidth)}>
-                      <Typography variant="subheading">Kończy się:</Typography>
+                      <Typography variant="subtitle1">Kończy się:</Typography>
                       <RadioGroup
                         aria-label="Koniec puli"
                         name="frequencyEndDateType"
@@ -433,7 +440,7 @@ class CalendarEventForm extends React.Component {
                           value="SINGLE"
                           disabled={readOnly}
                           control={<Radio />}
-                          label={
+                          label={(
                             <div className={classNames(classes.frequencyRadioWrapper)}>
                               <Typography className={classNames(readOnly
                                 ? [classes.disabled, classes.frequencyRadioLabel]
@@ -441,7 +448,8 @@ class CalendarEventForm extends React.Component {
                               >
                                 W dniu
                               </Typography>
-                              {frequencyEndDateType === 'SINGLE' &&
+                              {frequencyEndDateType === 'SINGLE'
+                              && (
                               <DateTimePicker
                                 date={formData.frequencyData.endDate}
                                 fullDay
@@ -452,20 +460,24 @@ class CalendarEventForm extends React.Component {
                                   minDate: formData.endDate,
                                 }}
                               />
+                              )
                               }
                             </div>
-                          }
+)}
                         />
                       </RadioGroup>
                     </div>
+                    )
                   }
                 </div>
-                {!readOnly &&
+                {!readOnly
+                  && (
                   <div className={classNames(classes.section, classes.fullWidth)}>
-                    <Typography variant="title" gutterBottom>
+                    <Typography variant="h6" gutterBottom>
                       Bilety
                     </Typography>
-                    {!readOnly &&
+                    {!readOnly
+                      && (
                       <div className={classNames(classes.columns, classes.fullWidth)}>
                         <TextField
                           onChange={event => handlePropFromEventChange(event)}
@@ -482,8 +494,8 @@ class CalendarEventForm extends React.Component {
                           >
                             Wybierz rodzaj biletu
                           </MenuItem>
-                          {ticketDefinitionsList &&
-                            ticketDefinitionsList.map(({ id, name, price }) => (
+                          {ticketDefinitionsList
+                            && ticketDefinitionsList.map(({ id, name, price }) => (
                               <MenuItem
                                 key={`${id}-${name}`}
                                 value={id}
@@ -510,8 +522,10 @@ class CalendarEventForm extends React.Component {
                           </Button>
                         </div>
                       </div>
+                      )
                     }
-                    {formData.ticketDefinitions &&
+                    {formData.ticketDefinitions
+                      && (
                       <TicketDefinitionList
                         disableAvailability={
                           Number.isInteger(formData.availableTicketsNumber)
@@ -531,10 +545,12 @@ class CalendarEventForm extends React.Component {
                         })}
                         readOnly={readOnly}
                       />
+                      )
                     }
-                    {isDefinitionFormVisible && !readOnly &&
+                    {isDefinitionFormVisible && !readOnly
+                      && (
                       <div className={classNames(classes.section, classes.fullWidth)}>
-                        <Typography variant="title">
+                        <Typography variant="h6">
                           Nowy rodzaj biletu
                         </Typography>
                         <TicketDefinitionForm
@@ -546,11 +562,13 @@ class CalendarEventForm extends React.Component {
                           }}
                         />
                       </div>
+                      )
                     }
                   </div>
+                  )
                 }
                 <div className={classNames(classes.section, classes.fullWidth)}>
-                  <Typography variant="subheading">Sprawdzanie biletów:</Typography>
+                  <Typography variant="subtitle1">Sprawdzanie biletów:</Typography>
                   <TextField
                     disabled={readOnly}
                     onChange={handleEntryStartDateOffsetChange}

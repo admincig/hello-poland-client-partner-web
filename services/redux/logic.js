@@ -1,3 +1,4 @@
+import reduxUtils from '@hello-poland/commons/utils/redux';
 import { logic as configLogic } from 'redux/config';
 import { logic as profileLogic } from '@hello-poland/commons/redux/profile';
 import { logic as sightsLogic } from '@hello-poland/commons/redux/sights';
@@ -7,7 +8,7 @@ import { logic as ticketPoolDefinitionsLogic } from '@hello-poland/commons/redux
 import { logic as ushersLogic } from 'redux/ushers';
 import { logic as viewLogic } from 'redux/view';
 
-export default Object.values({
+export default reduxUtils.parseReduxLogic({
   configLogic,
   profileLogic,
   sightEventsLogic,
@@ -16,4 +17,4 @@ export default Object.values({
   ticketPoolDefinitionsLogic,
   ushersLogic,
   viewLogic,
-}).reduce((acc, obj) => [...acc, ...Object.values(obj)], []);
+});

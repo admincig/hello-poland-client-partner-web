@@ -1,5 +1,6 @@
 import React from 'react';
 import App, { Container } from 'next/app';
+import Head from 'next/head';
 import JssProvider from 'react-jss/lib/JssProvider';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -9,6 +10,8 @@ import Router from 'next/router';
 import getPageContext from 'src/getPageContext';
 import withReduxStore from 'services/redux/withReduxStore';
 import { Provider } from 'react-redux';
+import config from 'config';
+import { actions as profileActions } from '@hello-poland/commons/redux/profile';
 
 Router.onRouteChangeStart = () => {
   NProgress.start();
@@ -37,13 +40,30 @@ class MyApp extends App {
     if (jssStyles && jssStyles.parentNode) {
       jssStyles.parentNode.removeChild(jssStyles);
     }
+
+    this.handleAccessTokenRefresh();
   }
+
+  handleAccessTokenRefresh = () => {
+    const { reduxStore: { dispatch, getState } } = this.props;
+    const { profile } = getState();
+    const { isAuthenticated } = profile || {};
+
+    if (isAuthenticated) {
+      dispatch(profileActions.fetchProfile());
+    }
+  };
 
   render() {
     const { Component, pageProps, reduxStore } = this.props;
 
+    const { name: title } = config.public;
+
     return (
       <Container>
+        <Head>
+          <title>{title}</title>
+        </Head>
         {/* Wrap every page in redux store Provider */}
         <Provider store={reduxStore}>
           {/* Wrap every page in Jss and Theme providers */}

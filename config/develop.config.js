@@ -6,10 +6,10 @@ module.exports = {
   },
   // Will be available on both server and client
   public: {
+    baseAffiliationURL: 'https://hpl.fream.pl/sight-events',
     name: 'Hello! Poland Partner',
     axios: {
       baseURL: 'http://localhost:3000/api',
     },
-    availableTicketsURL: 'http://hpl.fream.pl/api/v1/market/sight-events/:id/available-tickets?date=:date',
   },
 };

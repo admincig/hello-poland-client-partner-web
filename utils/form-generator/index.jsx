@@ -6,8 +6,10 @@ import isArray from './utils/isArray';
 
 class FormGenerator extends Component {
   shouldComponentUpdate(nextProps) {
-    const isDataDirty = !_isEqual(nextProps.data, this.props.data);
-    const isSchemaDirty = !_isEqual(nextProps.schema, this.props.schema);
+    const { data, schema } = this.props;
+
+    const isDataDirty = !_isEqual(nextProps.data, data);
+    const isSchemaDirty = !_isEqual(nextProps.schema, schema);
 
     return isDataDirty || isSchemaDirty;
   }
