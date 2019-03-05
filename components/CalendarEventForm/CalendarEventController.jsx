@@ -82,7 +82,6 @@ class CalendarEventController extends React.Component {
   getInitialDate = (startDate) => {
     let initialDate = startDate;
 
-    debugger;
     if (!initialDate) {
       initialDate = new Date();
       const evening = setMinutes(setHours(new Date(), 23), 29);
@@ -457,7 +456,6 @@ class CalendarEventController extends React.Component {
   render() {
     const { children } = this.props;
 
-    console.log(this.state);
     return children({
       ...this.props,
       ...this.state,
