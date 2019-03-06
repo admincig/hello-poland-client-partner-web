@@ -109,6 +109,7 @@ class ProfileView extends Component {
           activeTab={activeTab}
           profile={profile}
           handleTabChange={this.handleTabChange}
+          disableProfile={false}
         >
           {
             activeTab === 'profile' &&

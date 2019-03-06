@@ -45,7 +45,7 @@ class TabWrapper extends Component {
 
   render() {
     const { selectedTab } = this.state;
-    const { children, classes } = this.props;
+    const { children, classes, disableProfile } = this.props;
     return (
       <Paper>
         <Tabs
@@ -55,7 +55,7 @@ class TabWrapper extends Component {
           textColor="primary"
           value={selectedTab}
         >
-          <Tab label="Profil" />
+          <Tab label="Profil" disabled={disableProfile} />
           <Tab label="Hasło" />
         </Tabs>
         <div className={classes.childrenRoot}>

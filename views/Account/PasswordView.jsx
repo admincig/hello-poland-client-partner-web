@@ -58,7 +58,7 @@ class PasswordView extends Component {
           </Button>
         </Link>
         <Typography variant="title" gutterBottom>Profil</Typography>
-        <ProfileComponent activeTab="password" profile={profile}>
+        <ProfileComponent activeTab="password" profile={profile} handleTabChange={() => {}} disableProfile >
           <PasswordForm onSubmit={this.handleSubmit} />
         </ProfileComponent>
       </Layout>

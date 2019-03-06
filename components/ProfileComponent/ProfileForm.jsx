@@ -37,8 +37,7 @@ class ProfileForm extends Component {
     };
 
     this.validationSchema = object().shape({
-      name: string()
-        .required('Field is required.'),
+      name: string(),
     });
   }
 
