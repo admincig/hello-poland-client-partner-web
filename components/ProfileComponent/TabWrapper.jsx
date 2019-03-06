@@ -70,6 +70,7 @@ TabWrapper.propTypes = {
   active: PropTypes.string.isRequired,
   classes: PropTypes.shape({}).isRequired,
   children: PropTypes.node.isRequired,
+  disableProfile: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
 };
 
