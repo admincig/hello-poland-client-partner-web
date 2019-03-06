@@ -29,9 +29,10 @@ class ProfileForm extends Component {
   constructor(props) {
     super(props);
 
-    const { name } = props.profile;
+    const { email, name } = props.profile;
 
     this.initialValues = {
+      email: email || '',
       name: name || '',
     };
 
@@ -64,7 +65,7 @@ class ProfileForm extends Component {
                 <Field label="Nazwa" name="name" {...commonProps} required />
               </GridItem>
               <GridItem>
-                <Field label="email" name="email" {...commonProps} disabled />
+                <Field label="Adres e-mail" name="email" {...commonProps} disabled />
               </GridItem>
               <GridItem>
                 <Grid container justify="space-between" alignItems="center">

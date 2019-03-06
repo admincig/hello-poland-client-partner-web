@@ -16,19 +16,28 @@ import Router from 'next/router';
 
 
 class ProfileView extends Component {
+  constructor(props) {
+    super(props);
+
+    const { activeTab } = this.props;
+
+    this.state = {
+      activeTab,
+    };
+  }
+
   componentDidMount() {
     const { usherId, profile } = this.props;
-    if (!profile || profile.id === usherId) {
+
+    if (!profile || profile.id !== usherId) {
       this.fetchProfile(usherId);
     }
   }
 
   fetchProfile = (userId) => {
     const { fetchUsher } = this.props;
-    fetchUsher({
-      id: userId,
-      onFailure: () => console.log('elo'),
-    });
+
+    fetchUsher({ id: userId });
   };
 
   handlePasswordSubmit = (values, actions) => {
@@ -36,64 +45,79 @@ class ProfileView extends Component {
     const { setStatus, resetForm } = actions;
     const { changePassword, usherId } = this.props;
     const data = { oldPassword, password };
-    const callback = () => resetForm();
 
     setStatus(null);
 
     changePassword({
       id: usherId,
       data,
-      onFailure: this.handleSubmitCallback('failure')({
+      onFailure: this.handleSubmitFailure({
         formikActions: actions,
-        message: 'Wystąpił błąd przy zmianie hasła',
+        message: 'Wystąpił błąd podczas zmiany hasła.',
       }),
-      onSuccess: this.handleSubmitCallback('success')({
+      onSuccess: this.handleSubmitSuccess({
+        callback: () => resetForm(),
         formikActions: actions,
-        callback,
-        message: 'Zapisano pomyślnie',
+        message: 'Zapisano pomyślnie.',
       }),
     });
   };
 
   handleProfileSubmit = (values, actions) => {
-    const { name } = values;
+    const { email, password, ...data } = values;
     const { setStatus } = actions;
     const { changeProfile, usherId } = this.props;
-    const data = { name };
-    const callback = () => this.fetchProfile(usherId);
 
     setStatus(null);
 
     changeProfile({
       id: usherId,
       data,
-      onFailure: this.handleSubmitCallback('failure')({
+      onFailure: this.handleSubmitFailure({
         formikActions: actions,
-        message: 'Wystąpił błąd przy zmianie profilu',
+        message: 'Wystąpił błąd podczas aktualizacji profilu.',
       }),
-      onSuccess: this.handleSubmitCallback('success')({
+      onSuccess: this.handleSubmitSuccess({
+        callback: () => this.fetchProfile(usherId),
         formikActions: actions,
-        callback,
-        message: 'Zapisano pomyślnie',
+        message: 'Zapisano pomyślnie.',
       }),
     });
-  }
+  };
 
-  handleSubmitCallback = type => ({ formikActions, callback, message }) => () => {
+  handleSubmitFailure = ({ formikActions, message }) => {
     const { setStatus, setSubmitting } = formikActions;
+
+    setStatus({ type: 'failure', message: message || '' });
     setSubmitting(false);
-    setStatus({ type, message: message || '' });
+  };
+
+  handleSubmitSuccess = ({ formikActions, message, callback }) => () => {
+    const { setStatus, setSubmitting } = formikActions;
+
+    setStatus({ type: 'success', message: message || '' });
+    setSubmitting(false);
+
     if (callback) {
       callback();
     }
   };
 
-  handleTabChange = (activeTab) => {
-    Router.push(`/ushers/${this.props.usherId}/${activeTab}`);
+  handleTabChange = (nextTab) => {
+    const { usherId } = this.props;
+
+    const href = `/ushers/${nextTab}?usherId=${usherId}`;
+    const as = `/ushers/${usherId}/${nextTab}`;
+
+    Router.push(href, as);
+    this.setState({ activeTab: nextTab });
   };
 
   render() {
-    const { profile, activeTab } = this.props;
+    const { profile } = this.props;
+    const { activeTab } = this.state;
+
+    console.log(activeTab);
     return (
       <Layout>
         <Link href="/" passHref prefetch>
