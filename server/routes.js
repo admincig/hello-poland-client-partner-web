@@ -4,6 +4,10 @@
 
 module.exports = [
   {
+    page: '/ushers',
+    path: '/ushers/:usherId',
+  },
+  {
     page: '/ushers/password',
     path: '/ushers/:usherId/password',
   },

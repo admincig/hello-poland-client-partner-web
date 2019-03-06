@@ -110,6 +110,7 @@ class ProfileView extends Component {
     const as = `/ushers/${usherId}/${nextTab}`;
 
     Router.push(href, as);
+
     this.setState({ activeTab: nextTab });
   };
 
@@ -117,7 +118,6 @@ class ProfileView extends Component {
     const { profile } = this.props;
     const { activeTab } = this.state;
 
-    console.log(activeTab);
     return (
       <Layout>
         <Link href="/" passHref prefetch>
