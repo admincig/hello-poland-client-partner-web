@@ -125,6 +125,69 @@ describe('actions', () => {
     });
   });
 
+  describe('using change password action', () => {
+    it('should create an action to make password change request', () => {
+      const { changeProfile } = actions;
+      const { CHANGE_PROFILE } = types;
+      const id = 1;
+      const data = {
+        name: 'John Doe',
+      };
+      const expectedValue = {
+        type: CHANGE_PROFILE,
+        payload: {
+          url: `/ushers/${id}`,
+          method: 'patch',
+          data,
+        },
+      };
+
+      expect(changeProfile({ id, data })).toEqual(expectedValue);
+
+      expectedValue.onFailure = onFailure;
+      expectedValue.onSuccess = onSuccess;
+
+      expect(changeProfile({
+        id, data, onFailure, onSuccess,
+      })).toEqual(expectedValue);
+    });
+
+    it('should create an action to cancel password change request', () => {
+      const { changeProfileCancel } = actions;
+      const { CHANGE_PROFILE_CANCEL } = types;
+      const expectedValue = {
+        type: CHANGE_PROFILE_CANCEL,
+      };
+
+      expect(changeProfileCancel()).toEqual(expectedValue);
+    });
+
+    it('should create an action to fail password change request', () => {
+      const { changeProfileFailure } = actions;
+      const { CHANGE_PROFILE_FAILURE } = types;
+      const expectedValue = {
+        type: CHANGE_PROFILE_FAILURE,
+        error: {},
+      };
+
+      expect(changeProfileFailure()).toEqual(expectedValue);
+
+      expectedValue.error = axiosResponseError;
+
+      expect(changeProfileFailure(axiosResponseError)).toEqual(expectedValue);
+    });
+
+    it('should create an action to succeed password change request', () => {
+      const { changeProfileSuccess } = actions;
+      const { CHANGE_PROFILE_SUCCESS } = types;
+      const expectedValue = {
+        type: CHANGE_PROFILE_SUCCESS,
+      };
+
+      expect(changeProfileSuccess()).toEqual(expectedValue);
+    });
+  });
+
   describe('using item action', () => {
     it('should create an action to make request', () => {
       const { fetchItem } = actions;

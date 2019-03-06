@@ -34,7 +34,6 @@ class PasswordForm extends Component {
       id: props.userId ? props.userId : undefined,
       oldPassword: '',
       password: '',
-      passwordConfirm: '',
     };
 
     this.validationSchema = object().shape({

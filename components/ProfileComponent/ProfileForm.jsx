@@ -30,18 +30,15 @@ class ProfileForm extends Component {
   constructor(props) {
     super(props);
 
-    const { name, email } = props.profile;
+    const { name } = props.profile;
 
     this.initialValues = {
-      id: props.userId ? props.userId : undefined,
       name: name || '',
-      email: email || '',
     };
 
     this.validationSchema = object().shape({
       name: string()
         .required('Field is required.'),
-      email: string(),
     });
   }
 
