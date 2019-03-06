@@ -13,7 +13,6 @@ import { string, object } from 'yup';
 const commonProps = {
   component: TextField,
   fullWidth: true,
-  required: true,
   type: 'text',
 };
 
@@ -62,7 +61,7 @@ class ProfileForm extends Component {
                 </Hidden>
               }
               <GridItem>
-                <Field label="Nazwa" name="name" {...commonProps} />
+                <Field label="Nazwa" name="name" {...commonProps} required />
               </GridItem>
               <GridItem>
                 <Field label="email" name="email" {...commonProps} disabled />
