@@ -17,25 +17,23 @@ import Router from 'next/router';
 
 class ProfileView extends Component {
   componentDidMount() {
-    const { usherId, profile } = this.props;
-    if (!profile || profile.id === usherId) {
-      this.fetchProfile(usherId);
-    }
+    const { usherId } = this.props;
+    this.fetchProfile(usherId);
   }
 
   fetchProfile = (userId) => {
     const { fetchUsher } = this.props;
     fetchUsher({
       id: userId,
-      onFailure: () => console.log('elo'),
+      onFailure: () => Router.push('/404'),
     });
   };
 
   handlePasswordSubmit = (values, actions) => {
-    const { oldPassword, password } = values;
+    const { password } = values;
     const { setStatus, resetForm } = actions;
     const { changePassword, usherId } = this.props;
-    const data = { oldPassword, password };
+    const data = { password };
     const callback = () => resetForm();
 
     setStatus(null);
@@ -89,7 +87,7 @@ class ProfileView extends Component {
   };
 
   handleTabChange = (activeTab) => {
-    Router.push(`/ushers/${this.props.usherId}/${activeTab}`);
+    Router.replace(`/ushers/${this.props.usherId}/${activeTab}`);
   };
 
   render() {
@@ -117,7 +115,7 @@ class ProfileView extends Component {
           }
           {
             activeTab === 'password' &&
-            <PasswordForm onSubmit={this.handlePasswordSubmit} />
+            <PasswordForm onSubmit={this.handlePasswordSubmit} noOldpassword />
           }
         </ProfileComponent>
       </Layout>

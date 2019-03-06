@@ -39,7 +39,7 @@ class PasswordForm extends Component {
     this.validationSchema = object().shape({
       oldPassword: string(),
       password: string()
-        .notOneOf([ref('oldPassword')], 'New password must be different from the current one.')
+        .notOneOf([ref('oldPassword,')], 'New password must be different from the current one.')
         .min(8, 'Should be at least 8 characters long.'),
       passwordConfirm: string()
         .oneOf([ref('password')], 'Given passwords are different.'),
@@ -48,7 +48,7 @@ class PasswordForm extends Component {
 
   render() {
     const {
-      classes, FormikProps, onSubmit, userId,
+      classes, FormikProps, onSubmit, userId, noOldpassword,
     } = this.props;
 
     return (
@@ -66,9 +66,12 @@ class PasswordForm extends Component {
                   <Field component={TextField} name="id" type="hidden" />
                 </Hidden>
               }
-              <GridItem>
-                <Field label="Obecne hasło" name="oldPassword" {...commonProps} />
-              </GridItem>
+              {
+                !noOldpassword &&
+                <GridItem>
+                  <Field label="Obecne hasło" name="oldPassword" {...commonProps} />
+                </GridItem>
+              }
               <GridItem>
                 <Field label="Nowe hasło" name="password" {...commonProps} />
               </GridItem>
@@ -98,11 +101,13 @@ PasswordForm.propTypes = {
   FormikProps: PropTypes.shape({}),
   onSubmit: PropTypes.func.isRequired,
   userId: PropTypes.number,
+  noOldpassword: PropTypes.bool,
 };
 
 PasswordForm.defaultProps = {
   FormikProps: null,
   userId: null,
+  noOldpassword: false,
 };
 
 export default withStyles(styles)(PasswordForm);
