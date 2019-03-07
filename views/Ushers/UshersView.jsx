@@ -10,8 +10,8 @@ import {
   actions as ushersActions,
   selectors as ushersSelectors,
 } from 'redux/ushers';
-import UshersList from './components/UshersList';
 import withAuth from 'services/auth/withAuth';
+import UshersList from './components/UshersList';
 
 class UshersView extends Component {
   componentDidMount() {

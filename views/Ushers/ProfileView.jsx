@@ -129,20 +129,23 @@ class ProfileView extends Component {
             Bileterzy
           </Button>
         </Link>
-        <Typography variant="title" gutterBottom>Bileterzy / {profile.name || profile.email}</Typography>
+        <Typography variant="title" gutterBottom>
+Bileterzy /
+          {profile.name || profile.email}
+        </Typography>
         <ProfileComponent
           activeTab={activeTab}
           profile={profile}
-          handleTabChange={this.handleTabChange}
+          onTabChange={this.handleTabChange}
           disableProfile={false}
         >
           {
-            activeTab === 'profile' &&
-            <ProfileForm profile={profile} onSubmit={this.handleProfileSubmit} />
+            activeTab === 'profile'
+            && <ProfileForm profile={profile} onSubmit={this.handleProfileSubmit} />
           }
           {
-            activeTab === 'password' &&
-            <PasswordForm onSubmit={this.handlePasswordSubmit} />
+            activeTab === 'password'
+            && <PasswordForm onSubmit={this.handlePasswordSubmit} />
           }
         </ProfileComponent>
       </Layout>

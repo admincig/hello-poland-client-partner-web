@@ -30,19 +30,25 @@ class PasswordForm extends Component {
   constructor(props) {
     super(props);
 
+    const { userId } = props;
+
     this.initialValues = {
-      id: props.userId ? props.userId : undefined,
+      id: userId,
       oldPassword: '',
       password: '',
+      passwordConfirm: '',
     };
 
     this.validationSchema = object().shape({
-      oldPassword: string(),
+      oldPassword: string()
+        .required('Field is required.'),
       password: string()
         .notOneOf([ref('oldPassword')], 'New password must be different from the current one.')
-        .min(8, 'Should be at least 8 characters long.'),
+        .min(8, 'Should be at least 8 characters long.')
+        .required('Field is required.'),
       passwordConfirm: string()
-        .oneOf([ref('password')], 'Given passwords are different.'),
+        .oneOf([ref('password')], 'Given passwords are different.')
+        .required('Field is required.'),
     });
   }
 

@@ -37,7 +37,9 @@ class ProfileForm extends Component {
     };
 
     this.validationSchema = object().shape({
-      name: string(),
+      name: string()
+        .min(5, 'Should be at least 8 characters long.')
+        .required('Field is required.'),
     });
   }
 
@@ -56,10 +58,12 @@ class ProfileForm extends Component {
         {({ isSubmitting, status }) => (
           <Form>
             <Grid container spacing={16}>
-              {userId &&
-                <Hidden xlDown implementation="css">
-                  <Field component={TextField} name="id" type="hidden" />
-                </Hidden>
+              {userId
+                && (
+                  <Hidden xlDown implementation="css">
+                    <Field component={TextField} name="id" type="hidden" />
+                  </Hidden>
+                )
               }
               <GridItem>
                 <Field label="Nazwa" name="name" {...commonProps} required />
@@ -70,10 +74,12 @@ class ProfileForm extends Component {
               <GridItem>
                 <Grid container justify="space-between" alignItems="center">
                   <Button type="submit" disabled={isSubmitting}>Zapisz</Button>
-                  {status &&
-                  <Typography className={classes[status.type]}>
-                    {status.message}
-                  </Typography>
+                  {status
+                    && (
+                      <Typography className={classes[status.type]}>
+                        {status.message}
+                      </Typography>
+                    )
                   }
                 </Grid>
               </GridItem>
