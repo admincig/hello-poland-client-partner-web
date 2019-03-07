@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import Link from 'next/link';
 import Button from '@material-ui/core/Button';
@@ -10,6 +11,7 @@ import {
   selectors as ushersSelectors,
 } from 'redux/ushers';
 import UshersList from './components/UshersList';
+import withAuth from 'services/auth/withAuth';
 
 class UshersView extends Component {
   componentDidMount() {
@@ -55,4 +57,7 @@ const mapDispatchToProps = {
   fetchUshers: ushersActions.fetchList,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(UshersView);
+export default compose(
+  withAuth(),
+  connect(mapStateToProps, mapDispatchToProps),
+)(UshersView);

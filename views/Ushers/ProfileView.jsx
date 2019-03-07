@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import Link from 'next/link';
+import Router from 'next/router';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import {
@@ -12,8 +14,7 @@ import Layout from 'components/Layout';
 import ProfileComponent from 'components/ProfileComponent/ProfileComponent';
 import ProfileForm from 'components/ProfileComponent/ProfileForm';
 import PasswordForm from 'components/ProfileComponent/PasswordForm';
-import Router from 'next/router';
-
+import withAuth from 'services/auth/withAuth';
 
 class ProfileView extends Component {
   constructor(props) {
@@ -176,4 +177,7 @@ const mapDispatchToProps = {
   changeProfile: ushersActions.changeProfile,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProfileView);
+export default compose(
+  withAuth(),
+  connect(mapStateToProps, mapDispatchToProps),
+)(ProfileView);
