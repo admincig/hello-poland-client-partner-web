@@ -61,10 +61,12 @@ class PasswordForm extends Component {
         {({ isSubmitting, status }) => (
           <Form>
             <Grid container spacing={16}>
-              {userId &&
+              {userId
+                && (
                 <Hidden xlDown implementation="css">
                   <Field component={TextField} name="id" type="hidden" />
                 </Hidden>
+                )
               }
               <GridItem>
                 <Field label="Obecne hasło" name="oldPassword" {...commonProps} />
@@ -78,10 +80,12 @@ class PasswordForm extends Component {
               <GridItem>
                 <Grid container justify="space-between" alignItems="center">
                   <Button type="submit" disabled={isSubmitting}>Zmień hasło</Button>
-                  {status &&
+                  {status
+                    && (
                     <Typography className={classes[status.type]}>
                       {status.message}
                     </Typography>
+                    )
                   }
                 </Grid>
               </GridItem>

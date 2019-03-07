@@ -26,7 +26,12 @@ class UshersView extends Component {
         <Link href="/" passHref prefetch>
           <Button component="a">Strona główna</Button>
         </Link>
-        <Typography variant="title" gutterBottom>Bileterzy</Typography>
+        <Link href="/ushers" passHref prefetch>
+          <Button component="a">
+            Bileterzy
+          </Button>
+        </Link>
+        <Typography variant="h6" gutterBottom>Bileterzy</Typography>
         <UshersList ushers={ushers} />
       </Layout>
     );

@@ -120,10 +120,12 @@ class TicketDefinitionForm extends Component {
                 </Button>
               </GridItem>
               <GridItem md={2} sm={2}>
-                {onReset &&
+                {onReset
+                  && (
                   <Button variant="contained" color="primary" type="reset" disabled={isSubmitting} onClick={() => this.handleReset(null, formikActions)}>
                     Anuluj
                   </Button>
+                  )
                 }
               </GridItem>
             </Grid>

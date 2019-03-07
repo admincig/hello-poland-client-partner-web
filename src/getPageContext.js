@@ -5,9 +5,12 @@ import { createMuiTheme, createGenerateClassName } from '@material-ui/core/style
 // A theme with custom primary and secondary color.
 // It's optional.
 const theme = createMuiTheme({
-  palette: {},
   nprogress: {
     color: '#000',
+  },
+  palette: {},
+  typography: {
+    useNextVariants: true,
   },
 });
 

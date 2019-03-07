@@ -25,12 +25,13 @@ const ViewMessage = ({
   <Grid container className={classes.container} direction="column" alignItems="center">
     <Grid item className={classes.content} xs={8}>
       {Icon}
-      {message && message.length ?
-        <Typography align="center" variant="headline">
-          {message}
-        </Typography>
-        :
-        null
+      {message && message.length
+        ? (
+          <Typography align="center" variant="h5">
+            {message}
+          </Typography>
+        )
+        : null
       }
       {children}
     </Grid>
@@ -54,4 +55,3 @@ ViewMessage.defaultProps = {
 };
 
 export default withStyles(styles)(ViewMessage);
-
