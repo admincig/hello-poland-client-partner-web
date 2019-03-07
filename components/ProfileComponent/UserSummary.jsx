@@ -9,7 +9,6 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import DefaultAvatar from 'components/Layout/DefaultAvatar';
 
-
 const styles = theme => ({
   avatar: {
     fontSize: theme.spacing.unit * 10,

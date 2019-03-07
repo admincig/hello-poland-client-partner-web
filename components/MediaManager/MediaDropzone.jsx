@@ -77,10 +77,10 @@ class MediaDropzone extends Component {
         onDrop={this.handleDrop}
       >
         <Grid container className={classes.gridContainer}>
-          <Typography variant="title">
+          <Typography variant="h6">
             Przeciągnij plik tutaj
           </Typography>
-          <Typography color="textSecondary" variant="subheading" className={classes.gridSpacer}>
+          <Typography color="textSecondary" variant="subtitle1" className={classes.gridSpacer}>
             lub
           </Typography>
           <Button

@@ -1,13 +1,13 @@
 import { applyMiddleware, createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { createLogicMiddleware } from 'redux-logic';
-import config from 'config';
 import createHTTPClient from 'services/httpClient';
+import config from 'config';
 import rootReducer from './rootReducer';
 import logic from './logic';
 import getPersistedState, { subscribers } from './localStorage';
 
-export default function createInitializedStore(initialState = { config }) {
+export default function createInitializedStore(initialState = {}) {
   const logicMiddleware = createLogicMiddleware(logic);
 
   const store = createStore(
@@ -26,7 +26,7 @@ export default function createInitializedStore(initialState = { config }) {
     )),
   );
 
-  const httpClient = createHTTPClient(store, config.public.axios);
+  const httpClient = createHTTPClient(config.public.axios, store);
 
   logicMiddleware.addDeps({
     httpClient,

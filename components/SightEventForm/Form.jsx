@@ -191,7 +191,7 @@ class SightEventForm extends Component {
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <GridItem>
-                <Typography variant="title">Dane podstawowe</Typography>
+                <Typography variant="h6">Dane podstawowe</Typography>
               </GridItem>
               <Hidden xsUp>
                 <GridItem>
@@ -235,7 +235,7 @@ class SightEventForm extends Component {
                 <Field name="description" label="Opis oferty" required component={TextField} {...commonProps} multiline rowsMax={20} />
               </GridItem>
               <GridItem>
-                <Typography variant="title" className={classes.title}>Dane kontaktowe</Typography>
+                <Typography variant="h6" className={classes.title}>Dane kontaktowe</Typography>
               </GridItem>
               <GridItem>
                 <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
@@ -244,7 +244,7 @@ class SightEventForm extends Component {
                 <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
-                <Typography variant="title" className={classes.title}>Lokalizacja</Typography>
+                <Typography variant="h6" className={classes.title}>Lokalizacja</Typography>
               </GridItem>
               <GridItem>
                 <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
@@ -262,7 +262,8 @@ class SightEventForm extends Component {
                 <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={20} />
               </GridItem>
             </Grid>
-            {buttons &&
+            {buttons
+              && (
               <Grid container spacing={16}>
                 <GridItem md={2} sm={2}>
                   <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
@@ -270,6 +271,7 @@ class SightEventForm extends Component {
                   </Button>
                 </GridItem>
               </Grid>
+              )
             }
           </Form>
         )}

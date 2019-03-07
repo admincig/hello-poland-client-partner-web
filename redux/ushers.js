@@ -605,7 +605,7 @@ const fetchItemLogic = createLogic({
       } else {
         dispatch(fetchItemFailure(response));
 
-        if (onFailure && status === 404) {
+        if (onFailure) {
           onFailure();
         }
       }

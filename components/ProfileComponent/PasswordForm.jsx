@@ -30,19 +30,25 @@ class PasswordForm extends Component {
   constructor(props) {
     super(props);
 
+    const { userId } = props;
+
     this.initialValues = {
-      id: props.userId ? props.userId : undefined,
+      id: userId,
       oldPassword: '',
       password: '',
+      passwordConfirm: '',
     };
 
     this.validationSchema = object().shape({
-      oldPassword: string(),
+      oldPassword: string()
+        .required('Field is required.'),
       password: string()
-        .notOneOf([ref('oldPassword,')], 'New password must be different from the current one.')
-        .min(8, 'Should be at least 8 characters long.'),
+        .notOneOf([ref('oldPassword')], 'New password must be different from the current one.')
+        .min(8, 'Should be at least 8 characters long.')
+        .required('Field is required.'),
       passwordConfirm: string()
-        .oneOf([ref('password')], 'Given passwords are different.'),
+        .oneOf([ref('password')], 'Given passwords are different.')
+        .required('Field is required.'),
     });
   }
 
@@ -61,10 +67,12 @@ class PasswordForm extends Component {
         {({ isSubmitting, status }) => (
           <Form>
             <Grid container spacing={16}>
-              {userId &&
+              {userId
+                && (
                 <Hidden xlDown implementation="css">
                   <Field component={TextField} name="id" type="hidden" />
                 </Hidden>
+                )
               }
               {
                 !noOldpassword &&
@@ -81,10 +89,12 @@ class PasswordForm extends Component {
               <GridItem>
                 <Grid container justify="space-between" alignItems="center">
                   <Button type="submit" disabled={isSubmitting}>Zmień hasło</Button>
-                  {status &&
+                  {status
+                    && (
                     <Typography className={classes[status.type]}>
                       {status.message}
                     </Typography>
+                    )
                   }
                 </Grid>
               </GridItem>

@@ -29,14 +29,17 @@ class ProfileForm extends Component {
   constructor(props) {
     super(props);
 
-    const { name } = props.profile;
+    const { email, name } = props.profile;
 
     this.initialValues = {
+      email: email || '',
       name: name || '',
     };
 
     this.validationSchema = object().shape({
-      name: string(),
+      name: string()
+        .min(5, 'Should be at least 8 characters long.')
+        .required('Field is required.'),
     });
   }
 
@@ -55,24 +58,28 @@ class ProfileForm extends Component {
         {({ isSubmitting, status }) => (
           <Form>
             <Grid container spacing={16}>
-              {userId &&
-                <Hidden xlDown implementation="css">
-                  <Field component={TextField} name="id" type="hidden" />
-                </Hidden>
+              {userId
+                && (
+                  <Hidden xlDown implementation="css">
+                    <Field component={TextField} name="id" type="hidden" />
+                  </Hidden>
+                )
               }
               <GridItem>
                 <Field label="Nazwa" name="name" {...commonProps} required />
               </GridItem>
               <GridItem>
-                <Field label="email" name="email" {...commonProps} disabled />
+                <Field label="Adres e-mail" name="email" {...commonProps} disabled />
               </GridItem>
               <GridItem>
                 <Grid container justify="space-between" alignItems="center">
                   <Button type="submit" disabled={isSubmitting}>Zapisz</Button>
-                  {status &&
-                  <Typography className={classes[status.type]}>
-                    {status.message}
-                  </Typography>
+                  {status
+                    && (
+                      <Typography className={classes[status.type]}>
+                        {status.message}
+                      </Typography>
+                    )
                   }
                 </Grid>
               </GridItem>

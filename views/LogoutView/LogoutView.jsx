@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { bindActionCreators, compose } from 'redux';
 import { connect } from 'react-redux';
 import Router from 'next/router';
-import { selectors as configSelectors } from 'redux/config';
 import {
   actions as profileActions,
   selectors as profileSelectors,
@@ -16,7 +15,7 @@ class LogoutView extends Component {
 
   handleLogout = () => {
     const {
-      assetPrefix, credentials, logout, isAuthenticated,
+      credentials, logout, isAuthenticated,
     } = this.props;
 
     if (isAuthenticated) {
@@ -40,7 +39,7 @@ class LogoutView extends Component {
       path = path.substring(1, path.length);
     }
 
-    Router.push(`${assetPrefix}/${path}`);
+    Router.push(`/${path}`);
   };
 
   render() {
@@ -49,7 +48,6 @@ class LogoutView extends Component {
 }
 
 LogoutView.propTypes = {
-  assetPrefix: PropTypes.string.isRequired,
   credentials: PropTypes.shape({
     accessToken: PropTypes.string,
     refreshToken: PropTypes.string,
@@ -64,13 +62,11 @@ LogoutView.defaultProps = {
 
 const mapStateToProps = state => ({
   credentials: profileSelectors.getCredentials(state),
-  assetPrefix: configSelectors.getAppConfig(state).public.assetPrefix || '',
   isAuthenticated: profileSelectors.isAuthenticated(state),
 });
 
-const mapDispatchToProps = dispatch =>
-  bindActionCreators({
-    logout: profileActions.logout,
-  }, dispatch);
+const mapDispatchToProps = dispatch => bindActionCreators({
+  logout: profileActions.logout,
+}, dispatch);
 
 export default compose(connect(mapStateToProps, mapDispatchToProps))(LogoutView);

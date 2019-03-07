@@ -1,11 +1,19 @@
 import UshersView from 'views/Ushers';
 import Router from 'next/router';
 
-UshersView.getInitialProps = ({ query }) => {
+UshersView.getInitialProps = ({ res, query }) => {
   const { usherId } = query;
 
   if (usherId) {
-    Router.push(`/ushers/${usherId}/profile`);
+    const href = `/ushers/profile?usherId=${usherId}`;
+    const as = `/ushers/${usherId}/profile`;
+
+    if (res) {
+      res.writeHead(301, { Location: as });
+      res.end();
+    } else {
+      Router.push(href, as);
+    }
   }
 
   return {};
