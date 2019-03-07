@@ -130,7 +130,8 @@ class ProfileView extends Component {
           </Button>
         </Link>
         <Typography variant="title" gutterBottom>
-          Bileterzy / {profile.name || profile.email}
+          Bileterzy /&nbsp;
+          hwdp
         </Typography>
         <ProfileComponent
           activeTab={activeTab}
