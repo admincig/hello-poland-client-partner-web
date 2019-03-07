@@ -118,7 +118,6 @@ class ProfileView extends Component {
   render() {
     const { profile } = this.props;
     const { activeTab } = this.state;
-
     return (
       <Layout>
         <Link href="/" passHref prefetch>
@@ -130,8 +129,7 @@ class ProfileView extends Component {
           </Button>
         </Link>
         <Typography variant="title" gutterBottom>
-          Bileterzy /&nbsp;
-          {profile.name || profile.email}
+          {`Bileterzy / ${profile.name || profile.email}`}
         </Typography>
         <ProfileComponent
           activeTab={activeTab}
