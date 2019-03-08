@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import Link from 'next/link';
 import Button from '@material-ui/core/Button';
@@ -11,6 +12,7 @@ import {
 import Layout from 'components/Layout';
 import ProfileComponent from 'components/ProfileComponent/ProfileComponent';
 import PasswordForm from 'components/ProfileComponent/PasswordForm';
+import withAuth from 'services/auth/withAuth';
 
 class PasswordView extends Component {
   handleSubmit = (values, actions) => {
@@ -58,7 +60,7 @@ class PasswordView extends Component {
           </Button>
         </Link>
         <Typography variant="h6" gutterBottom>Profil</Typography>
-        <ProfileComponent activeTab="password" profile={profile}>
+        <ProfileComponent activeTab="password" profile={profile} onTabChange={() => {}} disableProfile>
           <PasswordForm onSubmit={this.handleSubmit} />
         </ProfileComponent>
       </Layout>
@@ -82,4 +84,7 @@ const mapDispatchToProps = {
   changePassword: profileActions.changePassword,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(PasswordView);
+export default compose(
+  withAuth(),
+  connect(mapStateToProps, mapDispatchToProps),
+)(PasswordView);

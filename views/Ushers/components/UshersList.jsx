@@ -17,7 +17,7 @@ const UshersList = ({ ushers }) => (
               {ushers.map(({
                 name, picture, email, id,
               }) => (
-                <Link key={`${id}-${email}`} href={`/ushers?usherId=${id}`} as={`/ushers/${id}`} passHref prefetch>
+                <Link key={`${id}-${email}`} href={`/ushers?usherId=${id}`} as={`/ushers/${id}/profile`} passHref prefetch>
                   <UshersListItem
                     name={name}
                     picture={picture}
