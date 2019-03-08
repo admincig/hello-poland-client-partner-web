@@ -12,10 +12,10 @@ import {
 } from 'redux/ushers';
 import Layout from 'components/Layout';
 import ProfileComponent from 'components/ProfileComponent/ProfileComponent';
-import ProfileForm from 'components/ProfileComponent/ProfileForm';
+import PasswordForm from 'components/ProfileComponent/PasswordForm';
 import withAuth from 'services/auth/withAuth';
 
-class ProfileView extends Component {
+class PasswordView extends Component {
   constructor(props) {
     super(props);
 
@@ -33,7 +33,7 @@ class ProfileView extends Component {
       this.fetchProfile(usherId);
     }
 
-    Router.prefetch('/ushers/password');
+    Router.prefetch('/ushers/profile');
   }
 
   fetchProfile = (userId) => {
@@ -42,22 +42,23 @@ class ProfileView extends Component {
     fetchUsher({ id: userId });
   };
 
-  handleProfileSubmit = (values, actions) => {
-    const { email, password, ...data } = values;
-    const { setStatus } = actions;
-    const { changeProfile, usherId } = this.props;
+  handlePasswordSubmit = (values, actions) => {
+    const { oldPassword, password } = values;
+    const { setStatus, resetForm } = actions;
+    const { changePassword, usherId } = this.props;
+    const data = { oldPassword, password };
 
     setStatus(null);
 
-    changeProfile({
+    changePassword({
       id: usherId,
       data,
       onFailure: this.handleSubmitFailure({
         formikActions: actions,
-        message: 'Wystąpił błąd podczas aktualizacji profilu.',
+        message: 'Wystąpił błąd podczas zmiany hasła.',
       }),
       onSuccess: this.handleSubmitSuccess({
-        callback: () => this.fetchProfile(usherId),
+        callback: () => resetForm(),
         formikActions: actions,
         message: 'Zapisano pomyślnie.',
       }),
@@ -120,17 +121,16 @@ class ProfileView extends Component {
           onTabChange={this.handleTabChange}
           disableProfile={false}
         >
-          <ProfileForm profile={profile} onSubmit={this.handleProfileSubmit} />
+          <PasswordForm onSubmit={this.handlePasswordSubmit} />
         </ProfileComponent>
       </Layout>
     );
   }
 }
 
-ProfileView.propTypes = {
+PasswordView.propTypes = {
   activeTab: PropTypes.string,
   changePassword: PropTypes.func.isRequired,
-  changeProfile: PropTypes.func.isRequired,
   fetchUsher: PropTypes.func.isRequired,
   profile: PropTypes.shape({
     email: PropTypes.string,
@@ -139,22 +139,20 @@ ProfileView.propTypes = {
   usherId: PropTypes.number.isRequired,
 };
 
-ProfileView.defaultProps = {
+PasswordView.defaultProps = {
   activeTab: 'profile',
 };
 
 const mapStateToProps = state => ({
   profile: ushersSelectors.getUsher(state),
-  ushers: ushersSelectors.getUshers(state),
 });
 
 const mapDispatchToProps = {
   fetchUsher: ushersActions.fetchItem,
   changePassword: ushersActions.changePassword,
-  changeProfile: ushersActions.changeProfile,
 };
 
 export default compose(
   withAuth(),
   connect(mapStateToProps, mapDispatchToProps),
-)(ProfileView);
+)(PasswordView);

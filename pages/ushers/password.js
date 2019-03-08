@@ -1,10 +1,10 @@
-import ProfileView from 'views/Ushers/ProfileView';
+import PasswordView from 'views/Ushers/PasswordView';
 
-ProfileView.getInitialProps = ({ query }) => {
+PasswordView.getInitialProps = ({ query }) => {
   const activeTab = 'password';
   const usherId = +query.usherId;
 
   return { activeTab, usherId };
 };
 
-export default ProfileView;
+export default PasswordView;
