@@ -9,7 +9,7 @@ UshersView.getInitialProps = ({ res, query }) => {
     const as = `/ushers/${usherId}/profile`;
 
     if (res) {
-      res.writeHead(301, { Location: as });
+      res.writeHead(302, { Location: as });
       res.end();
     } else {
       Router.push(href, as);
