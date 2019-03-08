@@ -129,7 +129,6 @@ class ProfileView extends Component {
 
 ProfileView.propTypes = {
   activeTab: PropTypes.string,
-  changePassword: PropTypes.func.isRequired,
   changeProfile: PropTypes.func.isRequired,
   fetchUsher: PropTypes.func.isRequired,
   profile: PropTypes.shape({
@@ -145,12 +144,10 @@ ProfileView.defaultProps = {
 
 const mapStateToProps = state => ({
   profile: ushersSelectors.getUsher(state),
-  ushers: ushersSelectors.getUshers(state),
 });
 
 const mapDispatchToProps = {
   fetchUsher: ushersActions.fetchItem,
-  changePassword: ushersActions.changePassword,
   changeProfile: ushersActions.changeProfile,
 };
 
