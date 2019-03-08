@@ -92,7 +92,7 @@ class ProfileView extends Component {
   };
 
   render() {
-    const { profile } = this.props;
+    const { profile, usherId } = this.props;
     const { activeTab } = this.state;
 
     let breadcrumbName = '';
@@ -120,7 +120,7 @@ class ProfileView extends Component {
           onTabChange={this.handleTabChange}
           disableProfile={false}
         >
-          <ProfileForm profile={profile} onSubmit={this.handleProfileSubmit} />
+          <ProfileForm profile={profile} key={profile.id} onSubmit={this.handleProfileSubmit} />
         </ProfileComponent>
       </Layout>
     );
