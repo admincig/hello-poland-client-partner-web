@@ -56,7 +56,7 @@ class PasswordForm extends Component {
     const {
       classes, FormikProps, onSubmit, userId, noOldpassword,
     } = this.props;
-    console.log(noOldpassword)
+
     return (
       <Formik
         {...FormikProps}
