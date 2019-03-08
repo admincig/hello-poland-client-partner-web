@@ -43,7 +43,7 @@ class PasswordForm extends Component {
       oldPassword: string()
         .required('Field is required.'),
       password: string()
-        .notOneOf([ref('oldPassword')], 'New password must be different from the current one.')
+        .notOneOf([ref('oldPassword')], `${props.noOldpassword ? 'Field is required.' : 'New password must be different from the current one.'}`)
         .min(8, 'Should be at least 8 characters long.')
         .required('Field is required.'),
       passwordConfirm: string()
@@ -56,7 +56,7 @@ class PasswordForm extends Component {
     const {
       classes, FormikProps, onSubmit, userId, noOldpassword,
     } = this.props;
-
+    console.log(noOldpassword)
     return (
       <Formik
         {...FormikProps}
@@ -75,10 +75,12 @@ class PasswordForm extends Component {
                 )
               }
               {
-                !noOldpassword &&
+                !noOldpassword
+                && (
                 <GridItem>
                   <Field label="Obecne hasło" name="oldPassword" {...commonProps} />
                 </GridItem>
+                )
               }
               <GridItem>
                 <Field label="Nowe hasło" name="password" {...commonProps} />
