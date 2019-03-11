@@ -209,6 +209,10 @@ class SightEventFormDialog extends Component {
       && !this.isItemLoaded(itemId, item);
   };
 
+  handleDefaultLanguageChange = (val) => {
+    console.log(val)
+  }
+
   render() {
     const {
       alertDialog, fetchingError, isFetching, isSubmitting, submittingError,
@@ -218,7 +222,9 @@ class SightEventFormDialog extends Component {
     } = this.props;
 
     const multimedia = this.getMultimedia();
-
+    const actions = [
+      { label: 'Ustaw jako domyślny język', action: this.handleDefaultLanguageChange },
+    ];
     return (
       <Fragment>
         <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
@@ -228,9 +234,9 @@ class SightEventFormDialog extends Component {
               ? <CircularProgress size={18} style={{ marginLeft: 20 }} />
               : null
             }
+            <LanguageActions actions={actions} rootLng="pl-PL" />
           </DialogTitle>
           <DialogContent>
-            <LanguageActions />
             <SightForm
               buttons={false}
               FormikProps={{ ref: this.formikRef }}
@@ -243,17 +249,17 @@ class SightEventFormDialog extends Component {
           <DialogActions>
             {submittingError
               && (
-              <Typography style={{ color: 'red' }}>
-                Wystąpił błąd podczas zapisywania.
-              </Typography>
+                <Typography style={{ color: 'red' }}>
+                  Wystąpił błąd podczas zapisywania.
+                </Typography>
               )
             }
             {fetchingError
-            && (
-            <Typography style={{ color: 'red' }}>
-              Wystąpił błąd podczas pobierania danych.
-            </Typography>
-            )
+              && (
+                <Typography style={{ color: 'red' }}>
+                  Wystąpił błąd podczas pobierania danych.
+                </Typography>
+              )
             }
             <Button disabled={isSubmitting} onClick={this.handleClose} color="primary">Anuluj</Button>
             <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>

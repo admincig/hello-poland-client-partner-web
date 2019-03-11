@@ -148,6 +148,9 @@ class SightFormDialog extends Component {
       && !this.isItemLoaded(itemId, item);
   };
 
+  handleDefaultLanguageChange = (val) => console.log(val)
+  
+
   render() {
     const {
       fetchingError, isFetching, isSubmitting, submittingError,
@@ -156,7 +159,9 @@ class SightFormDialog extends Component {
       clearItem, fetchItem, fetchSightsList, fetchSightEventsList, item, itemId, onClose, title,
       ...rest
     } = this.props;
-    const actions = []
+    const actions = [
+      { label: 'Ustaw jako domyślny język', action: this.handleDefaultLanguageChange }
+    ];
     return (
       <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
         <DialogTitle id="form-dialog-title">
@@ -165,9 +170,10 @@ class SightFormDialog extends Component {
             ? <CircularProgress size={18} style={{ marginLeft: 20 }} />
             : null
           }
+                    <LanguageActions actions={actions} rootLng="pl-PL" />
+
         </DialogTitle>
         <DialogContent>
-          <LanguageActions />
           <SightForm
             buttons={false}
             FormikProps={{ ref: this.formikRef }}
