@@ -10,7 +10,7 @@ const env = process.env.NODE_ENV;
 const dev = env !== 'production';
 const app = next({ dev });
 
-const handle = app.getRequestHandler();
+const handleRequest = app.getRequestHandler();
 
 let server;
 
@@ -35,7 +35,7 @@ app
     });
 
     // Default catch-all handler to allow Next.js to handle all other routes
-    server.all('*', (req, res) => handle(req, res));
+    server.all('*', (req, res) => handleRequest(req, res));
 
     server.listen(port, host, (err) => {
       if (err) {

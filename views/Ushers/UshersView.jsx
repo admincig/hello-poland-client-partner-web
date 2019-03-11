@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import Link from 'next/link';
 import Button from '@material-ui/core/Button';
@@ -9,6 +10,7 @@ import {
   actions as ushersActions,
   selectors as ushersSelectors,
 } from 'redux/ushers';
+import withAuth from 'services/auth/withAuth';
 import UshersList from './components/UshersList';
 
 class UshersView extends Component {
@@ -40,7 +42,11 @@ class UshersView extends Component {
 
 UshersView.propTypes = {
   fetchUshers: PropTypes.func.isRequired,
-  ushers: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  ushers: PropTypes.arrayOf(PropTypes.shape({})),
+};
+
+UshersView.defaultProps = {
+  ushers: [],
 };
 
 const mapStateToProps = state => ({
@@ -51,4 +57,7 @@ const mapDispatchToProps = {
   fetchUshers: ushersActions.fetchList,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(UshersView);
+export default compose(
+  withAuth(),
+  connect(mapStateToProps, mapDispatchToProps),
+)(UshersView);
