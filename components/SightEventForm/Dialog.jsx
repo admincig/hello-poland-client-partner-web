@@ -13,6 +13,7 @@ import {
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
 import AlertDialog from 'components/AlertDialog';
+import LanguageActions from 'components/LanguageActions';
 import SightForm from './Form';
 import MultimediaList from './MultimediaList';
 
@@ -229,6 +230,7 @@ class SightEventFormDialog extends Component {
             }
           </DialogTitle>
           <DialogContent>
+            <LanguageActions />
             <SightForm
               buttons={false}
               FormikProps={{ ref: this.formikRef }}

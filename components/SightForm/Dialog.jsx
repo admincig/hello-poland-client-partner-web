@@ -13,6 +13,7 @@ import {
   selectors as sightsSelectors,
 } from '@hello-poland/commons/redux/sights';
 import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
+import LanguageActions from 'components/LanguageActions';
 import SightForm from './Form';
 
 class SightFormDialog extends Component {
@@ -155,7 +156,7 @@ class SightFormDialog extends Component {
       clearItem, fetchItem, fetchSightsList, fetchSightEventsList, item, itemId, onClose, title,
       ...rest
     } = this.props;
-
+    const actions = []
     return (
       <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
         <DialogTitle id="form-dialog-title">
@@ -166,6 +167,7 @@ class SightFormDialog extends Component {
           }
         </DialogTitle>
         <DialogContent>
+          <LanguageActions />
           <SightForm
             buttons={false}
             FormikProps={{ ref: this.formikRef }}
