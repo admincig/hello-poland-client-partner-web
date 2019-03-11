@@ -8,7 +8,12 @@ import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
 import GridItem from 'components/GridItem';
 import Typography from '@material-ui/core/Typography';
-import { string, object, ref } from 'yup';
+import {
+  boolean,
+  string,
+  object,
+  ref,
+} from 'yup';
 
 const commonProps = {
   component: TextField,
@@ -40,8 +45,12 @@ class PasswordForm extends Component {
     };
 
     this.validationSchema = object().shape({
-      oldPassword: string()
-        .required('Field is required.'),
+      oldPassword: string().when('noOldPassword', {
+        is: false,
+        then: string().required(),
+        otherwise: string(),
+      }),
+      noOldpassword: boolean().default(() => props.noOldpassword),
       password: string()
         .notOneOf([ref('oldPassword')], `${props.noOldpassword ? 'Field is required.' : 'New password must be different from the current one.'}`)
         .min(8, 'Should be at least 8 characters long.')
