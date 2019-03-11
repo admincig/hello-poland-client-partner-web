@@ -43,10 +43,10 @@ class PasswordView extends Component {
   };
 
   handlePasswordSubmit = (values, actions) => {
-    const { oldPassword, password } = values;
+    const { password } = values;
     const { setStatus, resetForm } = actions;
     const { changePassword, usherId } = this.props;
-    const data = { oldPassword, password };
+    const data = { password };
 
     setStatus(null);
 
@@ -121,7 +121,7 @@ class PasswordView extends Component {
           onTabChange={this.handleTabChange}
           disableProfile={false}
         >
-          <PasswordForm onSubmit={this.handlePasswordSubmit} />
+          <PasswordForm onSubmit={this.handlePasswordSubmit} noOldpassword />
         </ProfileComponent>
       </Layout>
     );
