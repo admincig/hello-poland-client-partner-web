@@ -81,8 +81,8 @@ class HomeListItem extends Component {
     const {
       affiliation, blocked, classes, icon: Icon, primary, secondary, onAddClick, onAddLabel,
       onDeleteClick, onDeleteLabel, onDocumentClick, onDocumentLabel, onEditClick, onPreviewClick,
-      onPreviewLabel, onEditLabel, onMainImageClick, onMainImageLabel, onStatsClick, onStopSellClick,
-      onStopSellLabel, onViewClick, onViewLabel, published,
+      onPreviewLabel, onEditLabel, onMainImageClick, onMainImageLabel, onStatsClick,
+      onStopSellClick, onStopSellLabel, onViewClick, onViewLabel, published,
     } = this.props;
 
     const id = affiliationOpen ? 'simple-popper' : null;
