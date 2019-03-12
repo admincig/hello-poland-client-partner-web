@@ -18,6 +18,7 @@ import Typography from '@material-ui/core/Typography';
 import DesktopWindows from '@material-ui/icons/DesktopWindows';
 import AddIcon from '@material-ui/icons/Add';
 import AddAPhoto from '@material-ui/icons/AddAPhoto';
+import AssessmentIcon from '@material-ui/icons/Assessment';
 import CreateIcon from '@material-ui/icons/Create';
 import InfoIcon from '@material-ui/icons/Info';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -80,7 +81,7 @@ class HomeListItem extends Component {
     const {
       affiliation, blocked, classes, icon: Icon, primary, secondary, onAddClick, onAddLabel,
       onDeleteClick, onDeleteLabel, onDocumentClick, onDocumentLabel, onEditClick, onPreviewClick,
-      onPreviewLabel, onEditLabel, onMainImageClick, onMainImageLabel, onStopSellClick,
+      onPreviewLabel, onEditLabel, onMainImageClick, onMainImageLabel, onStatsClick, onStopSellClick,
       onStopSellLabel, onViewClick, onViewLabel, published,
     } = this.props;
 
@@ -166,6 +167,19 @@ class HomeListItem extends Component {
                 )}
               </Popper>
             </Fragment>
+            )
+          }
+          {onStatsClick
+            && (
+              <IconButton
+                aria-label="Pokaż dostępność biletów"
+                component="a"
+                href={onStatsClick()}
+                target="_blank"
+                title="Pokaż dostępność biletów"
+              >
+                <AssessmentIcon />
+              </IconButton>
             )
           }
           {onMainImageClick
@@ -273,6 +287,7 @@ HomeListItem.propTypes = {
   onPreviewLabel: PropTypes.string,
   onMainImageClick: PropTypes.func,
   onMainImageLabel: PropTypes.string,
+  onStatsClick: PropTypes.func,
   onStopSellClick: PropTypes.func,
   onStopSellLabel: PropTypes.string,
   onViewClick: PropTypes.func,
@@ -298,6 +313,7 @@ HomeListItem.defaultProps = {
   onPreviewLabel: null,
   onMainImageClick: null,
   onMainImageLabel: null,
+  onStatsClick: null,
   onStopSellClick: null,
   onStopSellLabel: null,
   onViewClick: null,
