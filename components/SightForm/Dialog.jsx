@@ -1,20 +1,33 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
+import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography/Typography';
 import {
   actions as sightsActions,
   selectors as sightsSelectors,
 } from '@hello-poland/commons/redux/sights';
 import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
+import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getSupportedLanguages } from 'utils/content-language';
+import ContentLanguage from 'components/ContentLanguage';
+import GridItem from 'components/GridItem';
 import LanguageActions from 'components/LanguageActions';
 import SightForm from './Form';
+import i18n from './i18n/pl-PL';
+
+const styles = () => ({
+  section: {
+    marginBottom: 40,
+  },
+});
 
 class SightFormDialog extends Component {
   constructor(props) {
@@ -28,6 +41,7 @@ class SightFormDialog extends Component {
       fetchingError: false,
       isFetching: false,
       isSubmitting: false,
+      language: DEFAULT_LANGUAGE,
       submittingError: false,
     };
   }
@@ -35,8 +49,9 @@ class SightFormDialog extends Component {
   componentDidUpdate() {
     if (this.shouldComponentFetch()) {
       const { itemId } = this.props;
+      const { language } = this.state;
 
-      this.handleFetchItem(itemId);
+      this.handleFetchItem(itemId, language);
     }
   }
 
@@ -71,11 +86,16 @@ class SightFormDialog extends Component {
     }
   };
 
-  handleFetchItem = (id) => {
+  handleFetchItem = (id, language) => {
     const { fetchItem } = this.props;
 
     fetchItem({
       id,
+      options: {
+        headers: {
+          'Content-Language': language,
+        },
+      },
       onFailure: this.handleFetchItemFailure,
       onSuccess: this.handleFetchItemSuccess,
     });
@@ -83,9 +103,24 @@ class SightFormDialog extends Component {
     this.setState({ fetchingError: false, isFetching: true });
   };
 
-  handleFetchItemFailure = () => this.setState({ fetchingError: true, isFetching: false });
+  handleFetchItemFailure = () => {
+    this.setState({ fetchingError: true, isFetching: false });
+  };
 
-  handleFetchItemSuccess = () => this.setState({ fetchingError: false, isFetching: false });
+  handleFetchItemSuccess = () => {
+    this.setState({ fetchingError: false, isFetching: false });
+  };
+
+  handleLanguageChange = (event) => {
+    const { itemId } = this.props;
+    const language = event.target.value;
+
+    this.setState({ language });
+
+    if (itemId) {
+      this.handleFetchItem(itemId, language);
+    }
+  };
 
   handleSubmit = () => {
     const { current } = this.formikRef;
@@ -167,12 +202,23 @@ class SightFormDialog extends Component {
 
   render() {
     const {
-      fetchingError, isFetching, isSubmitting, submittingError,
+      fetchingError, isFetching, isSubmitting, language, submittingError,
     } = this.state;
     const {
-      clearItem, fetchItem, fetchSightsList, fetchSightEventsList, item, itemId, onClose, title,
-      ...rest
+      classes, clearItem, fetchItem, fetchSightsList, fetchSightEventsList, item, itemId, onClose,
+      title, ...rest
     } = this.props;
+
+    let languageVersions = CONTENT_LANGUAGES;
+    let defaultLanguage;
+
+    if (this.isItemLoaded(itemId, item)) {
+      const { availableLanguageVersions, defaultLanguage: itemDefaultLanguage } = item;
+
+      languageVersions = getSupportedLanguages(availableLanguageVersions);
+      defaultLanguage = itemDefaultLanguage;
+    }
+
     const actions = [
       { label: 'Ustaw jako domyślny język', action: this.handleDefaultLanguageChange }
     ];
@@ -193,13 +239,28 @@ class SightFormDialog extends Component {
           }
         </DialogTitle>
         <DialogContent>
-          <SightForm
-            buttons={false}
-            FormikProps={{ ref: this.formikRef }}
-            initialValues={this.getInitialValues(item)}
-            onSubmitFailure={this.handleSubmitFailure}
-            onSubmitSuccess={this.handleSubmitSuccess}
-          />
+          <Grid container>
+            <GridItem>
+              <Typography variant="h6">Wersja językowa</Typography>
+            </GridItem>
+            <GridItem className={classes.section}>
+              <ContentLanguage
+                defaultItem={defaultLanguage}
+                label={itemId ? i18n.label : i18n.defaultLabel}
+                listItems={languageVersions}
+                onChange={this.handleLanguageChange}
+                value={language}
+              />
+            </GridItem>
+            <SightForm
+              buttons={false}
+              FormikProps={{ ref: this.formikRef }}
+              initialValues={this.getInitialValues(item)}
+              language={language}
+              onSubmitFailure={this.handleSubmitFailure}
+              onSubmitSuccess={this.handleSubmitSuccess}
+            />
+          </Grid>
         </DialogContent>
         <DialogActions>
           {submittingError
@@ -258,4 +319,7 @@ const mapDispatchToProps = {
   fetchSightEventsList: sightEventsActions.fetchList,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(SightFormDialog);
+export default compose(
+  withStyles(styles),
+  connect(mapStateToProps, mapDispatchToProps),
+)(SightFormDialog);

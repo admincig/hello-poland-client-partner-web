@@ -18,8 +18,6 @@ import yupString from 'yup/lib/string';
 import yupBoolen from 'yup/lib/boolean';
 import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
 import GridItem from 'components/GridItem';
-import ContentLanguage from 'components/ContentLanguage';
-import { DEFAULT_LANGUAGE } from 'utils/content-languages';
 
 const commonProps = {
   fullWidth: true,
@@ -54,7 +52,6 @@ class SightEventForm extends Component {
 
     this.state = {
       initialValues: this.getInitialValues(initialValues),
-      language: DEFAULT_LANGUAGE,
     };
 
     // TODO: nested validation seems not working
@@ -102,7 +99,6 @@ class SightEventForm extends Component {
       sightId: details.sightId || '',
       name: details.name || '',
       published: details.published || false,
-      // generalAdmission: details.generalAdmission || false,
       lead: details.lead || '',
       description: details.description || '',
       email: details.email || '',
@@ -121,11 +117,8 @@ class SightEventForm extends Component {
     initialValues: this.getInitialValues(initialValues),
   });
 
-  handleLanguageChange = event => this.setState({ language: event.target.value });
-
   handleSubmit = (values, actions) => {
-    const { onSubmit } = this.props;
-    const { language } = this.state;
+    const { language, onSubmit } = this.props;
     const options = {
       headers: {
         'Content-Language': language,
@@ -185,12 +178,9 @@ class SightEventForm extends Component {
   };
 
   render() {
-    const { initialValues, language } = this.state;
-    const {
-      buttons,
-      classes,
-      FormikProps,
-    } = this.props;
+    const { initialValues } = this.state;
+    const { buttons, classes, FormikProps } = this.props;
+
     return (
       <Formik
         enableReinitialize
@@ -205,13 +195,6 @@ class SightEventForm extends Component {
               <GridItem>
                 <Typography variant="h6">Dane podstawowe</Typography>
               </GridItem>
-              {!initialValues.id
-                && (
-                  <GridItem>
-                    <ContentLanguage value={language} onChange={this.handleLanguageChange} />
-                  </GridItem>
-                )
-              }
               <Hidden xsUp>
                 <GridItem>
                   <Field name="id" hidden component={TextField} {...commonProps} />
@@ -236,17 +219,6 @@ class SightEventForm extends Component {
                   )}
                 />
               </GridItem>
-              {/* <GridItem md={8} sm={8}> */}
-              {/* <Field */}
-              {/* name="generalAdmission" */}
-              {/* render={switchProps => ( */}
-              {/* <FormControlLabel */}
-              {/* control={<Switch {...fieldToSwitch(switchProps)} />} */}
-              {/* label="Oferta ogólna" */}
-              {/* /> */}
-              {/* )} */}
-              {/* /> */}
-              {/* </GridItem> */}
               <GridItem>
                 <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
               </GridItem>
@@ -305,6 +277,7 @@ SightEventForm.propTypes = {
   createItem: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
   initialValues: PropTypes.shape({}),
+  language: PropTypes.string.isRequired,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,

@@ -23,8 +23,6 @@ import yupString from 'yup/lib/string';
 import yupBoolen from 'yup/lib/boolean';
 import { actions as sightsActions } from '@hello-poland/commons/redux/sights';
 import GridItem from 'components/GridItem';
-import ContentLanguage from 'components/ContentLanguage';
-import { DEFAULT_LANGUAGE } from 'utils/content-languages';
 
 const i18n = {
   days: {
@@ -76,7 +74,6 @@ class SightForm extends Component {
     this.state = {
       initialValues: this.getInitialValues(initialValues),
       viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
-      language: DEFAULT_LANGUAGE,
     };
 
     // TODO: nested validation seems not working
@@ -151,7 +148,6 @@ class SightForm extends Component {
       id: details.id || '',
       name: details.name || '',
       published: details.published || false,
-      // generalAdmission: details.generalAdmission || false,
       lead: details.lead || '',
       description: details.description || '',
       email: details.email || '',
@@ -173,8 +169,6 @@ class SightForm extends Component {
   setViewOpeningHours = openingHours => this.setState({
     viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
   });
-
-  handleLanguageChange = event => this.setState({ language: event.target.value });
 
   handleOpeningHoursChange = (day, keyName, keyValue) => {
     const { initialValues, viewOpeningHours } = this.state;
@@ -226,8 +220,7 @@ class SightForm extends Component {
   };
 
   handleSubmit = (values, actions) => {
-    const { onSubmit } = this.props;
-    const { language } = this.state;
+    const { language, onSubmit } = this.props;
     const options = {
       headers: {
         'Content-Language': language,
@@ -286,7 +279,7 @@ class SightForm extends Component {
   };
 
   render() {
-    const { initialValues, language, viewOpeningHours } = this.state;
+    const { initialValues, viewOpeningHours } = this.state;
     const { buttons, classes, FormikProps } = this.props;
 
     return (
@@ -303,13 +296,6 @@ class SightForm extends Component {
               <GridItem>
                 <Typography variant="h6">Dane podstawowe</Typography>
               </GridItem>
-              {!initialValues.id
-                && (
-                  <GridItem>
-                    <ContentLanguage value={language} onChange={this.handleLanguageChange} />
-                  </GridItem>
-                )
-              }
               <Hidden xsUp>
                 <GridItem>
                   <Field name="id" hidden component={TextField} {...commonProps} />
@@ -329,17 +315,6 @@ class SightForm extends Component {
                   )}
                 />
               </GridItem>
-              {/* <GridItem md={8} sm={8}> */}
-              {/* <Field */}
-              {/* name="generalAdmission" */}
-              {/* render={switchProps => ( */}
-              {/* <FormControlLabel */}
-              {/* control={<Switch {...fieldToSwitch(switchProps)} />} */}
-              {/* label="Dodaj ofertę ogólną" */}
-              {/* /> */}
-              {/* )} */}
-              {/* /> */}
-              {/* </GridItem> */}
               <GridItem>
                 <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
               </GridItem>
@@ -434,6 +409,7 @@ SightForm.propTypes = {
   createItem: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
   initialValues: PropTypes.shape({}),
+  language: PropTypes.string.isRequired,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
