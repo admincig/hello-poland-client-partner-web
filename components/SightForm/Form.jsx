@@ -23,6 +23,8 @@ import yupString from 'yup/lib/string';
 import yupBoolen from 'yup/lib/boolean';
 import { actions as sightsActions } from '@hello-poland/commons/redux/sights';
 import GridItem from 'components/GridItem';
+import ContentLanguage from 'components/ContentLanguage';
+import { DEFAULT_LANGUAGE } from 'utils/content-languages';
 
 const i18n = {
   days: {
@@ -74,6 +76,7 @@ class SightForm extends Component {
     this.state = {
       initialValues: this.getInitialValues(initialValues),
       viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
+      language: DEFAULT_LANGUAGE,
     };
 
     // TODO: nested validation seems not working
@@ -171,6 +174,8 @@ class SightForm extends Component {
     viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
   });
 
+  handleLanguageChange = event => this.setState({ language: event.target.value });
+
   handleOpeningHoursChange = (day, keyName, keyValue) => {
     const { initialValues, viewOpeningHours } = this.state;
     const { openingHours } = initialValues;
@@ -211,7 +216,6 @@ class SightForm extends Component {
       openingHours = openingHours.filter(o => o.day !== day);
     }
 
-
     this.setState({
       initialValues: {
         ...values,
@@ -223,9 +227,15 @@ class SightForm extends Component {
 
   handleSubmit = (values, actions) => {
     const { onSubmit } = this.props;
+    const { language } = this.state;
+    const options = {
+      headers: {
+        'Content-Language': language,
+      },
+    };
 
     if (onSubmit) {
-      onSubmit(values, actions);
+      onSubmit(values, actions, options);
 
       return;
     }
@@ -237,6 +247,7 @@ class SightForm extends Component {
       data,
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
+      options,
     };
 
     if (_isNumber(id)) {
@@ -275,7 +286,7 @@ class SightForm extends Component {
   };
 
   render() {
-    const { initialValues, viewOpeningHours } = this.state;
+    const { initialValues, language, viewOpeningHours } = this.state;
     const { buttons, classes, FormikProps } = this.props;
 
     return (
@@ -292,6 +303,13 @@ class SightForm extends Component {
               <GridItem>
                 <Typography variant="h6">Dane podstawowe</Typography>
               </GridItem>
+              {!initialValues.id
+                && (
+                  <GridItem>
+                    <ContentLanguage value={language} onChange={this.handleLanguageChange} />
+                  </GridItem>
+                )
+              }
               <Hidden xsUp>
                 <GridItem>
                   <Field name="id" hidden component={TextField} {...commonProps} />
@@ -342,7 +360,7 @@ class SightForm extends Component {
                             onChange={this.handleOpeningHoursSelectionChange(item.day, values)}
                             value={`${item.day}`}
                           />
-)}
+                        )}
                         label={i18n.days[item.day]}
                       />
                     </GridItem>

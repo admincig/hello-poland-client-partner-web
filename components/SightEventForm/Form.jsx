@@ -18,6 +18,8 @@ import yupString from 'yup/lib/string';
 import yupBoolen from 'yup/lib/boolean';
 import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
 import GridItem from 'components/GridItem';
+import ContentLanguage from 'components/ContentLanguage';
+import { DEFAULT_LANGUAGE } from 'utils/content-languages';
 
 const commonProps = {
   fullWidth: true,
@@ -52,6 +54,7 @@ class SightEventForm extends Component {
 
     this.state = {
       initialValues: this.getInitialValues(initialValues),
+      language: DEFAULT_LANGUAGE,
     };
 
     // TODO: nested validation seems not working
@@ -118,11 +121,19 @@ class SightEventForm extends Component {
     initialValues: this.getInitialValues(initialValues),
   });
 
+  handleLanguageChange = event => this.setState({ language: event.target.value });
+
   handleSubmit = (values, actions) => {
     const { onSubmit } = this.props;
+    const { language } = this.state;
+    const options = {
+      headers: {
+        'Content-Language': language,
+      },
+    };
 
     if (onSubmit) {
-      onSubmit(values, actions);
+      onSubmit(values, actions, options);
 
       return;
     }
@@ -134,6 +145,7 @@ class SightEventForm extends Component {
       data,
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
+      options,
     };
 
 
@@ -173,7 +185,7 @@ class SightEventForm extends Component {
   };
 
   render() {
-    const { initialValues } = this.state;
+    const { initialValues, language } = this.state;
     const {
       buttons,
       classes,
@@ -193,6 +205,13 @@ class SightEventForm extends Component {
               <GridItem>
                 <Typography variant="h6">Dane podstawowe</Typography>
               </GridItem>
+              {!initialValues.id
+                && (
+                  <GridItem>
+                    <ContentLanguage value={language} onChange={this.handleLanguageChange} />
+                  </GridItem>
+                )
+              }
               <Hidden xsUp>
                 <GridItem>
                   <Field name="id" hidden component={TextField} {...commonProps} />

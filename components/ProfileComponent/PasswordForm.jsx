@@ -8,7 +8,12 @@ import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
 import GridItem from 'components/GridItem';
 import Typography from '@material-ui/core/Typography';
-import { string, object, ref } from 'yup';
+import {
+  boolean,
+  string,
+  object,
+  ref,
+} from 'yup';
 
 const commonProps = {
   component: TextField,
@@ -40,10 +45,14 @@ class PasswordForm extends Component {
     };
 
     this.validationSchema = object().shape({
-      oldPassword: string()
-        .required('Field is required.'),
+      oldPassword: string().when('noOldPassword', {
+        is: false,
+        then: string().required(),
+        otherwise: string(),
+      }),
+      noOldpassword: boolean().default(() => props.noOldpassword),
       password: string()
-        .notOneOf([ref('oldPassword')], 'New password must be different from the current one.')
+        .notOneOf([ref('oldPassword')], `${props.noOldpassword ? 'Field is required.' : 'New password must be different from the current one.'}`)
         .min(8, 'Should be at least 8 characters long.')
         .required('Field is required.'),
       passwordConfirm: string()
@@ -54,7 +63,7 @@ class PasswordForm extends Component {
 
   render() {
     const {
-      classes, FormikProps, onSubmit, userId,
+      classes, FormikProps, onSubmit, userId, noOldpassword,
     } = this.props;
 
     return (
@@ -74,9 +83,14 @@ class PasswordForm extends Component {
                 </Hidden>
                 )
               }
-              <GridItem>
-                <Field label="Obecne hasło" name="oldPassword" {...commonProps} />
-              </GridItem>
+              {
+                !noOldpassword
+                && (
+                <GridItem>
+                  <Field label="Obecne hasło" name="oldPassword" {...commonProps} />
+                </GridItem>
+                )
+              }
               <GridItem>
                 <Field label="Nowe hasło" name="password" {...commonProps} />
               </GridItem>
@@ -108,11 +122,13 @@ PasswordForm.propTypes = {
   FormikProps: PropTypes.shape({}),
   onSubmit: PropTypes.func.isRequired,
   userId: PropTypes.number,
+  noOldpassword: PropTypes.bool,
 };
 
 PasswordForm.defaultProps = {
   FormikProps: null,
   userId: null,
+  noOldpassword: false,
 };
 
 export default withStyles(styles)(PasswordForm);
