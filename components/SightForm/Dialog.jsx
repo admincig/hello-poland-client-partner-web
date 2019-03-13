@@ -17,6 +17,7 @@ import {
 } from '@hello-poland/commons/redux/sights';
 import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getSupportedLanguages } from 'utils/content-language';
+import AlertDialog from 'components/AlertDialog';
 import ContentLanguage from 'components/ContentLanguage';
 import GridItem from 'components/GridItem';
 import SightForm from './Form';
@@ -37,6 +38,12 @@ class SightFormDialog extends Component {
     this.intervalRef = null;
 
     this.state = {
+      alertDialog: {
+        content: null,
+        onSubmit: null,
+        open: false,
+        title: null,
+      },
       fetchingError: false,
       isFetching: false,
       isSubmitting: false,
@@ -84,6 +91,22 @@ class SightFormDialog extends Component {
       clearItem();
     }
   };
+
+  handleAlertDialogClear = () => this.setState({
+    alertDialog: {
+      content: null,
+      onSubmit: null,
+      open: false,
+      title: null,
+    },
+  });
+
+  handleAlertDialogClose = () => this.setState(state => ({
+    alertDialog: {
+      ...state.alertDialog,
+      open: false,
+    },
+  }));
 
   handleFetchItem = (id, language) => {
     const { fetchItem } = this.props;
@@ -199,9 +222,34 @@ class SightFormDialog extends Component {
     }
   };
 
+  handleDeleteTranslationConfirm = (value) => {
+    if (typeof value === 'string') {
+      this.setState({
+        alertDialog: {
+          content: 'Wybrana wersja językowa zostanie trwale usunięta, czy chcesz kontynuować?',
+          title: 'Usuwanie wersji językowej atrakcji',
+          open: true,
+          onSubmit: () => {
+            this.handleAlertDialogClose();
+            this.handleDeleteTranslation(value);
+          },
+        },
+      });
+    }
+  }
+
+  handleDeleteTranslation = (value) => {
+    const options = {
+      headers: {
+        'Content-Language': value,
+      },
+    };
+    console.log(value, options);
+  }
+
   render() {
     const {
-      fetchingError, isFetching, isSubmitting, language, submittingError,
+      fetchingError, isFetching, isSubmitting, language, submittingError, alertDialog,
     } = this.state;
     const {
       classes, clearItem, fetchItem, fetchSightsList, fetchSightEventsList, item, itemId, onClose,
@@ -219,6 +267,9 @@ class SightFormDialog extends Component {
     const actions = [
       { label: 'Ustaw jako domyślny język atrakcji', action: this.handleDefaultLanguageChange },
     ];
+    if (language !== defaultLanguage) {
+      actions.push({ label: 'Usuń wybraną wersję językową atrakcji', action: this.handleDeleteTranslationConfirm });
+    }
     return (
       <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
         <DialogTitle id="form-dialog-title">
@@ -273,6 +324,11 @@ class SightFormDialog extends Component {
           <Button disabled={isSubmitting} onClick={this.handleClose} color="primary">Anuluj</Button>
           <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>
         </DialogActions>
+        <AlertDialog
+          onClose={this.handleAlertDialogClose}
+          onExited={this.handleAlertDialogClear}
+          {...alertDialog}
+        />
       </Dialog>
     );
   }

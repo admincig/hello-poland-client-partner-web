@@ -256,6 +256,31 @@ class SightEventFormDialog extends Component {
     }
   }
 
+  handleDeleteTranslationConfirm = (value) => {
+    if (typeof value === 'string') {
+      this.setState({
+        alertDialog: {
+          content: 'Wybrana wersja językowa zostanie trwale usunięta, czy chcesz kontynuować?',
+          title: 'Usuwanie wersji językowej oferty',
+          open: true,
+          onSubmit: () => {
+            this.handleAlertDialogClose();
+            this.handleDeleteTranslation(value);
+          },
+        },
+      });
+    }
+  }
+
+  handleDeleteTranslation = (value) => {
+    const options = {
+      headers: {
+        'Content-Language': value,
+      },
+    };
+    console.log(value, options);
+  }
+
   render() {
     const {
       alertDialog, fetchingError, isFetching, isSubmitting, language, submittingError,
@@ -290,6 +315,10 @@ class SightEventFormDialog extends Component {
     const actions = [
       { label: 'Ustaw jako domyślny język oferty', action: this.handleDefaultLanguageChange },
     ];
+
+    if (language !== defaultLanguage) {
+      actions.push({ label: 'Usuń wybraną wersję językową ofery', action: this.handleDeleteTranslationConfirm });
+    }
     return (
       <Fragment>
         <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
