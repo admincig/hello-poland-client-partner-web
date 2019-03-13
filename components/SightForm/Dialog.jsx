@@ -19,7 +19,6 @@ import { actions as sightEventsActions } from '@hello-poland/commons/redux/sight
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getSupportedLanguages } from 'utils/content-language';
 import ContentLanguage from 'components/ContentLanguage';
 import GridItem from 'components/GridItem';
-import LanguageActions from 'components/LanguageActions';
 import SightForm from './Form';
 import i18n from './i18n/pl-PL';
 
@@ -195,7 +194,7 @@ class SightFormDialog extends Component {
         id: itemId,
         options,
         onSuccess: () => this.handleFetchItem(itemId),
-        onFailure: () => console.log('nie działa'),
+        onFailure: this.handleSubmitFailure,
       });
     }
   };
@@ -206,7 +205,7 @@ class SightFormDialog extends Component {
     } = this.state;
     const {
       classes, clearItem, fetchItem, fetchSightsList, fetchSightEventsList, item, itemId, onClose,
-      title, ...rest
+      title, changeDefaultLanguage, ...rest
     } = this.props;
 
     let languageVersions = CONTENT_LANGUAGES;
@@ -214,14 +213,9 @@ class SightFormDialog extends Component {
 
     if (this.isItemLoaded(itemId, item)) {
       const { availableLanguageVersions, defaultLanguage: itemDefaultLanguage } = item;
-
       languageVersions = getSupportedLanguages(availableLanguageVersions);
       defaultLanguage = itemDefaultLanguage;
     }
-
-    const actions = [
-      { label: 'Ustaw jako domyślny język', action: this.handleDefaultLanguageChange }
-    ];
     const actions = [
       { label: 'Ustaw jako domyślny język atrakcji', action: this.handleDefaultLanguageChange },
     ];
@@ -233,10 +227,6 @@ class SightFormDialog extends Component {
             ? <CircularProgress size={18} style={{ marginLeft: 20 }} />
             : null
           }
-          {
-            itemId
-            && <LanguageActions actions={actions} defaultLanguage={item.defaultLanguage || 'pl-PL'} />
-          }
         </DialogTitle>
         <DialogContent>
           <Grid container>
@@ -244,8 +234,11 @@ class SightFormDialog extends Component {
               <Typography variant="h6">Wersja językowa</Typography>
             </GridItem>
             <GridItem className={classes.section}>
+              {}
               <ContentLanguage
                 defaultItem={defaultLanguage}
+                id={itemId || undefined}
+                actions={itemId ? actions : null}
                 label={itemId ? i18n.label : i18n.defaultLabel}
                 listItems={languageVersions}
                 onChange={this.handleLanguageChange}
@@ -313,7 +306,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   clearItem: sightsActions.clearItem,
-  changeDefaultLanguage: sightsActions.changeDefault,
+  changeDefaultLanguage: sightsActions.changeDefaultLanguage,
   fetchItem: sightsActions.fetchItem,
   fetchSightsList: sightsActions.fetchList,
   fetchSightEventsList: sightEventsActions.fetchList,

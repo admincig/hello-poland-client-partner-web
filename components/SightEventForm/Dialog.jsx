@@ -19,7 +19,6 @@ import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getSupportedLanguages } from 'util
 import AlertDialog from 'components/AlertDialog';
 import ContentLanguage from 'components/ContentLanguage';
 import GridItem from 'components/GridItem';
-import LanguageActions from 'components/LanguageActions';
 import SightForm from './Form';
 import MultimediaList from './MultimediaList';
 import i18n from './i18n/pl-PL';
@@ -252,7 +251,7 @@ class SightEventFormDialog extends Component {
         id: itemId,
         options,
         onSuccess: () => this.handleFetchItem(itemId),
-        onFailure: () => console.log('nie działa'),
+        onFailure: this.handleSubmitFailure,
       });
     }
   }
@@ -262,7 +261,17 @@ class SightEventFormDialog extends Component {
       alertDialog, fetchingError, isFetching, isSubmitting, language, submittingError,
     } = this.state;
     const {
-      classes, clearItem, fetchItem, fetchList, item, itemId, onClose, parentId, title, deletePDF,
+      classes,
+      clearItem,
+      fetchItem,
+      fetchList,
+      item,
+      itemId,
+      onClose,
+      parentId,
+      title,
+      deletePDF,
+      changeDefaultLanguage,
       ...rest
     } = this.props;
 
@@ -290,10 +299,6 @@ class SightEventFormDialog extends Component {
               ? <CircularProgress size={18} style={{ marginLeft: 20 }} />
               : null
             }
-            {
-              itemId
-              && <LanguageActions actions={actions} defaultLanguage={item.defaultLanguage || 'pl-PL'} />
-            }
           </DialogTitle>
           <DialogContent>
             <Grid container>
@@ -303,6 +308,7 @@ class SightEventFormDialog extends Component {
               <GridItem className={classes.section}>
                 <ContentLanguage
                   defaultItem={defaultLanguage}
+                  actions={itemId ? actions : null}
                   label={itemId ? i18n.label : i18n.defaultLabel}
                   listItems={languageVersions}
                   onChange={this.handleLanguageChange}
