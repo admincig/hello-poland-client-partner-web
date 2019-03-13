@@ -210,7 +210,20 @@ class SightEventFormDialog extends Component {
   };
 
   handleDefaultLanguageChange = (val) => {
-    console.log(val)
+    const { changeDefaultLanguage, itemId } = this.props;
+    const options = {
+      headers: {
+        'Content-Language': val,
+      },
+    };
+    if (typeof val === 'string') {
+      changeDefaultLanguage({
+        id: itemId,
+        options,
+        onSuccess: () => this.handleFetchItem(itemId),
+        onFailure: () => console.log('nie działa'),
+      });
+    }
   }
 
   render() {
@@ -222,8 +235,19 @@ class SightEventFormDialog extends Component {
     } = this.props;
 
     const multimedia = this.getMultimedia();
+
+    let languageVersions = CONTENT_LANGUAGES;
+    let defaultLanguage;
+
+    if (this.isItemLoaded(itemId, item)) {
+      const { availableLanguageVersions, defaultLanguage: itemDefaultLanguage } = item;
+
+      languageVersions = getSupportedLanguages(availableLanguageVersions);
+      defaultLanguage = itemDefaultLanguage;
+    }
+
     const actions = [
-      { label: 'Ustaw jako domyślny język', action: this.handleDefaultLanguageChange },
+      { label: 'Ustaw jako domyślny język oferty', action: this.handleDefaultLanguageChange },
     ];
     return (
       <Fragment>
@@ -234,7 +258,10 @@ class SightEventFormDialog extends Component {
               ? <CircularProgress size={18} style={{ marginLeft: 20 }} />
               : null
             }
-            <LanguageActions actions={actions} rootLng="pl-PL" />
+            {
+              itemId
+              && <LanguageActions actions={actions} defaultLanguage={item.defaultLanguage || 'pl-PL'} />
+            }
           </DialogTitle>
           <DialogContent>
             <SightForm
@@ -276,6 +303,8 @@ class SightEventFormDialog extends Component {
 }
 
 SightEventFormDialog.propTypes = {
+  classes: PropTypes.shape({}).isRequired,
+  changeDefaultLanguage: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
   deletePDF: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
@@ -303,6 +332,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   clearItem: sightEventsActions.clearItem,
+  changeDefaultLanguage: sightEventsActions.changeDefaultLanguage,
   fetchItem: sightEventsActions.fetchItem,
   fetchList: sightEventsActions.fetchList,
   deletePDF: sightEventsActions.deletePDF,

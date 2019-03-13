@@ -148,9 +148,23 @@ class SightFormDialog extends Component {
       && !this.isItemLoaded(itemId, item);
   };
 
-  handleDefaultLanguageChange = (val) => console.log(val)
-  
+  }
+    }
+      });
+        onFailure: () => console.log('nie działa'),
+        onSuccess: () => this.handleFetchItem(itemId),
+        options,
+        id: itemId,
+      changeDefaultLanguage({
+    if (typeof val === 'string') {
 
+  handleDefaultLanguageChange = (val) => {
+    const { changeDefaultLanguage, itemId } = this.props;
+    const options = {
+      headers: {
+        'Content-Language': val,
+      },
+    };
   render() {
     const {
       fetchingError, isFetching, isSubmitting, submittingError,
@@ -160,8 +174,17 @@ class SightFormDialog extends Component {
       ...rest
     } = this.props;
     const actions = [
-      { label: 'Ustaw jako domyślny język', action: this.handleDefaultLanguageChange }
+      { label: 'Ustaw jako domyślny język atrakcji', action: this.handleDefaultLanguageChange },
     ];
+    let languageVersions = CONTENT_LANGUAGES;
+    let defaultLanguage;
+
+    if (this.isItemLoaded(itemId, item)) {
+      const { availableLanguageVersions, defaultLanguage: itemDefaultLanguage } = item;
+
+      languageVersions = getSupportedLanguages(availableLanguageVersions);
+      defaultLanguage = itemDefaultLanguage;
+    }
     return (
       <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
         <DialogTitle id="form-dialog-title">
@@ -170,8 +193,6 @@ class SightFormDialog extends Component {
             ? <CircularProgress size={18} style={{ marginLeft: 20 }} />
             : null
           }
-                    <LanguageActions actions={actions} rootLng="pl-PL" />
-
         </DialogTitle>
         <DialogContent>
           <SightForm
@@ -206,6 +227,7 @@ class SightFormDialog extends Component {
 }
 
 SightFormDialog.propTypes = {
+  classes: PropTypes.shape({}).isRequired,
   clearItem: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   fetchSightsList: PropTypes.func.isRequired,
@@ -231,6 +253,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   clearItem: sightsActions.clearItem,
+  changeDefaultLanguage: sightsActions.changeDefault,
   fetchItem: sightsActions.fetchItem,
   fetchSightsList: sightsActions.fetchList,
   fetchSightEventsList: sightEventsActions.fetchList,
