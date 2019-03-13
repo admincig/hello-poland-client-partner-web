@@ -4,14 +4,17 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
-import { CONTENT_LANGUAGES } from 'utils/content-languages';
-import i18n from './i18n/pl-PL';
+import { getLanguageLabel } from 'utils/content-language';
 
 const ContentLanguage = ({
-  FormControlProps, InputLabelProps, InputProps, label, ...props
+  defaultItem, FormControlProps, InputLabelProps, InputProps, label, listItems, ...props
 }) => (
   <FormControl {...FormControlProps}>
-    <InputLabel {...InputLabelProps} htmlFor="language">{label}</InputLabel>
+    {label
+      && (
+        <InputLabel {...InputLabelProps} htmlFor="language">{label}</InputLabel>
+      )
+    }
     <Select
       {...props}
       inputProps={{
@@ -19,25 +22,38 @@ const ContentLanguage = ({
         ...InputProps,
       }}
     >
-      {Object.values(CONTENT_LANGUAGES).map(lng => (
-        <MenuItem key={lng} value={lng}>{i18n.languages[lng]}</MenuItem>
-      ))}
+      {listItems.map((item) => {
+        const langLabel = getLanguageLabel(item, true, { locale: 'pl-PL' });
+
+        return (
+          <MenuItem key={item} value={item}>
+            {item === defaultItem
+              ? `${langLabel} - domyślny`
+              : langLabel
+            }
+          </MenuItem>
+        );
+      })}
     </Select>
   </FormControl>
 );
 
 ContentLanguage.propTypes = {
+  defaultItem: PropTypes.string,
   FormControlProps: PropTypes.shape({}),
   InputLabelProps: PropTypes.shape({}),
   InputProps: PropTypes.shape({}),
   label: PropTypes.string,
+  listItems: PropTypes.arrayOf(PropTypes.string),
 };
 
 ContentLanguage.defaultProps = {
+  defaultItem: '',
   FormControlProps: {},
   InputLabelProps: {},
   InputProps: {},
-  label: i18n.label,
+  label: null,
+  listItems: [],
 };
 
 export default ContentLanguage;
