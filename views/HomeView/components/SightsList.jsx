@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import Link from 'next/link';
+import formatDate from 'date-fns/format';
 import List from '@material-ui/core/List';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
@@ -36,6 +37,7 @@ import deserialize from 'utils/form-generator/data/deserialize';
 import serialize from 'utils/form-generator/data/serialize';
 import formatPrice from 'utils/formatPrice';
 import createSlug from 'utils/createSlug';
+import config from 'config';
 import ticketPoolDefinitionSchema from './ticketPoolDefinitionSchema';
 import HomeListItem from './HomeListItem';
 
@@ -532,7 +534,14 @@ class SightsList extends Component {
                                 slug: createSlug(sightEvent.name, sightEvent.id),
                               }
                               : null
-                          }
+                            }
+                            onStatsClick={() => {
+                              const URI = config.public.availableTicketsURL;
+
+                              return URI
+                                .replace(':id', sightEvent.id)
+                                .replace(':date', formatDate(new Date(), 'YYYY-MM-dd'));
+                            }}
                           />
                           <List style={{ marginLeft: 55 }}>
                             {sightEvent.ticketPoolDefinitions && sightEvent.ticketPoolDefinitions

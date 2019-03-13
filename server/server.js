@@ -4,11 +4,13 @@ const helmet = require('helmet');
 const routes = require('./routes');
 const proxyMiddleware = require('./proxy');
 
-const port = parseInt(process.env.NODE_PORT, 10) || 3000;
-const host = process.env.NODE_HOST || '127.0.0.1'; // https://tinyurl.com/y8nlgmj6
 const env = process.env.NODE_ENV;
 const dev = env !== 'production';
 const app = next({ dev });
+const { nextConfig } = app;
+const { serverRuntimeConfig } = nextConfig || {};
+const host = serverRuntimeConfig.host || '127.0.0.1'; // https://tinyurl.com/y8nlgmj6
+const port = +serverRuntimeConfig.port || 3000;
 
 const handleRequest = app.getRequestHandler();
 
