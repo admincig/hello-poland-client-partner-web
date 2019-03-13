@@ -12,10 +12,10 @@ import {
 } from 'redux/ushers';
 import Layout from 'components/Layout';
 import ProfileComponent from 'components/ProfileComponent/ProfileComponent';
-import PasswordForm from 'components/ProfileComponent/PasswordForm';
+import ProfileForm from 'components/ProfileComponent/ProfileForm';
 import withAuth from 'services/auth/withAuth';
 
-class PasswordView extends Component {
+class ProfileView extends Component {
   constructor(props) {
     super(props);
 
@@ -33,7 +33,7 @@ class PasswordView extends Component {
       this.fetchProfile(usherId);
     }
 
-    Router.prefetch('/ushers/profile');
+    Router.prefetch('/ushers/password');
   }
 
   fetchProfile = (userId) => {
@@ -42,23 +42,22 @@ class PasswordView extends Component {
     fetchUsher({ id: userId });
   };
 
-  handlePasswordSubmit = (values, actions) => {
-    const { password } = values;
-    const { setStatus, resetForm } = actions;
-    const { changePassword, usherId } = this.props;
-    const data = { password };
+  handleProfileSubmit = (values, actions) => {
+    const { email, password, ...data } = values;
+    const { setStatus } = actions;
+    const { changeProfile, usherId } = this.props;
 
     setStatus(null);
 
-    changePassword({
+    changeProfile({
       id: usherId,
       data,
       onFailure: this.handleSubmitFailure({
         formikActions: actions,
-        message: 'Wystąpił błąd podczas zmiany hasła.',
+        message: 'Wystąpił błąd podczas aktualizacji profilu.',
       }),
       onSuccess: this.handleSubmitSuccess({
-        callback: () => resetForm(),
+        callback: () => this.fetchProfile(usherId),
         formikActions: actions,
         message: 'Zapisano pomyślnie.',
       }),
@@ -93,9 +92,11 @@ class PasswordView extends Component {
   };
 
   render() {
-    const { profile } = this.props;
+    const { profile, usherId } = this.props;
     const { activeTab } = this.state;
 
+    const userProfile = profile.id === usherId ? profile : {};
+    const key = userProfile.id;
     let breadcrumbName = '';
 
     if (Object.keys(profile).length) {
@@ -121,16 +122,16 @@ class PasswordView extends Component {
           onTabChange={this.handleTabChange}
           disableProfile={false}
         >
-          <PasswordForm onSubmit={this.handlePasswordSubmit} noOldpassword />
+          <ProfileForm key={key} profile={userProfile} onSubmit={this.handleProfileSubmit} />
         </ProfileComponent>
       </Layout>
     );
   }
 }
 
-PasswordView.propTypes = {
+ProfileView.propTypes = {
   activeTab: PropTypes.string,
-  changePassword: PropTypes.func.isRequired,
+  changeProfile: PropTypes.func.isRequired,
   fetchUsher: PropTypes.func.isRequired,
   profile: PropTypes.shape({
     email: PropTypes.string,
@@ -139,7 +140,7 @@ PasswordView.propTypes = {
   usherId: PropTypes.number.isRequired,
 };
 
-PasswordView.defaultProps = {
+ProfileView.defaultProps = {
   activeTab: 'profile',
 };
 
@@ -149,10 +150,10 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   fetchUsher: ushersActions.fetchItem,
-  changePassword: ushersActions.changePassword,
+  changeProfile: ushersActions.changeProfile,
 };
 
 export default compose(
   withAuth(),
   connect(mapStateToProps, mapDispatchToProps),
-)(PasswordView);
+)(ProfileView);

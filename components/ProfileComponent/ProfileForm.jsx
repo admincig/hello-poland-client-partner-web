@@ -8,18 +8,12 @@ import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
 import GridItem from 'components/GridItem';
 import Typography from '@material-ui/core/Typography';
-import {
-  boolean,
-  string,
-  object,
-  ref,
-} from 'yup';
+import { string, object } from 'yup';
 
 const commonProps = {
   component: TextField,
   fullWidth: true,
-  required: true,
-  type: 'password',
+  type: 'text',
 };
 
 const styles = theme => ({
@@ -31,39 +25,27 @@ const styles = theme => ({
   },
 });
 
-class PasswordForm extends Component {
+class ProfileForm extends Component {
   constructor(props) {
     super(props);
 
-    const { userId } = props;
+    const { email, name } = props.profile;
 
     this.initialValues = {
-      id: userId,
-      oldPassword: '',
-      password: '',
-      passwordConfirm: '',
+      email: email || '',
+      name: name || '',
     };
 
     this.validationSchema = object().shape({
-      oldPassword: string().when('noOldPassword', {
-        is: false,
-        then: string().required(),
-        otherwise: string(),
-      }),
-      noOldpassword: boolean().default(() => props.noOldpassword),
-      password: string()
-        .notOneOf([ref('oldPassword')], `${props.noOldpassword ? 'Field is required.' : 'New password must be different from the current one.'}`)
-        .min(8, 'Should be at least 8 characters long.')
-        .required('Field is required.'),
-      passwordConfirm: string()
-        .oneOf([ref('password')], 'Given passwords are different.')
+      name: string()
+        .min(5, 'Should be at least 8 characters long.')
         .required('Field is required.'),
     });
   }
 
   render() {
     const {
-      classes, FormikProps, onSubmit, userId, noOldpassword,
+      classes, FormikProps, onSubmit, userId,
     } = this.props;
 
     return (
@@ -78,33 +60,25 @@ class PasswordForm extends Component {
             <Grid container spacing={16}>
               {userId
                 && (
-                <Hidden xlDown implementation="css">
-                  <Field component={TextField} name="id" type="hidden" />
-                </Hidden>
-                )
-              }
-              {
-                !noOldpassword
-                && (
-                <GridItem>
-                  <Field label="Obecne hasło" name="oldPassword" {...commonProps} />
-                </GridItem>
+                  <Hidden xlDown implementation="css">
+                    <Field component={TextField} name="id" type="hidden" />
+                  </Hidden>
                 )
               }
               <GridItem>
-                <Field label="Nowe hasło" name="password" {...commonProps} />
+                <Field label="Nazwa" name="name" {...commonProps} required />
               </GridItem>
               <GridItem>
-                <Field label="Powtórz nowe hasło" name="passwordConfirm" {...commonProps} />
+                <Field label="Adres e-mail" name="email" {...commonProps} disabled />
               </GridItem>
               <GridItem>
                 <Grid container justify="space-between" alignItems="center">
-                  <Button type="submit" disabled={isSubmitting}>Zmień hasło</Button>
+                  <Button type="submit" disabled={isSubmitting}>Zapisz</Button>
                   {status
                     && (
-                    <Typography className={classes[status.type]}>
-                      {status.message}
-                    </Typography>
+                      <Typography className={classes[status.type]}>
+                        {status.message}
+                      </Typography>
                     )
                   }
                 </Grid>
@@ -117,18 +91,20 @@ class PasswordForm extends Component {
   }
 }
 
-PasswordForm.propTypes = {
+ProfileForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   FormikProps: PropTypes.shape({}),
   onSubmit: PropTypes.func.isRequired,
   userId: PropTypes.number,
-  noOldpassword: PropTypes.bool,
+  profile: PropTypes.shape({
+    name: PropTypes.string,
+    email: PropTypes.string,
+  }).isRequired,
 };
 
-PasswordForm.defaultProps = {
+ProfileForm.defaultProps = {
   FormikProps: null,
   userId: null,
-  noOldpassword: false,
 };
 
-export default withStyles(styles)(PasswordForm);
+export default withStyles(styles)(ProfileForm);

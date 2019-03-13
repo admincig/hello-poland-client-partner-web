@@ -4,13 +4,15 @@ const helmet = require('helmet');
 const routes = require('./routes');
 const proxyMiddleware = require('./proxy');
 
-const port = parseInt(process.env.NODE_PORT, 10) || 3000;
-const host = process.env.NODE_HOST || '127.0.0.1'; // https://tinyurl.com/y8nlgmj6
 const env = process.env.NODE_ENV;
 const dev = env !== 'production';
 const app = next({ dev });
+const { nextConfig } = app;
+const { serverRuntimeConfig } = nextConfig || {};
+const host = serverRuntimeConfig.host || '127.0.0.1'; // https://tinyurl.com/y8nlgmj6
+const port = +serverRuntimeConfig.port || 3000;
 
-const handle = app.getRequestHandler();
+const handleRequest = app.getRequestHandler();
 
 let server;
 
@@ -35,7 +37,7 @@ app
     });
 
     // Default catch-all handler to allow Next.js to handle all other routes
-    server.all('*', (req, res) => handle(req, res));
+    server.all('*', (req, res) => handleRequest(req, res));
 
     server.listen(port, host, (err) => {
       if (err) {
