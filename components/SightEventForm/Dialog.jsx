@@ -273,12 +273,13 @@ class SightEventFormDialog extends Component {
   }
 
   handleDeleteTranslation = (value) => {
-    const options = {
-      headers: {
-        'Content-Language': value,
-      },
-    };
-    console.log(value, options);
+    const { deleteTranslation, itemId } = this.props;
+    deleteTranslation({
+      id: itemId,
+      language: value,
+      onSuccess: () => this.handleFetchItem(itemId),
+      onFailure: () => this.setState({ isSubmitting: false, submittingError: true }),
+    });
   }
 
   render() {
@@ -389,6 +390,7 @@ SightEventFormDialog.propTypes = {
   changeDefaultLanguage: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
   deletePDF: PropTypes.func.isRequired,
+  deleteTranslation: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   fetchList: PropTypes.func.isRequired,
   item: PropTypes.shape({}),
@@ -415,6 +417,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   clearItem: sightEventsActions.clearItem,
   changeDefaultLanguage: sightEventsActions.changeDefaultLanguage,
+  deleteTranslation: sightEventsActions.deleteTranslation,
   fetchItem: sightEventsActions.fetchItem,
   fetchList: sightEventsActions.fetchList,
   deletePDF: sightEventsActions.deletePDF,

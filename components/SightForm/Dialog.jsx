@@ -217,7 +217,7 @@ class SightFormDialog extends Component {
         id: itemId,
         options,
         onSuccess: () => this.handleFetchItem(itemId),
-        onFailure: this.handleSubmitFailure,
+        onFailure: () => this.setState({ isSubmitting: false, submittingError: true }),
       });
     }
   };
@@ -239,12 +239,13 @@ class SightFormDialog extends Component {
   }
 
   handleDeleteTranslation = (value) => {
-    const options = {
-      headers: {
-        'Content-Language': value,
-      },
-    };
-    console.log(value, options);
+    const { deleteTranslation, itemId } = this.props;
+    deleteTranslation({
+      id: itemId,
+      language: value,
+      onSuccess: () => this.handleFetchItem(itemId),
+      onFailure: () => this.setState({ isSubmitting: false, submittingError: true }),
+    });
   }
 
   render() {
@@ -338,6 +339,7 @@ SightFormDialog.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   changeDefaultLanguage: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
+  deleteTranslation: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   fetchSightsList: PropTypes.func.isRequired,
   fetchSightEventsList: PropTypes.func.isRequired,
@@ -363,6 +365,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   clearItem: sightsActions.clearItem,
   changeDefaultLanguage: sightsActions.changeDefaultLanguage,
+  deleteTranslation: sightsActions.deleteTranslation,
   fetchItem: sightsActions.fetchItem,
   fetchSightsList: sightsActions.fetchList,
   fetchSightEventsList: sightEventsActions.fetchList,
