@@ -15,7 +15,7 @@ const SelectActions = ({ actions, language }) => {
   return (
     <FormControl>
       <Button
-        style={{ width: 160 }}
+        style={{ width: 160, boxShadow: 'none' }}
         onClick={e => handleSelectToggle(e.currentTarget)}
         aria-owns={anchorEl ? 'simple-menu' : undefined}
         aria-haspopup="true"
