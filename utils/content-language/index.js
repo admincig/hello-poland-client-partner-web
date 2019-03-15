@@ -46,6 +46,17 @@ export function getSupportedLanguages(lngList = []) {
 }
 
 /**
+ * Returns list of available languages.
+ * @method
+ * @param {string[]} lngList - list of supported languages.
+ * @return {string[]} - filtered language list.
+ */
+
+export function getAvailableLanguages(lngList = []) {
+  return CONTENT_LANGUAGES.filter(item => lngList.indexOf(item) < 0);
+}
+
+/**
  * Returns pretty label.
  * @param {string} lng - label language code
  * @param {boolean} withCode - show language code beside label
