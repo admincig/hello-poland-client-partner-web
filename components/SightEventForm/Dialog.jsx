@@ -166,7 +166,10 @@ class SightEventFormDialog extends Component {
 
   handleFetchItemFailure = () => this.setState({ fetchingError: true, isFetching: false });
 
-  handleFetchItemSuccess = () => this.setState({ fetchingError: false, isFetching: false });
+  handleFetchItemSuccess = () => {
+    const { item: { defaultLanguage } } = this.props;
+    this.setState({ fetchingError: false, isFetching: false, language: defaultLanguage });
+  };
 
   handleLanguageChange = (event) => {
     const { itemId } = this.props;

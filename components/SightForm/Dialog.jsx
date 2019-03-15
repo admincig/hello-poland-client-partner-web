@@ -36,12 +36,11 @@ class SightFormDialog extends Component {
 
     this.intervalRef = null;
 
-    const { item } = props;
     this.state = {
       fetchingError: false,
       isFetching: false,
       isSubmitting: false,
-      language: item.defaultLanguage || DEFAULT_LANGUAGE,
+      language: DEFAULT_LANGUAGE,
       submittingError: false,
     };
   }
@@ -108,7 +107,8 @@ class SightFormDialog extends Component {
   };
 
   handleFetchItemSuccess = () => {
-    this.setState({ fetchingError: false, isFetching: false });
+    const { item: { defaultLanguage } } = this.props;
+    this.setState({ fetchingError: false, isFetching: false, language: defaultLanguage });
   };
 
   handleLanguageChange = (event) => {
