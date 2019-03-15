@@ -250,7 +250,7 @@ class SightEventFormDialog extends Component {
       changeDefaultLanguage({
         id: itemId,
         options,
-        onSuccess: () => this.handleFetchItem(itemId),
+        onSuccess: () => this.handleFetchItem(itemId, val),
         onFailure: this.handleSubmitFailure,
       });
     }

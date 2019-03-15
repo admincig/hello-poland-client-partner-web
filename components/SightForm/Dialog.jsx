@@ -216,8 +216,8 @@ class SightFormDialog extends Component {
       changeDefaultLanguage({
         id: itemId,
         options,
-        onSuccess: () => this.handleFetchItem(itemId),
-        onFailure: () => this.setState({ isSubmitting: false, submittingError: true }),
+        onSuccess: () => this.handleFetchItem(itemId, val),
+        onFailure: this.handleSubmitFailure,
       });
     }
   };
