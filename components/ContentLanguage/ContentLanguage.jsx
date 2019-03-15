@@ -4,50 +4,82 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
+import withStyles from '@material-ui/core/styles/withStyles';
 import { getLanguageLabel } from 'utils/content-language';
+import SelectActions from './SelectActions';
+
+const styles = {
+  root: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+};
 
 const ContentLanguage = ({
-  defaultItem, FormControlProps, InputLabelProps, InputProps, label, listItems, ...props
+  actions,
+  classes,
+  defaultItem,
+  FormControlProps,
+  InputLabelProps,
+  InputProps,
+  label,
+  listItems,
+  value,
+  ...props
 }) => (
-  <FormControl {...FormControlProps}>
-    {label
-      && (
-        <InputLabel {...InputLabelProps} htmlFor="language">{label}</InputLabel>
-      )
-    }
-    <Select
-      {...props}
-      inputProps={{
-        id: 'language',
-        ...InputProps,
-      }}
-    >
-      {listItems.map((item) => {
-        const langLabel = getLanguageLabel(item, true, { locale: 'pl-PL' });
+  <div className={classes.root}>
+    <FormControl {...FormControlProps}>
+      {label
+        && (
+          <InputLabel {...InputLabelProps} htmlFor="language">{label}</InputLabel>
+        )
+      }
+      <Select
+        value={value}
+        {...props}
+        inputProps={{
+          id: 'language',
+          ...InputProps,
+        }}
+      >
+        {listItems.map((item) => {
+          const langLabel = getLanguageLabel(item, true, { locale: 'pl-PL' });
 
-        return (
-          <MenuItem key={item} value={item}>
-            {item === defaultItem
-              ? `${langLabel} - domyślny`
-              : langLabel
-            }
-          </MenuItem>
-        );
-      })}
-    </Select>
-  </FormControl>
+          return (
+            <MenuItem key={item} value={item}>
+              {item === defaultItem
+                ? `${langLabel} - domyślny`
+                : langLabel
+              }
+            </MenuItem>
+          );
+        })}
+      </Select>
+    </FormControl>
+    {
+      actions
+      && <SelectActions actions={actions} language={value} />
+    }
+  </div>
 );
 
 ContentLanguage.propTypes = {
+  actions: PropTypes.arrayOf(PropTypes.shape({})),
+  classes: PropTypes.shape({}).isRequired,
   defaultItem: PropTypes.string,
   FormControlProps: PropTypes.shape({}),
   InputLabelProps: PropTypes.shape({}),
   InputProps: PropTypes.shape({}),
   label: PropTypes.string,
   listItems: PropTypes.arrayOf(PropTypes.string),
+  value: PropTypes.string.isRequired,
 };
 
 ContentLanguage.defaultProps = {
+  actions: null,
   defaultItem: '',
   FormControlProps: {},
   InputLabelProps: {},
@@ -56,4 +88,4 @@ ContentLanguage.defaultProps = {
   listItems: [],
 };
 
-export default ContentLanguage;
+export default withStyles(styles)(ContentLanguage);

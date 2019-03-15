@@ -242,12 +242,39 @@ class SightEventFormDialog extends Component {
       && !this.isItemLoaded(itemId, item);
   };
 
+  handleDefaultLanguageChange = (val) => {
+    const { changeDefaultLanguage, itemId } = this.props;
+    const options = {
+      headers: {
+        'Content-Language': val,
+      },
+    };
+    if (typeof val === 'string') {
+      changeDefaultLanguage({
+        id: itemId,
+        options,
+        onSuccess: () => this.handleFetchItem(itemId, val),
+        onFailure: this.handleSubmitFailure,
+      });
+    }
+  }
+
   render() {
     const {
       alertDialog, fetchingError, isFetching, isSubmitting, language, submittingError,
     } = this.state;
     const {
-      classes, clearItem, fetchItem, fetchList, item, itemId, onClose, parentId, title, deletePDF,
+      classes,
+      clearItem,
+      fetchItem,
+      fetchList,
+      item,
+      itemId,
+      onClose,
+      parentId,
+      title,
+      deletePDF,
+      changeDefaultLanguage,
       ...rest
     } = this.props;
 
@@ -263,6 +290,9 @@ class SightEventFormDialog extends Component {
       defaultLanguage = itemDefaultLanguage;
     }
 
+    const actions = [
+      { label: 'Ustaw jako domyślny język oferty', action: this.handleDefaultLanguageChange },
+    ];
     return (
       <Fragment>
         <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
@@ -281,6 +311,7 @@ class SightEventFormDialog extends Component {
               <GridItem className={classes.section}>
                 <ContentLanguage
                   defaultItem={defaultLanguage}
+                  actions={itemId ? actions : null}
                   label={itemId ? i18n.label : i18n.defaultLabel}
                   listItems={languageVersions}
                   onChange={this.handleLanguageChange}
@@ -301,17 +332,17 @@ class SightEventFormDialog extends Component {
           <DialogActions>
             {submittingError
               && (
-              <Typography style={{ color: 'red' }}>
-                Wystąpił błąd podczas zapisywania.
-              </Typography>
+                <Typography style={{ color: 'red' }}>
+                  Wystąpił błąd podczas zapisywania.
+                </Typography>
               )
             }
             {fetchingError
-            && (
-            <Typography style={{ color: 'red' }}>
-              Wystąpił błąd podczas pobierania danych.
-            </Typography>
-            )
+              && (
+                <Typography style={{ color: 'red' }}>
+                  Wystąpił błąd podczas pobierania danych.
+                </Typography>
+              )
             }
             <Button disabled={isSubmitting} onClick={this.handleClose} color="primary">Anuluj</Button>
             <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>
@@ -329,6 +360,7 @@ class SightEventFormDialog extends Component {
 
 SightEventFormDialog.propTypes = {
   classes: PropTypes.shape({}).isRequired,
+  changeDefaultLanguage: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
   deletePDF: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
@@ -356,6 +388,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   clearItem: sightEventsActions.clearItem,
+  changeDefaultLanguage: sightEventsActions.changeDefaultLanguage,
   fetchItem: sightEventsActions.fetchItem,
   fetchList: sightEventsActions.fetchList,
   deletePDF: sightEventsActions.deletePDF,
