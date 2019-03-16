@@ -6,7 +6,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { getLanguageLabel } from 'utils/content-language';
-import AddLanguage from './AddLanguage';
 import SelectActions from './SelectActions';
 
 const styles = {
@@ -26,13 +25,11 @@ const ContentLanguage = ({
   actions,
   classes,
   defaultItem,
-  handleAddLanguage,
   FormControlProps,
   InputLabelProps,
   InputProps,
   label,
   listItems,
-  notTranslatedLanguages,
   value,
   ...props
 }) => (

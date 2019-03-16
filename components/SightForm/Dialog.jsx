@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+import _isEqual from 'lodash/isEqual';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -16,8 +17,15 @@ import {
   selectors as sightsSelectors,
 } from '@hello-poland/commons/redux/sights';
 import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
-import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getSupportedLanguages } from 'utils/content-language';
+import {
+  CONTENT_LANGUAGES,
+  DEFAULT_LANGUAGE,
+  getSupportedLanguages,
+  getNotTranslatedLanguages,
+} from 'utils/content-language';
+import AlertDialog from 'components/AlertDialog';
 import ContentLanguage from 'components/ContentLanguage';
+import NewLanguageDialog from 'components/NewLanguageDialog';
 import GridItem from 'components/GridItem';
 import SightForm from './Form';
 import i18n from './i18n/pl-PL';
@@ -37,6 +45,16 @@ class SightFormDialog extends Component {
     this.intervalRef = null;
 
     this.state = {
+      alertDialog: {
+        content: null,
+        onSubmit: null,
+        open: false,
+        title: null,
+      },
+      newLanguageDialog: {
+        open: false,
+        newLanguage: null,
+      },
       fetchingError: false,
       isFetching: false,
       isSubmitting: false,
@@ -61,28 +79,58 @@ class SightFormDialog extends Component {
 
   getInitialValues = (item) => {
     const { itemId } = this.props;
+    const { newLanguageDialog: { newLanguage } } = this.state;
 
-    if (this.isItemLoaded(itemId, item)) {
-      return item;
+    if (this.isItemLoaded(itemId, item) && !newLanguage) {
+      return {
+        ...item,
+      };
+    }
+
+    if (newLanguage) {
+      return {
+        id: item.id,
+      };
     }
 
     return null;
   };
 
   handleClose = () => {
-    const { clearItem, onClose } = this.props;
-
-    if (onClose) {
-      onClose();
+    const { current: { state: { values }, initialValues } } = this.formikRef;
+    if (_isEqual(initialValues, values)) {
+      this.closeDialogFunction();
+    } else {
       this.setState({
-        fetchingError: false,
-        isFetching: false,
-        isSubmitting: false,
-        submittingError: false,
+        alertDialog: {
+          open: true,
+          onSubmit: () => {
+            this.handleAlertDialogClose();
+            this.handleAlertDialogClear();
+            this.closeDialogFunction();
+          },
+          title: 'Niezapisane zmiany',
+          content: 'Czy chcesz kontynuować?',
+        },
       });
-      clearItem();
     }
   };
+
+  handleAlertDialogClear = () => this.setState({
+    alertDialog: {
+      content: null,
+      onSubmit: null,
+      open: false,
+      title: null,
+    },
+  });
+
+  handleAlertDialogClose = () => this.setState(state => ({
+    alertDialog: {
+      ...state.alertDialog,
+      open: false,
+    },
+  }));
 
   handleFetchItem = (id, language) => {
     const { fetchItem } = this.props;
@@ -99,7 +147,6 @@ class SightFormDialog extends Component {
     });
 
     this.setState({ language });
-    console.log(language)
     this.setState({ fetchingError: false, isFetching: true });
   };
 
@@ -158,16 +205,25 @@ class SightFormDialog extends Component {
   };
 
   handleSubmitSuccess = (sightId, actions) => {
-    const { fetchSightsList, fetchSightEventsList } = this.props;
+    const { fetchSightsList, itemId } = this.props;
+    const { newLanguageDialog: { newLanguage }, language } = this.state;
     const { resetForm, setSubmitting } = actions;
 
     setSubmitting(false);
-    resetForm();
+
+    if (newLanguage) {
+      this.setState({
+        newLanguageDialog: {
+          newLanguage: null,
+        },
+      }, () => this.handleFetchItem(itemId, language));
+    } else {
+      resetForm();
+      this.handleClose();
+    }
 
     fetchSightsList();
-    fetchSightEventsList();
     this.setState({ isSubmitting: false, submittingError: false });
-    this.handleClose();
   };
 
   isItemLoaded = (itemId, item) => item
@@ -202,9 +258,37 @@ class SightFormDialog extends Component {
     }
   };
 
+  handleNewLanguageModalSubmit = value => (
+    this.setState({ newLanguageDialog: { newLanguage: value, open: false }, language: value })
+  );
+
+  handleNewLanguageModalOpen = value => (
+    typeof value === 'string'
+      ? this.setState({ newLanguageDialog: { open: true } })
+      : undefined
+  );
+
+  handleNewLanguageModalClose = () => this.setState({ newLanguageDialog: { open: false } })
+
+  closeDialogFunction() {
+    const { clearItem, onClose } = this.props;
+
+    if (onClose) {
+      onClose();
+      this.setState({
+        fetchingError: false,
+        isFetching: false,
+        isSubmitting: false,
+        submittingError: false,
+      });
+      clearItem();
+    }
+  }
+
   render() {
     const {
-      fetchingError, isFetching, isSubmitting, language, submittingError,
+      fetchingError, isFetching, isSubmitting, language,
+      submittingError, newLanguageDialog, alertDialog,
     } = this.state;
     const {
       classes, clearItem, fetchItem, fetchSightsList, fetchSightEventsList, item, itemId, onClose,
@@ -213,70 +297,92 @@ class SightFormDialog extends Component {
 
     let languageVersions = CONTENT_LANGUAGES;
     let defaultLanguage;
+    let notTranslatedLanguages = [];
 
-    if (this.isItemLoaded(itemId, item)) {
-      const { availableLanguageVersions, defaultLanguage: itemDefaultLanguage } = item;
-      languageVersions = getSupportedLanguages(availableLanguageVersions);
-      defaultLanguage = itemDefaultLanguage;
-    }
     const actions = [
       { label: 'Ustaw jako domyślny język atrakcji', action: this.handleDefaultLanguageChange },
     ];
+
+    if (this.isItemLoaded(itemId, item)) {
+      const { availableLanguageVersions, defaultLanguage: itemDefaultLanguage } = item;
+      if (newLanguageDialog.newLanguage) {
+        availableLanguageVersions.push(newLanguageDialog.newLanguage);
+      }
+      languageVersions = getSupportedLanguages(availableLanguageVersions);
+      notTranslatedLanguages = getNotTranslatedLanguages(languageVersions);
+      if (notTranslatedLanguages.length > 0) {
+        actions.push({ label: 'Dodaj wersję językową', action: this.handleNewLanguageModalOpen });
+      }
+      defaultLanguage = itemDefaultLanguage;
+    }
+
     return (
-      <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
-        <DialogTitle id="form-dialog-title">
-          {title}
-          {isFetching || isSubmitting
-            ? <CircularProgress size={18} style={{ marginLeft: 20 }} />
-            : null
-          }
-        </DialogTitle>
-        <DialogContent>
-          <Grid container>
-            <GridItem>
-              <Typography variant="h6">Wersja językowa</Typography>
-            </GridItem>
-            <GridItem className={classes.section}>
-              {}
-              <ContentLanguage
-                defaultItem={defaultLanguage}
-                id={itemId || undefined}
-                actions={itemId ? actions : null}
-                label={itemId ? i18n.label : i18n.defaultLabel}
-                listItems={languageVersions}
-                onChange={this.handleLanguageChange}
-                value={language}
+      <Fragment>
+        <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
+          <DialogTitle id="form-dialog-title">
+            {title}
+            {isFetching || isSubmitting
+              ? <CircularProgress size={18} style={{ marginLeft: 20 }} />
+              : null
+            }
+          </DialogTitle>
+          <DialogContent>
+            <Grid container>
+              <GridItem>
+                <Typography variant="h6">Wersja językowa</Typography>
+              </GridItem>
+              <GridItem className={classes.section}>
+                <ContentLanguage
+                  defaultItem={defaultLanguage}
+                  actions={itemId ? actions : null}
+                  label={itemId ? i18n.label : i18n.defaultLabel}
+                  listItems={languageVersions}
+                  onChange={this.handleLanguageChange}
+                  value={language}
+                />
+              </GridItem>
+              <SightForm
+                buttons={false}
+                FormikProps={{ ref: this.formikRef }}
+                initialValues={this.getInitialValues(item)}
+                language={language}
+                newLanguage={newLanguageDialog.newLanguage}
+                onSubmitFailure={this.handleSubmitFailure}
+                onSubmitSuccess={this.handleSubmitSuccess}
               />
-            </GridItem>
-            <SightForm
-              buttons={false}
-              FormikProps={{ ref: this.formikRef }}
-              initialValues={this.getInitialValues(item)}
-              language={language}
-              onSubmitFailure={this.handleSubmitFailure}
-              onSubmitSuccess={this.handleSubmitSuccess}
-            />
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          {submittingError
-            && (
-            <Typography style={{ color: 'red' }}>
-              Wystąpił błąd podczas zapisywania.
-            </Typography>
-            )
-          }
-          {fetchingError
-          && (
-          <Typography style={{ color: 'red' }}>
-            Wystąpił błąd podczas pobierania danych.
-          </Typography>
-          )
-          }
-          <Button disabled={isSubmitting} onClick={this.handleClose} color="primary">Anuluj</Button>
-          <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>
-        </DialogActions>
-      </Dialog>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            {submittingError
+              && (
+                <Typography style={{ color: 'red' }}>
+                  Wystąpił błąd podczas zapisywania.
+                </Typography>
+              )
+            }
+            {fetchingError
+              && (
+                <Typography style={{ color: 'red' }}>
+                  Wystąpił błąd podczas pobierania danych.
+                </Typography>
+              )
+            }
+            <Button disabled={isSubmitting} onClick={this.handleClose} color="primary">Anuluj</Button>
+            <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>
+          </DialogActions>
+        </Dialog>
+        <AlertDialog
+          onClose={this.handleAlertDialogClose}
+          onExited={this.handleAlertDialogClear}
+          {...alertDialog}
+        />
+        <NewLanguageDialog
+          handleClose={this.handleNewLanguageModalClose}
+          handleSubmit={this.handleNewLanguageModalSubmit}
+          list={notTranslatedLanguages}
+          open={newLanguageDialog.open || false}
+        />
+      </Fragment>
     );
   }
 }

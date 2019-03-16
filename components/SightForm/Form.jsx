@@ -220,7 +220,7 @@ class SightForm extends Component {
   };
 
   handleSubmit = (values, actions) => {
-    const { language, onSubmit } = this.props;
+    const { language, onSubmit, newLanguage } = this.props;
     const options = {
       headers: {
         'Content-Language': language,
@@ -234,7 +234,7 @@ class SightForm extends Component {
     }
 
     const { id, ...data } = values;
-    const { createItem, updateItem } = this.props;
+    const { createItem, createTranslation, updateItem } = this.props;
     let action = createItem;
     const payload = {
       data,
@@ -246,6 +246,12 @@ class SightForm extends Component {
     if (_isNumber(id)) {
       action = updateItem;
       payload.id = id;
+    }
+
+    if (newLanguage) {
+      action = createTranslation;
+      delete payload.id;
+      payload.data.id = id;
     }
 
     action(payload);
@@ -407,9 +413,11 @@ SightForm.propTypes = {
   buttons: PropTypes.bool,
   classes: PropTypes.shape({}).isRequired,
   createItem: PropTypes.func.isRequired,
+  createTranslation: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
   initialValues: PropTypes.shape({}),
   language: PropTypes.string.isRequired,
+  newLanguage: PropTypes.string,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
@@ -420,6 +428,7 @@ SightForm.defaultProps = {
   buttons: true,
   FormikProps: null,
   initialValues: null,
+  newLanguage: null,
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,
@@ -429,6 +438,7 @@ const mapStateToProps = () => ({});
 
 const mapDispatchToProps = {
   createItem: sightsActions.createItem,
+  createTranslation: sightsActions.createTranslation,
   updateItem: sightsActions.updateItem,
 };
 
