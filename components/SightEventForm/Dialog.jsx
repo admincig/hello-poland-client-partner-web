@@ -112,6 +112,12 @@ class SightEventFormDialog extends Component {
     return multimediaList;
   };
 
+  handleAddNewLanguage = (value) => {
+    if (typeof value === 'string') {
+      this.handleCheckUnsaved(() => this.handleNewLanguageModalOpen(value));
+    }
+  }
+
   handleAlertDialogClear = () => this.setState({
     alertDialog: {
       content: null,
@@ -141,22 +147,19 @@ class SightEventFormDialog extends Component {
   });
 
   handleClose = () => {
-    const { current: { state: { values }, initialValues } } = this.formikRef;
-    if (_isEqual(initialValues, values)) {
-      this.closeDialogFunction();
-    } else {
+    const { clearItem, onClose } = this.props;
+    if (onClose) {
+      onClose();
       this.setState({
-        alertDialog: {
-          open: true,
-          onSubmit: () => {
-            this.handleAlertDialogClose();
-            this.handleAlertDialogClear();
-            this.closeDialogFunction();
-          },
-          title: 'Niezapisane zmiany',
-          content: 'Czy chcesz kontynuować?',
+        fetchingError: false,
+        isFetching: false,
+        isSubmitting: false,
+        submittingError: false,
+        newLanguageDialog: {
+          newLanguage: null,
         },
       });
+      clearItem();
     }
   };
 
@@ -307,18 +310,23 @@ class SightEventFormDialog extends Component {
 
   handleNewLanguageModalClose = () => this.setState({ newLanguageDialog: { open: false } })
 
-  closeDialogFunction() {
-    const { clearItem, onClose } = this.props;
-
-    if (onClose) {
-      onClose();
+  handleCheckUnsaved = (onSubmit) => {
+    const { current: { state: { values }, initialValues } } = this.formikRef;
+    if (_isEqual(initialValues, values)) {
+      onSubmit();
+    } else {
       this.setState({
-        fetchingError: false,
-        isFetching: false,
-        isSubmitting: false,
-        submittingError: false,
+        alertDialog: {
+          open: true,
+          onSubmit: () => {
+            this.handleAlertDialogClose();
+            this.handleAlertDialogClear();
+            onSubmit();
+          },
+          title: 'Niezapisane zmiany',
+          content: 'Czy chcesz kontynuować?',
+        },
       });
-      clearItem();
     }
   }
 
@@ -351,7 +359,7 @@ class SightEventFormDialog extends Component {
       languageVersions = getSupportedLanguages(availableLanguageVersions);
       notTranslatedLanguages = getNotTranslatedLanguages(languageVersions);
       if (notTranslatedLanguages.length > 0) {
-        actions.push({ label: 'Dodaj wersję językową', action: this.handleNewLanguageModalOpen });
+        actions.push({ label: 'Dodaj wersję językową', action: this.handleAddNewLanguage });
       }
       defaultLanguage = itemDefaultLanguage;
     }
@@ -377,7 +385,7 @@ class SightEventFormDialog extends Component {
                   actions={itemId ? actions : null}
                   label={itemId ? i18n.label : i18n.defaultLabel}
                   listItems={languageVersions}
-                  onChange={this.handleLanguageChange}
+                  onChange={e => this.handleCheckUnsaved(() => this.handleLanguageChange(e))}
                   value={language}
                 />
               </GridItem>
@@ -408,7 +416,7 @@ class SightEventFormDialog extends Component {
                 </Typography>
               )
             }
-            <Button disabled={isSubmitting} onClick={this.handleClose} color="primary">Anuluj</Button>
+            <Button disabled={isSubmitting} onClick={() => this.handleCheckUnsaved(this.handleClose)} color="primary">Anuluj</Button>
             <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>
           </DialogActions>
         </Dialog>

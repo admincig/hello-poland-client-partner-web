@@ -16,7 +16,7 @@ const AlertDialog = ({
     {...props}
     onClose={onClose}
   >
-    <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
+    <DialogTitle id="alert-dialog-title">{title || ''}</DialogTitle>
     <DialogContent>
       <DialogContentText id="alert-dialog-description">{content}</DialogContentText>
     </DialogContent>
