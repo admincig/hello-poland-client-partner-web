@@ -98,6 +98,8 @@ class SightFormDialog extends Component {
       onSuccess: this.handleFetchItemSuccess,
     });
 
+    this.setState({ language });
+    console.log(language)
     this.setState({ fetchingError: false, isFetching: true });
   };
 

@@ -5,8 +5,9 @@ import FormControl from '@material-ui/core/FormControl';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 
-const AddLanguage = ({ list }) => {
+const AddLanguage = ({ list, handlePick }) => {
   const [anchorEl, handleDropdownOpen] = useState(null);
+  console.log(handlePick)
   return (
     <FormControl>
       <Button
@@ -30,7 +31,10 @@ const AddLanguage = ({ list }) => {
             <MenuItem
               component="div"
               value={value}
-              onClick={() => {}}
+              onClick={() => {
+                handleDropdownOpen(null);
+                handlePick(value);
+              }}
             >
               {value}
             </MenuItem>

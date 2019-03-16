@@ -118,6 +118,7 @@ class SightEventForm extends Component {
   });
 
   handleSubmit = (values, actions) => {
+    console.log(values)
     const { language, onSubmit } = this.props;
     const options = {
       headers: {

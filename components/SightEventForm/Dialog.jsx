@@ -15,10 +15,16 @@ import {
   actions as sightEventsActions,
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
-import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getSupportedLanguages } from 'utils/content-language';
+import {
+  CONTENT_LANGUAGES,
+  DEFAULT_LANGUAGE,
+  getSupportedLanguages,
+  getNotTranslatedLanguages,
+} from 'utils/content-language';
 import AlertDialog from 'components/AlertDialog';
 import ContentLanguage from 'components/ContentLanguage';
 import GridItem from 'components/GridItem';
+import NewLanguageDialog from 'components/NewLanguageDialog';
 import SightForm from './Form';
 import MultimediaList from './MultimediaList';
 import i18n from './i18n/pl-PL';
@@ -43,6 +49,10 @@ class SightEventFormDialog extends Component {
         onSubmit: null,
         open: false,
         title: null,
+      },
+      newLanguageDialog: {
+        open: false,
+        newLanguage: null
       },
       fetchingError: false,
       isFetching: false,
@@ -69,17 +79,17 @@ class SightEventFormDialog extends Component {
 
   getInitialValues = (item) => {
     const { itemId, parentId } = this.props;
+    const { newLanguageDialog: { newLanguage } } = this.state;
+    const sightId = item.sightId || parentId;
 
-    if (this.isItemLoaded(itemId, item)) {
-      const sightId = item.sightId || parentId;
-
+    if (this.isItemLoaded(itemId, item) && !newLanguage) {
       return {
         ...item,
         sightId,
       };
     }
 
-    return { sightId: parentId };
+    return { sightId };
   };
 
   getMultimedia = () => {
@@ -160,7 +170,7 @@ class SightEventFormDialog extends Component {
       onFailure: this.handleFetchItemFailure,
       onSuccess: this.handleFetchItemSuccess,
     });
-
+    this.setState({ language });
     this.setState({ fetchingError: false, isFetching: true });
   };
 
@@ -188,7 +198,7 @@ class SightEventFormDialog extends Component {
 
   handleSubmit = () => {
     const { current } = this.formikRef;
-
+    console.log(this.formikRef, current.props.initialValues, current.state.values, current.props.initialValues === current.state.values);
     if (current && current.submitForm) {
       this.setState({ isSubmitting: true, submittingError: false });
       current.submitForm();
@@ -263,9 +273,34 @@ class SightEventFormDialog extends Component {
     }
   }
 
+  handleAddLanguage = (val) => {
+    const { createTranslation, itemId } = this.props;
+    const options = {
+      headers: {
+        'Content-Language': val,
+      },
+    };
+    console.log(itemId)
+    if (typeof val === 'string') {
+      createTranslation({
+        id: itemId,
+        options,
+        data: {
+          id: itemId,
+        },
+        onSuccess: () => this.handleFetchItem(itemId, val),
+        onFailure: () => this.setState({ submittingError: true }),
+      });
+    }
+  }
+
+  handleNewLanguageModalSubmit = value => this.setState({newLanguageDialog: { newLanguage: value, open: false }});
+
+  handleNewLanguageModalOpen = value => typeof value === 'string' ? this.setState({newLanguageDialog: {open: true}}) : false;
+
   render() {
     const {
-      alertDialog, fetchingError, isFetching, isSubmitting, language, submittingError,
+      alertDialog, newLanguageDialog, fetchingError, isFetching, isSubmitting, language, submittingError,
     } = this.state;
     const {
       classes,
@@ -286,16 +321,21 @@ class SightEventFormDialog extends Component {
 
     let languageVersions = CONTENT_LANGUAGES;
     let defaultLanguage;
+    let notTranslatedLanguages = [];
 
     if (this.isItemLoaded(itemId, item)) {
       const { availableLanguageVersions, defaultLanguage: itemDefaultLanguage } = item;
-
+      if (newLanguageDialog.newLanguage) {
+        availableLanguageVersions.push(newLanguageDialog.newLanguage);
+      }
       languageVersions = getSupportedLanguages(availableLanguageVersions);
+      notTranslatedLanguages = getNotTranslatedLanguages(languageVersions);
       defaultLanguage = itemDefaultLanguage;
     }
 
     const actions = [
       { label: 'Ustaw jako domyślny język oferty', action: this.handleDefaultLanguageChange },
+      { label: 'Dodaj wersję językową', action: this.handleNewLanguageModalOpen }
     ];
     return (
       <Fragment>
@@ -318,7 +358,9 @@ class SightEventFormDialog extends Component {
                   actions={itemId ? actions : null}
                   label={itemId ? i18n.label : i18n.defaultLabel}
                   listItems={languageVersions}
+                  notTranslatedLanguages={notTranslatedLanguages}
                   onChange={this.handleLanguageChange}
+                  handleAddLanguage={this.handleAddLanguage}
                   value={language}
                 />
               </GridItem>
@@ -327,6 +369,7 @@ class SightEventFormDialog extends Component {
                 FormikProps={{ ref: this.formikRef }}
                 initialValues={this.getInitialValues(item)}
                 language={language}
+                newLanguage={newLanguageDialog.newLanguage}
                 onSubmitFailure={this.handleSubmitFailure}
                 onSubmitSuccess={this.handleSubmitSuccess}
               />
@@ -357,6 +400,12 @@ class SightEventFormDialog extends Component {
           onExited={this.handleAlertDialogClear}
           {...alertDialog}
         />
+        <NewLanguageDialog
+          handleClose={() => this.setState({ newLanguageDialog: { open: false }})}
+          handleSubmit={value => this.setState({ newLanguageDialog: { newLanguage: value, open: false }, language: value })}
+          list={notTranslatedLanguages}
+          open={newLanguageDialog.open}
+        />
       </Fragment>
     );
   }
@@ -365,6 +414,7 @@ class SightEventFormDialog extends Component {
 SightEventFormDialog.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   changeDefaultLanguage: PropTypes.func.isRequired,
+  createTranslation: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
   deletePDF: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
@@ -392,6 +442,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   clearItem: sightEventsActions.clearItem,
+  createTranslation: sightEventsActions.createTranslation,
   changeDefaultLanguage: sightEventsActions.changeDefaultLanguage,
   fetchItem: sightEventsActions.fetchItem,
   fetchList: sightEventsActions.fetchList,

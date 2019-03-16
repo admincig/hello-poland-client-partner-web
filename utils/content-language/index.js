@@ -46,13 +46,13 @@ export function getSupportedLanguages(lngList = []) {
 }
 
 /**
- * Returns list of available languages.
+ * Returns list of non translated languages.
  * @method
  * @param {string[]} lngList - list of supported languages.
  * @return {string[]} - filtered language list.
  */
 
-export function getAvailableLanguages(lngList = []) {
+export function getNotTranslatedLanguages(lngList = []) {
   return CONTENT_LANGUAGES.filter(item => lngList.indexOf(item) < 0);
 }
 
