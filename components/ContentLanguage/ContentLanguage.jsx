@@ -1,91 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import withStyles from '@material-ui/core/styles/withStyles';
-import { getLanguageLabel } from 'utils/content-language';
-import SelectActions from './SelectActions';
+import Grid from '@material-ui/core/Grid';
+import LanguagePicker from './LanguagePicker';
+import LanguageActions from './LanguageActions';
 
-const styles = {
-  root: {
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-  },
-};
-
-const ContentLanguage = ({
-  actions,
-  classes,
-  defaultItem,
-  FormControlProps,
-  InputLabelProps,
-  InputProps,
-  label,
-  listItems,
-  value,
-  ...props
-}) => (
-  <div className={classes.root}>
-    <FormControl {...FormControlProps}>
-      {label
-        && (
-          <InputLabel {...InputLabelProps} htmlFor="language">{label}</InputLabel>
-        )
-      }
-      <Select
-        value={value}
-        {...props}
-        inputProps={{
-          id: 'language',
-          ...InputProps,
-        }}
-      >
-        {listItems.map((item) => {
-          const langLabel = getLanguageLabel(item, true, { locale: 'pl-PL' });
-
-          return (
-            <MenuItem key={item} value={item}>
-              {item === defaultItem
-                ? `${langLabel} - domyślny`
-                : langLabel
-              }
-            </MenuItem>
-          );
-        })}
-      </Select>
-    </FormControl>
+const ContentLanguage = ({ LanguageActionsProps, LanguagePickerProps, showActions }) => (
+  <Grid container alignItems="flex-end" justify="space-between">
+    <LanguagePicker {...LanguagePickerProps} />
     {
-      actions
-      && <SelectActions actions={actions} language={value} />
+      showActions
+      && <LanguageActions {...LanguageActionsProps} />
     }
-  </div>
+  </Grid>
 );
 
 ContentLanguage.propTypes = {
-  actions: PropTypes.arrayOf(PropTypes.shape({})),
-  classes: PropTypes.shape({}).isRequired,
-  defaultItem: PropTypes.string,
-  FormControlProps: PropTypes.shape({}),
-  InputLabelProps: PropTypes.shape({}),
-  InputProps: PropTypes.shape({}),
-  label: PropTypes.string,
-  listItems: PropTypes.arrayOf(PropTypes.string),
-  value: PropTypes.string.isRequired,
+  LanguageActionsProps: PropTypes.shape({}),
+  LanguagePickerProps: PropTypes.shape({}),
+  showActions: PropTypes.bool,
 };
 
 ContentLanguage.defaultProps = {
-  actions: null,
-  defaultItem: '',
-  FormControlProps: {},
-  InputLabelProps: {},
-  InputProps: {},
-  label: null,
-  listItems: [],
+  LanguageActionsProps: null,
+  LanguagePickerProps: null,
+  showActions: false,
 };
 
-export default withStyles(styles)(ContentLanguage);
+export default ContentLanguage;
