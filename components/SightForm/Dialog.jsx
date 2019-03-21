@@ -92,10 +92,26 @@ class SightFormDialog extends Component {
     }
   };
 
+  handleDefaultLanguageChange = (language) => {
+    if (language && language.length) {
+      const { changeDefaultTranslation, itemId } = this.props;
+      const options = {
+        headers: {
+          'Content-Language': language,
+        },
+      };
+
+      changeDefaultTranslation({
+        id: itemId,
+        options,
+        onSuccess: () => this.handleFetchItem(itemId, language),
+        onFailure: this.handleSubmitFailure,
+      });
+    }
+  };
+
   handleFetchItem = (id, language) => {
     const { fetchItem } = this.props;
-
-    this.setState({ language });
 
     fetchItem({
       id,
@@ -190,24 +206,6 @@ class SightFormDialog extends Component {
       && !isFetching
       && itemId !== null
       && !this.isItemLoaded(itemId, item);
-  };
-
-  handleDefaultLanguageChange = (language) => {
-    if (language && language.length) {
-      const { changeDefaultTranslation, itemId } = this.props;
-      const options = {
-        headers: {
-          'Content-Language': language,
-        },
-      };
-
-      changeDefaultTranslation({
-        id: itemId,
-        options,
-        onSuccess: () => this.handleFetchItem(itemId, language),
-        onFailure: this.handleSubmitFailure,
-      });
-    }
   };
 
   render() {
