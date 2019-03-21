@@ -48,22 +48,22 @@ export function getSupportedLanguages(lngList = []) {
 /**
  * Returns pretty label.
  * @param {string} lng - label language code
- * @param {boolean} withCode - show language code beside label
  * @param {Object} options
  * @param {string} options.locale - defines base locale
- * @return {*}
+ * @param {boolean} [options.withCode] - show language code beside label
+ * @return {string} - translated label
  */
-export function getLanguageLabel(lng, withCode, options = {}) {
-  const { locale } = options;
+export function getLanguageLabel(lng, options = {}) {
+  const { locale, withCode } = options;
 
   if (!locales[locale]) {
     return '';
   }
 
-  const label = locales[locale].labels[lng];
+  let label = locales[locale].labels[lng];
 
-  if (withCode) {
-    return `${label} ${String.fromCharCode(8212)} ${lng}`;
+  if (withCode !== false) {
+    label = `${label} ${String.fromCharCode(8212)} ${lng}`;
   }
 
   return label;

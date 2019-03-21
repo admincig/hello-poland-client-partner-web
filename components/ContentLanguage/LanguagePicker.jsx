@@ -7,7 +7,7 @@ import Select from '@material-ui/core/Select';
 import { getLanguageLabel } from 'utils/content-language';
 
 const LanguagePicker = ({
-  defaultItem, label, listItems, value, ...props
+  defaultItem, inputProps, label, listItems, value, ...props
 }) => (
   <FormControl>
     {label
@@ -19,11 +19,12 @@ const LanguagePicker = ({
       value={value}
       {...props}
       inputProps={{
+        ...inputProps,
         id: 'language',
       }}
     >
       {listItems.map((item) => {
-        const langLabel = getLanguageLabel(item, true, { locale: 'pl-PL' });
+        const langLabel = getLanguageLabel(item, { locale: 'pl-PL' });
 
         return (
           <MenuItem key={item} value={item}>
@@ -39,10 +40,16 @@ const LanguagePicker = ({
 );
 
 LanguagePicker.propTypes = {
-  defaultItem: PropTypes.string.isRequired,
+  defaultItem: PropTypes.string,
+  inputProps: PropTypes.shape({}),
   label: PropTypes.string.isRequired,
   listItems: PropTypes.arrayOf(PropTypes.string).isRequired,
   value: PropTypes.string.isRequired,
+};
+
+LanguagePicker.defaultProps = {
+  defaultItem: null,
+  inputProps: null,
 };
 
 export default LanguagePicker;

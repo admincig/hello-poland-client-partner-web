@@ -1,23 +1,30 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import ArrowDropDown from '@material-ui/icons/ArrowDropDown';
+import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
-import FormControl from '@material-ui/core/FormControl';
+import Grid from '@material-ui/core/Grid';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import ArrowDropDown from '@material-ui/icons/ArrowDropDown';
 
-const SelectActions = ({ actions, language }) => {
+const styles = () => ({
+  button: {
+    boxShadow: 'none',
+  },
+});
+
+const LanguageActions = ({ actions, classes, language }) => {
   const [anchorEl, handleSelectToggle] = useState(null);
   const handleAction = (action) => {
     handleSelectToggle(null);
     action(language);
   };
   return (
-    <FormControl>
+    <Grid>
       <Button
-        style={{ width: 160, boxShadow: 'none' }}
+        className={classes.button}
         onClick={e => handleSelectToggle(e.currentTarget)}
-        aria-owns={anchorEl ? 'simple-menu' : undefined}
+        aria-owns={anchorEl ? 'actions-menu' : undefined}
         aria-haspopup="true"
         variant="contained"
       >
@@ -25,9 +32,9 @@ const SelectActions = ({ actions, language }) => {
         <ArrowDropDown />
       </Button>
       <Menu
-        id="simple-menu"
+        id="actions-menu"
         anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
+        open={!!anchorEl}
         onClose={() => handleSelectToggle(null)}
       >
         {
@@ -43,13 +50,14 @@ const SelectActions = ({ actions, language }) => {
           ))
         }
       </Menu>
-    </FormControl>
+    </Grid>
   );
 };
 
-SelectActions.propTypes = {
+LanguageActions.propTypes = {
   actions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  classes: PropTypes.shape({}).isRequired,
   language: PropTypes.string.isRequired,
 };
 
-export default SelectActions;
+export default withStyles(styles)(LanguageActions);

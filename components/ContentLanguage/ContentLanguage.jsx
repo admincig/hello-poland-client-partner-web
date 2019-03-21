@@ -2,44 +2,28 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Grid from '@material-ui/core/Grid';
 import LanguagePicker from './LanguagePicker';
-import SelectActions from './SelectActions';
+import LanguageActions from './LanguageActions';
 
-const ContentLanguage = ({
-  actions,
-  defaultItem,
-  label,
-  listItems,
-  value,
-  ...props
-}) => (
+const ContentLanguage = ({ LanguageActionsProps, LanguagePickerProps, showActions }) => (
   <Grid container alignItems="flex-end" justify="space-between">
-    <LanguagePicker
-      lablel={label}
-      defaultItem={defaultItem}
-      value={value}
-      listItems={listItems}
-      {...props}
-    />
+    <LanguagePicker {...LanguagePickerProps} />
     {
-      actions
-      && <SelectActions actions={actions} language={value} />
+      showActions
+      && <LanguageActions {...LanguageActionsProps} />
     }
   </Grid>
 );
 
 ContentLanguage.propTypes = {
-  actions: PropTypes.arrayOf(PropTypes.shape({})),
-  defaultItem: PropTypes.string,
-  label: PropTypes.string,
-  listItems: PropTypes.arrayOf(PropTypes.string),
-  value: PropTypes.string.isRequired,
+  LanguageActionsProps: PropTypes.shape({}),
+  LanguagePickerProps: PropTypes.shape({}),
+  showActions: PropTypes.bool,
 };
 
 ContentLanguage.defaultProps = {
-  actions: null,
-  defaultItem: '',
-  label: null,
-  listItems: [],
+  LanguageActionsProps: null,
+  LanguagePickerProps: null,
+  showActions: false,
 };
 
 export default ContentLanguage;
