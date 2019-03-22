@@ -15,7 +15,7 @@ import {
   actions as sightEventsActions,
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
-import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getSupportedLanguages } from 'utils/content-language';
+import {CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getLanguageLabel, getSupportedLanguages} from 'utils/content-language';
 import AlertDialog from 'components/AlertDialog';
 import ContentLanguage from 'components/ContentLanguage';
 import GridItem from 'components/GridItem';
@@ -50,11 +50,6 @@ class SightEventFormDialog extends Component {
       language: DEFAULT_LANGUAGE,
       submittingError: false,
     };
-
-    this.actions = [
-      { label: 'Ustaw jako domyślny język atrakcji', action: this.handleDefaultLanguageChange },
-      { label: 'Usuń wybraną wersję językową ofery', action: this.handleDeleteTranslationConfirm },
-    ];
   }
 
   componentDidUpdate() {
@@ -173,6 +168,41 @@ class SightEventFormDialog extends Component {
     deletePDF(payload);
   };
 
+  handleDeleteTranslation = (language) => {
+    const { deleteTranslation, item, itemId } = this.props;
+    const { defaultLanguage } = item || {};
+
+    deleteTranslation({
+      id: itemId,
+      pathParams: {
+        languageVersion: language,
+      },
+      onSuccess: () => {
+        this.setState({ isSubmitting: false, submittingError: false });
+        this.handleFetchItem(itemId, defaultLanguage);
+      },
+      onFailure: () => this.setState({ isSubmitting: false, submittingError: true }),
+    });
+  };
+
+  handleDeleteTranslationConfirm = (language) => {
+    if (language && language.length) {
+      const label = getLanguageLabel(language, { locale: 'pl-PL', withCode: false });
+
+      this.setState({
+        alertDialog: {
+          content: 'Wybrane tłumaczenie zostanie trwale usunięte. Czy chcesz kontynuować?',
+          title: `Usuwanie tłumaczenia - ${label}`,
+          open: true,
+          onSubmit: () => {
+            this.handleAlertDialogClose();
+            this.handleDeleteTranslation(language);
+          },
+        },
+      });
+    }
+  };
+
   handleFetchItem = (id, language) => {
     const { fetchItem } = this.props;
 
@@ -270,39 +300,13 @@ class SightEventFormDialog extends Component {
       && !this.isItemLoaded(itemId, item);
   };
 
-  handleDeleteTranslationConfirm = (value) => {
-    if (typeof value === 'string') {
-      this.setState({
-        alertDialog: {
-          content: 'Wybrana wersja językowa zostanie trwale usunięta, czy chcesz kontynuować?',
-          title: 'Usuwanie wersji językowej oferty',
-          open: true,
-          onSubmit: () => {
-            this.handleAlertDialogClose();
-            this.handleDeleteTranslation(value);
-          },
-        },
-      });
-    }
-  }
-
-  handleDeleteTranslation = (value) => {
-    const { deleteTranslation, itemId } = this.props;
-    deleteTranslation({
-      id: itemId,
-      language: value,
-      onSuccess: () => this.handleFetchItem(itemId),
-      onFailure: () => this.setState({ isSubmitting: false, submittingError: true }),
-    });
-  }
-
   render() {
     const {
       alertDialog, fetchingError, isFetching, isSubmitting, language, submittingError,
     } = this.state;
     const {
-      classes, clearItem, fetchItem, fetchList, item, itemId, onClose, parentId, title,
-      deletePDF, changeDefaultTranslation, ...rest
+      classes, clearItem, deleteTranslation, fetchItem, fetchList, item, itemId, onClose, parentId,
+      title, deletePDF, changeDefaultTranslation, ...rest
     } = this.props;
 
     const multimedia = this.getMultimedia();
@@ -315,6 +319,18 @@ class SightEventFormDialog extends Component {
 
       languageVersions = getSupportedLanguages(availableLanguageVersions);
       defaultLanguage = itemDefaultLanguage;
+    }
+
+    const translationActions = [];
+
+    if (language !== defaultLanguage) {
+      translationActions.push({
+        label: 'Usuń tłumaczenie', action: this.handleDeleteTranslationConfirm,
+      });
+
+      translationActions.push({
+        label: 'Ustaw tłumaczenie jako domyślne', action: this.handleDefaultLanguageChange,
+      });
     }
 
     return (
@@ -335,7 +351,7 @@ class SightEventFormDialog extends Component {
               <GridItem className={classes.section}>
                 <ContentLanguage
                   LanguageActionsProps={{
-                    actions: itemId ? this.actions : null,
+                    actions: itemId ? translationActions : null,
                     language,
                   }}
                   LanguagePickerProps={{
@@ -345,7 +361,7 @@ class SightEventFormDialog extends Component {
                     onChange: this.handleLanguageChange,
                     value: language,
                   }}
-                  showActions={!!itemId}
+                  showActions={!!itemId && !!translationActions.length}
                 />
               </GridItem>
               <SightForm

@@ -7,8 +7,7 @@ import LanguageActions from './LanguageActions';
 const ContentLanguage = ({ LanguageActionsProps, LanguagePickerProps, showActions }) => (
   <Grid container alignItems="flex-end" justify="space-between">
     <LanguagePicker {...LanguagePickerProps} />
-    {
-      showActions
+    {showActions
       && <LanguageActions {...LanguageActionsProps} />
     }
   </Grid>
