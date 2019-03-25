@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import _sortedUniq from 'lodash/sortedUniq';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import withStyles from '@material-ui/core/styles/withStyles';
@@ -156,10 +157,10 @@ class SightFormDialog extends Component {
       ...state.translationDialog,
       open: false,
     },
-    translations: [
+    translations: _sortedUniq([
       ...state.translations,
       language,
-    ].sort(),
+    ]),
   }));
 
   handleDefaultLanguageChange = (language) => {
