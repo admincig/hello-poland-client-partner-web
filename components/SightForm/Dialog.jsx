@@ -23,7 +23,7 @@ import {
 } from 'utils/content-language';
 import AlertDialog from 'components/AlertDialog';
 import ContentLanguage from 'components/ContentLanguage';
-import CreateTranslationDialog from 'components/NewLanguageDialog';
+import CreateTranslationDialog from 'components/ContentLanguage/CreateTranslationDialog';
 import GridItem from 'components/GridItem';
 import SightForm from './Form';
 import i18n from './i18n/pl-PL';
@@ -49,15 +49,15 @@ class SightFormDialog extends Component {
         open: false,
         title: null,
       },
-      translationDialog: {
-        open: false,
-        translations: [],
-      },
       fetchingError: false,
       isFetching: false,
       isSubmitting: false,
       language: DEFAULT_LANGUAGE,
       submittingError: false,
+      translationDialog: {
+        open: false,
+        translations: [],
+      },
       translations: CONTENT_LANGUAGES,
     };
   }
@@ -94,15 +94,6 @@ class SightFormDialog extends Component {
 
     return null;
   };
-
-  handleAlertDialogClear = () => this.setState({
-    alertDialog: {
-      content: null,
-      onSuccess: null,
-      open: false,
-      title: null,
-    },
-  });
 
   handleAlertDialogClose = () => this.setState({
     alertDialog: {
@@ -164,21 +155,24 @@ class SightFormDialog extends Component {
   }));
 
   handleDefaultLanguageChange = (language) => {
-    if (language && language.length) {
-      const { changeDefaultTranslation, itemId } = this.props;
-      const options = {
-        headers: {
-          'Content-Language': language,
-        },
-      };
+    const { changeDefaultTranslation, itemId } = this.props;
+    const options = {
+      headers: {
+        'Content-Language': language,
+      },
+    };
 
-      changeDefaultTranslation({
-        id: itemId,
-        options,
-        onSuccess: () => this.handleFetchItem(itemId, language),
-        onFailure: this.handleSubmitFailure,
-      });
-    }
+    changeDefaultTranslation({
+      id: itemId,
+      options,
+      onSuccess: () => {
+        this.setState({ isSubmitting: false, submittingError: false });
+        this.handleFetchItem(itemId, language);
+      },
+      onFailure: this.handleSubmitFailure,
+    });
+
+    this.setState({ isSubmitting: true, submittingError: false });
   };
 
   handleDeleteTranslation = (language) => {
@@ -196,6 +190,8 @@ class SightFormDialog extends Component {
       },
       onFailure: () => this.setState({ isSubmitting: false, submittingError: true }),
     });
+
+    this.setState({ isSubmitting: true, submittingError: false });
   };
 
   handleDeleteTranslationDialogOpen = (language) => {
@@ -413,7 +409,6 @@ class SightFormDialog extends Component {
         </Dialog>
         <AlertDialog
           onClose={this.handleAlertDialogClose}
-          // onExited={this.handleAlertDialogClear}
           {...alertDialog}
         />
         <CreateTranslationDialog

@@ -26,16 +26,21 @@ const CreateTranslationDialog = ({
     });
   };
 
+  const resetState = () => setState({ selected: null });
+
   const handleCancel = () => {
     onCancel();
+    resetState();
   };
 
   const handleClose = () => {
     onClose();
+    resetState();
   };
 
   const handleSuccess = () => {
     onSuccess(selected);
+    resetState();
   };
 
   return (
