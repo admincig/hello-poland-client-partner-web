@@ -2,7 +2,6 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import _isEqual from 'lodash/isEqual';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -45,13 +44,13 @@ class SightFormDialog extends Component {
     this.state = {
       alertDialog: {
         content: null,
-        onSubmit: null,
+        onSuccess: null,
         open: false,
         title: null,
       },
       translationDialog: {
         open: false,
-        translations: CONTENT_LANGUAGES,
+        translations: [],
       },
       fetchingError: false,
       isFetching: false,
@@ -95,52 +94,23 @@ class SightFormDialog extends Component {
     return null;
   };
 
-  handleCreateTranslationConfirmation = () => {
-    const { item } = this.props;
-    const { availableLanguageVersions } = item || {};
-
-    this.setState({
-      translationDialog: {
-        open: true,
-        translations: getUntranslatedLanguages(availableLanguageVersions),
-      },
-    });
-  };
-
-  handleCreateTranslationDialogClose = () => this.setState(state => ({
-    translationDialog: {
-      ...state.translationDialog,
-      open: false,
-    },
-  }));
-
-  handleCreateTranslationDialogSuccess = language => this.setState(state => ({
-    language,
-    translationDialog: {
-      ...state.translationDialog,
-      open: false,
-    },
-    translations: [
-      ...state.translations,
-      language,
-    ].sort(),
-  }));
-
   handleAlertDialogClear = () => this.setState({
     alertDialog: {
       content: null,
-      onSubmit: null,
+      onSuccess: null,
       open: false,
       title: null,
     },
   });
 
-  handleAlertDialogClose = () => this.setState(state => ({
+  handleAlertDialogClose = () => this.setState({
     alertDialog: {
-      ...state.alertDialog,
+      content: null,
+      onSuccess: null,
       open: false,
+      title: null,
     },
-  }));
+  });
 
   handleClose = () => {
     const { clearItem, onClose } = this.props;
@@ -160,6 +130,37 @@ class SightFormDialog extends Component {
       onClose();
     }
   };
+
+  handleCreateTranslationDialogClose = () => this.setState({
+    translationDialog: {
+      open: false,
+      translations: [],
+    },
+  });
+
+  handleCreateTranslationDialogOpen = () => {
+    const { item } = this.props;
+    const { availableLanguageVersions } = item || {};
+
+    this.setState({
+      translationDialog: {
+        open: true,
+        translations: getUntranslatedLanguages(availableLanguageVersions),
+      },
+    });
+  };
+
+  handleCreateTranslationDialogSuccess = language => this.setState(state => ({
+    language,
+    translationDialog: {
+      ...state.translationDialog,
+      open: false,
+    },
+    translations: [
+      ...state.translations,
+      language,
+    ].sort(),
+  }));
 
   handleDefaultLanguageChange = (language) => {
     if (language && language.length) {
@@ -196,22 +197,20 @@ class SightFormDialog extends Component {
     });
   };
 
-  handleDeleteTranslationConfirmation = (language) => {
-    if (language && language.length) {
-      const label = getLanguageLabel(language, { locale: 'pl-PL', withCode: false });
+  handleDeleteTranslationDialogOpen = (language) => {
+    const label = getLanguageLabel(language, { locale: 'pl-PL', withCode: false });
 
-      this.setState({
-        alertDialog: {
-          content: 'Wybrane tłumaczenie zostanie trwale usunięte. Czy chcesz kontynuować?',
-          title: `Usuwanie tłumaczenia - ${label}`,
-          open: true,
-          onSubmit: () => {
-            this.handleAlertDialogClose();
-            this.handleDeleteTranslation(language);
-          },
+    this.setState({
+      alertDialog: {
+        content: 'Wybrane tłumaczenie zostanie trwale usunięte. Czy chcesz kontynuować?',
+        title: `Usuwanie tłumaczenia - ${label}`,
+        open: true,
+        onSuccess: () => {
+          this.handleAlertDialogClose();
+          this.handleDeleteTranslation(language);
         },
-      });
-    }
+      },
+    });
   };
 
   handleFetchItem = (id, language) => {
@@ -288,25 +287,16 @@ class SightFormDialog extends Component {
   };
 
   handleSubmitSuccess = (sightId, actions) => {
-    const { fetchSightsList, itemId } = this.props;
-    const { newLanguageDialog: { newLanguage }, language } = this.state;
+    const { fetchSightsList, fetchSightEventsList } = this.props;
     const { resetForm, setSubmitting } = actions;
 
     setSubmitting(false);
-
-    if (newLanguage) {
-      this.setState({
-        newLanguageDialog: {
-          newLanguage: null,
-        },
-      }, () => this.handleFetchItem(itemId, language));
-    } else {
-      resetForm();
-      this.handleClose();
-    }
+    resetForm();
 
     fetchSightsList();
-    this.setState({ isSubmitting: false, submittingError: false });
+    fetchSightEventsList();
+
+    this.handleClose();
   };
 
   isItemLoaded = (itemId, item) => item
@@ -346,13 +336,13 @@ class SightFormDialog extends Component {
 
     if (CONTENT_LANGUAGES.length !== translations.length) {
       translationActions.push({
-        label: 'Dodaj tłumaczenie', action: this.handleCreateTranslationConfirmation,
+        label: 'Dodaj tłumaczenie', action: this.handleCreateTranslationDialogOpen,
       });
     }
 
     if (language !== defaultLanguage) {
       translationActions.push({
-        label: 'Usuń tłumaczenie', action: this.handleDeleteTranslationConfirmation,
+        label: 'Usuń tłumaczenie', action: this.handleDeleteTranslationDialogOpen,
       });
 
       translationActions.push({
@@ -396,7 +386,6 @@ class SightFormDialog extends Component {
                 FormikProps={{ ref: this.formikRef }}
                 initialValues={this.getInitialValues(item)}
                 language={language}
-                newLanguage={language}
                 onSubmitFailure={this.handleSubmitFailure}
                 onSubmitSuccess={this.handleSubmitSuccess}
               />
@@ -423,7 +412,7 @@ class SightFormDialog extends Component {
         </Dialog>
         <AlertDialog
           onClose={this.handleAlertDialogClose}
-          onExited={this.handleAlertDialogClear}
+          // onExited={this.handleAlertDialogClear}
           {...alertDialog}
         />
         <CreateTranslationDialog
