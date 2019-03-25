@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import _sortedUniq from 'lodash/sortedUniq';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import _isEqual from 'lodash/isEqual';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
