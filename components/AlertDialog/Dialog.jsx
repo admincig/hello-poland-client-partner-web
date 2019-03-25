@@ -8,7 +8,8 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 const AlertDialog = ({
-  content, onCancel, onCancelText, onDiscard, onDiscardText, onSuccess, onSuccessText, title, ...props
+  content, onCancel, onCancelText, onDiscard, onDiscardText, onSuccess, onSuccessText, title,
+  ...props
 }) => (
   <Dialog
     aria-labelledby="alert-dialog-title"
