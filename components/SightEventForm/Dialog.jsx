@@ -17,13 +17,13 @@ import {
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
 import {
-  CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getLanguageLabel, getSupportedLanguages,
-  getNotTranslatedLanguages,
+  CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getLanguageLabel, getTranslatedLanguages,
+  getUntranslatedLanguages as getNotTranslatedLanguages,
 } from 'utils/content-language';
 import AlertDialog from 'components/AlertDialog';
 import ContentLanguage from 'components/ContentLanguage';
 import GridItem from 'components/GridItem';
-import NewLanguageDialog from 'components/NewLanguageDialog';
+// import CreateTranslationDialog from 'components/NewLanguageDialog';
 import SightForm from './Form';
 import MultimediaList from './MultimediaList';
 import i18n from './i18n/pl-PL';
@@ -388,7 +388,7 @@ class SightEventFormDialog extends Component {
       if (newLanguageDialog.newLanguage) {
         availableLanguageVersions.push(newLanguageDialog.newLanguage);
       }
-      languageVersions = getSupportedLanguages(availableLanguageVersions);
+      languageVersions = getTranslatedLanguages(availableLanguageVersions);
       notTranslatedLanguages = getNotTranslatedLanguages(languageVersions);
       if (notTranslatedLanguages.length > 0) {
         actions.push({ label: 'Dodaj wersję językową', action: this.handleAddNewLanguage });
@@ -475,12 +475,12 @@ class SightEventFormDialog extends Component {
           onExited={this.handleAlertDialogClear}
           {...alertDialog}
         />
-        <NewLanguageDialog
-          handleClose={this.handleNewLanguageModalClose}
-          handleSubmit={this.handleNewLanguageModalSubmit}
-          list={notTranslatedLanguages}
-          open={newLanguageDialog.open || false}
-        />
+        {/*<CreateTranslationDialog*/}
+          {/*handleClose={this.handleNewLanguageModalClose}*/}
+          {/*handleSubmit={this.handleNewLanguageModalSubmit}*/}
+          {/*list={notTranslatedLanguages}*/}
+          {/*open={newLanguageDialog.open || false}*/}
+        {/*/>*/}
       </Fragment>
     );
   }

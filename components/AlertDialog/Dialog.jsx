@@ -8,7 +8,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 const AlertDialog = ({
-  content, onClose, onCloseText, onSubmit, onSubmitText, title, ...props
+  content, onCancel, onCancelText, onClose, onCloseText, onSuccess, onSuccessText, title, ...props
 }) => (
   <Dialog
     aria-labelledby="alert-dialog-title"
@@ -21,31 +21,32 @@ const AlertDialog = ({
       <DialogContentText id="alert-dialog-description">{content}</DialogContentText>
     </DialogContent>
     <DialogActions>
-      <Button onClick={onClose} color="primary">
-        {onCloseText}
-      </Button>
-      <Button onClick={onSubmit} color="primary" autoFocus>
-        {onSubmitText}
-      </Button>
+      {onClose && <Button onClick={onClose} color="primary">{onCloseText}</Button>}
+      {onCancel && <Button onClick={onCancel} color="primary">{onCancelText}</Button>}
+      {onSuccess && <Button onClick={onSuccess} color="primary" autoFocus>{onSuccessText}</Button>}
     </DialogActions>
   </Dialog>
 );
 
 AlertDialog.propTypes = {
   content: PropTypes.string,
+  onCancel: PropTypes.func,
+  onCancelText: PropTypes.string,
   onClose: PropTypes.func,
   onCloseText: PropTypes.string,
-  onSubmit: PropTypes.func,
-  onSubmitText: PropTypes.string,
+  onSuccess: PropTypes.func,
+  onSuccessText: PropTypes.string,
   title: PropTypes.string,
 };
 
 AlertDialog.defaultProps = {
   content: null,
+  onCancel: null,
+  onCancelText: 'Anuluj',
   onClose: null,
-  onCloseText: 'Anuluj',
-  onSubmit: null,
-  onSubmitText: 'OK',
+  onCloseText: 'Zamknij',
+  onSuccess: null,
+  onSuccessText: 'OK',
   title: '',
 };
 

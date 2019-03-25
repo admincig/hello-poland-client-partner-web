@@ -15,10 +15,12 @@ const styles = () => ({
 
 const LanguageActions = ({ actions, classes, language }) => {
   const [anchorEl, handleSelectToggle] = useState(null);
-  const handleAction = (action) => {
+
+  const handleActionClick = (action) => {
     handleSelectToggle(null);
     action(language);
   };
+
   return (
     <Grid>
       <Button
@@ -43,7 +45,7 @@ const LanguageActions = ({ actions, classes, language }) => {
               key={label}
               action={action}
               component="div"
-              onClick={() => handleAction(action)}
+              onClick={() => handleActionClick(action)}
             >
               {label}
             </MenuItem>

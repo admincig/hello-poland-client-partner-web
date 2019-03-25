@@ -1,1 +1,1 @@
-export { default } from './NewLanguageDialog';
+export { default } from '../ContentLanguage/CreateTranslationDialog';
