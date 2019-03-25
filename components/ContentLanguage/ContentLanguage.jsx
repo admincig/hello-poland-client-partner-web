@@ -1,59 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import { getLanguageLabel } from 'utils/content-language';
+import Grid from '@material-ui/core/Grid';
+import LanguagePicker from './LanguagePicker';
+import LanguageActions from './LanguageActions';
 
-const ContentLanguage = ({
-  defaultItem, FormControlProps, InputLabelProps, InputProps, label, listItems, ...props
-}) => (
-  <FormControl {...FormControlProps}>
-    {label
-      && (
-        <InputLabel {...InputLabelProps} htmlFor="language">{label}</InputLabel>
-      )
+const ContentLanguage = ({ LanguageActionsProps, LanguagePickerProps, showActions }) => (
+  <Grid container alignItems="flex-end" justify="space-between">
+    <LanguagePicker {...LanguagePickerProps} />
+    {
+      showActions
+      && <LanguageActions {...LanguageActionsProps} />
     }
-    <Select
-      {...props}
-      inputProps={{
-        id: 'language',
-        ...InputProps,
-      }}
-    >
-      {listItems.map((item) => {
-        const langLabel = getLanguageLabel(item, true, { locale: 'pl-PL' });
-
-        return (
-          <MenuItem key={item} value={item}>
-            {item === defaultItem
-              ? `${langLabel} - domyślny`
-              : langLabel
-            }
-          </MenuItem>
-        );
-      })}
-    </Select>
-  </FormControl>
+  </Grid>
 );
 
 ContentLanguage.propTypes = {
-  defaultItem: PropTypes.string,
-  FormControlProps: PropTypes.shape({}),
-  InputLabelProps: PropTypes.shape({}),
-  InputProps: PropTypes.shape({}),
-  label: PropTypes.string,
-  listItems: PropTypes.arrayOf(PropTypes.string),
+  LanguageActionsProps: PropTypes.shape({}),
+  LanguagePickerProps: PropTypes.shape({}),
+  showActions: PropTypes.bool,
 };
 
 ContentLanguage.defaultProps = {
-  defaultItem: '',
-  FormControlProps: {},
-  InputLabelProps: {},
-  InputProps: {},
-  label: null,
-  listItems: [],
+  LanguageActionsProps: null,
+  LanguagePickerProps: null,
+  showActions: false,
 };
 
 export default ContentLanguage;
