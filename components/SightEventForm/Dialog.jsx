@@ -136,7 +136,9 @@ class SightEventFormDialog extends Component {
     },
   });
 
-  handleCancelClick = () => this.handleCancel();
+  handleCancelClick = () => {
+    this.handleFormReload(this.handleCancel);
+  };
 
   handleCancel = () => {
     const { clearItem, onClose } = this.props;
@@ -155,10 +157,6 @@ class SightEventFormDialog extends Component {
     if (onClose) {
       onClose();
     }
-  };
-
-  handleCloseClick = () => {
-    this.handleFormReload(this.handleCancel);
   };
 
   handleCreateTranslationDialogCancel = () => this.setState({
@@ -261,6 +259,8 @@ class SightEventFormDialog extends Component {
       },
     });
   };
+
+  handleDiscardClick = () => this.handleCancel();
 
   handleFetchItem = (id, language) => {
     const { fetchItem } = this.props;
@@ -491,7 +491,7 @@ class SightEventFormDialog extends Component {
                 </Typography>
               )
             }
-            <Button disabled={isSubmitting} onClick={this.handleCloseClick} color="primary">Zamknij</Button>
+            <Button disabled={isSubmitting} onClick={this.handleDiscardClick} color="primary">Odrzuć</Button>
             <Button disabled={isSubmitting} onClick={this.handleCancelClick} color="primary">Anuluj</Button>
             <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>
           </DialogActions>
