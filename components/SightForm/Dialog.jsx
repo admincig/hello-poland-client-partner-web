@@ -18,9 +18,7 @@ import {
 } from '@hello-poland/commons/redux/sights';
 import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
 import {
-  CONTENT_LANGUAGES,
-  DEFAULT_LANGUAGE,
-  getSupportedLanguages,
+  CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getLanguageLabel, getSupportedLanguages,
   getNotTranslatedLanguages,
 } from 'utils/content-language';
 import AlertDialog from 'components/AlertDialog';
@@ -67,6 +65,7 @@ class SightFormDialog extends Component {
     if (this.shouldComponentFetch()) {
       const { itemId } = this.props;
       const { language } = this.state;
+
       this.handleFetchItem(itemId, language);
     }
   }
@@ -104,15 +103,88 @@ class SightFormDialog extends Component {
 
   handleClose = () => {
     const { clearItem, onClose } = this.props;
+
+    this.setState({
+      fetchingError: false,
+      isFetching: false,
+      isSubmitting: false,
+      language: DEFAULT_LANGUAGE,
+      submittingError: false,
+    });
+
+    clearItem();
+
     if (onClose) {
       onClose();
-      this.setState({
-        fetchingError: false,
-        isFetching: false,
-        isSubmitting: false,
-        submittingError: false,
+    }
+  };
+
+  handleDefaultLanguageChange = (language) => {
+    if (language && language.length) {
+      const { changeDefaultTranslation, itemId } = this.props;
+      const options = {
+        headers: {
+          'Content-Language': language,
+        },
+      };
+
+      changeDefaultTranslation({
+        id: itemId,
+        options,
+        onSuccess: () => this.handleFetchItem(itemId, language),
+        onFailure: this.handleSubmitFailure,
       });
-      clearItem();
+    }
+  };
+
+  handleAlertDialogClear = () => this.setState({
+    alertDialog: {
+      content: null,
+      onSubmit: null,
+      open: false,
+      title: null,
+    },
+  });
+
+  handleAlertDialogClose = () => this.setState(state => ({
+    alertDialog: {
+      ...state.alertDialog,
+      open: false,
+    },
+  }));
+
+  handleDeleteTranslation = (language) => {
+    const { deleteTranslation, item, itemId } = this.props;
+    const { defaultLanguage } = item || {};
+
+    deleteTranslation({
+      id: itemId,
+      pathParams: {
+        languageVersion: language,
+      },
+      onSuccess: () => {
+        this.setState({ isSubmitting: false, submittingError: false });
+        this.handleFetchItem(itemId, defaultLanguage);
+      },
+      onFailure: () => this.setState({ isSubmitting: false, submittingError: true }),
+    });
+  };
+
+  handleDeleteTranslationConfirm = (language) => {
+    if (language && language.length) {
+      const label = getLanguageLabel(language, { locale: 'pl-PL', withCode: false });
+
+      this.setState({
+        alertDialog: {
+          content: 'Wybrane tłumaczenie zostanie trwale usunięte. Czy chcesz kontynuować?',
+          title: `Usuwanie tłumaczenia - ${label}`,
+          open: true,
+          onSubmit: () => {
+            this.handleAlertDialogClose();
+            this.handleDeleteTranslation(language);
+          },
+        },
+      });
     }
   };
 
@@ -134,7 +206,7 @@ class SightFormDialog extends Component {
 
   handleFetchItem = (id, language) => {
     const { fetchItem } = this.props;
-    this.setState({ language });
+
     fetchItem({
       id,
       options: {
@@ -153,12 +225,10 @@ class SightFormDialog extends Component {
   handleFetchItemFailure = () => this.setState({ fetchingError: true, isFetching: false });
 
   handleFetchItemSuccess = () => {
-    const { item: { defaultLanguage, availableLanguageVersions } } = this.props;
-    const { language } = this.state;
-    this.setState({ fetchingError: false, isFetching: false });
-    if (availableLanguageVersions.indexOf(language) === -1) {
-      this.setState({ language: defaultLanguage });
-    }
+    const { item } = this.props;
+    const { language } = item || {};
+
+    this.setState({ fetchingError: false, isFetching: false, language });
   };
 
   handleLanguageChange = (event) => {
@@ -166,6 +236,7 @@ class SightFormDialog extends Component {
     const language = event.target.value;
 
     this.setState({ language });
+
     if (itemId) {
       this.handleFetchItem(itemId, language);
     }
@@ -241,23 +312,6 @@ class SightFormDialog extends Component {
       && !this.isItemLoaded(itemId, item);
   };
 
-  handleDefaultLanguageChange = (val) => {
-    const { changeDefaultLanguage, itemId } = this.props;
-    const options = {
-      headers: {
-        'Content-Language': val,
-      },
-    };
-    if (typeof val === 'string') {
-      changeDefaultLanguage({
-        id: itemId,
-        options,
-        onSuccess: () => this.handleFetchItem(itemId, val),
-        onFailure: this.handleSubmitFailure,
-      });
-    }
-  };
-
   handleNewLanguageModalSubmit = value => (
     this.setState({ newLanguageDialog: { newLanguage: value, open: false }, language: value })
   );
@@ -288,7 +342,7 @@ class SightFormDialog extends Component {
         },
       });
     }
-  }
+  };
 
   render() {
     const {
@@ -296,17 +350,13 @@ class SightFormDialog extends Component {
       submittingError, newLanguageDialog, alertDialog,
     } = this.state;
     const {
-      classes, clearItem, fetchItem, fetchSightsList, fetchSightEventsList, item, itemId, onClose,
-      title, changeDefaultLanguage, ...rest
+      classes, clearItem, deleteTranslation, fetchItem, fetchSightsList, fetchSightEventsList, item,
+      itemId, onClose, title, changeDefaultTranslation, ...rest
     } = this.props;
 
     let languageVersions = CONTENT_LANGUAGES;
     let defaultLanguage;
     let notTranslatedLanguages = [];
-
-    const actions = [
-      { label: 'Ustaw jako domyślny język atrakcji', action: this.handleDefaultLanguageChange },
-    ];
 
     if (this.isItemLoaded(itemId, item)) {
       const { availableLanguageVersions, defaultLanguage: itemDefaultLanguage } = item;
@@ -315,10 +365,23 @@ class SightFormDialog extends Component {
       }
       languageVersions = getSupportedLanguages(availableLanguageVersions);
       notTranslatedLanguages = getNotTranslatedLanguages(languageVersions);
-      if (notTranslatedLanguages.length > 0) {
-        actions.push({ label: 'Dodaj wersję językową', action: this.handleAddNewLanguage });
-      }
       defaultLanguage = itemDefaultLanguage;
+    }
+
+    const translationActions = [];
+
+    if (CONTENT_LANGUAGES.length !== languageVersions.length) {
+      translationActions.push({ label: 'Dodaj tłumaczenie', action: this.handleAddNewLanguage });
+    }
+
+    if (language !== defaultLanguage) {
+      translationActions.push({
+        label: 'Usuń tłumaczenie', action: this.handleDeleteTranslationConfirm,
+      });
+
+      translationActions.push({
+        label: 'Ustaw tłumaczenie jako domyślne', action: this.handleDefaultLanguageChange,
+      });
     }
 
     return (
@@ -337,13 +400,19 @@ class SightFormDialog extends Component {
                 <Typography variant="h6">Wersja językowa</Typography>
               </GridItem>
               <GridItem className={classes.section}>
-                <ContentLanguage
-                  defaultItem={defaultLanguage}
-                  actions={itemId ? actions : null}
-                  label={itemId ? i18n.label : i18n.defaultLabel}
-                  listItems={languageVersions}
-                  onChange={this.handleLanguageChange}
-                  value={language}
+              <ContentLanguage
+                LanguageActionsProps={{
+                  actions: itemId ? translationActions : null,
+                  language,
+                }}
+                LanguagePickerProps={{
+                  defaultItem: defaultLanguage,
+                  label: itemId ? i18n.label : i18n.defaultLabel,
+                  listItems: languageVersions,
+                  onChange: this.handleLanguageChange,
+                  value: language,
+                }}
+                showActions={!!itemId && !!translationActions.length}
                 />
               </GridItem>
               <SightForm
@@ -394,8 +463,9 @@ class SightFormDialog extends Component {
 
 SightFormDialog.propTypes = {
   classes: PropTypes.shape({}).isRequired,
-  changeDefaultLanguage: PropTypes.func.isRequired,
+  changeDefaultTranslation: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
+  deleteTranslation: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   fetchSightsList: PropTypes.func.isRequired,
   fetchSightEventsList: PropTypes.func.isRequired,
@@ -420,7 +490,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   clearItem: sightsActions.clearItem,
-  changeDefaultLanguage: sightsActions.changeDefaultLanguage,
+  changeDefaultTranslation: sightsActions.changeDefaultTranslation,
+  deleteTranslation: sightsActions.deleteTranslation,
   fetchItem: sightsActions.fetchItem,
   fetchSightsList: sightsActions.fetchList,
   fetchSightEventsList: sightEventsActions.fetchList,

@@ -118,15 +118,14 @@ class SightEventForm extends Component {
   });
 
   handleSubmit = (values, actions) => {
-    const { language, onSubmit, newLanguage } = this.props;
-    const options = {
-      headers: {
-        'Content-Language': language,
-      },
+    const { language, newLanguage, onSubmit } = this.props;
+    const options = {};
+    const pathParams = {
+      languageVersion: language,
     };
 
     if (onSubmit) {
-      onSubmit(values, actions, options);
+      onSubmit(values, actions, options, pathParams);
 
       return;
     }
@@ -139,6 +138,7 @@ class SightEventForm extends Component {
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
       options,
+      pathParams,
     };
 
 
