@@ -52,7 +52,7 @@ class SightEventFormDialog extends Component {
     };
 
     this.actions = [
-      { label: 'Ustaw jako domyślny język atrakcji', action: this.handleDefaultLanguageChange },
+      { label: 'Ustaw tłumaczenie jako domyślne', action: this.handleDefaultLanguageChange },
     ];
   }
 
