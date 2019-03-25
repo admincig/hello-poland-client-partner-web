@@ -95,7 +95,7 @@ class SightFormDialog extends Component {
     return null;
   };
 
-  handleAlertDialogClose = () => this.setState({
+  handleAlertDialogCancel = () => this.setState({
     alertDialog: {
       content: null,
       onSuccess: null,
@@ -203,7 +203,7 @@ class SightFormDialog extends Component {
         title: `Usuwanie tłumaczenia - ${label}`,
         open: true,
         onSuccess: () => {
-          this.handleAlertDialogClose();
+          this.handleAlertDialogCancel();
           this.handleDeleteTranslation(language);
         },
       },
@@ -408,7 +408,7 @@ class SightFormDialog extends Component {
           </DialogActions>
         </Dialog>
         <AlertDialog
-          onClose={this.handleAlertDialogClose}
+          onCancel={this.handleAlertDialogCancel}
           {...alertDialog}
         />
         <CreateTranslationDialog

@@ -65,7 +65,7 @@ class SightFormDialog extends Component {
     },
   });
 
-  handleAlertDialogClose = () => this.setState(state => ({
+  handleAlertDialogCancel = () => this.setState(state => ({
     alertDialog: {
       ...state.alertDialog,
       open: false,
@@ -77,7 +77,7 @@ class SightFormDialog extends Component {
       content: `Sprzedaż biletów na pulę "${name}" w dniu ${format(date, 'dd.MM.yyyy')} zostanie zatrzymana.`,
       onSubmit: () => {
         this.handleSubmit({ date, poolDefinitionId, sightEventId });
-        this.handleAlertDialogClose();
+        this.handleAlertDialogCancel();
       },
       open: true,
       title: 'Czy na pewno zablokować sprzedaż?',
@@ -174,7 +174,7 @@ class SightFormDialog extends Component {
           </Button>
         </DialogActions>
         <AlertDialog
-          onClose={this.handleAlertDialogClose}
+          onCancel={this.handleAlertDialogCancel}
           onExited={this.handleAlertDialogClear}
           {...alertDialog}
         />

@@ -109,7 +109,7 @@ class SightEventFormDialog extends Component {
     return multimediaList;
   };
 
-  handleAlertDialogClose = () => this.setState({
+  handleAlertDialogCancel = () => this.setState({
     alertDialog: {
       content: null,
       onSuccess: null,
@@ -123,7 +123,7 @@ class SightEventFormDialog extends Component {
       content: `Plik ${name} zostanie trwale usunięty i nie będzie można go przywrócic.`,
       onSubmit: () => {
         this.handleDeletePDF(sightEventId);
-        this.handleAlertDialogClose();
+        this.handleAlertDialogCancel();
       },
       open: true,
       title: 'Czy na pewno usunąć wybrany plik?',
@@ -239,7 +239,7 @@ class SightEventFormDialog extends Component {
         title: `Usuwanie tłumaczenia - ${label}`,
         open: true,
         onSuccess: () => {
-          this.handleAlertDialogClose();
+          this.handleAlertDialogCancel();
           this.handleDeleteTranslation(language);
         },
       },
@@ -445,7 +445,7 @@ class SightEventFormDialog extends Component {
           </DialogActions>
         </Dialog>
         <AlertDialog
-          onClose={this.handleAlertDialogClose}
+          onCancel={this.handleAlertDialogCancel}
           {...alertDialog}
         />
         <CreateTranslationDialog
