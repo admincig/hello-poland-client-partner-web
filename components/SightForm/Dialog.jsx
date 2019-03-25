@@ -16,7 +16,10 @@ import {
   selectors as sightsSelectors,
 } from '@hello-poland/commons/redux/sights';
 import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
-import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getSupportedLanguages } from 'utils/content-language';
+import {
+  CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getLanguageLabel, getSupportedLanguages,
+} from 'utils/content-language';
+import AlertDialog from 'components/AlertDialog';
 import ContentLanguage from 'components/ContentLanguage';
 import GridItem from 'components/GridItem';
 import SightForm from './Form';
@@ -37,16 +40,18 @@ class SightFormDialog extends Component {
     this.intervalRef = null;
 
     this.state = {
+      alertDialog: {
+        content: null,
+        onSubmit: null,
+        open: false,
+        title: null,
+      },
       fetchingError: false,
       isFetching: false,
       isSubmitting: false,
       language: DEFAULT_LANGUAGE,
       submittingError: false,
     };
-
-    this.actions = [
-      { label: 'Ustaw tłumaczenie jako domyślne', action: this.handleDefaultLanguageChange },
-    ];
   }
 
   componentDidUpdate() {
@@ -106,6 +111,57 @@ class SightFormDialog extends Component {
         options,
         onSuccess: () => this.handleFetchItem(itemId, language),
         onFailure: this.handleSubmitFailure,
+      });
+    }
+  };
+
+  handleAlertDialogClear = () => this.setState({
+    alertDialog: {
+      content: null,
+      onSubmit: null,
+      open: false,
+      title: null,
+    },
+  });
+
+  handleAlertDialogClose = () => this.setState(state => ({
+    alertDialog: {
+      ...state.alertDialog,
+      open: false,
+    },
+  }));
+
+  handleDeleteTranslation = (language) => {
+    const { deleteTranslation, item, itemId } = this.props;
+    const { defaultLanguage } = item || {};
+
+    deleteTranslation({
+      id: itemId,
+      pathParams: {
+        languageVersion: language,
+      },
+      onSuccess: () => {
+        this.setState({ isSubmitting: false, submittingError: false });
+        this.handleFetchItem(itemId, defaultLanguage);
+      },
+      onFailure: () => this.setState({ isSubmitting: false, submittingError: true }),
+    });
+  };
+
+  handleDeleteTranslationConfirm = (language) => {
+    if (language && language.length) {
+      const label = getLanguageLabel(language, { locale: 'pl-PL', withCode: false });
+
+      this.setState({
+        alertDialog: {
+          content: 'Wybrane tłumaczenie zostanie trwale usunięte. Czy chcesz kontynuować?',
+          title: `Usuwanie tłumaczenia - ${label}`,
+          open: true,
+          onSubmit: () => {
+            this.handleAlertDialogClose();
+            this.handleDeleteTranslation(language);
+          },
+        },
       });
     }
   };
@@ -210,11 +266,11 @@ class SightFormDialog extends Component {
 
   render() {
     const {
-      fetchingError, isFetching, isSubmitting, language, submittingError,
+      fetchingError, isFetching, isSubmitting, language, submittingError, alertDialog,
     } = this.state;
     const {
-      classes, clearItem, fetchItem, fetchSightsList, fetchSightEventsList, item, itemId, onClose,
-      title, changeDefaultTranslation, ...rest
+      classes, clearItem, deleteTranslation, fetchItem, fetchSightsList, fetchSightEventsList, item,
+      itemId, onClose, title, changeDefaultTranslation, ...rest
     } = this.props;
 
     let languageVersions = CONTENT_LANGUAGES;
@@ -222,8 +278,21 @@ class SightFormDialog extends Component {
 
     if (this.isItemLoaded(itemId, item)) {
       const { availableLanguageVersions, defaultLanguage: itemDefaultLanguage } = item;
+
       languageVersions = getSupportedLanguages(availableLanguageVersions);
       defaultLanguage = itemDefaultLanguage;
+    }
+
+    const translationActions = [];
+
+    if (language !== defaultLanguage) {
+      translationActions.push({
+        label: 'Usuń tłumaczenie', action: this.handleDeleteTranslationConfirm,
+      });
+
+      translationActions.push({
+        label: 'Ustaw tłumaczenie jako domyślne', action: this.handleDefaultLanguageChange,
+      });
     }
 
     return (
@@ -243,7 +312,7 @@ class SightFormDialog extends Component {
             <GridItem className={classes.section}>
               <ContentLanguage
                 LanguageActionsProps={{
-                  actions: itemId ? this.actions : null,
+                  actions: itemId ? translationActions : null,
                   language,
                 }}
                 LanguagePickerProps={{
@@ -253,7 +322,7 @@ class SightFormDialog extends Component {
                   onChange: this.handleLanguageChange,
                   value: language,
                 }}
-                showActions={!!itemId}
+                showActions={!!itemId && !!translationActions.length}
               />
             </GridItem>
             <SightForm
@@ -284,6 +353,11 @@ class SightFormDialog extends Component {
           <Button disabled={isSubmitting} onClick={this.handleClose} color="primary">Anuluj</Button>
           <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>
         </DialogActions>
+        <AlertDialog
+          onClose={this.handleAlertDialogClose}
+          onExited={this.handleAlertDialogClear}
+          {...alertDialog}
+        />
       </Dialog>
     );
   }
@@ -293,6 +367,7 @@ SightFormDialog.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   changeDefaultTranslation: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
+  deleteTranslation: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   fetchSightsList: PropTypes.func.isRequired,
   fetchSightEventsList: PropTypes.func.isRequired,
@@ -318,6 +393,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   clearItem: sightsActions.clearItem,
   changeDefaultTranslation: sightsActions.changeDefaultTranslation,
+  deleteTranslation: sightsActions.deleteTranslation,
   fetchItem: sightsActions.fetchItem,
   fetchSightsList: sightsActions.fetchList,
   fetchSightEventsList: sightEventsActions.fetchList,

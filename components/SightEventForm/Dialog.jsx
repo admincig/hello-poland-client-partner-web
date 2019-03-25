@@ -15,7 +15,9 @@ import {
   actions as sightEventsActions,
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
-import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getSupportedLanguages } from 'utils/content-language';
+import {
+  CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getLanguageLabel, getSupportedLanguages,
+} from 'utils/content-language';
 import AlertDialog from 'components/AlertDialog';
 import ContentLanguage from 'components/ContentLanguage';
 import GridItem from 'components/GridItem';
@@ -50,10 +52,6 @@ class SightEventFormDialog extends Component {
       language: DEFAULT_LANGUAGE,
       submittingError: false,
     };
-
-    this.actions = [
-      { label: 'Ustaw tłumaczenie jako domyślne', action: this.handleDefaultLanguageChange },
-    ];
   }
 
   componentDidUpdate() {
@@ -172,6 +170,41 @@ class SightEventFormDialog extends Component {
     deletePDF(payload);
   };
 
+  handleDeleteTranslation = (language) => {
+    const { deleteTranslation, item, itemId } = this.props;
+    const { defaultLanguage } = item || {};
+
+    deleteTranslation({
+      id: itemId,
+      pathParams: {
+        languageVersion: language,
+      },
+      onSuccess: () => {
+        this.setState({ isSubmitting: false, submittingError: false });
+        this.handleFetchItem(itemId, defaultLanguage);
+      },
+      onFailure: () => this.setState({ isSubmitting: false, submittingError: true }),
+    });
+  };
+
+  handleDeleteTranslationConfirm = (language) => {
+    if (language && language.length) {
+      const label = getLanguageLabel(language, { locale: 'pl-PL', withCode: false });
+
+      this.setState({
+        alertDialog: {
+          content: 'Wybrane tłumaczenie zostanie trwale usunięte. Czy chcesz kontynuować?',
+          title: `Usuwanie tłumaczenia - ${label}`,
+          open: true,
+          onSubmit: () => {
+            this.handleAlertDialogClose();
+            this.handleDeleteTranslation(language);
+          },
+        },
+      });
+    }
+  };
+
   handleFetchItem = (id, language) => {
     const { fetchItem } = this.props;
 
@@ -274,8 +307,8 @@ class SightEventFormDialog extends Component {
       alertDialog, fetchingError, isFetching, isSubmitting, language, submittingError,
     } = this.state;
     const {
-      classes, clearItem, fetchItem, fetchList, item, itemId, onClose, parentId, title,
-      deletePDF, changeDefaultTranslation, ...rest
+      classes, clearItem, deleteTranslation, fetchItem, fetchList, item, itemId, onClose, parentId,
+      title, deletePDF, changeDefaultTranslation, ...rest
     } = this.props;
 
     const multimedia = this.getMultimedia();
@@ -288,6 +321,18 @@ class SightEventFormDialog extends Component {
 
       languageVersions = getSupportedLanguages(availableLanguageVersions);
       defaultLanguage = itemDefaultLanguage;
+    }
+
+    const translationActions = [];
+
+    if (language !== defaultLanguage) {
+      translationActions.push({
+        label: 'Usuń tłumaczenie', action: this.handleDeleteTranslationConfirm,
+      });
+
+      translationActions.push({
+        label: 'Ustaw tłumaczenie jako domyślne', action: this.handleDefaultLanguageChange,
+      });
     }
 
     return (
@@ -308,7 +353,7 @@ class SightEventFormDialog extends Component {
               <GridItem className={classes.section}>
                 <ContentLanguage
                   LanguageActionsProps={{
-                    actions: itemId ? this.actions : null,
+                    actions: itemId ? translationActions : null,
                     language,
                   }}
                   LanguagePickerProps={{
@@ -318,7 +363,7 @@ class SightEventFormDialog extends Component {
                     onChange: this.handleLanguageChange,
                     value: language,
                   }}
-                  showActions={!!itemId}
+                  showActions={!!itemId && !!translationActions.length}
                 />
               </GridItem>
               <SightForm
@@ -366,6 +411,7 @@ SightEventFormDialog.propTypes = {
   changeDefaultTranslation: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
   deletePDF: PropTypes.func.isRequired,
+  deleteTranslation: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   fetchList: PropTypes.func.isRequired,
   item: PropTypes.shape({}),
@@ -392,6 +438,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   clearItem: sightEventsActions.clearItem,
   changeDefaultTranslation: sightEventsActions.changeDefaultTranslation,
+  deleteTranslation: sightEventsActions.deleteTranslation,
   fetchItem: sightEventsActions.fetchItem,
   fetchList: sightEventsActions.fetchList,
   deletePDF: sightEventsActions.deletePDF,
