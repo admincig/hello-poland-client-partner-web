@@ -111,7 +111,6 @@ class SightForm extends Component {
     if (!_isEqual(prevInitialValues, initialValues)) {
       const { openingHours } = initialValues || {};
 
-      console.log(initialValues);
       this.setInitialValues(initialValues);
       this.setViewOpeningHours(openingHours, true);
     }

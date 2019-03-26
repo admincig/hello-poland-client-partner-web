@@ -414,7 +414,7 @@ class SightEventFormDialog extends Component {
     let isDefaultLanguage = true;
 
     if (this.isItemLoaded(itemId, item)) {
-      const { defaultLanguage: itemDefaultLanguage, language } = item;
+      const { defaultLanguage: itemDefaultLanguage } = item;
 
       defaultLanguage = itemDefaultLanguage;
       isDefaultLanguage = language === defaultLanguage;
