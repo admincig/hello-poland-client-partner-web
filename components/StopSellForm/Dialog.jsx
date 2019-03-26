@@ -59,7 +59,7 @@ class SightFormDialog extends Component {
   handleAlertDialogClear = () => this.setState({
     alertDialog: {
       content: null,
-      onSubmit: null,
+      onSuccess: null,
       open: false,
       title: null,
     },
@@ -75,7 +75,7 @@ class SightFormDialog extends Component {
   handleAlertDialogOpen = ({ date, poolDefinitionId, sightEventId }, name) => this.setState({
     alertDialog: {
       content: `Sprzedaż biletów na pulę "${name}" w dniu ${format(date, 'dd.MM.yyyy')} zostanie zatrzymana.`,
-      onSubmit: () => {
+      onSuccess: () => {
         this.handleSubmit({ date, poolDefinitionId, sightEventId });
         this.handleAlertDialogCancel();
       },
@@ -101,7 +101,7 @@ class SightFormDialog extends Component {
     stopSell({
       sightEventId,
       ticketPoolId: poolDefinitionId,
-      date: format(poolStartDate, 'yyyy-MM-dd\'T\'HH:mm'),
+      date: format(poolStartDate, 'yyyy-MM-dd'),
       onFailure: this.handleSubmitFailure,
       onSuccess: this.handleSubmitSuccess,
     });
@@ -126,8 +126,8 @@ class SightFormDialog extends Component {
       alertDialog, isSubmitting, submittingError, date,
     } = this.state;
     const {
-      classes, poolDefinitionId, poolDefinitionName, sightEventId, title, stopSell, onClose,
-      ...rest
+      classes, poolDefinitionId, poolDefinitionName, sightEventId, title, stopSell, startDate,
+      onClose, ...rest
     } = this.props;
 
     return (
