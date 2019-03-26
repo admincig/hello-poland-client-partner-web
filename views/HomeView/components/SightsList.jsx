@@ -562,9 +562,15 @@ class SightsList extends Component {
                                   }
                                     onStopSellLabel="Wstrzymaj sprzedaż"
                                     onPreviewLabel="Podgląd puli"
-                                    onDeleteClick={
-                                    () => this.handleTicketPoolDelete(ticketPoolDefinition.id)
-                                  }
+                                    onDeleteClick={() => this.handleAlertDialogOpen({
+                                      content: '',
+                                      onSuccess: () => {
+                                        this.handleTicketPoolDelete(ticketPoolDefinition.id);
+                                        this.handleAlertDialogCancel();
+                                      },
+                                      open: true,
+                                      title: 'Czy na pewno usunąć wybraną pulę?',
+                                    })}
                                     onAddLabel="Usuń pulę biletów"
                                   />
                                   <List style={{ marginLeft: 55 }}>
