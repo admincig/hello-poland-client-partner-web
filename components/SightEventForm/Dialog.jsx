@@ -360,13 +360,15 @@ class SightEventFormDialog extends Component {
   };
 
   handleSubmitSuccess = (sightId, actions) => {
-    const { fetchList } = this.props;
-    const { resetForm, setSubmitting } = actions;
+    const { fetchList, itemId } = this.props;
+    const { language } = this.state;
+    const { setSubmitting } = actions;
 
     setSubmitting(false);
-    resetForm();
 
     fetchList();
+
+    this.handleFetchItem(itemId, language);
   };
 
   isFormDirty = () => {

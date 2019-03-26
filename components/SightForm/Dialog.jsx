@@ -326,14 +326,16 @@ class SightFormDialog extends Component {
   };
 
   handleSubmitSuccess = (sightId, actions) => {
-    const { fetchSightsList, fetchSightEventsList } = this.props;
-    const { resetForm, setSubmitting } = actions;
+    const { fetchSightsList, fetchSightEventsList, itemId } = this.props;
+    const { language } = this.state;
+    const { setSubmitting } = actions;
 
     setSubmitting(false);
-    resetForm();
 
     fetchSightsList();
     fetchSightEventsList();
+
+    this.handleFetchItem(itemId, language);
   };
 
   isFormDirty = () => {
