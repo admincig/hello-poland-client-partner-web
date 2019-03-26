@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
@@ -52,6 +52,7 @@ class SightEventForm extends Component {
 
     this.state = {
       initialValues: this.getInitialValues(initialValues),
+      isDefaultTranslation: true,
     };
 
     // TODO: nested validation seems not working
@@ -115,6 +116,7 @@ class SightEventForm extends Component {
 
   setInitialValues = initialValues => this.setState({
     initialValues: this.getInitialValues(initialValues),
+    isDefaultTranslation: this.isDefaultLanguage(initialValues),
   });
 
   handleSubmit = (values, actions) => {
@@ -189,8 +191,14 @@ class SightEventForm extends Component {
     resetForm();
   };
 
+  isDefaultLanguage = (initialValues) => {
+    const { language, defaultLanguage } = initialValues || {};
+
+    return language === defaultLanguage;
+  };
+
   render() {
-    const { initialValues } = this.state;
+    const { initialValues, isDefaultTranslation } = this.state;
     const { buttons, classes, FormikProps } = this.props;
 
     return (
@@ -220,50 +228,60 @@ class SightEventForm extends Component {
               <GridItem>
                 <Field name="name" label="Nazwa oferty" required component={TextField} {...commonProps} />
               </GridItem>
-              <GridItem md={4} sm={4}>
-                <Field
-                  name="published"
-                  render={switchProps => (
-                    <FormControlLabel
-                      control={<Switch {...fieldToSwitch(switchProps)} />}
-                      label="Publikuj"
+              {isDefaultTranslation
+                && (
+                  <GridItem md={4} sm={4}>
+                    <Field
+                      name="published"
+                      render={switchProps => (
+                        <FormControlLabel
+                          control={<Switch {...fieldToSwitch(switchProps)} />}
+                          label="Publikuj"
+                        />
+                      )}
                     />
-                  )}
-                />
-              </GridItem>
+                  </GridItem>
+                )
+              }
               <GridItem>
                 <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
                 <Field name="description" label="Opis oferty" required component={TextField} {...commonProps} multiline rowsMax={20} />
               </GridItem>
-              <GridItem>
-                <Typography variant="h6" className={classes.title}>Dane kontaktowe</Typography>
-              </GridItem>
-              <GridItem>
-                <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Typography variant="h6" className={classes.title}>Lokalizacja</Typography>
-              </GridItem>
-              <GridItem>
-                <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem md={4} sm={4}>
-                <Field name="location.zipCode" label="Kod pocztowy" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem md={8} sm={8}>
-                <Field name="location.city" label="Miasto" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={20} />
-              </GridItem>
+              {isDefaultTranslation
+                && (
+                  <Fragment>
+                    <GridItem>
+                      <Typography variant="h6" className={classes.title}>Dane kontaktowe</Typography>
+                    </GridItem>
+                    <GridItem>
+                      <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Typography variant="h6" className={classes.title}>Lokalizacja</Typography>
+                    </GridItem>
+                    <GridItem>
+                      <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={4} sm={4}>
+                      <Field name="location.zipCode" label="Kod pocztowy" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={8} sm={8}>
+                      <Field name="location.city" label="Miasto" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={20} />
+                    </GridItem>
+                  </Fragment>
+                )
+              }
             </Grid>
             {buttons
               && (
