@@ -95,7 +95,14 @@ class SightFormDialog extends Component {
     return null;
   };
 
-  handleAlertDialogCancel = () => this.setState({
+  handleAlertDialogCancel = () => this.setState(state => ({
+    alertDialog: {
+      ...state.alertDialog,
+      open: false,
+    },
+  }));
+
+  handleAlertDialogExited = () => this.setState({
     alertDialog: {
       content: null,
       onSuccess: null,
@@ -104,7 +111,11 @@ class SightFormDialog extends Component {
     },
   });
 
-  handleClose = () => {
+  handleCancelClick = () => {
+    this.handleFormReload(this.handleCancel);
+  };
+
+  handleCancel = () => {
     const { clearItem, onClose } = this.props;
 
     this.setState({
@@ -123,12 +134,16 @@ class SightFormDialog extends Component {
     }
   };
 
-  handleCreateTranslationDialogClose = () => this.setState({
+  handleCreateTranslationDialogCancel = () => this.setState({
     translationDialog: {
       open: false,
       translations: [],
     },
   });
+
+  handleCreateTranslationDialogClick = () => {
+    this.handleFormReload(this.handleCreateTranslationDialogOpen);
+  };
 
   handleCreateTranslationDialogOpen = () => {
     const { item } = this.props;
@@ -210,6 +225,8 @@ class SightFormDialog extends Component {
     });
   };
 
+  handleDiscardClick = () => this.handleCancel();
+
   handleFetchItem = (id, language) => {
     const { fetchItem } = this.props;
 
@@ -239,6 +256,27 @@ class SightFormDialog extends Component {
     });
   };
 
+  handleFormReload = (callback, options) => {
+    if (this.isFormDirty()) {
+      this.setState({
+        alertDialog: {
+          content: 'W formularzu są niezapisane zmiany. Wykonać operację mimo to?',
+          onSuccess: () => {
+            if (callback) {
+              callback(options);
+            }
+
+            this.handleAlertDialogCancel();
+          },
+          open: true,
+          title: 'Uwaga',
+        },
+      });
+    } else if (callback) {
+      callback(options);
+    }
+  };
+
   handleLanguageChange = (event) => {
     const { itemId } = this.props;
     const language = event.target.value;
@@ -248,6 +286,10 @@ class SightFormDialog extends Component {
     if (itemId) {
       this.handleFetchItem(itemId, language);
     }
+  };
+
+  handleLanguageChangeClick = (event) => {
+    this.handleFormReload(this.handleLanguageChange, event);
   };
 
   handleSubmit = () => {
@@ -284,16 +326,28 @@ class SightFormDialog extends Component {
   };
 
   handleSubmitSuccess = (sightId, actions) => {
-    const { fetchSightsList, fetchSightEventsList } = this.props;
-    const { resetForm, setSubmitting } = actions;
+    const { fetchSightsList, fetchSightEventsList, itemId } = this.props;
+    const { language } = this.state;
+    const { setSubmitting } = actions;
 
     setSubmitting(false);
-    resetForm();
 
     fetchSightsList();
     fetchSightEventsList();
 
-    this.handleClose();
+    this.handleFetchItem(itemId, language);
+  };
+
+  isFormDirty = () => {
+    const { current } = this.formikRef;
+
+    if (current && current.getFormikComputedProps) {
+      const { dirty } = current.getFormikComputedProps();
+
+      return dirty;
+    }
+
+    return false;
   };
 
   isItemLoaded = (itemId, item) => item
@@ -333,7 +387,7 @@ class SightFormDialog extends Component {
 
     if (CONTENT_LANGUAGES.length !== translations.length) {
       translationActions.push({
-        label: 'Dodaj tłumaczenie', action: this.handleCreateTranslationDialogOpen,
+        label: 'Dodaj tłumaczenie', action: this.handleCreateTranslationDialogClick,
       });
     }
 
@@ -372,7 +426,7 @@ class SightFormDialog extends Component {
                     defaultItem: defaultLanguage,
                     label: itemId ? i18n.label : i18n.defaultLabel,
                     listItems: translations,
-                    onChange: this.handleLanguageChange,
+                    onChange: this.handleLanguageChangeClick,
                     value: language,
                   }}
                   showActions={!!itemId && !!translationActions.length}
@@ -403,16 +457,18 @@ class SightFormDialog extends Component {
                 </Typography>
               )
             }
-            <Button disabled={isSubmitting} onClick={this.handleClose} color="primary">Anuluj</Button>
+            <Button disabled={isSubmitting} onClick={this.handleDiscardClick} color="primary">Odrzuć</Button>
+            <Button disabled={isSubmitting} onClick={this.handleCancelClick} color="primary">Anuluj</Button>
             <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>
           </DialogActions>
         </Dialog>
         <AlertDialog
           onCancel={this.handleAlertDialogCancel}
+          onExited={this.handleAlertDialogExited}
           {...alertDialog}
         />
         <CreateTranslationDialog
-          onClose={this.handleCreateTranslationDialogClose}
+          onCancel={this.handleCreateTranslationDialogCancel}
           onSuccess={this.handleCreateTranslationDialogSuccess}
           {...translationDialog}
         />
