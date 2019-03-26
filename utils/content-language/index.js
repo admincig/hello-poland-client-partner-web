@@ -38,11 +38,22 @@ export function isLanguageSupported(lng) {
 /**
  * Returns list of supported languages.
  * @method
- * @param {string[]} lngList - list of languages.
+ * @param {string[]} lngList - list of available languages.
  * @return {string[]} - filtered language list.
  */
-export function getSupportedLanguages(lngList = []) {
+export function getTranslatedLanguages(lngList = []) {
   return lngList.filter(item => isLanguageSupported(item));
+}
+
+/**
+ * Returns list of not translated languages.
+ * @method
+ * @param {string[]} lngList - list of translated languages.
+ * @return {string[]} - filtered language list.
+ */
+
+export function getUntranslatedLanguages(lngList = []) {
+  return CONTENT_LANGUAGES.filter(item => !lngList.some(lng => item === lng));
 }
 
 /**

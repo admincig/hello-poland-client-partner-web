@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import _sortedUniq from 'lodash/sortedUniq';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import withStyles from '@material-ui/core/styles/withStyles';
@@ -16,10 +17,12 @@ import {
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
 import {
-  CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getLanguageLabel, getSupportedLanguages,
+  CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getLanguageLabel, getTranslatedLanguages,
+  getUntranslatedLanguages,
 } from 'utils/content-language';
 import AlertDialog from 'components/AlertDialog';
 import ContentLanguage from 'components/ContentLanguage';
+import CreateTranslationDialog from 'components/ContentLanguage/CreateTranslationDialog';
 import GridItem from 'components/GridItem';
 import SightForm from './Form';
 import MultimediaList from './MultimediaList';
@@ -42,7 +45,7 @@ class SightEventFormDialog extends Component {
     this.state = {
       alertDialog: {
         content: null,
-        onSubmit: null,
+        onSuccess: null,
         open: false,
         title: null,
       },
@@ -51,6 +54,11 @@ class SightEventFormDialog extends Component {
       isSubmitting: false,
       language: DEFAULT_LANGUAGE,
       submittingError: false,
+      translationDialog: {
+        open: false,
+        translations: [],
+      },
+      translations: CONTENT_LANGUAGES,
     };
   }
 
@@ -71,17 +79,21 @@ class SightEventFormDialog extends Component {
 
   getInitialValues = (item) => {
     const { itemId, parentId } = this.props;
+    const { language } = this.state;
+    const sightId = item.sightId || parentId;
 
     if (this.isItemLoaded(itemId, item)) {
-      const sightId = item.sightId || parentId;
+      const { availableLanguageVersions } = item;
+      const hasNewTranslation = !availableLanguageVersions.some(lng => lng === language);
 
-      return {
-        ...item,
-        sightId,
-      };
+      if (hasNewTranslation) {
+        return { id: itemId, sightId };
+      }
+
+      return { ...item, sightId };
     }
 
-    return { sightId: parentId };
+    return { sightId };
   };
 
   getMultimedia = () => {
@@ -96,28 +108,21 @@ class SightEventFormDialog extends Component {
     return multimediaList;
   };
 
-  handleAlertDialogClear = () => this.setState({
+  handleAlertDialogCancel = () => this.setState({
     alertDialog: {
       content: null,
-      onSubmit: null,
+      onSuccess: null,
       open: false,
       title: null,
     },
   });
-
-  handleAlertDialogClose = () => this.setState(state => ({
-    alertDialog: {
-      ...state.alertDialog,
-      open: false,
-    },
-  }));
 
   handleAlertDialogOpen = (sightEventId, name) => this.setState({
     alertDialog: {
       content: `Plik ${name} zostanie trwale usunięty i nie będzie można go przywrócic.`,
       onSubmit: () => {
         this.handleDeletePDF(sightEventId);
-        this.handleAlertDialogClose();
+        this.handleAlertDialogCancel();
       },
       open: true,
       title: 'Czy na pewno usunąć wybrany plik?',
@@ -133,6 +138,7 @@ class SightEventFormDialog extends Component {
       isSubmitting: false,
       language: DEFAULT_LANGUAGE,
       submittingError: false,
+      translations: CONTENT_LANGUAGES,
     });
 
     clearItem();
@@ -142,22 +148,56 @@ class SightEventFormDialog extends Component {
     }
   };
 
-  handleDefaultLanguageChange = (language) => {
-    if (language && language.length) {
-      const { changeDefaultTranslation, itemId } = this.props;
-      const options = {
-        headers: {
-          'Content-Language': language,
-        },
-      };
+  handleCreateTranslationDialogClose = () => this.setState({
+    translationDialog: {
+      open: false,
+      translations: [],
+    },
+  });
 
-      changeDefaultTranslation({
-        id: itemId,
-        options,
-        onSuccess: () => this.handleFetchItem(itemId, language),
-        onFailure: this.handleSubmitFailure,
-      });
-    }
+  handleCreateTranslationDialogOpen = () => {
+    const { item } = this.props;
+    const { availableLanguageVersions } = item || {};
+
+    this.setState({
+      translationDialog: {
+        open: true,
+        translations: getUntranslatedLanguages(availableLanguageVersions),
+      },
+    });
+  };
+
+  handleCreateTranslationDialogSuccess = language => this.setState(state => ({
+    language,
+    translationDialog: {
+      ...state.translationDialog,
+      open: false,
+    },
+    translations: _sortedUniq([
+      ...state.translations,
+      language,
+    ]),
+  }));
+
+  handleDefaultLanguageChange = (language) => {
+    const { changeDefaultTranslation, itemId } = this.props;
+    const options = {
+      headers: {
+        'Content-Language': language,
+      },
+    };
+
+    changeDefaultTranslation({
+      id: itemId,
+      options,
+      onSuccess: () => {
+        this.setState({ isSubmitting: false, submittingError: false });
+        this.handleFetchItem(itemId, language);
+      },
+      onFailure: this.handleSubmitFailure,
+    });
+
+    this.setState({ isSubmitting: true, submittingError: false });
   };
 
   handleDeletePDF = (sightEventId) => {
@@ -185,24 +225,24 @@ class SightEventFormDialog extends Component {
       },
       onFailure: () => this.setState({ isSubmitting: false, submittingError: true }),
     });
+
+    this.setState({ isSubmitting: true, submittingError: false });
   };
 
-  handleDeleteTranslationConfirm = (language) => {
-    if (language && language.length) {
-      const label = getLanguageLabel(language, { locale: 'pl-PL', withCode: false });
+  handleDeleteTranslationDialogOpen = (language) => {
+    const label = getLanguageLabel(language, { locale: 'pl-PL', withCode: false });
 
-      this.setState({
-        alertDialog: {
-          content: 'Wybrane tłumaczenie zostanie trwale usunięte. Czy chcesz kontynuować?',
-          title: `Usuwanie tłumaczenia - ${label}`,
-          open: true,
-          onSubmit: () => {
-            this.handleAlertDialogClose();
-            this.handleDeleteTranslation(language);
-          },
+    this.setState({
+      alertDialog: {
+        content: 'Wybrane tłumaczenie zostanie trwale usunięte. Czy chcesz kontynuować?',
+        title: `Usuwanie tłumaczenia - ${label}`,
+        open: true,
+        onSuccess: () => {
+          this.handleAlertDialogCancel();
+          this.handleDeleteTranslation(language);
         },
-      });
-    }
+      },
+    });
   };
 
   handleFetchItem = (id, language) => {
@@ -226,9 +266,12 @@ class SightEventFormDialog extends Component {
 
   handleFetchItemSuccess = () => {
     const { item } = this.props;
-    const { language } = item || {};
+    const { availableLanguageVersions, language } = item || {};
+    const translations = getTranslatedLanguages(availableLanguageVersions);
 
-    this.setState({ fetchingError: false, isFetching: false, language });
+    this.setState({
+      fetchingError: false, isFetching: false, language, translations,
+    });
   };
 
   handleLanguageChange = (event) => {
@@ -244,7 +287,6 @@ class SightEventFormDialog extends Component {
 
   handleSubmit = () => {
     const { current } = this.formikRef;
-
     if (current && current.submitForm) {
       this.setState({ isSubmitting: true, submittingError: false });
       current.submitForm();
@@ -283,7 +325,7 @@ class SightEventFormDialog extends Component {
     resetForm();
 
     fetchList();
-    this.setState({ isSubmitting: false, submittingError: false });
+
     this.handleClose();
   };
 
@@ -305,6 +347,7 @@ class SightEventFormDialog extends Component {
   render() {
     const {
       alertDialog, fetchingError, isFetching, isSubmitting, language, submittingError,
+      translationDialog, translations,
     } = this.state;
     const {
       classes, clearItem, deleteTranslation, fetchItem, fetchList, item, itemId, onClose, parentId,
@@ -313,21 +356,25 @@ class SightEventFormDialog extends Component {
 
     const multimedia = this.getMultimedia();
 
-    let languageVersions = CONTENT_LANGUAGES;
     let defaultLanguage;
 
     if (this.isItemLoaded(itemId, item)) {
-      const { availableLanguageVersions, defaultLanguage: itemDefaultLanguage } = item;
+      const { defaultLanguage: itemDefaultLanguage } = item;
 
-      languageVersions = getSupportedLanguages(availableLanguageVersions);
       defaultLanguage = itemDefaultLanguage;
     }
 
     const translationActions = [];
 
+    if (CONTENT_LANGUAGES.length !== translations.length) {
+      translationActions.push({
+        label: 'Dodaj tłumaczenie', action: this.handleCreateTranslationDialogOpen,
+      });
+    }
+
     if (language !== defaultLanguage) {
       translationActions.push({
-        label: 'Usuń tłumaczenie', action: this.handleDeleteTranslationConfirm,
+        label: 'Usuń tłumaczenie', action: this.handleDeleteTranslationDialogOpen,
       });
 
       translationActions.push({
@@ -359,7 +406,7 @@ class SightEventFormDialog extends Component {
                   LanguagePickerProps={{
                     defaultItem: defaultLanguage,
                     label: itemId ? i18n.label : i18n.defaultLabel,
-                    listItems: languageVersions,
+                    listItems: translations,
                     onChange: this.handleLanguageChange,
                     value: language,
                   }}
@@ -397,9 +444,13 @@ class SightEventFormDialog extends Component {
           </DialogActions>
         </Dialog>
         <AlertDialog
-          onClose={this.handleAlertDialogClose}
-          onExited={this.handleAlertDialogClear}
+          onCancel={this.handleAlertDialogCancel}
           {...alertDialog}
+        />
+        <CreateTranslationDialog
+          onClose={this.handleCreateTranslationDialogClose}
+          onSuccess={this.handleCreateTranslationDialogSuccess}
+          {...translationDialog}
         />
       </Fragment>
     );

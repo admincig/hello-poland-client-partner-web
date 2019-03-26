@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
@@ -13,49 +13,63 @@ const styles = () => ({
   },
 });
 
-const LanguageActions = ({ actions, classes, language }) => {
-  const [anchorEl, handleSelectToggle] = useState(null);
-  const handleAction = (action) => {
-    handleSelectToggle(null);
-    action(language);
+class LanguageActions extends Component {
+  state = {
+    anchorEl: null,
   };
-  return (
-    <Grid>
-      <Button
-        className={classes.button}
-        onClick={e => handleSelectToggle(e.currentTarget)}
-        aria-owns={anchorEl ? 'actions-menu' : undefined}
-        aria-haspopup="true"
-        variant="contained"
-      >
-        Zarządzaj
-        <ArrowDropDown />
-      </Button>
-      <Menu
-        id="actions-menu"
-        anchorEl={anchorEl}
-        open={!!anchorEl}
-        onClose={() => handleSelectToggle(null)}
-      >
-        {
-          actions.map(({ label, action }) => (
-            <MenuItem
-              key={label}
-              action={action}
-              component="div"
-              onClick={() => handleAction(action)}
-            >
-              {label}
-            </MenuItem>
-          ))
-        }
-      </Menu>
-    </Grid>
-  );
-};
+
+  handleClick = event => this.setState({ anchorEl: event.currentTarget });
+
+  handleClose = () => this.setState({ anchorEl: null });
+
+  handleActionClick = (action) => {
+    const { language } = this.props;
+
+    action(language);
+
+    this.handleClose();
+  };
+
+  render() {
+    const { anchorEl } = this.state;
+    const { actions, classes } = this.props;
+
+    return (
+      <Grid>
+        <Button
+          className={classes.button}
+          onClick={this.handleClick}
+          aria-owns={anchorEl ? 'actions-menu' : undefined}
+          aria-haspopup="true"
+          variant="contained"
+        >
+          Zarządzaj
+          <ArrowDropDown />
+        </Button>
+        <Menu
+          id="actions-menu"
+          anchorEl={anchorEl}
+          open={!!anchorEl}
+          onClose={this.handleClose}
+        >
+          {
+            actions.map(({ label, action }) => (
+              <MenuItem key={label} onClick={() => this.handleActionClick(action)}>
+                {label}
+              </MenuItem>
+            ))
+          }
+        </Menu>
+      </Grid>
+    );
+  }
+}
 
 LanguageActions.propTypes = {
-  actions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  actions: PropTypes.arrayOf(PropTypes.shape({
+    action: PropTypes.func,
+    label: PropTypes.string,
+  })).isRequired,
   classes: PropTypes.shape({}).isRequired,
   language: PropTypes.string.isRequired,
 };

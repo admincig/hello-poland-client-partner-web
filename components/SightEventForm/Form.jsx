@@ -119,7 +119,11 @@ class SightEventForm extends Component {
 
   handleSubmit = (values, actions) => {
     const { language, onSubmit } = this.props;
-    const options = {};
+    const options = {
+      headers: {
+        'Content-Language': language,
+      },
+    };
     const pathParams = {
       languageVersion: language,
     };
@@ -131,7 +135,9 @@ class SightEventForm extends Component {
     }
 
     const { id, ...data } = values;
-    const { createItem, updateItem } = this.props;
+    const {
+      createItem, createTranslation, initialValues, updateItem,
+    } = this.props;
     let action = createItem;
     const payload = {
       data,
@@ -143,8 +149,14 @@ class SightEventForm extends Component {
 
 
     if (_isNumber(id)) {
-      action = updateItem;
-      payload.id = id;
+      if (!initialValues.language) {
+        action = createTranslation;
+        payload.data.id = id;
+      } else {
+        action = updateItem;
+        payload.id = id;
+        payload.pathParams = pathParams;
+      }
     }
 
     action(payload);
@@ -275,6 +287,7 @@ SightEventForm.propTypes = {
   buttons: PropTypes.bool,
   classes: PropTypes.shape({}).isRequired,
   createItem: PropTypes.func.isRequired,
+  createTranslation: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
   initialValues: PropTypes.shape({}),
   language: PropTypes.string.isRequired,
@@ -297,6 +310,7 @@ const mapStateToProps = () => ({});
 
 const mapDispatchToProps = {
   createItem: sightEventsActions.createItem,
+  createTranslation: sightEventsActions.createTranslation,
   updateItem: sightEventsActions.updateItem,
 };
 

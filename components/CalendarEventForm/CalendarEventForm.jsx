@@ -188,7 +188,7 @@ class CalendarEventForm extends React.Component {
     },
   });
 
-  handleAlertDialogClose = () => this.setState(state => ({
+  handleAlertDialogCancel = () => this.setState(state => ({
     alertDialog: {
       ...state.alertDialog,
       open: false,
@@ -538,7 +538,7 @@ class CalendarEventForm extends React.Component {
                           content: `Próbujesz usunąć bilet o nazwie "${name}". Kontynuować?`,
                           onSubmit: () => {
                             handleTicketDefinitionDelete(ticketDefinitionId);
-                            this.handleAlertDialogClose();
+                            this.handleAlertDialogCancel();
                           },
                           open: true,
                           title: 'Czy na pewno usunąć wybrany bilet?',
@@ -595,7 +595,7 @@ class CalendarEventForm extends React.Component {
           )}
         </CalendarEventController>
         <AlertDialog
-          onClose={this.handleAlertDialogClose}
+          onCancel={this.handleAlertDialogCancel}
           onExited={this.handleAlertDialogClear}
           {...alertDialog}
         />
