@@ -148,7 +148,6 @@ class SightForm extends Component {
       id: details.id || '',
       name: details.name || '',
       published: details.published || false,
-      // generalAdmission: details.generalAdmission || false,
       lead: details.lead || '',
       description: details.description || '',
       email: details.email || '',
@@ -211,7 +210,6 @@ class SightForm extends Component {
       openingHours = openingHours.filter(o => o.day !== day);
     }
 
-
     this.setState({
       initialValues: {
         ...values,
@@ -222,26 +220,43 @@ class SightForm extends Component {
   };
 
   handleSubmit = (values, actions) => {
-    const { onSubmit } = this.props;
+    const { language, onSubmit } = this.props;
+    const options = {
+      headers: {
+        'Content-Language': language,
+      },
+    };
+    const pathParams = {
+      languageVersion: language,
+    };
 
     if (onSubmit) {
-      onSubmit(values, actions);
+      onSubmit(values, actions, options, pathParams);
 
       return;
     }
 
     const { id, ...data } = values;
-    const { createItem, updateItem } = this.props;
+    const {
+      createItem, createTranslation, initialValues, updateItem,
+    } = this.props;
     let action = createItem;
     const payload = {
       data,
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
+      options,
     };
 
     if (_isNumber(id)) {
-      action = updateItem;
-      payload.id = id;
+      if (!initialValues.language) {
+        action = createTranslation;
+        payload.data.id = id;
+      } else {
+        action = updateItem;
+        payload.id = id;
+        payload.pathParams = pathParams;
+      }
     }
 
     action(payload);
@@ -311,17 +326,6 @@ class SightForm extends Component {
                   )}
                 />
               </GridItem>
-              {/* <GridItem md={8} sm={8}> */}
-              {/* <Field */}
-              {/* name="generalAdmission" */}
-              {/* render={switchProps => ( */}
-              {/* <FormControlLabel */}
-              {/* control={<Switch {...fieldToSwitch(switchProps)} />} */}
-              {/* label="Dodaj ofertę ogólną" */}
-              {/* /> */}
-              {/* )} */}
-              {/* /> */}
-              {/* </GridItem> */}
               <GridItem>
                 <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
               </GridItem>
@@ -342,7 +346,7 @@ class SightForm extends Component {
                             onChange={this.handleOpeningHoursSelectionChange(item.day, values)}
                             value={`${item.day}`}
                           />
-)}
+                        )}
                         label={i18n.days[item.day]}
                       />
                     </GridItem>
@@ -414,11 +418,14 @@ SightForm.propTypes = {
   buttons: PropTypes.bool,
   classes: PropTypes.shape({}).isRequired,
   createItem: PropTypes.func.isRequired,
+  createTranslation: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
   initialValues: PropTypes.shape({}),
+  language: PropTypes.string.isRequired,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
+  translation: PropTypes.bool,
   updateItem: PropTypes.func.isRequired,
 };
 
@@ -429,12 +436,14 @@ SightForm.defaultProps = {
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,
+  translation: false,
 };
 
 const mapStateToProps = () => ({});
 
 const mapDispatchToProps = {
   createItem: sightsActions.createItem,
+  createTranslation: sightsActions.createTranslation,
   updateItem: sightsActions.updateItem,
 };
 

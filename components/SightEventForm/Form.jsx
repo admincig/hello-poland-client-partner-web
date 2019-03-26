@@ -99,7 +99,6 @@ class SightEventForm extends Component {
       sightId: details.sightId || '',
       name: details.name || '',
       published: details.published || false,
-      // generalAdmission: details.generalAdmission || false,
       lead: details.lead || '',
       description: details.description || '',
       email: details.email || '',
@@ -119,27 +118,45 @@ class SightEventForm extends Component {
   });
 
   handleSubmit = (values, actions) => {
-    const { onSubmit } = this.props;
+    const { language, onSubmit } = this.props;
+    const options = {
+      headers: {
+        'Content-Language': language,
+      },
+    };
+    const pathParams = {
+      languageVersion: language,
+    };
 
     if (onSubmit) {
-      onSubmit(values, actions);
+      onSubmit(values, actions, options, pathParams);
 
       return;
     }
 
     const { id, ...data } = values;
-    const { createItem, updateItem } = this.props;
+    const {
+      createItem, createTranslation, initialValues, updateItem,
+    } = this.props;
     let action = createItem;
     const payload = {
       data,
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
+      options,
+      pathParams,
     };
 
 
     if (_isNumber(id)) {
-      action = updateItem;
-      payload.id = id;
+      if (!initialValues.language) {
+        action = createTranslation;
+        payload.data.id = id;
+      } else {
+        action = updateItem;
+        payload.id = id;
+        payload.pathParams = pathParams;
+      }
     }
 
     action(payload);
@@ -174,11 +191,8 @@ class SightEventForm extends Component {
 
   render() {
     const { initialValues } = this.state;
-    const {
-      buttons,
-      classes,
-      FormikProps,
-    } = this.props;
+    const { buttons, classes, FormikProps } = this.props;
+
     return (
       <Formik
         enableReinitialize
@@ -217,17 +231,6 @@ class SightEventForm extends Component {
                   )}
                 />
               </GridItem>
-              {/* <GridItem md={8} sm={8}> */}
-              {/* <Field */}
-              {/* name="generalAdmission" */}
-              {/* render={switchProps => ( */}
-              {/* <FormControlLabel */}
-              {/* control={<Switch {...fieldToSwitch(switchProps)} />} */}
-              {/* label="Oferta ogólna" */}
-              {/* /> */}
-              {/* )} */}
-              {/* /> */}
-              {/* </GridItem> */}
               <GridItem>
                 <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
               </GridItem>
@@ -284,8 +287,10 @@ SightEventForm.propTypes = {
   buttons: PropTypes.bool,
   classes: PropTypes.shape({}).isRequired,
   createItem: PropTypes.func.isRequired,
+  createTranslation: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
   initialValues: PropTypes.shape({}),
+  language: PropTypes.string.isRequired,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
@@ -305,6 +310,7 @@ const mapStateToProps = () => ({});
 
 const mapDispatchToProps = {
   createItem: sightEventsActions.createItem,
+  createTranslation: sightEventsActions.createTranslation,
   updateItem: sightEventsActions.updateItem,
 };
 
