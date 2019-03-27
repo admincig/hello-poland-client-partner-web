@@ -192,7 +192,8 @@ class SightEventForm extends Component {
   };
 
   isDefaultLanguage = (initialValues) => {
-    const { language, defaultLanguage } = initialValues || {};
+    const { defaultLanguage } = initialValues || {};
+    const { language } = this.props;
 
     return language === defaultLanguage;
   };

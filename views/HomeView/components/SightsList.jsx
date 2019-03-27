@@ -145,12 +145,15 @@ class SightsList extends Component {
     },
   });
 
-  handleAlertDialogCancel = () => this.setState(state => ({
-    alertDialog: {
-      ...state.alertDialog,
-      open: false,
-    },
-  }));
+  handleAlertDialogCancel = () => {
+    debugger;
+    this.setState(state => ({
+      alertDialog: {
+        ...state.alertDialog,
+        open: false,
+      },
+    }));
+  };
 
   handleAlertDialogOpen = alertDialog => this.setState({ alertDialog });
 

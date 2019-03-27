@@ -335,7 +335,11 @@ class SightFormDialog extends Component {
     fetchSightsList();
     fetchSightEventsList();
 
-    this.handleFetchItem(itemId, language);
+    if (itemId) {
+      this.handleFetchItem(itemId, language);
+    } else {
+      this.handleCancel();
+    }
   };
 
   isFormDirty = () => {
