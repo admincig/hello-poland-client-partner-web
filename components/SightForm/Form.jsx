@@ -73,6 +73,7 @@ class SightForm extends Component {
 
     this.state = {
       initialValues: this.getInitialValues(initialValues),
+      isDefaultTranslation: true,
       viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
     };
 
@@ -148,7 +149,6 @@ class SightForm extends Component {
       id: details.id || '',
       name: details.name || '',
       published: details.published || false,
-      // generalAdmission: details.generalAdmission || false,
       lead: details.lead || '',
       description: details.description || '',
       email: details.email || '',
@@ -165,6 +165,7 @@ class SightForm extends Component {
 
   setInitialValues = initialValues => this.setState({
     initialValues: this.getInitialValues(initialValues),
+    isDefaultTranslation: this.isDefaultLanguage(initialValues),
   });
 
   setViewOpeningHours = openingHours => this.setState({
@@ -211,7 +212,6 @@ class SightForm extends Component {
       openingHours = openingHours.filter(o => o.day !== day);
     }
 
-
     this.setState({
       initialValues: {
         ...values,
@@ -222,26 +222,43 @@ class SightForm extends Component {
   };
 
   handleSubmit = (values, actions) => {
-    const { onSubmit } = this.props;
+    const { language, onSubmit } = this.props;
+    const options = {
+      headers: {
+        'Content-Language': language,
+      },
+    };
+    const pathParams = {
+      languageVersion: language,
+    };
 
     if (onSubmit) {
-      onSubmit(values, actions);
+      onSubmit(values, actions, options, pathParams);
 
       return;
     }
 
     const { id, ...data } = values;
-    const { createItem, updateItem } = this.props;
+    const {
+      createItem, createTranslation, initialValues, updateItem,
+    } = this.props;
     let action = createItem;
     const payload = {
       data,
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
+      options,
     };
 
     if (_isNumber(id)) {
-      action = updateItem;
-      payload.id = id;
+      if (!initialValues.language) {
+        action = createTranslation;
+        payload.data.id = id;
+      } else {
+        action = updateItem;
+        payload.id = id;
+        payload.pathParams = pathParams;
+      }
     }
 
     action(payload);
@@ -274,8 +291,15 @@ class SightForm extends Component {
     resetForm();
   };
 
+  isDefaultLanguage = (initialValues) => {
+    const { defaultLanguage } = initialValues || {};
+    const { language } = this.props;
+
+    return language === defaultLanguage;
+  };
+
   render() {
-    const { initialValues, viewOpeningHours } = this.state;
+    const { initialValues, isDefaultTranslation, viewOpeningHours } = this.state;
     const { buttons, classes, FormikProps } = this.props;
 
     return (
@@ -300,97 +324,98 @@ class SightForm extends Component {
               <GridItem>
                 <Field name="name" label="Nazwa atrakcji" required component={TextField} {...commonProps} />
               </GridItem>
-              <GridItem md={4} sm={4}>
-                <Field
-                  name="published"
-                  render={switchProps => (
-                    <FormControlLabel
-                      control={<Switch {...fieldToSwitch(switchProps)} />}
-                      label="Publikuj"
+              {isDefaultTranslation
+                && (
+                  <GridItem md={4} sm={4}>
+                    <Field
+                      name="published"
+                      render={switchProps => (
+                        <FormControlLabel
+                          control={<Switch {...fieldToSwitch(switchProps)} />}
+                          label="Publikuj"
+                        />
+                      )}
                     />
-                  )}
-                />
-              </GridItem>
-              {/* <GridItem md={8} sm={8}> */}
-              {/* <Field */}
-              {/* name="generalAdmission" */}
-              {/* render={switchProps => ( */}
-              {/* <FormControlLabel */}
-              {/* control={<Switch {...fieldToSwitch(switchProps)} />} */}
-              {/* label="Dodaj ofertę ogólną" */}
-              {/* /> */}
-              {/* )} */}
-              {/* /> */}
-              {/* </GridItem> */}
+                  </GridItem>
+                )
+              }
               <GridItem>
                 <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
                 <Field name="description" label="Opis atrakcji" required component={TextField} {...commonProps} multiline rowsMax={20} />
               </GridItem>
-              <GridItem>
-                <Typography variant="h6" className={classes.title}>Godziny otwarcia</Typography>
-              </GridItem>
-              <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                {viewOpeningHours.map(item => (
-                  <Fragment key={`openingHours-list-${item.day}`}>
-                    <GridItem sm={6} md={6}>
-                      <FormControlLabel
-                        control={(
-                          <Switch
-                            checked={item.checked}
-                            onChange={this.handleOpeningHoursSelectionChange(item.day, values)}
-                            value={`${item.day}`}
-                          />
-)}
-                        label={i18n.days[item.day]}
-                      />
+              {isDefaultTranslation
+                && (
+                  <Fragment>
+                    <GridItem>
+                      <Typography variant="h6" className={classes.title}>Godziny otwarcia</Typography>
                     </GridItem>
-                    <GridItem sm={3} md={3}>
-                      <TimePicker
-                        ampm={false}
-                        className={classes.openingHoursTimepicker}
-                        disabled={!item.checked}
-                        onChange={event => this.handleOpeningHoursChange(item.day, 'openTime', event)}
-                        value={item.openTime}
-                      />
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                      {viewOpeningHours.map(item => (
+                        <Fragment key={`openingHours-list-${item.day}`}>
+                          <GridItem sm={6} md={6}>
+                            <FormControlLabel
+                              control={(
+                                <Switch
+                                  checked={item.checked}
+                                  onChange={
+                                    this.handleOpeningHoursSelectionChange(item.day, values)
+                                  }
+                                  value={`${item.day}`}
+                                />
+                              )}
+                              label={i18n.days[item.day]}
+                            />
+                          </GridItem>
+                          <GridItem sm={3} md={3}>
+                            <TimePicker
+                              ampm={false}
+                              className={classes.openingHoursTimepicker}
+                              disabled={!item.checked}
+                              onChange={event => this.handleOpeningHoursChange(item.day, 'openTime', event)}
+                              value={item.openTime}
+                            />
+                          </GridItem>
+                          <GridItem sm={3} md={3}>
+                            <TimePicker
+                              ampm={false}
+                              className={classes.openingHoursTimepicker}
+                              disabled={!item.checked}
+                              onChange={event => this.handleOpeningHoursChange(item.day, 'closeTime', event)}
+                              value={item.closeTime}
+                            />
+                          </GridItem>
+                        </Fragment>
+                      ))}
+                    </MuiPickersUtilsProvider>
+                    <GridItem>
+                      <Typography variant="h6" className={classes.title}>Dane kontaktowe</Typography>
                     </GridItem>
-                    <GridItem sm={3} md={3}>
-                      <TimePicker
-                        ampm={false}
-                        className={classes.openingHoursTimepicker}
-                        disabled={!item.checked}
-                        onChange={event => this.handleOpeningHoursChange(item.day, 'closeTime', event)}
-                        value={item.closeTime}
-                      />
+                    <GridItem>
+                      <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Typography variant="h6" className={classes.title}>Lokalizacja</Typography>
+                    </GridItem>
+                    <GridItem>
+                      <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={4} sm={4}>
+                      <Field name="location.zipCode" label="Kod pocztowy" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={8} sm={8}>
+                      <Field name="location.city" label="Miasto" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
                     </GridItem>
                   </Fragment>
-                ))}
-              </MuiPickersUtilsProvider>
-              <GridItem>
-                <Typography variant="h6" className={classes.title}>Dane kontaktowe</Typography>
-              </GridItem>
-              <GridItem>
-                <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Typography variant="h6" className={classes.title}>Lokalizacja</Typography>
-              </GridItem>
-              <GridItem>
-                <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem md={4} sm={4}>
-                <Field name="location.zipCode" label="Kod pocztowy" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem md={8} sm={8}>
-                <Field name="location.city" label="Miasto" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
-              </GridItem>
+                )
+              }
             </Grid>
             {buttons
             && (
@@ -414,11 +439,14 @@ SightForm.propTypes = {
   buttons: PropTypes.bool,
   classes: PropTypes.shape({}).isRequired,
   createItem: PropTypes.func.isRequired,
+  createTranslation: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
   initialValues: PropTypes.shape({}),
+  language: PropTypes.string.isRequired,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
+  translation: PropTypes.bool,
   updateItem: PropTypes.func.isRequired,
 };
 
@@ -429,12 +457,14 @@ SightForm.defaultProps = {
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,
+  translation: false,
 };
 
 const mapStateToProps = () => ({});
 
 const mapDispatchToProps = {
   createItem: sightsActions.createItem,
+  createTranslation: sightsActions.createTranslation,
   updateItem: sightsActions.updateItem,
 };
 

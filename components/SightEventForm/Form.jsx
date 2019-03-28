@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
@@ -52,6 +52,7 @@ class SightEventForm extends Component {
 
     this.state = {
       initialValues: this.getInitialValues(initialValues),
+      isDefaultTranslation: true,
     };
 
     // TODO: nested validation seems not working
@@ -99,7 +100,6 @@ class SightEventForm extends Component {
       sightId: details.sightId || '',
       name: details.name || '',
       published: details.published || false,
-      // generalAdmission: details.generalAdmission || false,
       lead: details.lead || '',
       description: details.description || '',
       email: details.email || '',
@@ -116,30 +116,49 @@ class SightEventForm extends Component {
 
   setInitialValues = initialValues => this.setState({
     initialValues: this.getInitialValues(initialValues),
+    isDefaultTranslation: this.isDefaultLanguage(initialValues),
   });
 
   handleSubmit = (values, actions) => {
-    const { onSubmit } = this.props;
+    const { language, onSubmit } = this.props;
+    const options = {
+      headers: {
+        'Content-Language': language,
+      },
+    };
+    const pathParams = {
+      languageVersion: language,
+    };
 
     if (onSubmit) {
-      onSubmit(values, actions);
+      onSubmit(values, actions, options, pathParams);
 
       return;
     }
 
     const { id, ...data } = values;
-    const { createItem, updateItem } = this.props;
+    const {
+      createItem, createTranslation, initialValues, updateItem,
+    } = this.props;
     let action = createItem;
     const payload = {
       data,
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
+      options,
+      pathParams,
     };
 
 
     if (_isNumber(id)) {
-      action = updateItem;
-      payload.id = id;
+      if (!initialValues.language) {
+        action = createTranslation;
+        payload.data.id = id;
+      } else {
+        action = updateItem;
+        payload.id = id;
+        payload.pathParams = pathParams;
+      }
     }
 
     action(payload);
@@ -172,13 +191,17 @@ class SightEventForm extends Component {
     resetForm();
   };
 
+  isDefaultLanguage = (initialValues) => {
+    const { defaultLanguage } = initialValues || {};
+    const { language } = this.props;
+
+    return language === defaultLanguage;
+  };
+
   render() {
-    const { initialValues } = this.state;
-    const {
-      buttons,
-      classes,
-      FormikProps,
-    } = this.props;
+    const { initialValues, isDefaultTranslation } = this.state;
+    const { buttons, classes, FormikProps } = this.props;
+
     return (
       <Formik
         enableReinitialize
@@ -206,61 +229,60 @@ class SightEventForm extends Component {
               <GridItem>
                 <Field name="name" label="Nazwa oferty" required component={TextField} {...commonProps} />
               </GridItem>
-              <GridItem md={4} sm={4}>
-                <Field
-                  name="published"
-                  render={switchProps => (
-                    <FormControlLabel
-                      control={<Switch {...fieldToSwitch(switchProps)} />}
-                      label="Publikuj"
+              {isDefaultTranslation
+                && (
+                  <GridItem md={4} sm={4}>
+                    <Field
+                      name="published"
+                      render={switchProps => (
+                        <FormControlLabel
+                          control={<Switch {...fieldToSwitch(switchProps)} />}
+                          label="Publikuj"
+                        />
+                      )}
                     />
-                  )}
-                />
-              </GridItem>
-              {/* <GridItem md={8} sm={8}> */}
-              {/* <Field */}
-              {/* name="generalAdmission" */}
-              {/* render={switchProps => ( */}
-              {/* <FormControlLabel */}
-              {/* control={<Switch {...fieldToSwitch(switchProps)} />} */}
-              {/* label="Oferta ogólna" */}
-              {/* /> */}
-              {/* )} */}
-              {/* /> */}
-              {/* </GridItem> */}
+                  </GridItem>
+                )
+              }
               <GridItem>
                 <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
                 <Field name="description" label="Opis oferty" required component={TextField} {...commonProps} multiline rowsMax={20} />
               </GridItem>
-              <GridItem>
-                <Typography variant="h6" className={classes.title}>Dane kontaktowe</Typography>
-              </GridItem>
-              <GridItem>
-                <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Typography variant="h6" className={classes.title}>Lokalizacja</Typography>
-              </GridItem>
-              <GridItem>
-                <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem md={4} sm={4}>
-                <Field name="location.zipCode" label="Kod pocztowy" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem md={8} sm={8}>
-                <Field name="location.city" label="Miasto" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={20} />
-              </GridItem>
+              {isDefaultTranslation
+                && (
+                  <Fragment>
+                    <GridItem>
+                      <Typography variant="h6" className={classes.title}>Dane kontaktowe</Typography>
+                    </GridItem>
+                    <GridItem>
+                      <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Typography variant="h6" className={classes.title}>Lokalizacja</Typography>
+                    </GridItem>
+                    <GridItem>
+                      <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={4} sm={4}>
+                      <Field name="location.zipCode" label="Kod pocztowy" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={8} sm={8}>
+                      <Field name="location.city" label="Miasto" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={20} />
+                    </GridItem>
+                  </Fragment>
+                )
+              }
             </Grid>
             {buttons
               && (
@@ -284,8 +306,10 @@ SightEventForm.propTypes = {
   buttons: PropTypes.bool,
   classes: PropTypes.shape({}).isRequired,
   createItem: PropTypes.func.isRequired,
+  createTranslation: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
   initialValues: PropTypes.shape({}),
+  language: PropTypes.string.isRequired,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
@@ -305,6 +329,7 @@ const mapStateToProps = () => ({});
 
 const mapDispatchToProps = {
   createItem: sightEventsActions.createItem,
+  createTranslation: sightEventsActions.createTranslation,
   updateItem: sightEventsActions.updateItem,
 };
 

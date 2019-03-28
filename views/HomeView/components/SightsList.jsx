@@ -56,7 +56,7 @@ class SightsList extends Component {
   state = {
     alertDialog: {
       content: null,
-      onSubmit: null,
+      onSuccess: null,
       open: false,
       title: null,
     },
@@ -139,18 +139,20 @@ class SightsList extends Component {
   handleAlertDialogClear = () => this.setState({
     alertDialog: {
       content: null,
-      onSubmit: null,
+      onSuccess: null,
       open: false,
       title: null,
     },
   });
 
-  handleAlertDialogClose = () => this.setState(state => ({
-    alertDialog: {
-      ...state.alertDialog,
-      open: false,
-    },
-  }));
+  handleAlertDialogCancel = () => {
+    this.setState(state => ({
+      alertDialog: {
+        ...state.alertDialog,
+        open: false,
+      },
+    }));
+  };
 
   handleAlertDialogOpen = alertDialog => this.setState({ alertDialog });
 
@@ -459,9 +461,9 @@ class SightsList extends Component {
                     onAddLabel="Dodaj ofertę"
                     onDeleteClick={() => this.handleAlertDialogOpen({
                       content: '',
-                      onSubmit: () => {
+                      onSuccess: () => {
                         this.handleSightDelete(sight.id);
-                        this.handleAlertDialogClose();
+                        this.handleAlertDialogCancel();
                       },
                       open: true,
                       title: 'Czy na pewno usunąć wybraną atrakcję?',
@@ -497,9 +499,9 @@ class SightsList extends Component {
                             onAddLabel="Dodaj pulę biletów"
                             onDeleteClick={() => this.handleAlertDialogOpen({
                               content: '',
-                              onSubmit: () => {
+                              onSuccess: () => {
                                 this.handleSightEventDelete(sightEvent.id);
-                                this.handleAlertDialogClose();
+                                this.handleAlertDialogCancel();
                               },
                               open: true,
                               title: 'Czy na pewno usunąć wybraną ofertę?',
@@ -571,9 +573,15 @@ class SightsList extends Component {
                                   }
                                     onStopSellLabel="Wstrzymaj sprzedaż"
                                     onPreviewLabel="Podgląd puli"
-                                    onDeleteClick={
-                                    () => this.handleTicketPoolDelete(ticketPoolDefinition.id)
-                                  }
+                                    onDeleteClick={() => this.handleAlertDialogOpen({
+                                      content: '',
+                                      onSuccess: () => {
+                                        this.handleTicketPoolDelete(ticketPoolDefinition.id);
+                                        this.handleAlertDialogCancel();
+                                      },
+                                      open: true,
+                                      title: 'Czy na pewno usunąć wybraną pulę?',
+                                    })}
                                     onAddLabel="Usuń pulę biletów"
                                   />
                                   <List style={{ marginLeft: 55 }}>
@@ -615,13 +623,13 @@ class SightsList extends Component {
           : <EmptyResultsMessage message="Brak elementów do wyświetlenia" />
         }
         <AlertDialog
-          onClose={this.handleAlertDialogClose}
+          onCancel={this.handleAlertDialogCancel}
           onExited={this.handleAlertDialogClear}
           {...alertDialog}
         />
         <FormDialog
           disableBackdropClick
-          onClose={this.handleFormDialogClose}
+          onCancel={this.handleFormDialogClose}
           onExited={this.setDefaultDialogProperties}
           onSubmit={this.handleFormSubmit}
           open={dialog}
