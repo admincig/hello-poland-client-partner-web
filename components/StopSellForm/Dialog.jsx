@@ -75,7 +75,7 @@ class SightFormDialog extends Component {
   handleAlertDialogOpen = ({ date, poolDefinitionId, sightEventId }, name) => this.setState({
     alertDialog: {
       content: `Sprzedaż biletów na pulę "${name}" w dniu ${format(date, 'dd.MM.yyyy')} zostanie zatrzymana.`,
-      onSubmit: () => {
+      onSuccess: () => {
         this.handleSubmit({ date, poolDefinitionId, sightEventId });
         this.handleAlertDialogCancel();
       },
