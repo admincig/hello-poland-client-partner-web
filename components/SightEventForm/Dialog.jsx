@@ -368,7 +368,11 @@ class SightEventFormDialog extends Component {
 
     fetchList();
 
-    this.handleFetchItem(itemId, language);
+    if (itemId) {
+      this.handleFetchItem(itemId, language);
+    } else {
+      this.handleCancel();
+    }
   };
 
   isFormDirty = () => {
@@ -411,11 +415,13 @@ class SightEventFormDialog extends Component {
     const multimedia = this.getMultimedia();
 
     let defaultLanguage;
+    let isDefaultLanguage = true;
 
     if (this.isItemLoaded(itemId, item)) {
       const { defaultLanguage: itemDefaultLanguage } = item;
 
       defaultLanguage = itemDefaultLanguage;
+      isDefaultLanguage = language === defaultLanguage;
     }
 
     const translationActions = [];
@@ -475,7 +481,9 @@ class SightEventFormDialog extends Component {
                 onSubmitFailure={this.handleSubmitFailure}
                 onSubmitSuccess={this.handleSubmitSuccess}
               />
-              <MultimediaList data={multimedia} onItemDelete={this.handleAlertDialogOpen} />
+              {isDefaultLanguage
+                && <MultimediaList data={multimedia} onItemDelete={this.handleAlertDialogOpen} />
+              }
             </Grid>
           </DialogContent>
           <DialogActions>

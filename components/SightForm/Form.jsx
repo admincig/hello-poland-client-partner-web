@@ -73,6 +73,7 @@ class SightForm extends Component {
 
     this.state = {
       initialValues: this.getInitialValues(initialValues),
+      isDefaultTranslation: true,
       viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
     };
 
@@ -164,6 +165,7 @@ class SightForm extends Component {
 
   setInitialValues = initialValues => this.setState({
     initialValues: this.getInitialValues(initialValues),
+    isDefaultTranslation: this.isDefaultLanguage(initialValues),
   });
 
   setViewOpeningHours = openingHours => this.setState({
@@ -289,8 +291,15 @@ class SightForm extends Component {
     resetForm();
   };
 
+  isDefaultLanguage = (initialValues) => {
+    const { defaultLanguage } = initialValues || {};
+    const { language } = this.props;
+
+    return language === defaultLanguage;
+  };
+
   render() {
-    const { initialValues, viewOpeningHours } = this.state;
+    const { initialValues, isDefaultTranslation, viewOpeningHours } = this.state;
     const { buttons, classes, FormikProps } = this.props;
 
     return (
@@ -315,86 +324,98 @@ class SightForm extends Component {
               <GridItem>
                 <Field name="name" label="Nazwa atrakcji" required component={TextField} {...commonProps} />
               </GridItem>
-              <GridItem md={4} sm={4}>
-                <Field
-                  name="published"
-                  render={switchProps => (
-                    <FormControlLabel
-                      control={<Switch {...fieldToSwitch(switchProps)} />}
-                      label="Publikuj"
+              {isDefaultTranslation
+                && (
+                  <GridItem md={4} sm={4}>
+                    <Field
+                      name="published"
+                      render={switchProps => (
+                        <FormControlLabel
+                          control={<Switch {...fieldToSwitch(switchProps)} />}
+                          label="Publikuj"
+                        />
+                      )}
                     />
-                  )}
-                />
-              </GridItem>
+                  </GridItem>
+                )
+              }
               <GridItem>
                 <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
                 <Field name="description" label="Opis atrakcji" required component={TextField} {...commonProps} multiline rowsMax={20} />
               </GridItem>
-              <GridItem>
-                <Typography variant="h6" className={classes.title}>Godziny otwarcia</Typography>
-              </GridItem>
-              <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                {viewOpeningHours.map(item => (
-                  <Fragment key={`openingHours-list-${item.day}`}>
-                    <GridItem sm={6} md={6}>
-                      <FormControlLabel
-                        control={(
-                          <Switch
-                            checked={item.checked}
-                            onChange={this.handleOpeningHoursSelectionChange(item.day, values)}
-                            value={`${item.day}`}
-                          />
-                        )}
-                        label={i18n.days[item.day]}
-                      />
+              {isDefaultTranslation
+                && (
+                  <Fragment>
+                    <GridItem>
+                      <Typography variant="h6" className={classes.title}>Godziny otwarcia</Typography>
                     </GridItem>
-                    <GridItem sm={3} md={3}>
-                      <TimePicker
-                        ampm={false}
-                        className={classes.openingHoursTimepicker}
-                        disabled={!item.checked}
-                        onChange={event => this.handleOpeningHoursChange(item.day, 'openTime', event)}
-                        value={item.openTime}
-                      />
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                      {viewOpeningHours.map(item => (
+                        <Fragment key={`openingHours-list-${item.day}`}>
+                          <GridItem sm={6} md={6}>
+                            <FormControlLabel
+                              control={(
+                                <Switch
+                                  checked={item.checked}
+                                  onChange={
+                                    this.handleOpeningHoursSelectionChange(item.day, values)
+                                  }
+                                  value={`${item.day}`}
+                                />
+                              )}
+                              label={i18n.days[item.day]}
+                            />
+                          </GridItem>
+                          <GridItem sm={3} md={3}>
+                            <TimePicker
+                              ampm={false}
+                              className={classes.openingHoursTimepicker}
+                              disabled={!item.checked}
+                              onChange={event => this.handleOpeningHoursChange(item.day, 'openTime', event)}
+                              value={item.openTime}
+                            />
+                          </GridItem>
+                          <GridItem sm={3} md={3}>
+                            <TimePicker
+                              ampm={false}
+                              className={classes.openingHoursTimepicker}
+                              disabled={!item.checked}
+                              onChange={event => this.handleOpeningHoursChange(item.day, 'closeTime', event)}
+                              value={item.closeTime}
+                            />
+                          </GridItem>
+                        </Fragment>
+                      ))}
+                    </MuiPickersUtilsProvider>
+                    <GridItem>
+                      <Typography variant="h6" className={classes.title}>Dane kontaktowe</Typography>
                     </GridItem>
-                    <GridItem sm={3} md={3}>
-                      <TimePicker
-                        ampm={false}
-                        className={classes.openingHoursTimepicker}
-                        disabled={!item.checked}
-                        onChange={event => this.handleOpeningHoursChange(item.day, 'closeTime', event)}
-                        value={item.closeTime}
-                      />
+                    <GridItem>
+                      <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Typography variant="h6" className={classes.title}>Lokalizacja</Typography>
+                    </GridItem>
+                    <GridItem>
+                      <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={4} sm={4}>
+                      <Field name="location.zipCode" label="Kod pocztowy" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={8} sm={8}>
+                      <Field name="location.city" label="Miasto" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
                     </GridItem>
                   </Fragment>
-                ))}
-              </MuiPickersUtilsProvider>
-              <GridItem>
-                <Typography variant="h6" className={classes.title}>Dane kontaktowe</Typography>
-              </GridItem>
-              <GridItem>
-                <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Typography variant="h6" className={classes.title}>Lokalizacja</Typography>
-              </GridItem>
-              <GridItem>
-                <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem md={4} sm={4}>
-                <Field name="location.zipCode" label="Kod pocztowy" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem md={8} sm={8}>
-                <Field name="location.city" label="Miasto" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
-              </GridItem>
+                )
+              }
             </Grid>
             {buttons
             && (

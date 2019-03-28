@@ -9,11 +9,11 @@ import Typography from '@material-ui/core/Typography/Typography';
 
 
 const FormDialog = ({
-  children, error, onClose, onSubmit, title, readOnly, ...rest
+  children, error, onCancel, onSubmit, title, readOnly, ...rest
 }) => {
   const buttonClose = readOnly ? 'Zamknij' : 'Anuluj';
   return (
-    <Dialog onClose={onClose} aria-labelledby="form-dialog-title" {...rest}>
+    <Dialog onClose={onCancel} aria-labelledby="form-dialog-title" {...rest}>
       <DialogTitle id="form-dialog-title">{title}</DialogTitle>
       <DialogContent>
         {children}
@@ -26,7 +26,7 @@ const FormDialog = ({
           </Typography>
           )
         }
-        <Button onClick={onClose} color="primary">{buttonClose}</Button>
+        <Button onClick={onCancel} color="primary">{buttonClose}</Button>
         {!readOnly
           && <Button onClick={onSubmit} color="primary">Zapisz</Button>
         }
@@ -38,7 +38,7 @@ const FormDialog = ({
 FormDialog.propTypes = {
   children: PropTypes.element,
   error: PropTypes.bool,
-  onClose: PropTypes.func,
+  onCancel: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   title: PropTypes.string,
   readOnly: PropTypes.bool,
@@ -47,7 +47,7 @@ FormDialog.propTypes = {
 FormDialog.defaultProps = {
   children: null,
   error: false,
-  onClose: null,
+  onCancel: null,
   title: null,
   readOnly: false,
 };
