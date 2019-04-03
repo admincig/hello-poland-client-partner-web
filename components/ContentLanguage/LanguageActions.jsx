@@ -54,7 +54,11 @@ class LanguageActions extends Component {
         >
           {
             actions.map(({ disabled, label, action }) => (
-              <MenuItem key={label} disabled={disabled} onClick={() => this.handleActionClick(action)}>
+              <MenuItem
+                key={label}
+                disabled={disabled}
+                onClick={() => this.handleActionClick(action)}
+              >
                 {label}
               </MenuItem>
             ))
