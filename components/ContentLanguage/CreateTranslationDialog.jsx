@@ -69,7 +69,7 @@ const CreateTranslationDialog = ({
       <DialogActions>
         {onClose && <Button onClick={handleClose} color="primary">{onCloseText}</Button>}
         {onCancel && <Button onClick={handleCancel} color="primary">{onCancelText}</Button>}
-        {onSuccess && <Button onClick={handleSuccess} color="primary">{onSuccessText}</Button>}
+        {onSuccess && <Button onClick={handleSuccess} disabled={!selected} color="primary">{onSuccessText}</Button>}
       </DialogActions>
     </Dialog>
   );
