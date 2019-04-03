@@ -53,8 +53,8 @@ class LanguageActions extends Component {
           onClose={this.handleClose}
         >
           {
-            actions.map(({ label, action }) => (
-              <MenuItem key={label} onClick={() => this.handleActionClick(action)}>
+            actions.map(({ disabled, label, action }) => (
+              <MenuItem key={label} disabled={disabled} onClick={() => this.handleActionClick(action)}>
                 {label}
               </MenuItem>
             ))
