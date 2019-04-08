@@ -387,23 +387,23 @@ class SightFormDialog extends Component {
       defaultLanguage = itemDefaultLanguage;
     }
 
-    const translationActions = [];
-
-    if (CONTENT_LANGUAGES.length !== translations.length) {
-      translationActions.push({
-        label: 'Dodaj tłumaczenie', action: this.handleCreateTranslationDialogClick,
-      });
-    }
-
-    if (language !== defaultLanguage) {
-      translationActions.push({
-        label: 'Usuń tłumaczenie', action: this.handleDeleteTranslationDialogOpen,
-      });
-
-      translationActions.push({
-        label: 'Ustaw tłumaczenie jako domyślne', action: this.handleDefaultLanguageChange,
-      });
-    }
+    const translationActions = [
+      {
+        action: this.handleCreateTranslationDialogClick,
+        disabled: CONTENT_LANGUAGES.length === translations.length,
+        label: 'Dodaj tłumaczenie',
+      },
+      {
+        action: this.handleDeleteTranslationDialogOpen,
+        disabled: language === defaultLanguage,
+        label: 'Usuń tłumaczenie',
+      },
+      {
+        action: this.handleDefaultLanguageChange,
+        disabled: language === defaultLanguage,
+        label: 'Ustaw tłumaczenie jako domyślne',
+      },
+    ];
 
     return (
       <Fragment>
