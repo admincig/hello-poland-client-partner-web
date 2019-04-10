@@ -127,7 +127,7 @@ class SightEventFormDialog extends Component {
   handleAlertDialogOpen = (sightEventId, name) => this.setState({
     alertDialog: {
       content: `Plik ${name} zostanie trwale usunięty i nie będzie można go przywrócic.`,
-      onSubmit: () => {
+      onSuccess: () => {
         this.handleDeletePDF(sightEventId);
         this.handleAlertDialogCancel();
       },
@@ -217,9 +217,11 @@ class SightEventFormDialog extends Component {
 
   handleDeletePDF = (sightEventId) => {
     const { deletePDF } = this.props;
+    const { language } = this.state;
+
     const payload = {
       id: sightEventId,
-      onSuccess: () => this.handleFetchItem(sightEventId),
+      onSuccess: () => this.handleFetchItem(sightEventId, language),
     };
 
     deletePDF(payload);

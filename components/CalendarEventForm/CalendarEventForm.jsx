@@ -536,7 +536,7 @@ class CalendarEventForm extends React.Component {
                         onAvailabilityChange={handleTicketDefinitionChange}
                         onDeleteClick={(ticketDefinitionId, name) => this.handleAlertDialogOpen({
                           content: `Próbujesz usunąć bilet o nazwie "${name}". Kontynuować?`,
-                          onSubmit: () => {
+                          onSuccess: () => {
                             handleTicketDefinitionDelete(ticketDefinitionId);
                             this.handleAlertDialogCancel();
                           },
