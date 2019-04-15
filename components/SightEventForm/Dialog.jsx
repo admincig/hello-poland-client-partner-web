@@ -127,7 +127,7 @@ class SightEventFormDialog extends Component {
   handleAlertDialogOpen = (sightEventId, name) => this.setState({
     alertDialog: {
       content: `Plik ${name} zostanie trwale usunięty i nie będzie można go przywrócic.`,
-      onSubmit: () => {
+      onSuccess: () => {
         this.handleDeletePDF(sightEventId);
         this.handleAlertDialogCancel();
       },
@@ -217,9 +217,11 @@ class SightEventFormDialog extends Component {
 
   handleDeletePDF = (sightEventId) => {
     const { deletePDF } = this.props;
+    const { language } = this.state;
+
     const payload = {
       id: sightEventId,
-      onSuccess: () => this.handleFetchItem(sightEventId),
+      onSuccess: () => this.handleFetchItem(sightEventId, language),
     };
 
     deletePDF(payload);
@@ -424,23 +426,23 @@ class SightEventFormDialog extends Component {
       isDefaultLanguage = language === defaultLanguage;
     }
 
-    const translationActions = [];
-
-    if (CONTENT_LANGUAGES.length !== translations.length) {
-      translationActions.push({
-        label: 'Dodaj tłumaczenie', action: this.handleCreateTranslationDialogClick,
-      });
-    }
-
-    if (language !== defaultLanguage) {
-      translationActions.push({
-        label: 'Usuń tłumaczenie', action: this.handleDeleteTranslationDialogOpen,
-      });
-
-      translationActions.push({
-        label: 'Ustaw tłumaczenie jako domyślne', action: this.handleDefaultLanguageChange,
-      });
-    }
+    const translationActions = [
+      {
+        action: this.handleCreateTranslationDialogClick,
+        disabled: CONTENT_LANGUAGES.length === translations.length,
+        label: 'Dodaj tłumaczenie',
+      },
+      {
+        action: this.handleDeleteTranslationDialogOpen,
+        disabled: language === defaultLanguage,
+        label: 'Usuń tłumaczenie',
+      },
+      {
+        action: this.handleDefaultLanguageChange,
+        disabled: language === defaultLanguage,
+        label: 'Ustaw tłumaczenie jako domyślne',
+      },
+    ];
 
     return (
       <Fragment>

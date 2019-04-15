@@ -35,6 +35,7 @@ const styles = theme => ({
   },
   link: {
     backgroundColor: theme.palette.grey[100],
+    display: 'block',
   },
   paper: {
     maxWidth: 350,
@@ -146,16 +147,18 @@ class HomeListItem extends Component {
                       <DialogContent>
                         <DialogContentText>
                           Link afiliacyjny:
-                          <Typography paragraph className={classes.link}>
-                            {getAffiliationURL(affiliation.slug, affiliation.code)}
-                          </Typography>
-                          Kod na stronę:
-                          <TextField
-                            fullWidth
-                            margin="none"
-                            value={getAffiliationLink(affiliation.slug, affiliation.code)}
-                          />
                         </DialogContentText>
+                        <Typography paragraph className={classes.link}>
+                          {getAffiliationURL(affiliation.slug, affiliation.code)}
+                        </Typography>
+                        <DialogContentText>
+                          Kod na stronę:
+                        </DialogContentText>
+                        <TextField
+                          fullWidth
+                          margin="none"
+                          value={getAffiliationLink(affiliation.slug, affiliation.code)}
+                        />
                       </DialogContent>
                       <DialogActions className={classes.dialogActions}>
                         <Button onClick={this.handleAffiliationClose} color="primary">
