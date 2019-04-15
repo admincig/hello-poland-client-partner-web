@@ -212,11 +212,15 @@ class SightsList extends Component {
     } else if (fileType === FILE_TYPES.DOCUMENT) {
       action = createPDF;
     }
+    const requestOptions = {
+      ...options,
+      timeout: 20000,
+    };
 
     action({
       id: parentId,
       data,
-      options,
+      options: requestOptions,
       onFailure: this.handleMediaManagerSubmitFailure,
       onSuccess: this.handleMediaManagerSubmitSuccess,
     });
