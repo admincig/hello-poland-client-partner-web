@@ -41,6 +41,7 @@ class MediaManager extends Component {
         headers: {
           'content-type': metadata.type,
         },
+        timeout: 0,
       };
 
       this.setState({

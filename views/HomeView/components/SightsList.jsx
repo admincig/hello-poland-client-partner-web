@@ -195,7 +195,7 @@ class SightsList extends Component {
     const { createMainSightImage, createMainSightEventImage, createPDF } = this.props;
     const { mediaManagerData } = this.state;
     const { fileType, parentId, parentType } = mediaManagerData;
-    let action = null;
+    let action = () => {};
 
     if (fileType === FILE_TYPES.MAIN_IMAGE) {
       if (parentType === PARENT_TYPES.SIGHT) {
@@ -205,22 +205,18 @@ class SightsList extends Component {
       }
     } else if (fileType === FILE_TYPES.IMAGE) {
       if (parentType === PARENT_TYPES.SIGHT) {
-        action = null;
+        action = () => {};
       } else {
-        action = null;
+        action = () => {};
       }
     } else if (fileType === FILE_TYPES.DOCUMENT) {
       action = createPDF;
     }
-    const requestOptions = {
-      ...options,
-      timeout: 20000,
-    };
 
     action({
       id: parentId,
       data,
-      options: requestOptions,
+      options,
       onFailure: this.handleMediaManagerSubmitFailure,
       onSuccess: this.handleMediaManagerSubmitSuccess,
     });
