@@ -46,25 +46,31 @@ class MediaDropzone extends Component {
     this.handleDropCallback(acceptedFiles, rejectedFiles);
   };
 
-  async handleDropCallback(acceptedIncomingFiles, rejectedIncomingFiles) {
-    const { onDrop } = this.props;
+  handleDropCallback(acceptedIncomingFiles, rejectedIncomingFiles) {
+    const { onDrop, onDropStart } = this.props;
 
-    const acceptedFiles = await Promise.all(acceptedIncomingFiles.map(async file => ({
-      arrayBuffer: await readFileBuffer(file),
-      metadata: file,
-    })));
+    if (onDropStart) {
+      onDropStart();
+    }
 
-    const rejectedFiles = await Promise.all(rejectedIncomingFiles.map(async file => ({
-      arrayBuffer: await readFileBuffer(file),
-      metadata: file,
-    })));
+    setTimeout(async () => {
+      const acceptedFiles = await Promise.all(acceptedIncomingFiles.map(async file => ({
+        arrayBuffer: await readFileBuffer(file),
+        metadata: file,
+      })));
 
-    onDrop(acceptedFiles, rejectedFiles);
+      const rejectedFiles = await Promise.all(rejectedIncomingFiles.map(async file => ({
+        arrayBuffer: await readFileBuffer(file),
+        metadata: file,
+      })));
+
+      onDrop(acceptedFiles, rejectedFiles);
+    }, 100);
   }
 
   render() {
     const {
-      classes, disabled, onDrop, ...props
+      classes, disabled, onDrop, onDropStart, ...props
     } = this.props;
 
     return (
@@ -102,10 +108,12 @@ MediaDropzone.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   disabled: PropTypes.bool,
   onDrop: PropTypes.func.isRequired,
+  onDropStart: PropTypes.func,
 };
 
 MediaDropzone.defaultProps = {
   disabled: false,
+  onDropStart: null,
 };
 
 export default withStyles(styles)(MediaDropzone);
