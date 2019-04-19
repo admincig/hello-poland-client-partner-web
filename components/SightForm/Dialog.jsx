@@ -462,8 +462,8 @@ class SightFormDialog extends Component {
               )
             }
             <Button disabled={isSubmitting} onClick={this.handleDiscardClick} color="primary">Odrzuć</Button>
-            <Button disabled={isSubmitting} onClick={this.handleCancelClick} color="primary">Anuluj</Button>
             <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>
+            <Button disabled={isSubmitting} onClick={this.handleCancelClick} color="primary">Zamknij</Button>
           </DialogActions>
         </Dialog>
         <AlertDialog
