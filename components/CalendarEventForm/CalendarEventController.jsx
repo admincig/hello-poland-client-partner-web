@@ -362,10 +362,10 @@ class CalendarEventController extends React.Component {
     const month = getMonth(poolDate);
     const date = getDate(poolDate);
 
-    const eD = setYear(setMonth(setDate(endDate, date), month), year);
-    const eED = setYear(setMonth(setDate(entryEndDate, date), month), year);
-    const sD = setYear(setMonth(setDate(startDate, date), month), year);
-    const eSD = setYear(setMonth(setDate(entryStartDate, date), month), year);
+    const eD = setDate(setMonth(setYear(endDate, year), month), date);
+    const eED = setDate(setMonth(setYear(entryEndDate, year), month), date);
+    const sD = setDate(setMonth(setYear(startDate, year), month), date);
+    const eSD = setDate(setMonth(setYear(entryStartDate, year), month), date);
 
     const dates = {
       endDate: this.getFormattedDate(eD),
