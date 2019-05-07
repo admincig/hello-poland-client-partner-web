@@ -12,7 +12,17 @@ import MediaDropzone from './MediaDropzone';
 class MediaManager extends Component {
   state = {
     fileType: null,
+    processing: false,
   };
+
+  componentDidUpdate(prevProps) {
+    const { error: prevError, open: prevOpen } = prevProps;
+    const { error, open } = this.props;
+
+    if ((error && error !== prevError) || (open && open !== prevOpen)) {
+      this.setProcessing(false);
+    }
+  }
 
   getErrorByFileType = (fileType) => {
     if (fileType) {
@@ -31,6 +41,21 @@ class MediaManager extends Component {
     return '';
   };
 
+  setProcessing = processing => this.setState({ processing });
+
+  handleClose = () => {
+    const { processing } = this.state;
+    const { onClose } = this.props;
+
+    if (processing) {
+      this.setProcessing(false);
+    }
+
+    if (onClose) {
+      onClose();
+    }
+  };
+
   handleDrop = (acceptedFiles) => {
     const { onSubmit } = this.props;
 
@@ -41,6 +66,7 @@ class MediaManager extends Component {
         headers: {
           'content-type': metadata.type,
         },
+        timeout: 0,
       };
 
       this.setState({
@@ -51,23 +77,26 @@ class MediaManager extends Component {
     });
   };
 
+  handleDropStart = () => this.setProcessing(true);
+
   render() {
     const {
-      error, onClose, title, submitting, ...rest
+      error, onClose, title, ...rest
     } = this.props;
-    const { fileType } = this.state;
+    const { fileType, processing } = this.state;
 
     return (
-      <Dialog onClose={onClose} aria-labelledby="form-dialog-title" {...rest}>
+      <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
         <DialogTitle id="form-dialog-title">{title}</DialogTitle>
         <DialogContent>
           <MediaDropzone
-            disabled={submitting}
+            disabled={processing}
             disableClick
             multiple={false}
             onDrop={this.handleDrop}
+            onDropStart={this.handleDropStart}
           />
-          {submitting && <LinearProgress />}
+          {processing && <LinearProgress />}
         </DialogContent>
         <DialogActions>
           { error
@@ -77,7 +106,7 @@ class MediaManager extends Component {
             </Typography>
             )
           }
-          <Button onClick={onClose} color="primary">Zamknij</Button>
+          <Button onClick={this.handleClose} color="primary">Zamknij</Button>
         </DialogActions>
       </Dialog>
     );
@@ -88,14 +117,14 @@ MediaManager.propTypes = {
   error: PropTypes.bool,
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  submitting: PropTypes.bool,
+  open: PropTypes.bool,
   title: PropTypes.string,
 };
 
 MediaManager.defaultProps = {
   error: false,
+  open: false,
   title: null,
-  submitting: false,
 };
 
 export default MediaManager;

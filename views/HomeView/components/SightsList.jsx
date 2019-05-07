@@ -67,7 +67,6 @@ class SightsList extends Component {
     mediaManager: false,
     readOnly: false,
     mediaManagerData: {},
-    mediaManagerSubmitting: false,
     schema: null,
     sightForm: false,
     sightEventForm: false,
@@ -178,7 +177,6 @@ class SightsList extends Component {
   handleMediaManagerClose = () => this.setState({
     mediaManager: false,
     mediaManagerData: {},
-    mediaManagerSubmitting: false,
     submitError: false,
   });
 
@@ -195,7 +193,7 @@ class SightsList extends Component {
     const { createMainSightImage, createMainSightEventImage, createPDF } = this.props;
     const { mediaManagerData } = this.state;
     const { fileType, parentId, parentType } = mediaManagerData;
-    let action = null;
+    let action = () => {};
 
     if (fileType === FILE_TYPES.MAIN_IMAGE) {
       if (parentType === PARENT_TYPES.SIGHT) {
@@ -205,9 +203,9 @@ class SightsList extends Component {
       }
     } else if (fileType === FILE_TYPES.IMAGE) {
       if (parentType === PARENT_TYPES.SIGHT) {
-        action = null;
+        action = () => {};
       } else {
-        action = null;
+        action = () => {};
       }
     } else if (fileType === FILE_TYPES.DOCUMENT) {
       action = createPDF;
@@ -221,11 +219,10 @@ class SightsList extends Component {
       onSuccess: this.handleMediaManagerSubmitSuccess,
     });
 
-    this.setState({ mediaManagerSubmitting: true, submitError: false });
+    this.setState({ submitError: false });
   };
 
   handleMediaManagerSubmitFailure = () => this.setState({
-    mediaManagerSubmitting: false,
     submitError: true,
   });
 
@@ -427,7 +424,7 @@ class SightsList extends Component {
   render() {
     const { sightEventsList, sightsList } = this.props;
     const {
-      alertDialog, dialog, formData, formType, mediaManager, mediaManagerSubmitting, schema,
+      alertDialog, dialog, formData, formType, mediaManager, schema,
       sightForm, sightEventForm, stats, stopSellForm, submitError, title, readOnly,
     } = this.state;
 
@@ -670,7 +667,6 @@ class SightsList extends Component {
           onClose={this.handleMediaManagerClose}
           onSubmit={this.handleMediaManagerSubmit}
           open={mediaManager}
-          submitting={mediaManagerSubmitting}
           title="Dodaj multimedia"
         />
         <StatsDialog
