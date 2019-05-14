@@ -175,21 +175,33 @@ class SightsList extends Component {
   };
 
   handleMediaManagerClose = () => {
-    const { createMainSightImageCancel, createMainSightEventImageCancel } = this.props;
+    const {
+      createMainSightImageCancel,
+      createMainSightEventImageCancel,
+      createPDFCancel,
+    } = this.props;
+    const { mediaManagerData } = this.state;
+    const { fileType, parentType } = mediaManagerData;
+    let action = () => {};
     this.setState({
       mediaManager: false,
       mediaManagerData: {},
       submitError: false,
     });
-    let action = () => {};
-    const { mediaManagerData } = this.state;
-    const { fileType, parentType } = mediaManagerData;
     if (fileType === FILE_TYPES.MAIN_IMAGE) {
       if (parentType === PARENT_TYPES.SIGHT) {
         action = createMainSightImageCancel;
       } else {
         action = createMainSightEventImageCancel;
       }
+    } else if (fileType === FILE_TYPES.IMAGE) {
+      if (parentType === PARENT_TYPES.SIGHT) {
+        action = () => {};
+      } else {
+        action = () => {};
+      }
+    } else if (fileType === FILE_TYPES.DOCUMENT) {
+      action = createPDFCancel;
     }
     action();
   }
@@ -698,6 +710,7 @@ SightsList.propTypes = {
   createMainSightImage: PropTypes.func.isRequired,
   createMainSightEventImage: PropTypes.func.isRequired,
   createPDF: PropTypes.func.isRequired,
+  createPDFCancel: PropTypes.func.isRequired,
   createTicketPoolDefinition: PropTypes.func.isRequired,
   deleteSight: PropTypes.func.isRequired,
   deleteSightEvent: PropTypes.func.isRequired,
@@ -734,6 +747,7 @@ const mapDispatchToProps = {
   createMainSightImage: sightsActions.createMainImage,
   createMainSightEventImage: sightEventActions.createMainImage,
   createPDF: sightEventActions.createPDF,
+  createPDFCancel: sightEventActions.createPDFCancel,
   createTicketPoolDefinition: ticketPoolDefinitionActions.createItem,
   deleteSight: sightsActions.deleteItem,
   deleteSightEvent: sightEventActions.deleteItem,
