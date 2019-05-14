@@ -174,11 +174,25 @@ class SightsList extends Component {
     });
   };
 
-  handleMediaManagerClose = () => this.setState({
-    mediaManager: false,
-    mediaManagerData: {},
-    submitError: false,
-  });
+  handleMediaManagerClose = () => {
+    const { createMainSightImageCancel, createMainSightEventImageCancel } = this.props;
+    this.setState({
+      mediaManager: false,
+      mediaManagerData: {},
+      submitError: false,
+    });
+    let action = () => {};
+    const { mediaManagerData } = this.state;
+    const { fileType, parentType } = mediaManagerData;
+    if (fileType === FILE_TYPES.MAIN_IMAGE) {
+      if (parentType === PARENT_TYPES.SIGHT) {
+        action = createMainSightImageCancel;
+      } else {
+        action = createMainSightEventImageCancel;
+      }
+    }
+    action()
+  }
 
   handleMediaManagerOpen = ({ parentId, parentType, fileType }) => this.setState({
     mediaManager: true,
@@ -713,6 +727,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
+  createMainSightImageCancel: sightsActions.createMainImageCancel,
+  createMainSightEventImageCancel : sightEventActions.createMainImageCancel,
   createMainSightImage: sightsActions.createMainImage,
   createMainSightEventImage: sightEventActions.createMainImage,
   createPDF: sightEventActions.createPDF,
