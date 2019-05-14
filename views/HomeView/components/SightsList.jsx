@@ -191,7 +191,7 @@ class SightsList extends Component {
         action = createMainSightEventImageCancel;
       }
     }
-    action()
+    action();
   }
 
   handleMediaManagerOpen = ({ parentId, parentType, fileType }) => this.setState({
@@ -693,6 +693,8 @@ class SightsList extends Component {
 }
 
 SightsList.propTypes = {
+  createMainSightImageCancel: PropTypes.func.isRequired,
+  createMainSightEventImageCancel: PropTypes.func.isRequired,
   createMainSightImage: PropTypes.func.isRequired,
   createMainSightEventImage: PropTypes.func.isRequired,
   createPDF: PropTypes.func.isRequired,
@@ -728,7 +730,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   createMainSightImageCancel: sightsActions.createMainImageCancel,
-  createMainSightEventImageCancel : sightEventActions.createMainImageCancel,
+  createMainSightEventImageCancel: sightEventActions.createMainImageCancel,
   createMainSightImage: sightsActions.createMainImage,
   createMainSightEventImage: sightEventActions.createMainImage,
   createPDF: sightEventActions.createPDF,
