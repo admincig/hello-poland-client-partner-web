@@ -125,6 +125,12 @@ const FETCH_LIST_FAILURE = `${prefix}FETCH_LIST_FAILURE`;
  */
 const FETCH_LIST_SUCCESS = `${prefix}FETCH_LIST_SUCCESS`;
 
+/**
+ * Type used for clearing currently loaded entity.
+ * @type {string}
+ */
+
+const CLEAR_ITEM = `${prefix}CLEAR_ITEM`;
 
 export const types = {
   CHANGE_PASSWORD,
@@ -143,6 +149,7 @@ export const types = {
   FETCH_LIST_CANCEL,
   FETCH_LIST_FAILURE,
   FETCH_LIST_SUCCESS,
+  CLEAR_ITEM,
 };
 
 
@@ -420,6 +427,18 @@ const fetchListSuccess = data => ({
   data,
 });
 
+/**
+ * Creates action for item removal.
+ * @method
+ * @return {{type: string}}
+ */
+
+
+var clearItem = function clearItem() {
+  return {
+    type: CLEAR_ITEM
+  };
+};
 
 export const actions = {
   changePassword,
@@ -438,6 +457,7 @@ export const actions = {
   fetchListCancel,
   fetchListFailure,
   fetchListSuccess,
+  clearItem,
 };
 
 
@@ -584,7 +604,7 @@ const fetchItemLogic = createLogic({
     FETCH_ITEM,
   ],
   cancelType: [
-    FETCH_ITEM_CANCEL,
+    FETCH_ITEM_CANCEL, CLEAR_ITEM
   ],
   latest: true,
   async process(
@@ -720,6 +740,13 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
         error: initialState.error,
         list: action.data.items,
       };
+      case CLEAR_ITEM:
+      return {
+        ...state,
+        error: initialState.error,
+        item: initialState.item,
+      };
+
     default:
       return state;
   }

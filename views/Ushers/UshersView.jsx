@@ -12,16 +12,38 @@ import {
 } from 'redux/ushers';
 import withAuth from 'services/auth/withAuth';
 import UshersList from './components/UshersList';
+import UsherFormDialog from './components/UsherFormDialog';
 
 class UshersView extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      usherFormDialogOpen: false,
+    }
+  }
+
   componentDidMount() {
     const { fetchUshers } = this.props;
 
     fetchUshers();
   }
 
+  openUsherFormDialog = () => {
+    this.setState({
+      usherFormDialogOpen: true
+    })
+  }
+
+  closeUsherFormDialog = () => {
+    this.setState({
+      usherFormDialogOpen: false
+    })
+  }
+
   render() {
     const { ushers } = this.props;
+    const { usherFormDialogOpen } = this.state;
 
     return (
       <Layout>
@@ -34,6 +56,16 @@ class UshersView extends Component {
           </Button>
         </Link>
         <Typography variant="h6" gutterBottom>Bileterzy</Typography>
+        <Button
+            color="primary"
+            size="small"
+            variant="contained"
+            style={{marginBottom: '1rem'}}
+            onClick={this.openUsherFormDialog}
+          >
+            Dodaj biletera
+          </Button>
+          {usherFormDialogOpen && <UsherFormDialog open={usherFormDialogOpen} onCloseUsherFormDialog={this.closeUsherFormDialog}/>}
         <UshersList ushers={ushers} />
       </Layout>
     );
