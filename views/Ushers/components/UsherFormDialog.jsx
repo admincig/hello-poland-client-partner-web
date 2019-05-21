@@ -9,10 +9,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import {
-  actions as ushersActions,
-  selectors as ushersSelectors,
-} from '../../../redux/ushers';
+import { actions as ushersActions } from '../../../redux/ushers';
 
 
 import UsherForm from './UsherForm';
@@ -93,22 +90,16 @@ class UsherFormDialog extends Component {
       this.setState({ isSubmitting: false, submittingError: false });
       setSubmitting(false);
     };
-  
-    handleSubmitSuccess = (sightId, actions) => {
-      const { fetchSightsList, fetchSightEventsList, itemId } = this.props;
-      const { language } = this.state;
+    // zmien sight na usher!!!
+    handleSubmitSuccess = (actions) => {
+      const { fetchUshersList, itemId } = this.props;
       const { setSubmitting } = actions;
   
       setSubmitting(false);
   
-      fetchSightsList();
-      fetchSightEventsList();
+      fetchUshersList();
   
-      if (itemId) {
-        this.handleFetchItem(itemId, language);
-      } else {
-        this.handleCancel();
-      }
+      this.handleCancel();
     };
 
     handleDiscardClick = () => this.handleCancel();
@@ -132,7 +123,7 @@ class UsherFormDialog extends Component {
     
     render() {
         const { isFetching, isSubmitting, submittingError, fetchingError} = this.state;
-        const { clearItem, ...rest } = this.props;
+        const { clearItem, fetchUshersList, ...rest } = this.props;
 
         return (
             <Fragment>
@@ -173,8 +164,10 @@ class UsherFormDialog extends Component {
 UsherFormDialog.propTypes = {
   clearItem: PropTypes.func.isRequired,
 };
-  
+
 UsherFormDialog.defaultProps = {
+  clearItem: PropTypes.func.isRequired,
+  fetchUshersList: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -182,6 +175,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   clearItem: ushersActions.clearItem,
+  fetchUshersList: ushersActions.fetchList,
 };
 
 export default compose(

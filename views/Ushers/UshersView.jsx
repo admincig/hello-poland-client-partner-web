@@ -19,7 +19,7 @@ class UshersView extends Component {
     super(props)
 
     this.state = {
-      usherFormDialogOpen: false,
+      usherForm: false,
     }
   }
 
@@ -29,21 +29,21 @@ class UshersView extends Component {
     fetchUshers();
   }
 
-  openUsherFormDialog = () => {
+  handleUsherFormOpen = () => {
     this.setState({
-      usherFormDialogOpen: true
+      usherForm: true,
     })
   }
 
-  closeUsherFormDialog = () => {
+  handleUsherFormClose = () => {
     this.setState({
-      usherFormDialogOpen: false
+      usherForm: false
     })
   }
 
   render() {
     const { ushers } = this.props;
-    const { usherFormDialogOpen } = this.state;
+    const { usherForm } = this.state;
 
     return (
       <Layout>
@@ -61,11 +61,11 @@ class UshersView extends Component {
             size="small"
             variant="contained"
             style={{marginBottom: '1rem'}}
-            onClick={this.openUsherFormDialog}
+            onClick={this.handleUsherFormOpen}
           >
             Dodaj biletera
           </Button>
-          <UsherFormDialog open={usherFormDialogOpen} onClose={this.closeUsherFormDialog}/>
+          <UsherFormDialog open={usherForm} onClose={this.handleUsherFormClose}/>
         <UshersList ushers={ushers} />
       </Layout>
     );

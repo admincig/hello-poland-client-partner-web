@@ -83,7 +83,7 @@ class UsherForm extends Component {
         const { onSubmitSuccess } = this.props;
     
         if (onSubmitSuccess) {
-          onSubmitSuccess(usherId, actions);
+          onSubmitSuccess(actions);
     
           return;
         }
