@@ -1,8 +1,6 @@
 import React, { Component, Fragment } from 'react';
-import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button/Button';
-import Grid from '@material-ui/core/Grid';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import Typography from '@material-ui/core/Typography/Typography';
@@ -144,8 +142,7 @@ class UsherFormDialog extends Component {
                 { isFetching || isSubmitting ? <CircularProgress size={18} style={{ marginLeft: 20 }} /> : null }
                     </DialogTitle>
                     <DialogContent>
-                        <UsherForm buttons={false}
-                                   FormikProps={{ ref: this.formikRef }}
+                        <UsherForm FormikProps={{ ref: this.formikRef }}
                                    onSubmitFailure={this.handleSubmitFailure}
                                    onSubmitSuccess={this.handleSubmitSuccess}/>
                     </DialogContent>

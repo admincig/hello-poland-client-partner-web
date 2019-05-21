@@ -54,12 +54,6 @@ class UsherForm extends Component {
 
       handleSubmit = (values, actions) => {
         const { onSubmit } = this.props;
-
-        const options = {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          };
     
         if (onSubmit) {
           onSubmit(values, actions);
@@ -74,7 +68,6 @@ class UsherForm extends Component {
           data,
           onFailure: this.handleSubmitFailure(actions),
           onSuccess: this.handleSubmitSuccess(actions),
-          options,
         };
         
         action(payload);
@@ -92,11 +85,11 @@ class UsherForm extends Component {
         setSubmitting(false);
       };
     
-      handleSubmitSuccess = actions => (sightId) => {
+      handleSubmitSuccess = actions => (usherId) => {
         const { onSubmitSuccess } = this.props;
     
         if (onSubmitSuccess) {
-          onSubmitSuccess(sightId, actions);
+          onSubmitSuccess(usherId, actions);
     
           return;
         }
@@ -108,7 +101,7 @@ class UsherForm extends Component {
       };
 
     render() {
-        const { FormikProps, buttons } = this.props;
+        const { FormikProps } = this.props;
         return (
             <Formik
             enableReinitialize
@@ -116,7 +109,6 @@ class UsherForm extends Component {
             validationSchema={this.validationSchema}
             initialValues={this.initialValues}
             onSubmit={this.handleSubmit}>
-            {({ isSubmitting, values }) => (
                 <Form autoComplete="off" noValidate>
                     <Grid container spacing={16}>
                         <GridItem>
@@ -132,19 +124,7 @@ class UsherForm extends Component {
                             <Field name="password" type="password" label="Hasło" component={TextField} {...commonProps} />
                         </GridItem>
                     </Grid>
-                    {buttons
-                    && (
-                    <Grid container spacing={16}>
-                        <GridItem md={2} sm={2}>
-                            <Button variant="password" color="primary" type="submit" disabled={isSubmitting}>
-                            Zapisz
-                            </Button>
-                        </GridItem>
-                    </Grid>
-                    )
-                    }
                 </Form>
-                )}
             </Formik>
         )
     }
@@ -153,10 +133,16 @@ class UsherForm extends Component {
 UsherForm.propTypes = {
     createItem: PropTypes.func.isRequired,
     FormikProps: PropTypes.shape({}),
+    onSubmitFailure: PropTypes.func,
+    onSubmitSuccess: PropTypes.func,
+    onSubmit: PropTypes.func,
   };
   
   UsherForm.defaultProps = {
     FormikProps: null,
+    onSubmitFailure: null,
+    onSubmitSuccess: null,
+    onSubmit: null,
   };
   
   const mapStateToProps = () => ({});
