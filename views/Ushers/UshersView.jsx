@@ -65,7 +65,7 @@ class UshersView extends Component {
           >
             Dodaj biletera
           </Button>
-          {usherFormDialogOpen && <UsherFormDialog open={usherFormDialogOpen} onCloseUsherFormDialog={this.closeUsherFormDialog}/>}
+          <UsherFormDialog open={usherFormDialogOpen} onClose={this.closeUsherFormDialog}/>
         <UshersList ushers={ushers} />
       </Layout>
     );

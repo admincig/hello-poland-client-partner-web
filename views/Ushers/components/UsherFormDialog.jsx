@@ -23,6 +23,8 @@ class UsherFormDialog extends Component {
     constructor(props) {
         super(props)
 
+        this.intervalRef = null;
+
         this.formikRef = React.createRef();
 
         this.state = {
@@ -32,6 +34,12 @@ class UsherFormDialog extends Component {
             submittingError: false,
             fetchingError: false,
         }
+    }
+
+    componentWillUnmount() {
+      if (this.intervalRef) {
+        clearInterval(this.intervalRef);
+      }
     }
 
     handleCancelClick = () => {
@@ -55,52 +63,91 @@ class UsherFormDialog extends Component {
       }
     }
 
-    handleFormReload = (callback, options) => {
-      if (this.isFormDirty()) {
-        this.setState({
-          alertDialog: {
-            content: 'W formularzu są niezapisane zmiany. Wykonać operację mimo to?',
-            onSuccess: () => {
-              if (callback) {
-                callback(options);
-              }
+    handleSubmit = () => {
+      const { current } = this.formikRef;
   
-              this.handleAlertDialogCancel();
-            },
-            open: true,
-            title: 'Uwaga',
-          },
-        });
-      } else if (callback) {
-        callback(options);
+      if (current && current.submitForm) {
+        this.setState({ isSubmitting: true, submittingError: false });
+        current.submitForm();
+  
+        this.intervalRef = setInterval(this.handleSubmitChange, 200);
+      }
+    };
+  
+    // hacking missing validation callback in Formik
+    handleSubmitChange = () => {
+      const { current } = this.formikRef;
+  
+      if (current && current.getFormikBag) {
+        const { getFormikBag } = current;
+        const { isSubmitting } = getFormikBag();
+  
+        if (!isSubmitting) {
+          this.setState({ isSubmitting });
+          clearInterval(this.intervalRef);
+        }
+      }
+    };
+  
+    handleSubmitFailure = (actions) => {
+      const { setSubmitting } = actions;
+  
+      this.setState({ isSubmitting: false, submittingError: false });
+      setSubmitting(false);
+    };
+  
+    handleSubmitSuccess = (sightId, actions) => {
+      const { fetchSightsList, fetchSightEventsList, itemId } = this.props;
+      const { language } = this.state;
+      const { setSubmitting } = actions;
+  
+      setSubmitting(false);
+  
+      fetchSightsList();
+      fetchSightEventsList();
+  
+      if (itemId) {
+        this.handleFetchItem(itemId, language);
+      } else {
+        this.handleCancel();
       }
     };
 
-    isFormDirty = () => {
-      const { current } = this.formikRef;
+    handleDiscardClick = () => this.handleCancel();
+
+    handleCancel = () => {
+      const { clearItem, onClose } = this.props;
   
-      if (current && current.getFormikComputedProps) {
-        const { dirty } = current.getFormikComputedProps();
+      this.setState({
+        fetchingError: false,
+        isFetching: false,
+        isSubmitting: false,
+        submittingError: false,
+      });
   
-        return dirty;
+      clearItem();
+  
+      if (onClose) {
+        onClose();
       }
-  
-      return false;
     };
     
     render() {
         const { isFetching, isSubmitting, submittingError, fetchingError} = this.state;
-        const { title, ...rest } = this.props;
+        const { clearItem, ...rest } = this.props;
 
         return (
             <Fragment>
                 <Dialog {...rest}>
                     <DialogTitle id="form-dialog-title">
-                    {title}
+                    Dodaj biletera
                 { isFetching || isSubmitting ? <CircularProgress size={18} style={{ marginLeft: 20 }} /> : null }
                     </DialogTitle>
                     <DialogContent>
-                        <UsherForm FormikProps={{ ref: this.formikRef }} buttons={false}/>
+                        <UsherForm buttons={false}
+                                   FormikProps={{ ref: this.formikRef }}
+                                   onSubmitFailure={this.handleSubmitFailure}
+                                   onSubmitSuccess={this.handleSubmitSuccess}/>
                     </DialogContent>
                     <DialogActions>
                         {submittingError
@@ -119,7 +166,6 @@ class UsherFormDialog extends Component {
                         }
                         <Button disabled={isSubmitting} onClick={this.handleDiscardClick} color="primary">Odrzuć</Button>
                         <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>
-                        <Button disabled={isSubmitting} onClick={this.handleCancelClick} color="primary">Zamknij</Button>
                     </DialogActions>
                 </Dialog>
             </Fragment>
@@ -128,6 +174,7 @@ class UsherFormDialog extends Component {
 }
 
 UsherFormDialog.propTypes = {
+  clearItem: PropTypes.func.isRequired,
 };
   
 UsherFormDialog.defaultProps = {

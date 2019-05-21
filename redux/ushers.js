@@ -132,6 +132,25 @@ const FETCH_LIST_SUCCESS = `${prefix}FETCH_LIST_SUCCESS`;
 
 const CLEAR_ITEM = `${prefix}CLEAR_ITEM`;
 
+/**
+ * Type used for handling entity creation.
+ * @type {string}
+ */
+const CREATE_ITEM = `${prefix}CREATE_ITEM`;
+
+/**
+ * Type used for handling entity creation failure.
+ * @type {string}
+ */
+const CREATE_ITEM_FAILURE = `${prefix}CREATE_ITEM_FAILURE`;
+
+/**
+ * Type used for handling entity creation success.
+ * @type {string}
+ */
+const CREATE_ITEM_SUCCESS = `${prefix}CREATE_ITEM_SUCCESS`;
+
+
 export const types = {
   CHANGE_PASSWORD,
   CHANGE_PASSWORD_CANCEL,
@@ -150,6 +169,9 @@ export const types = {
   FETCH_LIST_FAILURE,
   FETCH_LIST_SUCCESS,
   CLEAR_ITEM,
+  CREATE_ITEM,
+  CREATE_ITEM_FAILURE,
+  CREATE_ITEM_SUCCESS,
 };
 
 
@@ -440,6 +462,66 @@ var clearItem = function clearItem() {
   };
 };
 
+/**
+ * Creates action with item creation request details.
+ * @method
+ * @param {Object} params
+ * @param {Object} params.data - request data
+ * @param {Object} [params.options] - request config
+ * @param {failureCallback} [params.onFailure] - failure callback
+ * @param {successCallback} [params.onSuccess] - success callback
+ * @return {{
+ *   type: string,
+ *   payload: {url: string, method: string, data: *, options: *},
+ *   onFailure: failureCallback,
+ *   onSuccess: successCallback
+ * }}
+ */
+const createItem = ({
+  data, options, onFailure, onSuccess,
+} = {}) => ({
+  type: CREATE_ITEM,
+  payload: {
+    url: apiURL,
+    method: 'post',
+    ...options,
+    data,
+  },
+  onFailure,
+  onSuccess,
+});
+
+/**
+ * Creates action for item creation request failing.
+ * @method
+ * @param {Object} params - axios response schema
+ * @param params.data - response body
+ * @param params.status - response status
+ * @return {{
+ *   type: string,
+ *   error: {data, status: number}
+ * }}
+ */
+const createItemFailure = ({ data, status } = {}) => ({
+  type: CREATE_ITEM_FAILURE,
+  error: {
+    data,
+    status,
+  },
+});
+
+/**
+ * Creates action for successful item creation request.
+ * @method
+ * @param {Object} data - response body
+ * @return {{type: string, data: *}}
+ */
+const createItemSuccess = data => ({
+  type: CREATE_ITEM_SUCCESS,
+  data,
+});
+
+
 export const actions = {
   changePassword,
   changePasswordCancel,
@@ -457,7 +539,10 @@ export const actions = {
   fetchListCancel,
   fetchListFailure,
   fetchListSuccess,
+  createItem,
   clearItem,
+  createItemFailure,
+  createItemSuccess,
 };
 
 
@@ -688,12 +773,53 @@ const fetchListLogic = createLogic({
   },
 });
 
+const createItemLogic = createLogic({
+  type: [
+    CREATE_ITEM,
+  ],
+  latest: true,
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { data, status } = response;
+
+      if (status === 200 || status === 204) {
+        dispatch(createItemSuccess(data));
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        dispatch(createItemFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch ({ response }) {
+      dispatch(createItemFailure(response));
+
+      if (onFailure) {
+        onFailure();
+      }
+    }
+
+    done();
+  },
+});
+
+
 
 export const logic = {
   changePasswordLogic,
   changeProfileLogic,
   fetchItemLogic,
   fetchListLogic,
+  createItemLogic,
 };
 
 
@@ -746,6 +872,8 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
         error: initialState.error,
         item: initialState.item,
       };
+      case CREATE_ITEM_FAILURE:
+      case CREATE_ITEM_SUCCESS:
 
     default:
       return state;

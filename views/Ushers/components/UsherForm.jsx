@@ -21,7 +21,10 @@ import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import yupBoolen from 'yup/lib/boolean';
-import { actions as sightsActions } from '@hello-poland/commons/redux/sights';
+import {
+    actions as ushersActions,
+    selectors as ushersSelectors,
+  } from '../../../redux/ushers';
 import GridItem from 'components/GridItem';
 
 const commonProps = {
@@ -35,8 +38,74 @@ class UsherForm extends Component {
         // TODO: nested validation seems not working
         // TODO: see https://github.com/jaredpalmer/formik/issues/986
         this.validationSchema = yupObject().shape({
+            name: yupString()
+                .min(3)
+                .max(250),
+            email: yupString().email().trim().required(),
+            //password: skopiuj z biletera
         });
+
+        this.initialValues = {
+            email: '',
+            name: '',
+            password: '',
+        }
       }
+
+      handleSubmit = (values, actions) => {
+        const { onSubmit } = this.props;
+
+        const options = {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          };
+    
+        if (onSubmit) {
+          onSubmit(values, actions);
+    
+          return;
+        }
+        
+        const { ...data } = values;
+        const { createItem } = this.props;
+        let action = createItem;
+        const payload = {
+          data,
+          onFailure: this.handleSubmitFailure(actions),
+          onSuccess: this.handleSubmitSuccess(actions),
+          options,
+        };
+        
+        action(payload);
+      };
+
+    handleSubmitFailure = actions => () => {
+        const { onSubmitFailure } = this.props;
+    
+        if (onSubmitFailure) {
+          onSubmitFailure(actions);
+        }
+    
+        const { setSubmitting } = actions;
+    
+        setSubmitting(false);
+      };
+    
+      handleSubmitSuccess = actions => (sightId) => {
+        const { onSubmitSuccess } = this.props;
+    
+        if (onSubmitSuccess) {
+          onSubmitSuccess(sightId, actions);
+    
+          return;
+        }
+    
+        const { resetForm, setSubmitting } = actions;
+    
+        setSubmitting(false);
+        resetForm();
+      };
 
     render() {
         const { FormikProps, buttons } = this.props;
@@ -45,6 +114,7 @@ class UsherForm extends Component {
             enableReinitialize
             {...FormikProps}
             validationSchema={this.validationSchema}
+            initialValues={this.initialValues}
             onSubmit={this.handleSubmit}>
             {({ isSubmitting, values }) => (
                 <Form autoComplete="off" noValidate>
@@ -53,13 +123,13 @@ class UsherForm extends Component {
                             <Typography variant="h6">Partner jest jednocześnie bileterem</Typography>
                         </GridItem>
                         <GridItem>
-                            <Field name="email" label="Email" hidden component={TextField} {...commonProps} />
+                            <Field name="email" label="Email" component={TextField} {...commonProps} />
                         </GridItem>
                         <GridItem>
-                            <Field name="name" label="Nazwa" hidden component={TextField} {...commonProps} />
+                            <Field name="name" label="Nazwa" component={TextField} {...commonProps} />
                         </GridItem>
                         <GridItem>
-                            <Field name="password" label="Hasło" hidden component={TextField} {...commonProps} />
+                            <Field name="password" type="password" label="Hasło" component={TextField} {...commonProps} />
                         </GridItem>
                     </Grid>
                     {buttons
@@ -81,8 +151,8 @@ class UsherForm extends Component {
 }
 
 UsherForm.propTypes = {
+    createItem: PropTypes.func.isRequired,
     FormikProps: PropTypes.shape({}),
-    initialValues: PropTypes.shape({}),
   };
   
   UsherForm.defaultProps = {
@@ -92,9 +162,7 @@ UsherForm.propTypes = {
   const mapStateToProps = () => ({});
   
   const mapDispatchToProps = {
-    createItem: sightsActions.createItem,
-    createTranslation: sightsActions.createTranslation,
-    updateItem: sightsActions.updateItem,
+    createItem: ushersActions.createItem,
   };
 
-export default UsherForm;
+export default connect(mapStateToProps, mapDispatchToProps)(UsherForm);
