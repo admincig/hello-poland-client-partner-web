@@ -1,31 +1,18 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { compose } from 'redux';
 import { connect } from 'react-redux';
 import _find from 'lodash/find';
 import _isEqual from 'lodash/isEqual';
 import _isNumber from 'lodash/isNumber';
-import format from 'date-fns/format';
-import withStyles from '@material-ui/core/styles/withStyles';
-import Button from '@material-ui/core/Button';
-import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
-import Hidden from '@material-ui/core/Hidden';
-import Switch from '@material-ui/core/Switch';
 import Typography from '@material-ui/core/Typography/Typography';
-import TimePicker from 'material-ui-pickers/TimePicker';
-import MuiPickersUtilsProvider from 'material-ui-pickers/MuiPickersUtilsProvider';
-import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
-import yupBoolen from 'yup/lib/boolean';
-import {
-    actions as ushersActions,
-    selectors as ushersSelectors,
-  } from '../../../redux/ushers';
+import { actions as ushersActions } from '../../../redux/ushers';
 import GridItem from 'components/GridItem';
+import { ref } from 'yup'
 
 const commonProps = {
     fullWidth: true,
@@ -40,15 +27,22 @@ class UsherForm extends Component {
         this.validationSchema = yupObject().shape({
             name: yupString()
                 .min(3)
-                .max(250),
+                .max(250)
+                .required(),
             email: yupString().email().trim().required(),
-            //password: skopiuj z biletera
+            password: yupString()
+                    .min(8, 'Should be at least 8 characters long.')
+                    .required('Field is required.'),
+            confirmPassword: yupString()
+                    .oneOf([ref('password')], 'Given passwords are different.')
+                    .required('Field is required.'),
         });
 
         this.initialValues = {
             email: '',
             name: '',
             password: '',
+            confirmPassword: '',
         }
       }
 
@@ -61,7 +55,7 @@ class UsherForm extends Component {
           return;
         }
         
-        const { ...data } = values;
+        const { confirmPassword, ...data } = values;
         const { createItem } = this.props;
         let action = createItem;
         const payload = {
@@ -115,13 +109,16 @@ class UsherForm extends Component {
                             <Typography variant="h6">Partner jest jednocześnie bileterem</Typography>
                         </GridItem>
                         <GridItem>
-                            <Field name="email" label="Email" component={TextField} {...commonProps} />
+                            <Field name="email" label="Email" component={TextField} required {...commonProps} />
                         </GridItem>
                         <GridItem>
-                            <Field name="name" label="Nazwa" component={TextField} {...commonProps} />
+                            <Field name="name" label="Nazwa" component={TextField} required {...commonProps} />
                         </GridItem>
                         <GridItem>
-                            <Field name="password" type="password" label="Hasło" component={TextField} {...commonProps} />
+                            <Field name="password" type="password" label="Hasło" component={TextField} required {...commonProps} />
+                        </GridItem>
+                        <GridItem>
+                            <Field name="confirmPassword" type="password" label="Powtórz Hasło" required component={TextField} {...commonProps} />
                         </GridItem>
                     </Grid>
                 </Form>
