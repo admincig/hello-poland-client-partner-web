@@ -9,7 +9,7 @@ import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import GridItem from 'components/GridItem';
 import { ref } from 'yup';
-import { actions as ushersActions } from '../../../redux/ushers';
+import { actions as ushersActions } from 'redux/ushers';
 
 const commonProps = {
   fullWidth: true,
@@ -26,7 +26,10 @@ class UsherForm extends Component {
         .min(3)
         .max(250)
         .required(),
-      email: yupString().email().trim().required(),
+      email: yupString()
+            .email()
+            .trim()
+            .required(),
       password: yupString()
         .min(8, 'Should be at least 8 characters long.')
         .required('Field is required.'),
@@ -54,14 +57,13 @@ class UsherForm extends Component {
 
         const { confirmPassword, ...data } = values;
         const { createItem } = this.props;
-        const action = createItem;
         const payload = {
           data,
           onFailure: this.handleSubmitFailure(actions),
           onSuccess: this.handleSubmitSuccess(actions),
         };
 
-        action(payload);
+        createItem(payload);
       };
 
     handleSubmitFailure = actions => () => {
@@ -95,7 +97,6 @@ class UsherForm extends Component {
         const { FormikProps } = this.props;
         return (
           <Formik
-            enableReinitialize
             {...FormikProps}
             validationSchema={this.validationSchema}
             initialValues={this.initialValues}
@@ -104,7 +105,7 @@ class UsherForm extends Component {
             <Form autoComplete="off" noValidate>
               <Grid container spacing={16}>
                 <GridItem>
-                  <Typography variant="h6">Partner jest jednocześnie bileterem</Typography>
+                  <Typography>Partner jest jednocześnie bileterem</Typography>
                 </GridItem>
                 <GridItem>
                   <Field name="email" label="Email" component={TextField} required {...commonProps} />

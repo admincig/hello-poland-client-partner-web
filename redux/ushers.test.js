@@ -188,6 +188,66 @@ describe('actions', () => {
     });
   });
 
+  describe('using clear', () => {
+    it('should create an action with request payload', () => {
+      const { createItem } = actions;
+      const { CREATE_ITEM } = types;
+      const data = { a: 1 };
+      const options = { b: 2 };
+      const expectedValue = {
+        type: CREATE_ITEM,
+        payload: {
+          url: apiURL,
+          method: 'post',
+          data,
+        },
+      };
+
+      expect(createItem({ data })).toEqual(expectedValue);
+
+      expectedValue.payload = {
+        ...expectedValue.payload,
+        ...options,
+      };
+
+      expect(createItem({ data, options })).toEqual(expectedValue);
+
+      expectedValue.onFailure = onFailure;
+      expectedValue.onSuccess = onSuccess;
+
+      expect(createItem({
+        data, options, onFailure, onSuccess,
+      })).toEqual(expectedValue);
+    });
+
+    it('should create an action for failed request', () => {
+      const { createItemFailure } = actions;
+      const { CREATE_ITEM_FAILURE } = types;
+      const expectedValue = {
+        type: CREATE_ITEM_FAILURE,
+        error: {},
+      };
+
+      expect(createItemFailure()).toEqual(expectedValue);
+
+      expectedValue.error = axiosResponseError;
+
+      expect(createItemFailure(axiosResponseError)).toEqual(expectedValue);
+    });
+
+    it('should create an action for successful request', () => {
+      const { createItemSuccess } = actions;
+      const { CREATE_ITEM_SUCCESS } = types;
+      const data = { a: 1 };
+      const expectedValue = {
+        type: CREATE_ITEM_SUCCESS,
+        data,
+      };
+
+      expect(createItemSuccess(data)).toEqual(expectedValue);
+    });
+  })
+
   describe('using item action', () => {
     it('should create an action to make request', () => {
       const { fetchItem } = actions;
@@ -399,6 +459,25 @@ describe('reducer', () => {
 
   it('should return current state if action type was not found', () => {
     expect(reducer()(undefined, { type: 'INVALID_TYPE' })).toEqual(defaultInitialState);
+  });
+
+  it('should handle CLEAR_ITEM', () => {
+    const action = actions.clearItem();
+    const expectedValue = {
+      ...defaultInitialState,
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
+  it('should handle CREATE_ITEM_SUCCESS', () => {
+    const data = { id: 1 };
+    const action = actions.createItemSuccess(data);
+    const expectedValue = {
+      ...defaultInitialState,
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
   });
 
   describe('using item reducers', () => {
