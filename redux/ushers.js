@@ -456,9 +456,9 @@ const fetchListSuccess = data => ({
  */
 
 
-var clearItem = function clearItem() {
+const clearItem = function clearItem() {
   return {
-    type: CLEAR_ITEM
+    type: CLEAR_ITEM,
   };
 };
 
@@ -689,7 +689,7 @@ const fetchItemLogic = createLogic({
     FETCH_ITEM,
   ],
   cancelType: [
-    FETCH_ITEM_CANCEL, CLEAR_ITEM
+    FETCH_ITEM_CANCEL, CLEAR_ITEM,
   ],
   latest: true,
   async process(
@@ -813,7 +813,6 @@ const createItemLogic = createLogic({
 });
 
 
-
 export const logic = {
   changePasswordLogic,
   changeProfileLogic,
@@ -850,6 +849,7 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
   switch (action.type) {
     case FETCH_ITEM_FAILURE:
     case FETCH_LIST_FAILURE:
+    case CREATE_ITEM_FAILURE:
       return {
         ...state,
         error: action.error,
@@ -866,14 +866,17 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
         error: initialState.error,
         list: action.data.items,
       };
-      case CLEAR_ITEM:
+    case CLEAR_ITEM:
       return {
         ...state,
         error: initialState.error,
         item: initialState.item,
       };
-      case CREATE_ITEM_FAILURE:
-      case CREATE_ITEM_SUCCESS:
+    case CREATE_ITEM_SUCCESS:
+      return {
+        ...state,
+        error: initialState.error,
+      };
 
     default:
       return state;

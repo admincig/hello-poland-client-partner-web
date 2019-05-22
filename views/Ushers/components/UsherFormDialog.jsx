@@ -15,27 +15,25 @@ import { actions as ushersActions } from '../../../redux/ushers';
 import UsherForm from './UsherForm';
 
 class UsherFormDialog extends Component {
-    constructor(props) {
-        super(props)
+  constructor(props) {
+    super(props);
 
-        this.intervalRef = null;
+    this.intervalRef = null;
 
-        this.formikRef = React.createRef();
+    this.formikRef = React.createRef();
 
-        this.state = {
-            usherData: {},
-            isFetching: false,
-            isSubmitting: false,
-            submittingError: false,
-            fetchingError: false,
-        }
+    this.state = {
+      isFetching: false,
+      isSubmitting: false,
+      submittingError: false,
+    };
+  }
+
+  componentWillUnmount() {
+    if (this.intervalRef) {
+      clearInterval(this.intervalRef);
     }
-
-    componentWillUnmount() {
-      if (this.intervalRef) {
-        clearInterval(this.intervalRef);
-      }
-    }
+  }
 
     handleCancelClick = () => {
       this.handleFormReload(this.handleCancel);
@@ -43,9 +41,8 @@ class UsherFormDialog extends Component {
 
     handleCancel = () => {
       const { clearItem, onClose } = this.props;
-  
+
       this.setState({
-        fetchingError: false,
         isFetching: false,
         isSubmitting: false,
         submittingError: false,
@@ -60,45 +57,45 @@ class UsherFormDialog extends Component {
 
     handleSubmit = () => {
       const { current } = this.formikRef;
-  
+
       if (current && current.submitForm) {
         this.setState({ isSubmitting: true, submittingError: false });
         current.submitForm();
-  
+
         this.intervalRef = setInterval(this.handleSubmitChange, 200);
       }
     };
-  
+
     // hacking missing validation callback in Formik
     handleSubmitChange = () => {
       const { current } = this.formikRef;
-  
+
       if (current && current.getFormikBag) {
         const { getFormikBag } = current;
         const { isSubmitting } = getFormikBag();
-  
+
         if (!isSubmitting) {
           this.setState({ isSubmitting });
           clearInterval(this.intervalRef);
         }
       }
     };
-  
+
     handleSubmitFailure = (actions) => {
       const { setSubmitting } = actions;
-  
-      this.setState({ isSubmitting: false, submittingError: false });
+
+      this.setState({ isSubmitting: false, submittingError: true });
       setSubmitting(false);
     };
-    // zmien sight na usher!!!
+
     handleSubmitSuccess = (actions) => {
-      const { fetchUshersList, itemId } = this.props;
+      const { fetchUshersList } = this.props;
       const { setSubmitting } = actions;
-  
+
       setSubmitting(false);
-  
+
       fetchUshersList();
-  
+
       this.handleCancel();
     };
 
@@ -106,71 +103,70 @@ class UsherFormDialog extends Component {
 
     handleCancel = () => {
       const { clearItem, onClose } = this.props;
-  
+
       this.setState({
-        fetchingError: false,
         isFetching: false,
         isSubmitting: false,
         submittingError: false,
       });
-  
+
       clearItem();
-  
+
       if (onClose) {
         onClose();
       }
     };
-    
-    render() {
-        const { isFetching, isSubmitting, submittingError, fetchingError} = this.state;
-        const { clearItem, fetchUshersList, ...rest } = this.props;
 
-        return (
-            <Fragment>
-                <Dialog {...rest}>
-                    <DialogTitle id="form-dialog-title">
+    render() {
+      const { isFetching, isSubmitting, submittingError } = this.state;
+      const { clearItem, fetchUshersList, ...rest } = this.props;
+
+      return (
+        <Fragment>
+          <Dialog {...rest}>
+            <DialogTitle id="form-dialog-title">
                     Dodaj biletera
-                { isFetching || isSubmitting ? <CircularProgress size={18} style={{ marginLeft: 20 }} /> : null }
-                    </DialogTitle>
-                    <DialogContent>
-                        <UsherForm FormikProps={{ ref: this.formikRef }}
-                                   onSubmitFailure={this.handleSubmitFailure}
-                                   onSubmitSuccess={this.handleSubmitSuccess}/>
-                    </DialogContent>
-                    <DialogActions>
-                        {submittingError
+              { isFetching || isSubmitting
+                ? <CircularProgress size={18} style={{ marginLeft: 20 }} />
+                : null }
+            </DialogTitle>
+            <DialogContent>
+              <UsherForm
+                FormikProps={{ ref: this.formikRef }}
+                onSubmitFailure={this.handleSubmitFailure}
+                onSubmitSuccess={this.handleSubmitSuccess}
+              />
+            </DialogContent>
+            <DialogActions>
+              {submittingError
                           && (
                             <Typography style={{ color: 'red' }}>
-                              Wystąpił błąd podczas zapisywania.
+                              Podany bileter już isranieje.
                             </Typography>
                           )
                         }
-                        {fetchingError
-                          && (
-                            <Typography style={{ color: 'red' }}>
-                              Wystąpił błąd podczas pobierania danych.
-                            </Typography>
-                          )
-                        }
-                        <Button disabled={isSubmitting} onClick={this.handleDiscardClick} color="primary">Odrzuć</Button>
-                        <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>
-                    </DialogActions>
-                </Dialog>
-            </Fragment>
-        )
+              <Button disabled={isSubmitting} onClick={this.handleDiscardClick} color="primary">Odrzuć</Button>
+              <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>
+            </DialogActions>
+          </Dialog>
+        </Fragment>
+      );
     }
 }
 
 UsherFormDialog.propTypes = {
   clearItem: PropTypes.func.isRequired,
+  fetchUshersList: PropTypes.func.isRequired,
+  onClose: PropTypes.func,
+  open: PropTypes.bool,
 };
 
 UsherFormDialog.defaultProps = {
-  clearItem: PropTypes.func.isRequired,
-  fetchUshersList: PropTypes.func.isRequired,
+  onClose: null,
+  open: false,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = () => ({
 });
 
 const mapDispatchToProps = {
@@ -179,5 +175,5 @@ const mapDispatchToProps = {
 };
 
 export default compose(
-  connect(mapStateToProps, mapDispatchToProps)
+  connect(mapStateToProps, mapDispatchToProps),
 )(UsherFormDialog);

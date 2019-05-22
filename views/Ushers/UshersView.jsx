@@ -16,11 +16,11 @@ import UsherFormDialog from './components/UsherFormDialog';
 
 class UshersView extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
       usherForm: false,
-    }
+    };
   }
 
   componentDidMount() {
@@ -32,13 +32,13 @@ class UshersView extends Component {
   handleUsherFormOpen = () => {
     this.setState({
       usherForm: true,
-    })
+    });
   }
 
   handleUsherFormClose = () => {
     this.setState({
-      usherForm: false
-    })
+      usherForm: false,
+    });
   }
 
   render() {
@@ -57,15 +57,15 @@ class UshersView extends Component {
         </Link>
         <Typography variant="h6" gutterBottom>Bileterzy</Typography>
         <Button
-            color="primary"
-            size="small"
-            variant="contained"
-            style={{marginBottom: '1rem'}}
-            onClick={this.handleUsherFormOpen}
-          >
+          color="primary"
+          size="small"
+          variant="contained"
+          style={{ marginBottom: '1rem' }}
+          onClick={this.handleUsherFormOpen}
+        >
             Dodaj biletera
-          </Button>
-          <UsherFormDialog open={usherForm} onClose={this.handleUsherFormClose}/>
+        </Button>
+        <UsherFormDialog open={usherForm} onClose={this.handleUsherFormClose} />
         <UshersList ushers={ushers} />
       </Layout>
     );
