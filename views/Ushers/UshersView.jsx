@@ -31,17 +31,9 @@ class UshersView extends Component {
     fetchUshers();
   }
 
-  handleUsherFormOpen = () => {
-    this.setState({
-      usherForm: true,
-    });
-  }
+  handleUsherFormOpen = () => this.setState({ usherForm: true });
 
-  handleUsherFormClose = () => {
-    this.setState({
-      usherForm: false,
-    });
-  }
+  handleUsherFormClose = () => this.setState({ usherForm: false });
 
   render() {
     const { ushers } = this.props;
