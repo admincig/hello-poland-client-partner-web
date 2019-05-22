@@ -5,6 +5,8 @@ import { connect } from 'react-redux';
 import Link from 'next/link';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
+import GridItem from 'components/GridItem';
 import Layout from 'components/Layout';
 import {
   actions as ushersActions,
@@ -47,26 +49,35 @@ class UshersView extends Component {
 
     return (
       <Layout>
-        <Link href="/" passHref prefetch>
-          <Button component="a">Strona główna</Button>
-        </Link>
-        <Link href="/ushers" passHref prefetch>
-          <Button component="a">
-            Bileterzy
-          </Button>
-        </Link>
-        <Typography variant="h6" gutterBottom>Bileterzy</Typography>
-        <Button
-          color="primary"
-          size="small"
-          variant="contained"
-          style={{ marginBottom: '1rem' }}
-          onClick={this.handleUsherFormOpen}
-        >
+        <Grid container spacing={8}>
+          <GridItem>
+            <Link href="/" passHref prefetch>
+              <Button component="a">Strona główna</Button>
+            </Link>
+            <Link href="/ushers" passHref prefetch>
+              <Button component="a">
+                Bileterzy
+              </Button>
+            </Link>
+          </GridItem>
+          <GridItem>
+            <Typography variant="h6" gutterBottom>Bileterzy</Typography>
+          </GridItem>
+          <GridItem>
+            <Button
+              color="primary"
+              size="small"
+              variant="contained"
+              onClick={this.handleUsherFormOpen}
+            >
             Dodaj biletera
-        </Button>
+            </Button>
+          </GridItem>
+          <GridItem>
+            <UshersList ushers={ushers} />
+          </GridItem>
+        </Grid>
         <UsherFormDialog open={usherForm} onClose={this.handleUsherFormClose} />
-        <UshersList ushers={ushers} />
       </Layout>
     );
   }
