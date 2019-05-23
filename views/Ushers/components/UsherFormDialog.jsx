@@ -9,7 +9,10 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { actions as ushersActions } from 'redux/ushers';
+import { 
+  actions as ushersActions, 
+  selectors as ushersSelectors,
+} from 'redux/ushers';
 
 import UsherForm from './UsherForm';
 
@@ -78,6 +81,7 @@ class UsherFormDialog extends Component {
   };
 
   handleSubmitFailure = (actions) => {
+    const { error } = this.props;
     const { setSubmitting } = actions;
     this.setState({ isSubmitting: false, submittingError: true });
     setSubmitting(false);
@@ -111,7 +115,9 @@ class UsherFormDialog extends Component {
 
   render() {
     const { isFetching, isSubmitting, submittingError } = this.state;
-    const { clearItem, fetchUshersList, ...rest } = this.props;
+    const { clearItem, fetchUshersList, error, ...rest } = this.props;
+    const { data } = error || {};
+    const { message } = data || {};
 
     return (
       <Fragment>
@@ -133,7 +139,7 @@ class UsherFormDialog extends Component {
             {submittingError
                         && (
                           <Typography style={{ color: 'red' }}>
-                            Podany bileter już isranieje.
+                            {message}
                           </Typography>
                         )
                       }
@@ -151,14 +157,17 @@ UsherFormDialog.propTypes = {
   fetchUshersList: PropTypes.func.isRequired,
   onClose: PropTypes.func,
   open: PropTypes.bool,
+  error: PropTypes.shape({}),
 };
 
 UsherFormDialog.defaultProps = {
   onClose: null,
   open: false,
+  error: null,
 };
 
-const mapStateToProps = () => ({
+const mapStateToProps = (state) => ({
+  error: ushersSelectors.getError(state),
 });
 
 const mapDispatchToProps = {

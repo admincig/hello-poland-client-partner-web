@@ -27,9 +27,9 @@ class UsherForm extends Component {
         .max(250)
         .required(),
       email: yupString()
-            .email()
-            .trim()
-            .required(),
+        .email()
+        .trim()
+        .required(),
       password: yupString()
         .min(8, 'Should be at least 8 characters long.')
         .required('Field is required.'),
