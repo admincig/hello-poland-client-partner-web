@@ -246,7 +246,7 @@ describe('actions', () => {
 
       expect(createItemSuccess(data)).toEqual(expectedValue);
     });
-  })
+  });
 
   describe('using item action', () => {
     it('should create an action to make request', () => {

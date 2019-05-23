@@ -9,8 +9,8 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { 
-  actions as ushersActions, 
+import {
+  actions as ushersActions,
   selectors as ushersSelectors,
 } from 'redux/ushers';
 
@@ -29,13 +29,13 @@ class UsherFormDialog extends Component {
       isSubmitting: false,
       submittingError: false,
     };
-  };
+  }
 
   componentWillUnmount() {
     if (this.intervalRef) {
       clearInterval(this.intervalRef);
-    };
-  };
+    }
+  }
 
   handleCancelClick = () => {
     this.handleFormReload(this.handleCancel);
@@ -81,12 +81,11 @@ class UsherFormDialog extends Component {
   };
 
   handleSubmitFailure = (actions) => {
-    const { error } = this.props;
     const { setSubmitting } = actions;
     this.setState({ isSubmitting: false, submittingError: true });
     setSubmitting(false);
   };
-  
+
   handleSubmitSuccess = (actions) => {
     const { fetchUshersList } = this.props;
     const { setSubmitting } = actions;
@@ -115,7 +114,9 @@ class UsherFormDialog extends Component {
 
   render() {
     const { isFetching, isSubmitting, submittingError } = this.state;
-    const { clearItem, fetchUshersList, error, ...rest } = this.props;
+    const {
+      clearItem, fetchUshersList, error, ...rest
+    } = this.props;
     const { data } = error || {};
     const { message } = data || {};
 
@@ -166,7 +167,7 @@ UsherFormDialog.defaultProps = {
   error: null,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   error: ushersSelectors.getError(state),
 });
 

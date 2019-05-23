@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography/Typography';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
@@ -46,84 +45,81 @@ class UsherForm extends Component {
     };
   }
 
-      handleSubmit = (values, actions) => {
-        const { onSubmit } = this.props;
+  handleSubmit = (values, actions) => {
+    const { onSubmit } = this.props;
 
-        if (onSubmit) {
-          onSubmit(values, actions);
+    if (onSubmit) {
+      onSubmit(values, actions);
 
-          return;
-        }
+      return;
+    }
 
-        const { confirmPassword, ...data } = values;
-        const { createItem } = this.props;
-        const payload = {
-          data,
-          onFailure: this.handleSubmitFailure(actions),
-          onSuccess: this.handleSubmitSuccess(actions),
-        };
-
-        createItem(payload);
-      };
-
-    handleSubmitFailure = actions => () => {
-      const { onSubmitFailure } = this.props;
-
-      if (onSubmitFailure) {
-        onSubmitFailure(actions);
-      }
-
-      const { setSubmitting } = actions;
-
-      setSubmitting(false);
+    const { confirmPassword, ...data } = values;
+    const { createItem } = this.props;
+    const payload = {
+      data,
+      onFailure: this.handleSubmitFailure(actions),
+      onSuccess: this.handleSubmitSuccess(actions),
     };
 
-      handleSubmitSuccess = actions => () => {
-        const { onSubmitSuccess } = this.props;
+    createItem(payload);
+  };
 
-        if (onSubmitSuccess) {
-          onSubmitSuccess(actions);
+  handleSubmitFailure = actions => () => {
+    const { onSubmitFailure } = this.props;
 
-          return;
-        }
+    if (onSubmitFailure) {
+      onSubmitFailure(actions);
+    }
 
-        const { resetForm, setSubmitting } = actions;
+    const { setSubmitting } = actions;
 
-        setSubmitting(false);
-        resetForm();
-      };
+    setSubmitting(false);
+  };
 
-      render() {
-        const { FormikProps } = this.props;
-        return (
-          <Formik
-            {...FormikProps}
-            validationSchema={this.validationSchema}
-            initialValues={this.initialValues}
-            onSubmit={this.handleSubmit}
-          >
-            <Form autoComplete="off" noValidate>
-              <Grid container spacing={16}>
-                <GridItem>
-                  <Typography>Partner jest jednocześnie bileterem</Typography>
-                </GridItem>
-                <GridItem>
-                  <Field name="email" label="Email" component={TextField} required {...commonProps} />
-                </GridItem>
-                <GridItem>
-                  <Field name="name" label="Nazwa" component={TextField} required {...commonProps} />
-                </GridItem>
-                <GridItem>
-                  <Field name="password" type="password" label="Hasło" component={TextField} required {...commonProps} />
-                </GridItem>
-                <GridItem>
-                  <Field name="confirmPassword" type="password" label="Powtórz Hasło" required component={TextField} {...commonProps} />
-                </GridItem>
-              </Grid>
-            </Form>
-          </Formik>
-        );
-      }
+  handleSubmitSuccess = actions => () => {
+    const { onSubmitSuccess } = this.props;
+
+    if (onSubmitSuccess) {
+      onSubmitSuccess(actions);
+
+      return;
+    }
+
+    const { resetForm, setSubmitting } = actions;
+
+    setSubmitting(false);
+    resetForm();
+  };
+
+  render() {
+    const { FormikProps } = this.props;
+    return (
+      <Formik
+        {...FormikProps}
+        validationSchema={this.validationSchema}
+        initialValues={this.initialValues}
+        onSubmit={this.handleSubmit}
+      >
+        <Form autoComplete="off" noValidate>
+          <Grid container spacing={16}>
+            <GridItem>
+              <Field name="email" label="Email" component={TextField} required helperText="Partner jest jednocześnie bileterem" {...commonProps} />
+            </GridItem>
+            <GridItem>
+              <Field name="name" label="Nazwa" component={TextField} required {...commonProps} />
+            </GridItem>
+            <GridItem>
+              <Field name="password" type="password" label="Hasło" component={TextField} required {...commonProps} />
+            </GridItem>
+            <GridItem>
+              <Field name="confirmPassword" type="password" label="Powtórz Hasło" required component={TextField} {...commonProps} />
+            </GridItem>
+          </Grid>
+        </Form>
+      </Formik>
+    );
+  }
 }
 
 UsherForm.propTypes = {
