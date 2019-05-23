@@ -40,6 +40,7 @@ import createSlug from 'utils/createSlug';
 import config from 'config';
 import ticketPoolDefinitionSchema from './ticketPoolDefinitionSchema';
 import HomeListItem from './HomeListItem';
+import MailingFormDialig from 'components/MailingForm/Dialog';
 
 const PARENT_TYPES = {
   SIGHT: 'SIGHT',
@@ -73,6 +74,7 @@ class SightsList extends Component {
     stats: {
       open: false,
     },
+    mailingForm: false,
     stopSellForm: false,
     submitError: false,
     title: '',
@@ -447,11 +449,15 @@ class SightsList extends Component {
     this.setState({ formData });
   };
 
+  handleMailingFormOpen = () => this.setState({mailingForm: true,})
+
+  handleMailingFormClose = () => this.setState({mailingForm: false,})
+
   render() {
     const { sightEventsList, sightsList } = this.props;
     const {
       alertDialog, dialog, formData, formType, mediaManager, schema,
-      sightForm, sightEventForm, stats, stopSellForm, submitError, title, readOnly,
+      sightForm, mailingForm, sightEventForm, stats, stopSellForm, submitError, title, readOnly,
     } = this.state;
 
     return (
@@ -466,6 +472,9 @@ class SightsList extends Component {
         </Link>
         <Button onClick={this.handleStatsDialogOpen}>
           Statystyki
+        </Button>
+        <Button onClick={this.handleMailingFormOpen}>
+          Mailing
         </Button>
         {sightsList && sightsList.length
           ? (
@@ -698,6 +707,11 @@ class SightsList extends Component {
         <StatsDialog
           onClose={this.handleStatsDialogClose}
           {...stats}
+        />
+        <MailingFormDialig 
+          open={mailingForm}
+          onClose={this.handleMailingFormClose}
+
         />
       </Fragment>
     );
