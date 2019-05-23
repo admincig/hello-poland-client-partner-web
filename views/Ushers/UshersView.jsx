@@ -32,8 +32,8 @@ class UshersView extends Component {
   }
 
   handleUsherFormOpen = () => {
-    const { clearItem } = this.props;
-    clearItem();
+    const { clearError } = this.props;
+    clearError();
     this.setState({ usherForm: true });
   }
 
@@ -80,7 +80,7 @@ class UshersView extends Component {
 }
 
 UshersView.propTypes = {
-  clearItem: PropTypes.func.isRequired,
+  clearError: PropTypes.func.isRequired,
   fetchUshers: PropTypes.func.isRequired,
   ushers: PropTypes.arrayOf(PropTypes.shape({})),
 };
@@ -94,7 +94,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  clearItem: ushersActions.clearItem,
+  clearError: ushersActions.clearError,
   fetchUshers: ushersActions.fetchList,
 };
 

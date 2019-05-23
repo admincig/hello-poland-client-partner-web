@@ -150,6 +150,11 @@ const CREATE_ITEM_FAILURE = `${prefix}CREATE_ITEM_FAILURE`;
  */
 const CREATE_ITEM_SUCCESS = `${prefix}CREATE_ITEM_SUCCESS`;
 
+/**
+ * Type used for clear error.
+ * @type {string}
+ */
+const CLEAR_ERROR = `${prefix}CLEAR_ERROR`;
 
 export const types = {
   CHANGE_PASSWORD,
@@ -172,6 +177,7 @@ export const types = {
   CREATE_ITEM,
   CREATE_ITEM_FAILURE,
   CREATE_ITEM_SUCCESS,
+  CLEAR_ERROR,
 };
 
 
@@ -454,13 +460,7 @@ const fetchListSuccess = data => ({
  * @method
  * @return {{type: string}}
  */
-
-
-const clearItem = function clearItem() {
-  return {
-    type: CLEAR_ITEM,
-  };
-};
+const clearItem = () => ({ type: CLEAR_ITEM });
 
 /**
  * Creates action with item creation request details.
@@ -521,6 +521,12 @@ const createItemSuccess = data => ({
   data,
 });
 
+/**
+ * Creates action for clear error
+ * @method
+ * @return {{type: string}}
+ */
+const clearError = () => ({ type: CLEAR_ERROR });
 
 export const actions = {
   changePassword,
@@ -543,6 +549,7 @@ export const actions = {
   clearItem,
   createItemFailure,
   createItemSuccess,
+  clearError,
 };
 
 
@@ -873,6 +880,7 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
         item: initialState.item,
       };
     case CREATE_ITEM_SUCCESS:
+    case CLEAR_ERROR:
       return {
         ...state,
         error: initialState.error,

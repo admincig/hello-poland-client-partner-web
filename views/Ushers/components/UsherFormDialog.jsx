@@ -42,7 +42,7 @@ class UsherFormDialog extends Component {
   };
 
   handleCancel = () => {
-    const { clearItem, onClose } = this.props;
+    const { onClose, clearError } = this.props;
 
     this.setState({
       isFetching: false,
@@ -50,7 +50,7 @@ class UsherFormDialog extends Component {
       submittingError: false,
     });
 
-    clearItem();
+    clearError();
     if (onClose) {
       onClose();
     }
@@ -97,7 +97,7 @@ class UsherFormDialog extends Component {
   handleDiscardClick = () => this.handleCancel();
 
   handleCancel = () => {
-    const { clearItem, onClose } = this.props;
+    const { clearError, onClose } = this.props;
 
     this.setState({
       isFetching: false,
@@ -105,7 +105,7 @@ class UsherFormDialog extends Component {
       submittingError: false,
     });
 
-    clearItem();
+    clearError();
 
     if (onClose) {
       onClose();
@@ -115,7 +115,7 @@ class UsherFormDialog extends Component {
   render() {
     const { isFetching, isSubmitting, submittingError } = this.state;
     const {
-      clearItem, fetchUshersList, error, ...rest
+      clearError, fetchUshersList, error, ...rest
     } = this.props;
     const { data } = error || {};
     const { message } = data || {};
@@ -154,7 +154,7 @@ class UsherFormDialog extends Component {
 }
 
 UsherFormDialog.propTypes = {
-  clearItem: PropTypes.func.isRequired,
+  clearError: PropTypes.func.isRequired,
   fetchUshersList: PropTypes.func.isRequired,
   onClose: PropTypes.func,
   open: PropTypes.bool,
@@ -172,7 +172,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  clearItem: ushersActions.clearItem,
+  clearError: ushersActions.clearError,
   fetchUshersList: ushersActions.fetchList,
 };
 

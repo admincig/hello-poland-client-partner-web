@@ -470,6 +470,15 @@ describe('reducer', () => {
     expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
   });
 
+  it('should handle CLEAR_ERROR', () => {
+    const action = actions.clearError();
+    const expectedValue = {
+      ...defaultInitialState,
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
   it('should handle CREATE_ITEM_SUCCESS', () => {
     const data = { id: 1 };
     const action = actions.createItemSuccess(data);
