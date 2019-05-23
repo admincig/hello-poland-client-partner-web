@@ -78,6 +78,37 @@ const CHANGE_PROFILE_FAILURE = `${prefix}CHANGE_PROFILE_FAILURE`;
 const CHANGE_PROFILE_SUCCESS = `${prefix}CHANGE_PROFILE_SUCCESS`;
 
 /**
+ * Type used for clear error.
+ * @type {string}
+ */
+const CLEAR_ERROR = `${prefix}CLEAR_ERROR`;
+
+/**
+ * Type used for clearing currently loaded entity.
+ * @type {string}
+ */
+
+const CLEAR_ITEM = `${prefix}CLEAR_ITEM`;
+
+/**
+ * Type used for handling entity creation.
+ * @type {string}
+ */
+const CREATE_ITEM = `${prefix}CREATE_ITEM`;
+
+/**
+ * Type used for handling entity creation failure.
+ * @type {string}
+ */
+const CREATE_ITEM_FAILURE = `${prefix}CREATE_ITEM_FAILURE`;
+
+/**
+ * Type used for handling entity creation success.
+ * @type {string}
+ */
+const CREATE_ITEM_SUCCESS = `${prefix}CREATE_ITEM_SUCCESS`;
+
+/**
  * Type used for handling entity fetching.
  * @type {string}
  */
@@ -125,37 +156,6 @@ const FETCH_LIST_FAILURE = `${prefix}FETCH_LIST_FAILURE`;
  */
 const FETCH_LIST_SUCCESS = `${prefix}FETCH_LIST_SUCCESS`;
 
-/**
- * Type used for clearing currently loaded entity.
- * @type {string}
- */
-
-const CLEAR_ITEM = `${prefix}CLEAR_ITEM`;
-
-/**
- * Type used for handling entity creation.
- * @type {string}
- */
-const CREATE_ITEM = `${prefix}CREATE_ITEM`;
-
-/**
- * Type used for handling entity creation failure.
- * @type {string}
- */
-const CREATE_ITEM_FAILURE = `${prefix}CREATE_ITEM_FAILURE`;
-
-/**
- * Type used for handling entity creation success.
- * @type {string}
- */
-const CREATE_ITEM_SUCCESS = `${prefix}CREATE_ITEM_SUCCESS`;
-
-/**
- * Type used for clear error.
- * @type {string}
- */
-const CLEAR_ERROR = `${prefix}CLEAR_ERROR`;
-
 export const types = {
   CHANGE_PASSWORD,
   CHANGE_PASSWORD_CANCEL,
@@ -165,6 +165,11 @@ export const types = {
   CHANGE_PROFILE_CANCEL,
   CHANGE_PROFILE_FAILURE,
   CHANGE_PROFILE_SUCCESS,
+  CLEAR_ERROR,
+  CLEAR_ITEM,
+  CREATE_ITEM,
+  CREATE_ITEM_FAILURE,
+  CREATE_ITEM_SUCCESS,
   FETCH_ITEM,
   FETCH_ITEM_CANCEL,
   FETCH_ITEM_FAILURE,
@@ -173,11 +178,6 @@ export const types = {
   FETCH_LIST_CANCEL,
   FETCH_LIST_FAILURE,
   FETCH_LIST_SUCCESS,
-  CLEAR_ITEM,
-  CREATE_ITEM,
-  CREATE_ITEM_FAILURE,
-  CREATE_ITEM_SUCCESS,
-  CLEAR_ERROR,
 };
 
 
@@ -317,6 +317,72 @@ const changeProfileFailure = ({ data, status } = {}) => ({
  */
 const changeProfileSuccess = () => ({
   type: CHANGE_PROFILE_SUCCESS,
+});
+
+/**
+ * Creates action for clear error
+ * @method
+ * @return {{type: string}}
+ */
+const clearError = () => ({ type: CLEAR_ERROR });
+
+/**
+ * Creates action with item creation request details.
+ * @method
+ * @param {Object} params
+ * @param {Object} params.data - request data
+ * @param {Object} [params.options] - request config
+ * @param {failureCallback} [params.onFailure] - failure callback
+ * @param {successCallback} [params.onSuccess] - success callback
+ * @return {{
+ *   type: string,
+ *   payload: {url: string, method: string, data: *, options: *},
+ *   onFailure: failureCallback,
+ *   onSuccess: successCallback
+ * }}
+ */
+const createItem = ({
+  data, options, onFailure, onSuccess,
+} = {}) => ({
+  type: CREATE_ITEM,
+  payload: {
+    url: apiURL,
+    method: 'post',
+    ...options,
+    data,
+  },
+  onFailure,
+  onSuccess,
+});
+
+/**
+ * Creates action for item creation request failing.
+ * @method
+ * @param {Object} params - axios response schema
+ * @param params.data - response body
+ * @param params.status - response status
+ * @return {{
+ *   type: string,
+ *   error: {data, status: number}
+ * }}
+ */
+const createItemFailure = ({ data, status } = {}) => ({
+  type: CREATE_ITEM_FAILURE,
+  error: {
+    data,
+    status,
+  },
+});
+
+/**
+ * Creates action for successful item creation request.
+ * @method
+ * @param {Object} data - response body
+ * @return {{type: string, data: *}}
+ */
+const createItemSuccess = data => ({
+  type: CREATE_ITEM_SUCCESS,
+  data,
 });
 
 /**
@@ -462,72 +528,6 @@ const fetchListSuccess = data => ({
  */
 const clearItem = () => ({ type: CLEAR_ITEM });
 
-/**
- * Creates action with item creation request details.
- * @method
- * @param {Object} params
- * @param {Object} params.data - request data
- * @param {Object} [params.options] - request config
- * @param {failureCallback} [params.onFailure] - failure callback
- * @param {successCallback} [params.onSuccess] - success callback
- * @return {{
- *   type: string,
- *   payload: {url: string, method: string, data: *, options: *},
- *   onFailure: failureCallback,
- *   onSuccess: successCallback
- * }}
- */
-const createItem = ({
-  data, options, onFailure, onSuccess,
-} = {}) => ({
-  type: CREATE_ITEM,
-  payload: {
-    url: apiURL,
-    method: 'post',
-    ...options,
-    data,
-  },
-  onFailure,
-  onSuccess,
-});
-
-/**
- * Creates action for item creation request failing.
- * @method
- * @param {Object} params - axios response schema
- * @param params.data - response body
- * @param params.status - response status
- * @return {{
- *   type: string,
- *   error: {data, status: number}
- * }}
- */
-const createItemFailure = ({ data, status } = {}) => ({
-  type: CREATE_ITEM_FAILURE,
-  error: {
-    data,
-    status,
-  },
-});
-
-/**
- * Creates action for successful item creation request.
- * @method
- * @param {Object} data - response body
- * @return {{type: string, data: *}}
- */
-const createItemSuccess = data => ({
-  type: CREATE_ITEM_SUCCESS,
-  data,
-});
-
-/**
- * Creates action for clear error
- * @method
- * @return {{type: string}}
- */
-const clearError = () => ({ type: CLEAR_ERROR });
-
 export const actions = {
   changePassword,
   changePasswordCancel,
@@ -537,6 +537,11 @@ export const actions = {
   changeProfileCancel,
   changeProfileFailure,
   changeProfileSuccess,
+  clearError,
+  createItem,
+  clearItem,
+  createItemFailure,
+  createItemSuccess,
   fetchItem,
   fetchItemCancel,
   fetchItemFailure,
@@ -545,11 +550,6 @@ export const actions = {
   fetchListCancel,
   fetchListFailure,
   fetchListSuccess,
-  createItem,
-  clearItem,
-  createItemFailure,
-  createItemSuccess,
-  clearError,
 };
 
 

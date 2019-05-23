@@ -126,15 +126,15 @@ UsherForm.propTypes = {
   createItem: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
   onSubmitFailure: PropTypes.func,
-  onSubmitSuccess: PropTypes.func,
   onSubmit: PropTypes.func,
+  onSubmitSuccess: PropTypes.func,
 };
 
 UsherForm.defaultProps = {
   FormikProps: null,
   onSubmitFailure: null,
-  onSubmitSuccess: null,
   onSubmit: null,
+  onSubmitSuccess: null,
 };
 
 const mapStateToProps = () => ({});

@@ -155,16 +155,16 @@ class UsherFormDialog extends Component {
 
 UsherFormDialog.propTypes = {
   clearError: PropTypes.func.isRequired,
-  fetchUshersList: PropTypes.func.isRequired,
-  onClose: PropTypes.func,
-  open: PropTypes.bool,
   error: PropTypes.shape({}),
+  fetchUshersList: PropTypes.func.isRequired,
+  open: PropTypes.bool,
+  onClose: PropTypes.func,
 };
 
 UsherFormDialog.defaultProps = {
+  error: null,
   onClose: null,
   open: false,
-  error: null,
 };
 
 const mapStateToProps = state => ({
