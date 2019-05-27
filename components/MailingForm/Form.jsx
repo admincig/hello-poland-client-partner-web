@@ -20,14 +20,14 @@ class MailingForm extends Component {
     // TODO: nested validation seems not working
     // TODO: see https://github.com/jaredpalmer/formik/issues/986
     this.validationSchema = yupObject().shape({
-        p24Statement: yupString()
-            .min(15)
-            .max(15)
-            .required(),
+      p24Statement: yupString()
+        .min(15)
+        .max(15)
+        .required(),
     });
 
     this.initialValues = {
-        p24Statement: '',
+      p24Statement: '',
     };
   }
 

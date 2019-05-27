@@ -9,15 +9,15 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import MailingForm from './Form';
 import {
   actions as bookingsActions,
   selectors as bookingsSelectors,
 } from '@hello-poland/commons/redux/bookings';
+import MailingForm from './Form';
 
 class MailingFormDialog extends Component {
   constructor(props) {
-     super(props);
+    super(props);
 
     this.intervalRef = null;
 
@@ -88,7 +88,6 @@ class MailingFormDialog extends Component {
   handleSubmitSuccess = (actions) => {
     const { setSubmitting } = actions;
     setSubmitting(false);
-    fetchUshersList();
     this.handleCancel();
   };
 
@@ -131,7 +130,7 @@ class MailingFormDialog extends Component {
           </DialogActions>
         </Dialog>
       </Fragment>
-      
+
     );
   }
 }

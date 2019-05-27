@@ -39,9 +39,9 @@ import serialize from 'utils/form-generator/data/serialize';
 import formatPrice from 'utils/formatPrice';
 import createSlug from 'utils/createSlug';
 import config from 'config';
+import MailingFormDialig from 'components/MailingForm/Dialog';
 import ticketPoolDefinitionSchema from './ticketPoolDefinitionSchema';
 import HomeListItem from './HomeListItem';
-import MailingFormDialig from 'components/MailingForm/Dialog';
 
 const PARENT_TYPES = {
   SIGHT: 'SIGHT',
@@ -454,10 +454,10 @@ class SightsList extends Component {
     const { clearError } = this.props;
     clearError();
 
-    this.setState({mailingForm: true,})
+    this.setState({ mailingForm: true });
   }
 
-  handleMailingFormClose = () => this.setState({mailingForm: false,})
+  handleMailingFormClose = () => this.setState({ mailingForm: false })
 
   render() {
     const { sightEventsList, sightsList } = this.props;
@@ -714,7 +714,7 @@ class SightsList extends Component {
           onClose={this.handleStatsDialogClose}
           {...stats}
         />
-        <MailingFormDialig 
+        <MailingFormDialig
           open={mailingForm}
           onClose={this.handleMailingFormClose}
 
