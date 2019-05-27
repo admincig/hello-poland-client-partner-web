@@ -1,4 +1,5 @@
 import reduxUtils from '@hello-poland/commons/utils/redux';
+import { logic as bookingLogic } from '@hello-poland/commons/redux/bookings';
 import { logic as configLogic } from 'redux/config';
 import { logic as profileLogic } from '@hello-poland/commons/redux/profile';
 import { logic as sightsLogic } from '@hello-poland/commons/redux/sights';
@@ -9,6 +10,7 @@ import { logic as ushersLogic } from 'redux/ushers';
 import { logic as viewLogic } from 'redux/view';
 
 export default reduxUtils.parseReduxLogic({
+  bookingLogic,
   configLogic,
   profileLogic,
   sightEventsLogic,

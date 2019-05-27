@@ -21,6 +21,7 @@ import {
   actions as sightEventActions,
   selectors as sightEventSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
+import { actions as bookingsActions } from '@hello-poland/commons/redux/bookings';
 import { actions as ticketPoolDefinitionActions } from '@hello-poland/commons/redux/ticketPoolDefinitions';
 import AlertDialog from 'components/AlertDialog';
 import FormDialog from 'components/FormDialog';
@@ -449,7 +450,12 @@ class SightsList extends Component {
     this.setState({ formData });
   };
 
-  handleMailingFormOpen = () => this.setState({mailingForm: true,})
+  handleMailingFormOpen = () => {
+    const { clearError } = this.props;
+    clearError();
+
+    this.setState({mailingForm: true,})
+  }
 
   handleMailingFormClose = () => this.setState({mailingForm: false,})
 
@@ -719,6 +725,7 @@ class SightsList extends Component {
 }
 
 SightsList.propTypes = {
+  clearError: PropTypes.func.isRequired,
   createMainSightImageCancel: PropTypes.func.isRequired,
   createMainSightEventImageCancel: PropTypes.func.isRequired,
   createMainSightImage: PropTypes.func.isRequired,
@@ -756,6 +763,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
+  clearError: bookingsActions.clearError,
   createMainSightImageCancel: sightsActions.createMainImageCancel,
   createMainSightEventImageCancel: sightEventActions.createMainImageCancel,
   createMainSightImage: sightsActions.createMainImage,
