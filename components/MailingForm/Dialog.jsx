@@ -8,7 +8,6 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import {
   actions as bookingsActions,
   selectors as bookingsSelectors,
@@ -19,21 +18,12 @@ class MailingFormDialog extends Component {
   constructor(props) {
     super(props);
 
-    this.intervalRef = null;
 
     this.formikRef = React.createRef();
 
     this.state = {
-      isFetching: false,
-      isSubmitting: false,
       submittingError: false,
     };
-  }
-
-  componentWillUnmount() {
-    if (this.intervalRef) {
-      clearInterval(this.intervalRef);
-    }
   }
 
   handleCancelClick = () => {
@@ -44,8 +34,6 @@ class MailingFormDialog extends Component {
     const { onClose, clearError } = this.props;
 
     this.setState({
-      isFetching: false,
-      isSubmitting: false,
       submittingError: false,
     });
 
@@ -55,33 +43,9 @@ class MailingFormDialog extends Component {
     }
   };
 
-  handleSubmit = () => {
-    const { current } = this.formikRef;
-    if (current && current.submitForm) {
-      this.setState({ isSubmitting: true, submittingError: false });
-      current.submitForm();
-      this.intervalRef = setInterval(this.handleSubmitChange, 200);
-    }
-  };
-
-  // hacking missing validation callback in Formik
-  handleSubmitChange = () => {
-    const { current } = this.formikRef;
-
-    if (current && current.getFormikBag) {
-      const { getFormikBag } = current;
-      const { isSubmitting } = getFormikBag();
-
-      if (!isSubmitting) {
-        this.setState({ isSubmitting });
-        clearInterval(this.intervalRef);
-      }
-    }
-  };
-
   handleSubmitFailure = (actions) => {
     const { setSubmitting } = actions;
-    this.setState({ isSubmitting: false, submittingError: true });
+    this.setState({ submittingError: true });
     setSubmitting(false);
   };
 
@@ -94,7 +58,7 @@ class MailingFormDialog extends Component {
   handleDiscardClick = () => this.handleCancel();
 
   render() {
-    const { isFetching, isSubmitting, submittingError } = this.state;
+    const { submittingError } = this.state;
     const {
       clearError, error, ...rest
     } = this.props;
@@ -106,13 +70,9 @@ class MailingFormDialog extends Component {
         <Dialog {...rest}>
           <DialogTitle id="form-dialog-title">
                   Wyślij email z biletami
-            { isFetching || isSubmitting
-              ? <CircularProgress size={18} style={{ marginLeft: 20 }} />
-              : null }
           </DialogTitle>
           <DialogContent>
             <MailingForm
-              FormikProps={{ ref: this.formikRef }}
               onSubmitFailure={this.handleSubmitFailure}
               onSubmitSuccess={this.handleSubmitSuccess}
             />
@@ -125,8 +85,7 @@ class MailingFormDialog extends Component {
                           </Typography>
                         )
                       }
-            <Button disabled={isSubmitting} onClick={this.handleDiscardClick} color="primary">Odrzuć</Button>
-            <Button disabled={isSubmitting} onClick={this.handleSubmit} color="primary">Zapisz</Button>
+            <Button onClick={this.handleDiscardClick} color="primary">Zamknij</Button>
           </DialogActions>
         </Dialog>
       </Fragment>

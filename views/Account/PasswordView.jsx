@@ -61,7 +61,7 @@ class PasswordView extends Component {
         </Link>
         <Typography variant="h6" gutterBottom>Profil</Typography>
         <ProfileComponent activeTab="password" profile={profile} onTabChange={() => {}} disableProfile>
-          <PasswordForm onSubmit={this.handleSubmit} />
+          <PasswordForm type="submit" onSubmit={this.handleSubmit} />
         </ProfileComponent>
       </Layout>
     );

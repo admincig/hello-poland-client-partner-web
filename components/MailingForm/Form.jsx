@@ -6,12 +6,8 @@ import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
-import GridItem from 'components/GridItem';
 import { actions as bookingsActions } from '@hello-poland/commons/redux/bookings';
-
-const commonProps = {
-  fullWidth: true,
-};
+import { Button } from '@material-ui/core';
 
 class MailingForm extends Component {
   constructor(props) {
@@ -39,7 +35,6 @@ class MailingForm extends Component {
 
       return;
     }
-
     const { p24Statement } = values;
     const { sendEmail } = this.props;
     const payload = {
@@ -79,19 +74,20 @@ class MailingForm extends Component {
   };
 
   render() {
-    const { FormikProps } = this.props;
     return (
       <Formik
-        {...FormikProps}
         validationSchema={this.validationSchema}
         initialValues={this.initialValues}
         onSubmit={this.handleSubmit}
       >
         <Form autoComplete="off" noValidate>
-          <Grid container spacing={16}>
-            <GridItem>
-              <Field name="p24Statement" label="Numer przelewu" component={TextField} required helperText="Wpisz numer przelewu od P24 w formacie: p24-xxx-xxx-xxx" {...commonProps} />
-            </GridItem>
+          <Grid container wrap="nowrap" alignItems="center" spacing={16}>
+            <Grid item xs={8}>
+              <Field name="p24Statement" label="Tytuł przelewu" component={TextField} required helperText="Wpisz tytuł przelewu od P24 w formacie: p24-xxx-xxx-xxx" />
+            </Grid>
+            <Grid item xs={2}>
+              <Button type="submit" color="secondary">Wyślij</Button>
+            </Grid>
           </Grid>
         </Form>
       </Formik>
@@ -101,14 +97,12 @@ class MailingForm extends Component {
 
 MailingForm.propTypes = {
   sendEmail: PropTypes.func.isRequired,
-  FormikProps: PropTypes.shape({}),
   onSubmitFailure: PropTypes.func,
   onSubmit: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
 };
 
 MailingForm.defaultProps = {
-  FormikProps: null,
   onSubmitFailure: null,
   onSubmit: null,
   onSubmitSuccess: null,
