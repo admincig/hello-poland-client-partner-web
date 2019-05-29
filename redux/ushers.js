@@ -78,6 +78,37 @@ const CHANGE_PROFILE_FAILURE = `${prefix}CHANGE_PROFILE_FAILURE`;
 const CHANGE_PROFILE_SUCCESS = `${prefix}CHANGE_PROFILE_SUCCESS`;
 
 /**
+ * Type used for clear error.
+ * @type {string}
+ */
+const CLEAR_ERROR = `${prefix}CLEAR_ERROR`;
+
+/**
+ * Type used for clearing currently loaded entity.
+ * @type {string}
+ */
+
+const CLEAR_ITEM = `${prefix}CLEAR_ITEM`;
+
+/**
+ * Type used for handling entity creation.
+ * @type {string}
+ */
+const CREATE_ITEM = `${prefix}CREATE_ITEM`;
+
+/**
+ * Type used for handling entity creation failure.
+ * @type {string}
+ */
+const CREATE_ITEM_FAILURE = `${prefix}CREATE_ITEM_FAILURE`;
+
+/**
+ * Type used for handling entity creation success.
+ * @type {string}
+ */
+const CREATE_ITEM_SUCCESS = `${prefix}CREATE_ITEM_SUCCESS`;
+
+/**
  * Type used for handling entity fetching.
  * @type {string}
  */
@@ -125,7 +156,6 @@ const FETCH_LIST_FAILURE = `${prefix}FETCH_LIST_FAILURE`;
  */
 const FETCH_LIST_SUCCESS = `${prefix}FETCH_LIST_SUCCESS`;
 
-
 export const types = {
   CHANGE_PASSWORD,
   CHANGE_PASSWORD_CANCEL,
@@ -135,6 +165,11 @@ export const types = {
   CHANGE_PROFILE_CANCEL,
   CHANGE_PROFILE_FAILURE,
   CHANGE_PROFILE_SUCCESS,
+  CLEAR_ERROR,
+  CLEAR_ITEM,
+  CREATE_ITEM,
+  CREATE_ITEM_FAILURE,
+  CREATE_ITEM_SUCCESS,
   FETCH_ITEM,
   FETCH_ITEM_CANCEL,
   FETCH_ITEM_FAILURE,
@@ -285,6 +320,72 @@ const changeProfileSuccess = () => ({
 });
 
 /**
+ * Creates action for clear error
+ * @method
+ * @return {{type: string}}
+ */
+const clearError = () => ({ type: CLEAR_ERROR });
+
+/**
+ * Creates action with item creation request details.
+ * @method
+ * @param {Object} params
+ * @param {Object} params.data - request data
+ * @param {Object} [params.options] - request config
+ * @param {failureCallback} [params.onFailure] - failure callback
+ * @param {successCallback} [params.onSuccess] - success callback
+ * @return {{
+ *   type: string,
+ *   payload: {url: string, method: string, data: *, options: *},
+ *   onFailure: failureCallback,
+ *   onSuccess: successCallback
+ * }}
+ */
+const createItem = ({
+  data, options, onFailure, onSuccess,
+} = {}) => ({
+  type: CREATE_ITEM,
+  payload: {
+    url: apiURL,
+    method: 'post',
+    ...options,
+    data,
+  },
+  onFailure,
+  onSuccess,
+});
+
+/**
+ * Creates action for item creation request failing.
+ * @method
+ * @param {Object} params - axios response schema
+ * @param params.data - response body
+ * @param params.status - response status
+ * @return {{
+ *   type: string,
+ *   error: {data, status: number}
+ * }}
+ */
+const createItemFailure = ({ data, status } = {}) => ({
+  type: CREATE_ITEM_FAILURE,
+  error: {
+    data,
+    status,
+  },
+});
+
+/**
+ * Creates action for successful item creation request.
+ * @method
+ * @param {Object} data - response body
+ * @return {{type: string, data: *}}
+ */
+const createItemSuccess = data => ({
+  type: CREATE_ITEM_SUCCESS,
+  data,
+});
+
+/**
  * Creates action with item request details.
  * @method
  * @param {Object} params
@@ -420,6 +521,12 @@ const fetchListSuccess = data => ({
   data,
 });
 
+/**
+ * Creates action for item removal.
+ * @method
+ * @return {{type: string}}
+ */
+const clearItem = () => ({ type: CLEAR_ITEM });
 
 export const actions = {
   changePassword,
@@ -430,6 +537,11 @@ export const actions = {
   changeProfileCancel,
   changeProfileFailure,
   changeProfileSuccess,
+  clearError,
+  createItem,
+  clearItem,
+  createItemFailure,
+  createItemSuccess,
   fetchItem,
   fetchItemCancel,
   fetchItemFailure,
@@ -584,7 +696,7 @@ const fetchItemLogic = createLogic({
     FETCH_ITEM,
   ],
   cancelType: [
-    FETCH_ITEM_CANCEL,
+    FETCH_ITEM_CANCEL, CLEAR_ITEM,
   ],
   latest: true,
   async process(
@@ -668,12 +780,52 @@ const fetchListLogic = createLogic({
   },
 });
 
+const createItemLogic = createLogic({
+  type: [
+    CREATE_ITEM,
+  ],
+  latest: true,
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { data, status } = response;
+
+      if (status === 200 || status === 204) {
+        dispatch(createItemSuccess(data));
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        dispatch(createItemFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch ({ response }) {
+      dispatch(createItemFailure(response));
+
+      if (onFailure) {
+        onFailure();
+      }
+    }
+
+    done();
+  },
+});
+
 
 export const logic = {
   changePasswordLogic,
   changeProfileLogic,
   fetchItemLogic,
   fetchListLogic,
+  createItemLogic,
 };
 
 
@@ -704,6 +856,7 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
   switch (action.type) {
     case FETCH_ITEM_FAILURE:
     case FETCH_LIST_FAILURE:
+    case CREATE_ITEM_FAILURE:
       return {
         ...state,
         error: action.error,
@@ -720,6 +873,19 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
         error: initialState.error,
         list: action.data.items,
       };
+    case CLEAR_ITEM:
+      return {
+        ...state,
+        error: initialState.error,
+        item: initialState.item,
+      };
+    case CREATE_ITEM_SUCCESS:
+    case CLEAR_ERROR:
+      return {
+        ...state,
+        error: initialState.error,
+      };
+
     default:
       return state;
   }

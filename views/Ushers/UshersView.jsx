@@ -5,6 +5,8 @@ import { connect } from 'react-redux';
 import Link from 'next/link';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
+import GridItem from 'components/GridItem';
 import Layout from 'components/Layout';
 import {
   actions as ushersActions,
@@ -12,35 +14,73 @@ import {
 } from 'redux/ushers';
 import withAuth from 'services/auth/withAuth';
 import UshersList from './components/UshersList';
+import UsherFormDialog from './components/UsherFormDialog';
 
 class UshersView extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      usherForm: false,
+    };
+  }
+
   componentDidMount() {
     const { fetchUshers } = this.props;
 
     fetchUshers();
   }
 
+  handleUsherFormOpen = () => {
+    const { clearError } = this.props;
+    clearError();
+    this.setState({ usherForm: true });
+  }
+
+  handleUsherFormClose = () => this.setState({ usherForm: false });
+
   render() {
     const { ushers } = this.props;
+    const { usherForm } = this.state;
 
     return (
       <Layout>
-        <Link href="/" passHref prefetch>
-          <Button component="a">Strona główna</Button>
-        </Link>
-        <Link href="/ushers" passHref prefetch>
-          <Button component="a">
-            Bileterzy
-          </Button>
-        </Link>
-        <Typography variant="h6" gutterBottom>Bileterzy</Typography>
-        <UshersList ushers={ushers} />
+        <Grid container spacing={8}>
+          <GridItem>
+            <Link href="/" passHref prefetch>
+              <Button component="a">Strona główna</Button>
+            </Link>
+            <Link href="/ushers" passHref prefetch>
+              <Button component="a">
+                Bileterzy
+              </Button>
+            </Link>
+          </GridItem>
+          <GridItem>
+            <Typography variant="h6" gutterBottom>Bileterzy</Typography>
+          </GridItem>
+          <GridItem>
+            <Button
+              color="primary"
+              size="small"
+              variant="contained"
+              onClick={this.handleUsherFormOpen}
+            >
+            Dodaj biletera
+            </Button>
+          </GridItem>
+          <GridItem>
+            <UshersList ushers={ushers} />
+          </GridItem>
+        </Grid>
+        <UsherFormDialog open={usherForm} onClose={this.handleUsherFormClose} />
       </Layout>
     );
   }
 }
 
 UshersView.propTypes = {
+  clearError: PropTypes.func.isRequired,
   fetchUshers: PropTypes.func.isRequired,
   ushers: PropTypes.arrayOf(PropTypes.shape({})),
 };
@@ -54,6 +94,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
+  clearError: ushersActions.clearError,
   fetchUshers: ushersActions.fetchList,
 };
 
