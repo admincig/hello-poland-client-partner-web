@@ -7,20 +7,12 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
-import {
-  actions as bookingsActions,
-  selectors as bookingsSelectors,
-} from '@hello-poland/commons/redux/bookings';
+import { actions as bookingsActions } from '@hello-poland/commons/redux/bookings';
 import MailingForm from './Form';
 
 class MailingFormDialog extends Component {
-
   handleCancel = () => {
     const { onClose, clearError } = this.props;
-
-    this.setState({
-      submittingError: false,
-    });
 
     clearError();
     if (onClose) {
@@ -30,7 +22,6 @@ class MailingFormDialog extends Component {
 
   handleSubmitFailure = (actions) => {
     const { setSubmitting } = actions;
-    this.setState({ submittingError: true });
     setSubmitting(false);
   };
 

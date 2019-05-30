@@ -461,7 +461,7 @@ class SightsList extends Component {
     const { clearError } = this.props;
     clearError();
 
-    this.setState({ mailingForm: false })
+    this.setState({ mailingForm: false });
   }
 
   render() {
