@@ -6,15 +6,17 @@ import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
-import { actions as bookingsActions } from '@hello-poland/commons/redux/bookings';
+import {
+  actions as bookingsActions,
+  selectors as bookingsSelectors,
+} from '@hello-poland/commons/redux/bookings';
 import { Button } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography/Typography';
 
 class MailingForm extends Component {
   constructor(props) {
     super(props);
 
-    // TODO: nested validation seems not working
-    // TODO: see https://github.com/jaredpalmer/formik/issues/986
     this.validationSchema = yupObject().shape({
       p24Statement: yupString()
         .min(15)
@@ -36,14 +38,14 @@ class MailingForm extends Component {
       return;
     }
     const { p24Statement } = values;
-    const { sendEmail } = this.props;
+    const { sendTicketEmail } = this.props;
     const payload = {
       p24Statement,
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
     };
 
-    sendEmail(payload);
+    sendTicketEmail(payload);
   };
 
   handleSubmitFailure = actions => () => {
@@ -74,6 +76,9 @@ class MailingForm extends Component {
   };
 
   render() {
+    const { error, showErrors } = this.props;
+    const { data } = error || {};
+    const { message } = data || {};
     return (
       <Formik
         validationSchema={this.validationSchema}
@@ -89,6 +94,13 @@ class MailingForm extends Component {
               <Button type="submit" color="secondary">Wyślij</Button>
             </Grid>
           </Grid>
+          {showErrors
+            && (
+              <Typography style={{ color: 'red' }}>
+                {message}
+              </Typography>
+            )
+          }
         </Form>
       </Formik>
     );
@@ -96,22 +108,27 @@ class MailingForm extends Component {
 }
 
 MailingForm.propTypes = {
-  sendEmail: PropTypes.func.isRequired,
+  error: PropTypes.shape({}),
+  sendTicketEmail: PropTypes.func.isRequired,
+  showErrors: PropTypes.bool,
   onSubmitFailure: PropTypes.func,
   onSubmit: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
 };
 
 MailingForm.defaultProps = {
+  error: null,
   onSubmitFailure: null,
   onSubmit: null,
   onSubmitSuccess: null,
+  showErrors: false,
 };
 
-const mapStateToProps = () => ({});
-
+const mapStateToProps = state => ({
+  error: bookingsSelectors.getError(state),
+});
 const mapDispatchToProps = {
-  sendEmail: bookingsActions.sendTicketsEmail,
+  sendTicketEmail: bookingsActions.sendTicketsEmail,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(MailingForm);

@@ -457,7 +457,12 @@ class SightsList extends Component {
     this.setState({ mailingForm: true });
   }
 
-  handleMailingFormClose = () => this.setState({ mailingForm: false })
+  handleMailingFormClose = () => {
+    const { clearError } = this.props;
+    clearError();
+
+    this.setState({ mailingForm: false })
+  }
 
   render() {
     const { sightEventsList, sightsList } = this.props;

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button/Button';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import Typography from '@material-ui/core/Typography/Typography';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -15,20 +14,6 @@ import {
 import MailingForm from './Form';
 
 class MailingFormDialog extends Component {
-  constructor(props) {
-    super(props);
-
-
-    this.formikRef = React.createRef();
-
-    this.state = {
-      submittingError: false,
-    };
-  }
-
-  handleCancelClick = () => {
-    this.handleFormReload(this.handleCancel);
-  };
 
   handleCancel = () => {
     const { onClose, clearError } = this.props;
@@ -58,12 +43,9 @@ class MailingFormDialog extends Component {
   handleDiscardClick = () => this.handleCancel();
 
   render() {
-    const { submittingError } = this.state;
     const {
       clearError, error, ...rest
     } = this.props;
-    const { data } = error || {};
-    const { message } = data || {};
 
     return (
       <Fragment>
@@ -75,21 +57,14 @@ class MailingFormDialog extends Component {
             <MailingForm
               onSubmitFailure={this.handleSubmitFailure}
               onSubmitSuccess={this.handleSubmitSuccess}
+              showErrors
             />
           </DialogContent>
           <DialogActions>
-            {submittingError
-                        && (
-                          <Typography style={{ color: 'red' }}>
-                            {message}
-                          </Typography>
-                        )
-                      }
             <Button onClick={this.handleDiscardClick} color="primary">Zamknij</Button>
           </DialogActions>
         </Dialog>
       </Fragment>
-
     );
   }
 }
@@ -107,14 +82,10 @@ MailingFormDialog.defaultProps = {
   error: null,
 };
 
-const mapStateToProps = state => ({
-  error: bookingsSelectors.getError(state),
-});
-
 const mapDispatchToProps = {
   clearError: bookingsActions.clearError,
 };
 
 export default compose(
-  connect(mapStateToProps, mapDispatchToProps),
+  connect(null, mapDispatchToProps),
 )(MailingFormDialog);
