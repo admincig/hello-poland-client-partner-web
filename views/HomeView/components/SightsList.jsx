@@ -450,18 +450,15 @@ class SightsList extends Component {
     this.setState({ formData });
   };
 
-  handleMailingFormOpen = () => {
-    const { clearError } = this.props;
-    clearError();
-
-    this.setState({ mailingForm: true });
-  }
+  handleMailingFormOpen = () => this.setState({ mailingForm: true });
 
   handleMailingFormClose = () => {
+    this.setState({ mailingForm: false });
+  }
+
+  handleMailingFormExit = () => {
     const { clearError } = this.props;
     clearError();
-
-    this.setState({ mailingForm: false });
   }
 
   render() {
@@ -722,7 +719,7 @@ class SightsList extends Component {
         <MailingFormDialig
           open={mailingForm}
           onClose={this.handleMailingFormClose}
-
+          onExited={this.handleMailingFormExit}
         />
       </Fragment>
     );

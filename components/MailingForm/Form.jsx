@@ -56,12 +56,13 @@ class MailingForm extends Component {
     }
 
     const { setSubmitting } = actions;
-
     setSubmitting(false);
   };
 
   handleSubmitSuccess = actions => () => {
-    const { onSubmitSuccess } = this.props;
+    const { onSubmitSuccess, clearError } = this.props;
+
+    clearError();
 
     if (onSubmitSuccess) {
       onSubmitSuccess(actions);
@@ -76,7 +77,7 @@ class MailingForm extends Component {
   };
 
   render() {
-    const { error, showErrors } = this.props;
+    const { error, hideErrors } = this.props;
     const { data } = error || {};
     const { message } = data || {};
     return (
@@ -94,9 +95,9 @@ class MailingForm extends Component {
               <Button type="submit" color="secondary">Wyślij</Button>
             </Grid>
           </Grid>
-          {showErrors
+          {!hideErrors
             && (
-              <Typography style={{ color: 'red' }}>
+              <Typography color="secondary">
                 {message}
               </Typography>
             )
@@ -108,26 +109,28 @@ class MailingForm extends Component {
 }
 
 MailingForm.propTypes = {
+  clearError: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
+  hideErrors: PropTypes.bool,
   sendTicketEmail: PropTypes.func.isRequired,
-  showErrors: PropTypes.bool,
-  onSubmitFailure: PropTypes.func,
   onSubmit: PropTypes.func,
+  onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
 };
 
 MailingForm.defaultProps = {
   error: null,
-  onSubmitFailure: null,
   onSubmit: null,
+  onSubmitFailure: null,
   onSubmitSuccess: null,
-  showErrors: false,
+  hideErrors: false,
 };
 
 const mapStateToProps = state => ({
   error: bookingsSelectors.getError(state),
 });
 const mapDispatchToProps = {
+  clearError: bookingsActions.clearError,
   sendTicketEmail: bookingsActions.sendTicketsEmail,
 };
 
