@@ -16,11 +16,6 @@ class MailingFormDialog extends Component {
     }
   };
 
-  handleSubmitFailure = (actions) => {
-    const { setSubmitting } = actions;
-    setSubmitting(false);
-  };
-
   handleSubmitSuccess = (actions) => {
     const { setSubmitting } = actions;
     setSubmitting(false);
@@ -40,7 +35,6 @@ class MailingFormDialog extends Component {
           </DialogTitle>
           <DialogContent>
             <MailingForm
-              onSubmitFailure={this.handleSubmitFailure}
               onSubmitSuccess={this.handleSubmitSuccess}
             />
           </DialogContent>
