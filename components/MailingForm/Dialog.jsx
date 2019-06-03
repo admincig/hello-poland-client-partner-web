@@ -5,7 +5,9 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
+import { actions as bookingsActions } from '@hello-poland/commons/redux/bookings';
 import MailingForm from './Form';
+import { connect } from 'react-redux';
 
 class MailingFormDialog extends Component {
   handleCancel = () => {
@@ -24,12 +26,17 @@ class MailingFormDialog extends Component {
 
   handleDiscardClick = () => this.handleCancel();
 
+  handleMailingFormExit = () => {
+    const { clearError } = this.props;
+    clearError();
+  }
+
   render() {
-    const { ...rest } = this.props;
+    const { clearError, ...rest } = this.props;
 
     return (
       <Fragment>
-        <Dialog {...rest}>
+        <Dialog onExited={this.handleMailingFormExit} {...rest}>
           <DialogTitle id="form-dialog-title">
             Wyślij email z biletami
           </DialogTitle>
@@ -48,15 +55,21 @@ class MailingFormDialog extends Component {
 }
 
 MailingFormDialog.propTypes = {
+  clearError: PropTypes.func.isRequired,
   onClose: PropTypes.func,
   open: PropTypes.bool,
   error: PropTypes.shape({}),
 };
 
 MailingFormDialog.defaultProps = {
+  clearError: bookingsActions.clearError,
   onClose: null,
   open: false,
   error: null,
 };
 
-export default MailingFormDialog;
+const mapDispatchToProps = {
+  clearError: bookingsActions.clearError,
+};
+
+export default connect(undefined, mapDispatchToProps)(MailingFormDialog);
