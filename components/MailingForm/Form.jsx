@@ -63,7 +63,7 @@ class MailingForm extends Component {
 
     if (onSubmitSuccess) {
       onSubmitSuccess(actions);
-      if(onClearError) {
+      if (onClearError) {
         onClearError();
       } else {
         clearError();
@@ -73,7 +73,7 @@ class MailingForm extends Component {
 
     const { resetForm, setSubmitting } = actions;
 
-    if(onClearError) {
+    if (onClearError) {
       onClearError();
     } else {
       clearError();
@@ -119,20 +119,20 @@ MailingForm.propTypes = {
   clearError: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
   hideErrors: PropTypes.bool,
-  sendTicketEmail: PropTypes.func.isRequired,
   onClearError: PropTypes.func,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
+  sendTicketEmail: PropTypes.func.isRequired,
 };
 
 MailingForm.defaultProps = {
   error: null,
+  hideErrors: false,
   onClearError: null,
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,
-  hideErrors: false,
 };
 
 const mapStateToProps = state => ({

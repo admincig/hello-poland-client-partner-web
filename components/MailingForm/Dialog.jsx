@@ -6,8 +6,8 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import { actions as bookingsActions } from '@hello-poland/commons/redux/bookings';
-import MailingForm from './Form';
 import { connect } from 'react-redux';
+import MailingForm from './Form';
 
 class MailingFormDialog extends Component {
   handleCancel = () => {
@@ -62,7 +62,6 @@ MailingFormDialog.propTypes = {
 };
 
 MailingFormDialog.defaultProps = {
-  clearError: bookingsActions.clearError,
   onClose: null,
   open: false,
   error: null,
