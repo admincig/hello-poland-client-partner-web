@@ -476,7 +476,7 @@ class SightsList extends Component {
           Statystyki
         </Button>
         <Button onClick={this.handleMailingFormOpen}>
-          Mailing
+          Wyślij bilet
         </Button>
         {sightsList && sightsList.length
           ? (
