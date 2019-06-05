@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import bookings, { name as bookingsName } from '@hello-poland/commons/redux/bookings';
 import config, { name as configName } from 'redux/config';
 import profile, { name as profileName } from '@hello-poland/commons/redux/profile';
 import sightEvents, { name as sightEventsName } from '@hello-poland/commons/redux/sightEvents';
@@ -9,6 +10,7 @@ import ushers, { name as ushersName } from 'redux/ushers';
 import view, { name as viewName } from 'redux/view';
 
 export default combineReducers({
+  [bookingsName]: bookings(),
   [configName]: config,
   [profileName]: profile(),
   [sightEventsName]: sightEvents(),
