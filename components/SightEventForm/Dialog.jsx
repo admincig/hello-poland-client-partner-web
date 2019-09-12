@@ -13,6 +13,10 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography/Typography';
 import {
+  actions as categoriesActions,
+  selectors as categoriesSelectors,
+} from '@hello-poland/commons/redux/categories';
+import {
   actions as sightEventsActions,
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
@@ -24,6 +28,7 @@ import AlertDialog from 'components/AlertDialog';
 import ContentLanguage from 'components/ContentLanguage';
 import CreateTranslationDialog from 'components/ContentLanguage/CreateTranslationDialog';
 import GridItem from 'components/GridItem';
+import CategoriesForm from './CategoriesForm';
 import SightForm from './Form';
 import MultimediaList from './MultimediaList';
 import i18n from './i18n/pl-PL';
@@ -60,6 +65,11 @@ class SightEventFormDialog extends Component {
       },
       translations: CONTENT_LANGUAGES,
     };
+  }
+
+
+  componentDidMount() {
+    this.handleFetchCategoriesList(DEFAULT_LANGUAGE);
   }
 
   componentDidUpdate() {
@@ -193,6 +203,50 @@ class SightEventFormDialog extends Component {
       language,
     ]),
   }));
+
+  handleItemCategoryDeleteSuccess = () => {
+    const { itemId } = this.props;
+
+    this.handleFetchItem(itemId, DEFAULT_LANGUAGE);
+  };
+
+  handleItemCategoryDelete = (categoryId) => {
+    const { itemId, deleteItemCategory } = this.props;
+
+    deleteItemCategory({
+      id: itemId,
+      categoryId,
+      onSuccess: this.handleItemCategoryDeleteSuccess,
+    });
+  };
+
+  handleItemCategorySubmitSuccess = () => {
+    const { itemId } = this.props;
+
+    this.handleFetchItem(itemId, DEFAULT_LANGUAGE);
+  };
+
+  handleItemCategorySubmit = (categoryId) => {
+    const { itemId, updateItemCategory } = this.props;
+
+    updateItemCategory({
+      id: itemId,
+      categoryId,
+      onSuccess: this.handleItemCategorySubmitSuccess,
+    });
+  };
+
+  handleFetchCategoriesList = (language) => {
+    const { fetchCategoriesList } = this.props;
+
+    fetchCategoriesList({
+      options: {
+        headers: {
+          'Content-Language': language,
+        },
+      },
+    });
+  };
 
   handleDefaultLanguageChange = (language) => {
     const { changeDefaultTranslation, itemId } = this.props;
@@ -410,8 +464,9 @@ class SightEventFormDialog extends Component {
       translationDialog, translations,
     } = this.state;
     const {
-      classes, clearItem, deleteTranslation, fetchItem, fetchList, item, itemId, onClose, parentId,
-      title, deletePDF, changeDefaultTranslation, ...rest
+      categoriesList, classes, clearItem, deleteItemCategory, deleteTranslation,
+      fetchCategoriesList, fetchItem, fetchList, item, itemId,onClose, parentId, title, deletePDF,
+      changeDefaultTranslation, updateItemCategory, ...rest
     } = this.props;
 
     const multimedia = this.getMultimedia();
@@ -487,6 +542,13 @@ class SightEventFormDialog extends Component {
                 && <MultimediaList data={multimedia} onItemDelete={this.handleAlertDialogOpen} />
               }
             </Grid>
+            <CategoriesForm
+              categories={categoriesList}
+              items={item.categories}
+              managePublic
+              onSubmit={this.handleItemCategorySubmit}
+              onDelete={this.handleItemCategoryDelete}
+            />
           </DialogContent>
           <DialogActions>
             {submittingError
@@ -523,11 +585,14 @@ class SightEventFormDialog extends Component {
 }
 
 SightEventFormDialog.propTypes = {
+  categoriesList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   classes: PropTypes.shape({}).isRequired,
   changeDefaultTranslation: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
   deletePDF: PropTypes.func.isRequired,
+  deleteItemCategory: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
+  fetchCategoriesList: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   fetchList: PropTypes.func.isRequired,
   item: PropTypes.shape({}),
@@ -536,6 +601,7 @@ SightEventFormDialog.propTypes = {
   open: PropTypes.bool,
   parentId: PropTypes.number,
   title: PropTypes.string,
+  updateItemCategory: PropTypes.func.isRequired,
 };
 
 SightEventFormDialog.defaultProps = {
@@ -548,16 +614,20 @@ SightEventFormDialog.defaultProps = {
 };
 
 const mapStateToProps = state => ({
+  categoriesList: categoriesSelectors.getList(state),
   item: sightEventsSelectors.getSightEvent(state),
 });
 
 const mapDispatchToProps = {
   clearItem: sightEventsActions.clearItem,
   changeDefaultTranslation: sightEventsActions.changeDefaultTranslation,
+  deleteItemCategory: sightEventsActions.deleteItemCategory,
   deleteTranslation: sightEventsActions.deleteTranslation,
+  fetchCategoriesList: categoriesActions.fetchList,
   fetchItem: sightEventsActions.fetchItem,
   fetchList: sightEventsActions.fetchList,
   deletePDF: sightEventsActions.deletePDF,
+  updateItemCategory: sightEventsActions.updateItemCategory,
 };
 
 export default compose(
