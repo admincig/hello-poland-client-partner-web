@@ -49,8 +49,8 @@ const styles = theme => ({
 });
 
 function CategoriesForm({
-                          categories, classes, items, managePublic, manageRestricted, onSubmit, onDelete,
-                        }) {
+  categories, classes, items, managePublic, manageRestricted, onSubmit, onDelete,
+}) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [dialogType, setDialogType] = React.useState(null);
   const [selectedCategoryId, setSelectedCategoryId] = React.useState('');

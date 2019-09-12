@@ -465,7 +465,7 @@ class SightEventFormDialog extends Component {
     } = this.state;
     const {
       categoriesList, classes, clearItem, deleteItemCategory, deleteTranslation,
-      fetchCategoriesList, fetchItem, fetchList, item, itemId,onClose, parentId, title, deletePDF,
+      fetchCategoriesList, fetchItem, fetchList, item, itemId, onClose, parentId, title, deletePDF,
       changeDefaultTranslation, updateItemCategory, ...rest
     } = this.props;
 
