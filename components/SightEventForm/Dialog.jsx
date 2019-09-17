@@ -542,13 +542,17 @@ class SightEventFormDialog extends Component {
                 && <MultimediaList data={multimedia} onItemDelete={this.handleAlertDialogOpen} />
               }
             </Grid>
-            <CategoriesForm
-              categories={categoriesList}
-              items={item.categories}
-              managePublic
-              onSubmit={this.handleItemCategorySubmit}
-              onDelete={this.handleItemCategoryDelete}
-            />
+            {isDefaultLanguage
+              && (
+                <CategoriesForm
+                  categories={categoriesList}
+                  items={item.categories}
+                  managePublic
+                  onSubmit={this.handleItemCategorySubmit}
+                  onDelete={this.handleItemCategoryDelete}
+                />
+              )
+            }
           </DialogContent>
           <DialogActions>
             {submittingError
