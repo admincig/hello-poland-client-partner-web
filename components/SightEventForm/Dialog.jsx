@@ -17,6 +17,10 @@ import {
   selectors as categoriesSelectors,
 } from '@hello-poland/commons/redux/categories';
 import {
+  actions as tagsActions,
+  selectors as tagsSelectors,
+} from '@hello-poland/commons/redux/tags';
+import {
   actions as sightEventsActions,
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
@@ -28,10 +32,16 @@ import AlertDialog from 'components/AlertDialog';
 import ContentLanguage from 'components/ContentLanguage';
 import CreateTranslationDialog from 'components/ContentLanguage/CreateTranslationDialog';
 import GridItem from 'components/GridItem';
+import TagsForm from 'components/TagsForm';
 import CategoriesForm from './CategoriesForm';
 import SightForm from './Form';
 import MultimediaList from './MultimediaList';
 import i18n from './i18n/pl-PL';
+
+const ITEM_DATA_TYPES = {
+  CATEGORY: 'CATEGORY',
+  TAG: 'TAG',
+};
 
 const styles = () => ({
   section: {
@@ -70,6 +80,7 @@ class SightEventFormDialog extends Component {
 
   componentDidMount() {
     this.handleFetchCategoriesList(DEFAULT_LANGUAGE);
+    this.handleFetchTagsList(DEFAULT_LANGUAGE);
   }
 
   componentDidUpdate() {
@@ -204,36 +215,61 @@ class SightEventFormDialog extends Component {
     ]),
   }));
 
-  handleItemCategoryDeleteSuccess = () => {
+  handleItemDataTypeDeleteSuccess = () => {
     const { itemId } = this.props;
+    const { selectedTranslation } = this.state;
 
-    this.handleFetchItem(itemId, DEFAULT_LANGUAGE);
+    this.handleFetchItem(itemId, selectedTranslation);
   };
 
-  handleItemCategoryDelete = (categoryId) => {
-    const { itemId, deleteItemCategory } = this.props;
+  handleItemDataTypeDelete = dataType => (dataTypeId) => {
+    const { itemId, deleteItemCategory, deleteItemTag } = this.props;
+    let action = () => {};
+    const options = {};
 
-    deleteItemCategory({
+    if (dataType === ITEM_DATA_TYPES.CATEGORY) {
+      action = deleteItemCategory;
+      options.categoryId = dataTypeId;
+    } else if (dataType === ITEM_DATA_TYPES.TAG) {
+      action = deleteItemTag;
+      options.tagId = dataTypeId;
+    }
+
+    action({
       id: itemId,
-      categoryId,
-      onSuccess: this.handleItemCategoryDeleteSuccess,
+      ...options,
+      onSuccess: this.handleItemDataTypeDeleteSuccess,
     });
   };
 
-  handleItemCategorySubmitSuccess = () => {
-    const { itemId } = this.props;
 
-    this.handleFetchItem(itemId, DEFAULT_LANGUAGE);
+  handleItemDataTypeSubmitSuccess = () => {
+    const { itemId } = this.props;
+    const { selectedTranslation } = this.state;
+
+    this.handleFetchItem(itemId, selectedTranslation);
   };
 
-  handleItemCategorySubmit = (categoryId) => {
-    const { itemId, updateItemCategory } = this.props;
+  handleItemDataTypeSubmit = dataType => (dataTypeId) => {
+    const { itemId, updateItemCategory, updateItemTag } = this.props;
+    let action = () => {};
+    const options = {};
 
-    updateItemCategory({
-      id: itemId,
-      categoryId,
-      onSuccess: this.handleItemCategorySubmitSuccess,
-    });
+    if (dataType === ITEM_DATA_TYPES.CATEGORY) {
+      action = updateItemCategory;
+      options.categoryId = dataTypeId;
+    } else if (dataType === ITEM_DATA_TYPES.TAG) {
+      action = updateItemTag;
+      options.tagId = dataTypeId;
+    }
+
+    if (action) {
+      action({
+        id: itemId,
+        ...options,
+        onSuccess: this.handleItemDataTypeSubmitSuccess,
+      });
+    }
   };
 
   handleFetchCategoriesList = (language) => {
@@ -344,6 +380,18 @@ class SightEventFormDialog extends Component {
 
     this.setState({
       fetchingError: false, isFetching: false, language, translations,
+    });
+  };
+
+  handleFetchTagsList = (language) => {
+    const { fetchTagsList } = this.props;
+
+    fetchTagsList({
+      options: {
+        headers: {
+          'Content-Language': language,
+        },
+      },
     });
   };
 
@@ -465,8 +513,8 @@ class SightEventFormDialog extends Component {
     } = this.state;
     const {
       categoriesList, classes, clearItem, deleteItemCategory, deleteTranslation,
-      fetchCategoriesList, fetchItem, fetchList, item, itemId, onClose, parentId, title, deletePDF,
-      changeDefaultTranslation, updateItemCategory, ...rest
+      fetchCategoriesList, fetchItem, fetchList, item, itemId, onClose, parentId, tagsList, title,
+      deletePDF, changeDefaultTranslation, updateItemCategory, ...rest
     } = this.props;
 
     const multimedia = this.getMultimedia();
@@ -548,8 +596,19 @@ class SightEventFormDialog extends Component {
                   categories={categoriesList}
                   items={item.categories}
                   managePublic
-                  onSubmit={this.handleItemCategorySubmit}
-                  onDelete={this.handleItemCategoryDelete}
+                  onSubmit={this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.CATEGORY)}
+                  onDelete={this.handleItemDataTypeDelete(ITEM_DATA_TYPES.CATEGORY)}
+                />
+              )
+            }
+            {isDefaultLanguage
+              && (
+                <TagsForm
+                  tags={tagsList}
+                  items={item.categories}
+                  managePublic
+                  onSubmit={this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.TAG)}
+                  onDelete={this.handleItemDataTypeDelete(ITEM_DATA_TYPES.TAG)}
                 />
               )
             }
@@ -595,17 +654,21 @@ SightEventFormDialog.propTypes = {
   clearItem: PropTypes.func.isRequired,
   deletePDF: PropTypes.func.isRequired,
   deleteItemCategory: PropTypes.func.isRequired,
+  deleteItemTag: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
   fetchCategoriesList: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   fetchList: PropTypes.func.isRequired,
+  fetchTagsList: PropTypes.func.isRequired,
   item: PropTypes.shape({}),
   itemId: PropTypes.number,
   onClose: PropTypes.func,
   open: PropTypes.bool,
   parentId: PropTypes.number,
+  tagsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   title: PropTypes.string,
   updateItemCategory: PropTypes.func.isRequired,
+  updateItemTag: PropTypes.func.isRequired,
 };
 
 SightEventFormDialog.defaultProps = {
@@ -620,18 +683,22 @@ SightEventFormDialog.defaultProps = {
 const mapStateToProps = state => ({
   categoriesList: categoriesSelectors.getList(state),
   item: sightEventsSelectors.getSightEvent(state),
+  tagsList: tagsSelectors.getList(state),
 });
 
 const mapDispatchToProps = {
   clearItem: sightEventsActions.clearItem,
   changeDefaultTranslation: sightEventsActions.changeDefaultTranslation,
   deleteItemCategory: sightEventsActions.deleteItemCategory,
+  deleteItemTag: sightEventsActions.deleteItemTag,
   deleteTranslation: sightEventsActions.deleteTranslation,
   fetchCategoriesList: categoriesActions.fetchList,
   fetchItem: sightEventsActions.fetchItem,
   fetchList: sightEventsActions.fetchList,
+  fetchTagsList: tagsActions.fetchList,
   deletePDF: sightEventsActions.deletePDF,
   updateItemCategory: sightEventsActions.updateItemCategory,
+  updateItemTag: sightEventsActions.updateItemTag,
 };
 
 export default compose(
