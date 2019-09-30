@@ -32,8 +32,8 @@ import AlertDialog from 'components/AlertDialog';
 import ContentLanguage from 'components/ContentLanguage';
 import CreateTranslationDialog from 'components/ContentLanguage/CreateTranslationDialog';
 import GridItem from 'components/GridItem';
+import CategoriesForm from 'components/CategoriesForm';
 import TagsForm from 'components/TagsForm';
-import CategoriesForm from './CategoriesForm';
 import SightForm from './Form';
 import MultimediaList from './MultimediaList';
 import i18n from './i18n/pl-PL';
@@ -606,15 +606,13 @@ class SightEventFormDialog extends Component {
             }
             {isDefaultLanguage
               && (
-                <div className={classes.section}>
-                  <TagsForm
-                    tags={tagsList}
-                    items={item.categories}
-                    managePublic
-                    onSubmit={this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.TAG)}
-                    onDelete={this.handleItemDataTypeDelete(ITEM_DATA_TYPES.TAG)}
-                  />
-                </div>
+                <TagsForm
+                  tags={tagsList}
+                  items={item.categories}
+                  managePublic
+                  onSubmit={this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.TAG)}
+                  onDelete={this.handleItemDataTypeDelete(ITEM_DATA_TYPES.TAG)}
+                />
               )
             }
           </DialogContent>
