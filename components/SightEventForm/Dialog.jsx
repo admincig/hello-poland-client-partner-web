@@ -512,9 +512,10 @@ class SightEventFormDialog extends Component {
       translationDialog, translations,
     } = this.state;
     const {
-      categoriesList, classes, clearItem, deleteItemCategory, deleteTranslation,
-      fetchCategoriesList, fetchItem, fetchList, item, itemId, onClose, parentId, tagsList, title,
-      deletePDF, changeDefaultTranslation, updateItemCategory, ...rest
+      categoriesList, classes, clearItem, deleteItemCategory, deleteItemTag, deleteTranslation,
+      fetchCategoriesList, fetchItem, fetchList, fetchTagsList, item, itemId, onClose, parentId,
+      tagsList, title, deletePDF, changeDefaultTranslation, updateItemCategory, updateItemTag,
+      ...rest
     } = this.props;
 
     const multimedia = this.getMultimedia();
@@ -592,24 +593,28 @@ class SightEventFormDialog extends Component {
             </Grid>
             {isDefaultLanguage
               && (
-                <CategoriesForm
-                  categories={categoriesList}
-                  items={item.categories}
-                  managePublic
-                  onSubmit={this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.CATEGORY)}
-                  onDelete={this.handleItemDataTypeDelete(ITEM_DATA_TYPES.CATEGORY)}
-                />
+                <div className={classes.section}>
+                  <CategoriesForm
+                    categories={categoriesList}
+                    items={item.categories}
+                    managePublic
+                    onSubmit={this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.CATEGORY)}
+                    onDelete={this.handleItemDataTypeDelete(ITEM_DATA_TYPES.CATEGORY)}
+                  />
+                </div>
               )
             }
             {isDefaultLanguage
               && (
-                <TagsForm
-                  tags={tagsList}
-                  items={item.categories}
-                  managePublic
-                  onSubmit={this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.TAG)}
-                  onDelete={this.handleItemDataTypeDelete(ITEM_DATA_TYPES.TAG)}
-                />
+                <div className={classes.section}>
+                  <TagsForm
+                    tags={tagsList}
+                    items={item.categories}
+                    managePublic
+                    onSubmit={this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.TAG)}
+                    onDelete={this.handleItemDataTypeDelete(ITEM_DATA_TYPES.TAG)}
+                  />
+                </div>
               )
             }
           </DialogContent>

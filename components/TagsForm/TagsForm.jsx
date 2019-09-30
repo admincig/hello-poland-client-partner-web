@@ -232,12 +232,12 @@ function TagsForm({
         onClose={handleDialogClose}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle id="form-dialog-title">Dodaj kategorię</DialogTitle>
+        <DialogTitle id="form-dialog-title">Dodaj tag</DialogTitle>
         <DialogContent>
           <FormControl className={classes.formControl}>
-            <InputLabel htmlFor="selected-category">Kategoria</InputLabel>
+            <InputLabel htmlFor="selected-tag">Tag</InputLabel>
             <Select
-              input={<Input id="selected-category" />}
+              input={<Input id="selected-tag" />}
               onChange={handleChangeSelectedTagId}
               value={selectedTagId}
             >
