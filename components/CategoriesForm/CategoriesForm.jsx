@@ -53,9 +53,9 @@ const styles = theme => ({
 });
 
 function CategoriesForm({
-  categories, classes, defaultTranslation, items, managePublic, manageRestricted, onSubmit,
-  onDelete, translation,
-}) {
+                          categories, classes, defaultTranslation, items, managePublic, manageRestricted, onSubmit,
+                          onDelete, translation,
+                        }) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [dialogType, setDialogType] = React.useState(null);
   const [selectedCategoryId, setSelectedCategoryId] = React.useState('');
@@ -110,130 +110,130 @@ function CategoriesForm({
           <Typography variant="h6">Kategorie partnera</Typography>
         </Grid>
         {managePublic
-          && (
-            <Grid item>
-              <IconButton
-                aria-label="Dodaj"
-                disabled={!isDefaultTranslation}
-                onClick={() => handleDialogOpen(DIALOG_TYPE.PUBLIC)}
-                title="Dodaj"
-              >
-                <AddIcon />
-              </IconButton>
-            </Grid>
-          )
+        && (
+          <Grid item>
+            <IconButton
+              aria-label="Dodaj"
+              disabled={!isDefaultTranslation}
+              onClick={() => handleDialogOpen(DIALOG_TYPE.PUBLIC)}
+              title="Dodaj"
+            >
+              <AddIcon />
+            </IconButton>
+          </Grid>
+        )
         }
       </Grid>
       {(publicCategories.length === 0)
-        && (
-          <Grid container item direction="column" alignItems="center" justify="center">
-            <Typography>Brak ketegorii przypisanych przez partnera.</Typography>
-          </Grid>
-        )
+      && (
+        <Grid container item direction="column" alignItems="center" justify="center">
+          <Typography>Brak ketegorii przypisanych przez partnera.</Typography>
+        </Grid>
+      )
       }
       {publicCategories.length > 0
-        && (
-          <Grid container>
-            {publicCategories.length
-              && (
-                <Table>
-                  <TableBody>
-                    {publicCategories.map(({ iconUrl, id: itemId, label }) => (
-                      <TableRow key={`${label}-${itemId}`} hover={managePublic}>
-                        <TableCell className={classes.thumbnail} padding="none">
-                          {iconUrl
-                            ? <img src={iconUrl} height={32} width={32} alt={label} />
-                            : <InsertDriveFileIcon />
-                          }
-                        </TableCell>
-                        <TableCell>{label}</TableCell>
-                        <TableCell align="right" padding="none">
-                          {managePublic
-                            && (
-                              <IconButton
-                                aria-label="Usuń"
-                                disabled={!isDefaultTranslation}
-                                onClick={() => handleCategoryDelete(itemId)}
-                                title="Usuń"
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            )
-                          }
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )
-            }
-          </Grid>
-        )
+      && (
+        <Grid container>
+          {publicCategories.length
+          && (
+            <Table>
+              <TableBody>
+                {publicCategories.map(({ iconUrl, id: itemId, label }) => (
+                  <TableRow key={`${label}-${itemId}`} hover={managePublic}>
+                    <TableCell className={classes.thumbnail} padding="none">
+                      {iconUrl
+                        ? <img src={iconUrl} height={32} width={32} alt={label} />
+                        : <InsertDriveFileIcon />
+                      }
+                    </TableCell>
+                    <TableCell>{label}</TableCell>
+                    <TableCell align="right" padding="none">
+                      {managePublic
+                      && (
+                        <IconButton
+                          aria-label="Usuń"
+                          disabled={!isDefaultTranslation}
+                          onClick={() => handleCategoryDelete(itemId)}
+                          title="Usuń"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      )
+                      }
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )
+          }
+        </Grid>
+      )
       }
       <Grid container alignItems="center" justify="space-between" className={classes.section}>
         <Grid item>
           <Typography variant="h6">Kategorie Hello! Poland</Typography>
         </Grid>
         {manageRestricted
-          && (
-            <Grid item>
-              <IconButton
-                aria-label="Dodaj"
-                disabled={!isDefaultTranslation}
-                onClick={() => handleDialogOpen(DIALOG_TYPE.RESTRICTED)}
-                title="Dodaj"
-              >
-                <AddIcon />
-              </IconButton>
-            </Grid>
-          )
+        && (
+          <Grid item>
+            <IconButton
+              aria-label="Dodaj"
+              disabled={!isDefaultTranslation}
+              onClick={() => handleDialogOpen(DIALOG_TYPE.RESTRICTED)}
+              title="Dodaj"
+            >
+              <AddIcon />
+            </IconButton>
+          </Grid>
+        )
         }
       </Grid>
       {(restrictedCategories.length === 0)
-        && (
-          <Grid container item direction="column" alignItems="center" justify="center">
-            <Typography>Brak ketegorii przypisanych przez Hello! Poland.</Typography>
-          </Grid>
-        )
+      && (
+        <Grid container item direction="column" alignItems="center" justify="center">
+          <Typography>Brak kategorii przypisanych przez Hello! Poland.</Typography>
+        </Grid>
+      )
       }
       {restrictedCategories.length > 0
-        && (
-          <Grid container>
-            {restrictedCategories.length
-              && (
-                <Table>
-                  <TableBody>
-                    {restrictedCategories.map(({ iconUrl, id: itemId, label }) => (
-                      <TableRow key={`${label}-${itemId}`} hover={manageRestricted}>
-                        <TableCell className={classes.thumbnail} padding="none">
-                          {iconUrl
-                            ? <img src={iconUrl} height={32} width={32} alt={label} />
-                            : <InsertDriveFileIcon />
-                          }
-                        </TableCell>
-                        <TableCell>{label}</TableCell>
-                        <TableCell align="right" padding="none">
-                          {manageRestricted
-                            && (
-                              <IconButton
-                                aria-label="Usuń"
-                                disabled={!isDefaultTranslation}
-                                onClick={() => handleCategoryDelete(itemId)}
-                                title="Usuń"
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            )
-                          }
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )
-            }
-          </Grid>
-        )
+      && (
+        <Grid container>
+          {restrictedCategories.length
+          && (
+            <Table>
+              <TableBody>
+                {restrictedCategories.map(({ iconUrl, id: itemId, label }) => (
+                  <TableRow key={`${label}-${itemId}`} hover={manageRestricted}>
+                    <TableCell className={classes.thumbnail} padding="none">
+                      {iconUrl
+                        ? <img src={iconUrl} height={32} width={32} alt={label} />
+                        : <InsertDriveFileIcon />
+                      }
+                    </TableCell>
+                    <TableCell>{label}</TableCell>
+                    <TableCell align="right" padding="none">
+                      {manageRestricted
+                      && (
+                        <IconButton
+                          aria-label="Usuń"
+                          disabled={!isDefaultTranslation}
+                          onClick={() => handleCategoryDelete(itemId)}
+                          title="Usuń"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      )
+                      }
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )
+          }
+        </Grid>
+      )
       }
       <Dialog
         open={dialogOpen}
@@ -286,8 +286,8 @@ CategoriesForm.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape({})),
   managePublic: PropTypes.bool,
   manageRestricted: PropTypes.bool,
-  onSubmit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func,
+  onDelete: PropTypes.func,
   translation: PropTypes.string,
 };
 
@@ -297,6 +297,8 @@ CategoriesForm.defaultProps = {
   items: [],
   managePublic: false,
   manageRestricted: false,
+  onSubmit: null,
+  onDelete: null,
   translation: DEFAULT_LANGUAGE,
 };
 
