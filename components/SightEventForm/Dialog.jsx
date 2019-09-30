@@ -219,6 +219,7 @@ class SightEventFormDialog extends Component {
     const { itemId } = this.props;
     const { selectedTranslation } = this.state;
 
+    debugger;
     this.handleFetchItem(itemId, selectedTranslation);
   };
 
@@ -245,9 +246,9 @@ class SightEventFormDialog extends Component {
 
   handleItemDataTypeSubmitSuccess = () => {
     const { itemId } = this.props;
-    const { selectedTranslation } = this.state;
+    const { language } = this.state;
 
-    this.handleFetchItem(itemId, selectedTranslation);
+    this.handleFetchItem(itemId, language);
   };
 
   handleItemDataTypeSubmit = dataType => (dataTypeId) => {
@@ -608,7 +609,7 @@ class SightEventFormDialog extends Component {
               && (
                 <TagsForm
                   tags={tagsList}
-                  items={item.categories}
+                  items={item.tags}
                   managePublic
                   onSubmit={this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.TAG)}
                   onDelete={this.handleItemDataTypeDelete(ITEM_DATA_TYPES.TAG)}
