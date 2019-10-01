@@ -217,10 +217,9 @@ class SightEventFormDialog extends Component {
 
   handleItemDataTypeDeleteSuccess = () => {
     const { itemId } = this.props;
-    const { selectedTranslation } = this.state;
+    const { language } = this.state;
 
-    debugger;
-    this.handleFetchItem(itemId, selectedTranslation);
+    this.handleFetchItem(itemId, language);
   };
 
   handleItemDataTypeDelete = dataType => (dataTypeId) => {
