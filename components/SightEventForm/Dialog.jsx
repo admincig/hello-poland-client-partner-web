@@ -597,7 +597,7 @@ class SightEventFormDialog extends Component {
                   <CategoriesForm
                     categories={categoriesList}
                     items={item.categories}
-                    managePublic
+                    managePublic={!!item.id}
                     onSubmit={this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.CATEGORY)}
                     onDelete={this.handleItemDataTypeDelete(ITEM_DATA_TYPES.CATEGORY)}
                   />
@@ -609,7 +609,7 @@ class SightEventFormDialog extends Component {
                 <TagsForm
                   tags={tagsList}
                   items={item.tags}
-                  managePublic
+                  managePublic={!!item.id}
                   onSubmit={this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.TAG)}
                   onDelete={this.handleItemDataTypeDelete(ITEM_DATA_TYPES.TAG)}
                 />
