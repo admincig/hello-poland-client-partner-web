@@ -280,7 +280,7 @@ describe('actions', () => {
       const expectedValue = {
         type: CREATE_TRANSLATION,
         payload: {
-          url: apiURL,
+          url: `${apiURL}/card`,
           method: 'post',
           data,
         },
