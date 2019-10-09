@@ -27,7 +27,7 @@ import {
 import {
   CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getLanguageLabel, getTranslatedLanguages,
   getUntranslatedLanguages,
-} from 'utils/content-language';
+} from 'utils/translations';
 import AlertDialog from 'components/AlertDialog';
 import ContentLanguage from 'components/ContentLanguage';
 import CreateTranslationDialog from 'components/ContentLanguage/CreateTranslationDialog';

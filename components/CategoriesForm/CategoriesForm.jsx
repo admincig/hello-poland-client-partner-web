@@ -21,7 +21,7 @@ import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
-import { DEFAULT_LANGUAGE } from 'utils/content-language';
+import { DEFAULT_LANGUAGE } from 'utils/translations';
 
 const DIALOG_TYPE = {
   COMBINED: 'COMBINED',
