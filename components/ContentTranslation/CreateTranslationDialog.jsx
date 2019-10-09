@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -14,19 +14,15 @@ import { getLanguageLabel } from 'utils/translations';
 const CreateTranslationDialog = ({
   onCancel, onCancelText, onClose, onCloseText, onSuccess, onSuccessText, translations, ...props
 }) => {
-  const [state, setState] = useState(null);
-  const { selected } = state || {};
+  const [selected, setSelected] = React.useState(null);
 
   const handleChange = (event) => {
     const { value } = event.target;
 
-    setState({
-      ...state,
-      selected: value,
-    });
+    setSelected(value);
   };
 
-  const resetState = () => setState({ selected: null });
+  const resetState = () => setSelected(null);
 
   const handleCancel = () => {
     onCancel();

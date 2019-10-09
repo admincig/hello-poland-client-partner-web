@@ -59,6 +59,8 @@ class MediaManager extends Component {
   handleDrop = (acceptedFiles) => {
     const { onSubmit } = this.props;
 
+    this.handleDropStart();
+
     acceptedFiles.forEach((acceptedFile) => {
       const { arrayBuffer, metadata } = acceptedFile;
       const data = new Uint8Array(arrayBuffer);
@@ -94,7 +96,6 @@ class MediaManager extends Component {
             disableClick
             multiple={false}
             onDrop={this.handleDrop}
-            onDropStart={this.handleDropStart}
           />
           {processing && <LinearProgress />}
         </DialogContent>

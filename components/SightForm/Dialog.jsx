@@ -20,11 +20,12 @@ import { actions as sightEventsActions } from '@hello-poland/commons/redux/sight
 import {
   CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getLanguageLabel, getTranslatedLanguages,
   getUntranslatedLanguages,
-} from 'utils/content-language';
+} from 'utils/translations';
 import AlertDialog from 'components/AlertDialog';
 import ContentLanguage from 'components/ContentLanguage';
 import CreateTranslationDialog from 'components/ContentLanguage/CreateTranslationDialog';
 import GridItem from 'components/GridItem';
+import CategoriesForm from 'components/CategoriesForm';
 import SightForm from './Form';
 import i18n from './i18n/pl-PL';
 
@@ -380,11 +381,13 @@ class SightFormDialog extends Component {
     } = this.props;
 
     let defaultLanguage;
+    let isDefaultLanguage = true;
 
     if (this.isItemLoaded(itemId, item)) {
       const { defaultLanguage: itemDefaultLanguage } = item;
 
       defaultLanguage = itemDefaultLanguage;
+      isDefaultLanguage = language === defaultLanguage;
     }
 
     const translationActions = [
@@ -416,7 +419,7 @@ class SightFormDialog extends Component {
             }
           </DialogTitle>
           <DialogContent>
-            <Grid container>
+            <Grid container className={classes.section}>
               <GridItem>
                 <Typography variant="h6">Wersja językowa</Typography>
               </GridItem>
@@ -445,6 +448,11 @@ class SightFormDialog extends Component {
                 onSubmitSuccess={this.handleSubmitSuccess}
               />
             </Grid>
+            {isDefaultLanguage
+              && (
+                <CategoriesForm items={item.categories} />
+              )
+            }
           </DialogContent>
           <DialogActions>
             {submittingError

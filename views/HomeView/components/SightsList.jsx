@@ -206,7 +206,7 @@ class SightsList extends Component {
       action = createPDFCancel;
     }
     action();
-  }
+  };
 
   handleMediaManagerOpen = ({ parentId, parentType, fileType }) => this.setState({
     mediaManager: true,
@@ -453,7 +453,7 @@ class SightsList extends Component {
 
   handleMailingFormClose = () => {
     this.setState({ mailingForm: false });
-  }
+  };
 
   render() {
     const { sightEventsList, sightsList } = this.props;
@@ -470,6 +470,11 @@ class SightsList extends Component {
         <Link href="/ushers" passHref prefetch>
           <Button component="a">
             Bileterzy
+          </Button>
+        </Link>
+        <Link href="/card" passHref prefetch>
+          <Button component="a">
+            Dane Partnera
           </Button>
         </Link>
         <Button onClick={this.handleStatsDialogOpen}>
