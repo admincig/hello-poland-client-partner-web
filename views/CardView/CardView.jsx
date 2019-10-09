@@ -192,7 +192,6 @@ class CardView extends React.Component {
     const { selectedTranslation } = this.state;
     const { resetForm, setSubmitting } = actions;
 
-    console.log('handleSubmitSuccess');
     this.handleFetchItem(selectedTranslation);
 
     setSubmitting(false);
