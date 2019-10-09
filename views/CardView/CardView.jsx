@@ -54,21 +54,6 @@ class CardView extends React.Component {
     this.handleFetchItem(selectedTranslation);
   }
 
-  getFormValues = (originalItem) => {
-    const { selectedTranslation } = this.state;
-    const { availableLanguageVersions } = originalItem || {};
-    const hasNewTranslation = availableLanguageVersions
-      && !availableLanguageVersions.some(lng => lng === selectedTranslation);
-
-    if (hasNewTranslation) {
-      const { label, ...originalItemProps } = originalItem;
-
-      return { ...originalItemProps };
-    }
-
-    return { ...originalItem };
-  };
-
   getMultimediaFromItem = (item) => {
     const { mainImage } = item;
     const data = [];
@@ -207,6 +192,7 @@ class CardView extends React.Component {
     const { selectedTranslation } = this.state;
     const { resetForm, setSubmitting } = actions;
 
+    console.log('handleSubmitSuccess');
     this.handleFetchItem(selectedTranslation);
 
     setSubmitting(false);
@@ -260,9 +246,9 @@ class CardView extends React.Component {
           </Tabs>
           {tabs[0].id === selectedTab && (
             <PartnerMarketForm
-              initialValues={this.getFormValues(item)}
+              initialValues={item}
               language={selectedTranslation}
-              // onSubmitSuccess={this.handleSubmitSuccess}
+              onSubmitSuccess={this.handleSubmitSuccess}
             />
           )}
           {tabs[1].id === selectedTab && (

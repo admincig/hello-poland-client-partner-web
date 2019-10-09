@@ -470,7 +470,7 @@ const createTranslation = ({
 } = {}) => ({
   type: CREATE_TRANSLATION,
   payload: {
-    url: apiURL,
+    url: `${apiURL}/card`,
     method: 'post',
     ...options,
     data,
