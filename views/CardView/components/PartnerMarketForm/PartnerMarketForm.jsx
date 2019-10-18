@@ -59,11 +59,11 @@ class PartnerMarketForm extends React.Component {
     });
   }
 
-  componentDidUpdate(prevProps) {
-    const { initialValues: prevInitialValues } = prevProps;
-    const { initialValues } = this.props;
+  componentDidUpdate() {
+    const { initialValues: stateInitialValues } = this.state;
+    const { initialValues, requestError } = this.props;
 
-    if (!_isEqual(prevInitialValues, initialValues)) {
+    if (!_isEqual(this.getInitialValues(initialValues), stateInitialValues) && !requestError) {
       this.setInitialValues(initialValues);
     }
   }
@@ -149,11 +149,10 @@ class PartnerMarketForm extends React.Component {
       return;
     }
 
-    const { resetForm, setSubmitting } = actions;
+    const { setSubmitting } = actions;
 
     clearError();
     setSubmitting(false);
-    resetForm();
   };
 
   render() {
