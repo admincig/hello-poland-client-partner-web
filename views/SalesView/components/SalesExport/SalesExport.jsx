@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect, ReactReduxContext } from 'react-redux';
-import DateFnsUtils from '@date-io/date-fns';
+import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import DatePicker from 'material-ui-pickers/DatePicker';
 import MuiPickersUtilsProvider from 'material-ui-pickers/MuiPickersUtilsProvider';
 import format from 'date-fns/format';
