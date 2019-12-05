@@ -2,10 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import Link from 'next/link';
 import Router from 'next/router';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
 import {
   actions as ushersActions,
   selectors as ushersSelectors,
