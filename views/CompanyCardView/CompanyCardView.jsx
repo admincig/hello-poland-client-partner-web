@@ -35,7 +35,7 @@ const tabs = [
   { id: 'multimedia', label: 'Multimedia' },
 ];
 
-class CompanyView extends React.Component {
+class CompanyCardView extends React.Component {
   constructor(props) {
     super(props);
 
@@ -209,10 +209,6 @@ class CompanyView extends React.Component {
 
     return (
       <Layout>
-        <Link href="/" passHref prefetch>
-          <Button component="a">Strona główna</Button>
-        </Link>
-        <Typography variant="h6" gutterBottom>Dane partnera</Typography>
         <Paper className={classes.wrapper}>
           <Grid container justify="flex-end">
             <Grid item>
@@ -274,7 +270,7 @@ class CompanyView extends React.Component {
   }
 }
 
-CompanyView.propTypes = {
+CompanyCardView.propTypes = {
   changeDefaultTranslation: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
@@ -284,7 +280,7 @@ CompanyView.propTypes = {
   item: PropTypes.shape({}),
 };
 
-CompanyView.defaultProps = {
+CompanyCardView.defaultProps = {
   error: null,
   item: {},
 };
@@ -306,4 +302,4 @@ export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withAuth(),
   withStyles(styles),
-)(CompanyView);
+)(CompanyCardView);

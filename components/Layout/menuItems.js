@@ -8,15 +8,12 @@ export default [
     label: 'Atrakcje i oferty', href: '/', Icon: DashboardIcon,
   },
   {
+    label: 'Wizyówka firmy', href: '/company-card', Icon: DomainIcon,
+  },
+  {
     label: 'Sprzedaż', href: '/sales', Icon: ShoppingCartIcon,
   },
   {
     label: 'Bileterzy', href: '/ushers', Icon: PeopleIcon,
-  },
-  {
-    label: 'Ustawienia',
-  },
-  {
-    label: 'Dane firmy', href: '/settings/company', Icon: DomainIcon,
   },
 ];
