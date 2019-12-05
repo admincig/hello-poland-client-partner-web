@@ -97,25 +97,9 @@ class ProfileView extends Component {
 
     const userProfile = profile.id === usherId ? profile : {};
     const key = userProfile.id;
-    let breadcrumbName = '';
-
-    if (Object.keys(profile).length) {
-      breadcrumbName = profile.name || profile.email;
-    }
 
     return (
       <Layout>
-        <Link href="/" passHref prefetch>
-          <Button component="a">Strona główna</Button>
-        </Link>
-        <Link href="/ushers" passHref prefetch>
-          <Button component="a">
-            Bileterzy
-          </Button>
-        </Link>
-        <Typography variant="h6" gutterBottom>
-          {`Bileterzy / ${breadcrumbName}`}
-        </Typography>
         <ProfileComponent
           activeTab={activeTab}
           profile={profile}

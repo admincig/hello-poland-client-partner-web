@@ -35,7 +35,7 @@ const tabs = [
   { id: 'multimedia', label: 'Multimedia' },
 ];
 
-class CardView extends React.Component {
+class CompanyView extends React.Component {
   constructor(props) {
     super(props);
 
@@ -274,7 +274,7 @@ class CardView extends React.Component {
   }
 }
 
-CardView.propTypes = {
+CompanyView.propTypes = {
   changeDefaultTranslation: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
@@ -284,7 +284,7 @@ CardView.propTypes = {
   item: PropTypes.shape({}),
 };
 
-CardView.defaultProps = {
+CompanyView.defaultProps = {
   error: null,
   item: {},
 };
@@ -306,4 +306,4 @@ export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withAuth(),
   withStyles(styles),
-)(CardView);
+)(CompanyView);

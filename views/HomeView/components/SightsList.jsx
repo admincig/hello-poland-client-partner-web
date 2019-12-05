@@ -467,16 +467,6 @@ class SightsList extends Component {
         <Button onClick={() => this.handleSightFormOpen({ title: 'Dodaj atrakcję' })}>
           Dodaj atrakcję
         </Button>
-        <Link href="/ushers" passHref prefetch>
-          <Button component="a">
-            Bileterzy
-          </Button>
-        </Link>
-        <Link href="/card" passHref prefetch>
-          <Button component="a">
-            Dane Partnera
-          </Button>
-        </Link>
         <Button onClick={this.handleStatsDialogOpen}>
           Statystyki
         </Button>

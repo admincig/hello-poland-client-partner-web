@@ -47,26 +47,8 @@ class UshersView extends Component {
       <Layout>
         <Grid container spacing={8}>
           <GridItem>
-            <Link href="/" passHref prefetch>
-              <Button component="a">Strona główna</Button>
-            </Link>
-            <Link href="/ushers" passHref prefetch>
-              <Button component="a">
-                Bileterzy
-              </Button>
-            </Link>
-          </GridItem>
-          <GridItem>
-            <Typography variant="h6" gutterBottom>Bileterzy</Typography>
-          </GridItem>
-          <GridItem>
-            <Button
-              color="primary"
-              size="small"
-              variant="contained"
-              onClick={this.handleUsherFormOpen}
-            >
-            Dodaj biletera
+            <Button onClick={this.handleUsherFormOpen}>
+              Dodaj biletera
             </Button>
           </GridItem>
           <GridItem>

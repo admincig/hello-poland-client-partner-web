@@ -1,63 +1,60 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
+import { compose } from 'redux';
 import { withRouter } from 'next/router';
+import withAuth from 'services/auth/withAuth';
+import Grid from '@material-ui/core/Grid';
+import NoSsr from '@material-ui/core/NoSsr';
+import config from 'config';
 import Content from './Content';
 import Header from './Header';
 import MenuDrawer from './MenuDrawer';
+import menuItems from './menuItems';
 
-const MENU_ITEMS = [];
+const title = config.public.name;
 
-class Layout extends Component {
-  state = {
-    isMenuOpened: false,
-  };
-
-  openMenu = () => {
-    this.setState({
-      isMenuOpened: true,
-    });
-  };
-
-  closeMenu = () => {
-    this.setState({
-      isMenuOpened: false,
-    });
-  };
-
-  render() {
-    const { HeaderProps, children, router } = this.props;
-    const { isMenuOpened } = this.state;
-
-    return (
-      <React.Fragment>
-        <Header onMenuButtonClick={this.openMenu} {...HeaderProps} />
-        <Content>
-          {MENU_ITEMS.length
-            ? (
-              <MenuDrawer
-                menuItems={MENU_ITEMS}
-                open={isMenuOpened}
-                onClose={this.closeMenu}
-                currentPath={router.asPath}
-              />
-            )
-            : null
+function Layout({
+  children, ContentProps, HeaderProps, isAuthenticated, router,
+}) {
+  return (
+    <React.Fragment>
+      <Header documentTitle={title} {...HeaderProps} />
+      <Grid container>
+        <NoSsr>
+          {isAuthenticated
+          && (
+            <MenuDrawer
+              currentPath={router.pathname}
+              menuItems={menuItems}
+            />
+          )
           }
+        </NoSsr>
+        <Content {...ContentProps}>
           {children}
         </Content>
-      </React.Fragment>
-    );
-  }
+      </Grid>
+    </React.Fragment>
+  );
 }
 
 Layout.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.oneOfType([
+    PropTypes.node,
+    PropTypes.object,
+  ]).isRequired,
+  ContentProps: PropTypes.shape({}),
   HeaderProps: PropTypes.shape({}),
+  isAuthenticated: PropTypes.bool.isRequired,
   router: PropTypes.shape({}).isRequired,
 };
 
 Layout.defaultProps = {
+  ContentProps: {},
   HeaderProps: {},
 };
 
-export default withRouter(Layout);
+export default compose(
+  withAuth(),
+  withRouter,
+)(Layout);

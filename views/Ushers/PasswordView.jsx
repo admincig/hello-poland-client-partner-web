@@ -96,25 +96,8 @@ class PasswordView extends Component {
     const { profile } = this.props;
     const { activeTab } = this.state;
 
-    let breadcrumbName = '';
-
-    if (Object.keys(profile).length) {
-      breadcrumbName = profile.name || profile.email;
-    }
-
     return (
       <Layout>
-        <Link href="/" passHref prefetch>
-          <Button component="a">Strona główna</Button>
-        </Link>
-        <Link href="/ushers" passHref prefetch>
-          <Button component="a">
-            Bileterzy
-          </Button>
-        </Link>
-        <Typography variant="h6" gutterBottom>
-          {`Bileterzy / ${breadcrumbName}`}
-        </Typography>
         <ProfileComponent
           activeTab={activeTab}
           profile={profile}

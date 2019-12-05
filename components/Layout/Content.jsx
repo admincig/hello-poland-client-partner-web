@@ -5,8 +5,12 @@ import classNames from 'classnames';
 
 const styles = {
   root: {
-    width: '100%',
+    margin: '0 auto 0 240px',
+    minHeight: '100vh',
     padding: [[72, 8, 8]],
+    width: '100%',
+  },
+  authenticated: {
     margin: '0 auto',
   },
 };
