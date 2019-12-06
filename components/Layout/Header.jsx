@@ -7,11 +7,9 @@ import withStyles from '@material-ui/core/styles/withStyles';
 import AppBar from '@material-ui/core/AppBar';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import NoSsr from '@material-ui/core/NoSsr';
-import MenuIcon from '@material-ui/icons/Menu';
 import ProfileMenu from './ProfileMenu';
 
 const styles = theme => ({
@@ -34,7 +32,6 @@ const Header = ({
   <AppBar className={classes.root} {...props}>
     <Toolbar>
       <Grid container alignItems="center">
-        <IconButton><MenuIcon /></IconButton>
         <Typography variant="h6" color="inherit">{documentTitle}</Typography>
       </Grid>
       <Grid container alignItems="center" justify="flex-end">

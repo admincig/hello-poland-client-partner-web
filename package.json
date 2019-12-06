@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@fream/axios-commons": "^2.0.0",
-    "@hello-poland/commons": "^1.16.1",
+    "@hello-poland/commons": "^1.17.1",
     "@material-ui/core": "^3.9.2",
     "@material-ui/docs": "^3.0.0-alpha.9",
     "@material-ui/icons": "^3.0.2",
