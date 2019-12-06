@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { actions as profileActions, selectors as profileSelectors } from '@hello-poland/commons/redux/profile';
+import { actions as profileActions, selectors as profileSelectors } from 'redux/profile';
 import withStyles from '@material-ui/core/styles/withStyles';
 import AppBar from '@material-ui/core/AppBar';
 import CircularProgress from '@material-ui/core/CircularProgress';

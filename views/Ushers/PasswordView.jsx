@@ -50,7 +50,7 @@ class PasswordView extends Component {
     changePassword({
       id: usherId,
       data,
-      onFailure: this.handleSubmitFailure({
+      onFailure: () => this.handleSubmitFailure({
         formikActions: actions,
         message: 'Wystąpił błąd podczas zmiany hasła.',
       }),
