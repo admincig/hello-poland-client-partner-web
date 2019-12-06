@@ -226,7 +226,9 @@ class MultimediaForm extends React.Component {
   });
 
   render() {
-    const { alertDialog, mediaManager, uploadError } = this.state;
+    const {
+      alertDialog, mediaManager, mediaManagerData, uploadError,
+    } = this.state;
     const {
       classes, AttachmentProps, ImageGalleryProps, MainImageProps, defaultTranslation, itemId,
       translation,
@@ -315,6 +317,7 @@ class MultimediaForm extends React.Component {
         <MediaManager
           disableBackdropClick
           error={uploadError}
+          imageUpload={mediaManagerData.uploadType !== UPLOAD_TYPE.ATTACHMENT}
           onClose={this.handleMediaManagerClose}
           onSubmit={this.handleMediaManagerSubmit}
           open={mediaManager}
