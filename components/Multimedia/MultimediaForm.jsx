@@ -145,6 +145,7 @@ class MultimediaForm extends React.Component {
     this.setState({
       mediaManager: false,
       mediaManagerData: {},
+      uploadError: false,
     });
 
     if (uploadType === UPLOAD_TYPE.ATTACHMENT) {
@@ -165,8 +166,6 @@ class MultimediaForm extends React.Component {
       });
     }
 
-    this.setState({ uploadError: false });
-
     if (onSuccess) {
       onSuccess();
     }
@@ -177,6 +176,8 @@ class MultimediaForm extends React.Component {
     const { mediaManagerData } = this.state;
     const { uploadType, itemId } = mediaManagerData;
     let action = () => {};
+
+    this.setState({ uploadError: false });
 
     if (uploadType === UPLOAD_TYPE.ATTACHMENT) {
       const { createAttachment } = AttachmentProps;
@@ -201,17 +202,13 @@ class MultimediaForm extends React.Component {
   };
 
   handleMediaManagerSubmitFailure = () => {
-    const { onFailure } = this.props;
-
     this.setState({ uploadError: true });
-
-    if (onFailure) {
-      onFailure();
-    }
   };
 
   handleMediaManagerSubmitSuccess = () => {
     const { onSuccess } = this.props;
+
+    this.setState({ uploadError: false });
 
     if (onSuccess) {
       onSuccess();
