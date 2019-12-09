@@ -11,7 +11,6 @@ import MediaDropzone from './MediaDropzone';
 
 class MediaManager extends Component {
   state = {
-    fileType: null,
     processing: false,
   };
 
@@ -23,23 +22,6 @@ class MediaManager extends Component {
       this.setProcessing(false);
     }
   }
-
-  getErrorByFileType = (fileType) => {
-    if (fileType) {
-      const type = /image/.test(fileType) ? 'image' : fileType.toLowerCase();
-
-      switch (type) {
-        case 'image':
-          return 'Obrazek powinien być w formacie JPEG, a jego szerokość musi wynosić minimum 2000px.';
-        case 'application/pdf':
-          return 'Niepoprawny format dokumentu.';
-        default:
-          return 'Wystąpił błąd podczas zapisywania pliku.';
-      }
-    }
-
-    return '';
-  };
 
   setProcessing = processing => this.setState({ processing });
 
@@ -71,10 +53,6 @@ class MediaManager extends Component {
         timeout: 0,
       };
 
-      this.setState({
-        fileType: metadata.type,
-      });
-
       onSubmit({ data, options });
     });
   };
@@ -83,9 +61,9 @@ class MediaManager extends Component {
 
   render() {
     const {
-      error, onClose, title, ...rest
+      error, imageUpload, onClose, title, ...rest
     } = this.props;
-    const { fileType, processing } = this.state;
+    const { processing } = this.state;
 
     return (
       <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
@@ -103,7 +81,10 @@ class MediaManager extends Component {
           { error
             && (
             <Typography style={{ color: 'red' }}>
-              {this.getErrorByFileType(fileType)}
+              {imageUpload
+                ? 'Obrazek powinien być w formacie JPEG, a jego szerokość musi wynosić minimum 2000px.'
+                : 'Wystąpił błąd podczas zapisywania pliku.'
+              }
             </Typography>
             )
           }
@@ -116,6 +97,7 @@ class MediaManager extends Component {
 
 MediaManager.propTypes = {
   error: PropTypes.bool,
+  imageUpload: PropTypes.bool,
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   open: PropTypes.bool,
@@ -124,6 +106,7 @@ MediaManager.propTypes = {
 
 MediaManager.defaultProps = {
   error: false,
+  imageUpload: false,
   open: false,
   title: null,
 };

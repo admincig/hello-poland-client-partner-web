@@ -26,6 +26,7 @@ import ContentLanguage from 'components/ContentLanguage';
 import CreateTranslationDialog from 'components/ContentLanguage/CreateTranslationDialog';
 import GridItem from 'components/GridItem';
 import CategoriesForm from 'components/CategoriesForm';
+import MultimediaForm from 'components/Multimedia/MultimediaForm';
 import SightForm from './Form';
 import i18n from './i18n/pl-PL';
 
@@ -94,6 +95,62 @@ class SightFormDialog extends Component {
     }
 
     return null;
+  };
+
+  getMultimediaFromItem = (item) => {
+    const { images, mainImage, pdfAttachment } = item;
+    const data = {};
+
+    if (mainImage) {
+      const { id, ...downloadUrl } = mainImage;
+
+      data.mainImage = {
+        createdBy: '',
+        createdDate: '',
+        id,
+        modifiedBy: '',
+        modifiedDate: '',
+        name: 'Zdjęcie promocyjne',
+        path: '/home/hpl/var/DMS/omg/1234.jpg',
+        size: 12345,
+        type: 'image/jpeg',
+        downloadUrl,
+      };
+    }
+
+    if (Array.isArray(images)) {
+      data.images = images.map((image) => {
+        const { id, ...downloadUrl } = image;
+        return {
+          createdBy: '',
+          createdDate: '',
+          id,
+          modifiedBy: '',
+          modifiedDate: '',
+          name: `Zdjęcie galerii (id #${id})`,
+          path: '/home/hpl/var/DMS/omg/1234.jpg',
+          size: 12345,
+          type: 'image/jpeg',
+          downloadUrl,
+        };
+      });
+    }
+
+    if (pdfAttachment) {
+      data.attachments = [
+        {
+          ...pdfAttachment,
+          createdBy: '',
+          createdDate: '',
+          modifiedBy: '',
+          modifiedDate: '',
+          size: 12345,
+          type: 'application/pdf',
+        },
+      ];
+    }
+
+    return data;
   };
 
   handleAlertDialogCancel = () => this.setState(state => ({
@@ -376,18 +433,22 @@ class SightFormDialog extends Component {
       translationDialog, translations,
     } = this.state;
     const {
-      classes, clearItem, deleteTranslation, fetchItem, fetchSightsList, fetchSightEventsList, item,
+      classes, clearItem, createImage, createImageCancel, createMainImage, createMainImageCancel,
+      deleteImage, deleteTranslation, fetchItem, fetchSightsList, fetchSightEventsList, item,
       itemId, onClose, title, changeDefaultTranslation, ...rest
     } = this.props;
 
     let defaultLanguage;
     let isDefaultLanguage = true;
+    let multimedia = {};
 
     if (this.isItemLoaded(itemId, item)) {
       const { defaultLanguage: itemDefaultLanguage } = item;
 
       defaultLanguage = itemDefaultLanguage;
       isDefaultLanguage = language === defaultLanguage;
+
+      multimedia = this.getMultimediaFromItem(item);
     }
 
     const translationActions = [
@@ -448,11 +509,32 @@ class SightFormDialog extends Component {
                 onSubmitSuccess={this.handleSubmitSuccess}
               />
             </Grid>
-            {isDefaultLanguage
-              && (
-                <CategoriesForm items={item.categories} />
-              )
-            }
+            {itemId && isDefaultLanguage && (
+              <Grid container>
+                <GridItem className={classes.section}>
+                  <CategoriesForm items={item.categories} />
+                </GridItem>
+                <GridItem>
+                  <MultimediaForm
+                    defaultTranslation={defaultLanguage}
+                    ImageGalleryProps={{
+                      createImage,
+                      createImageCancel,
+                      deleteImage,
+                      items: multimedia.images,
+                    }}
+                    itemId={itemId}
+                    MainImageProps={{
+                      createMainImage,
+                      createMainImageCancel,
+                      item: multimedia.mainImage,
+                    }}
+                    onSuccess={() => this.handleFetchItem(itemId, language)}
+                    translation={language}
+                  />
+                </GridItem>
+              </Grid>
+            )}
           </DialogContent>
           <DialogActions>
             {submittingError
@@ -493,6 +575,11 @@ SightFormDialog.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   changeDefaultTranslation: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
+  createImage: PropTypes.func.isRequired,
+  createImageCancel: PropTypes.func.isRequired,
+  createMainImage: PropTypes.func.isRequired,
+  createMainImageCancel: PropTypes.func.isRequired,
+  deleteImage: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   fetchSightsList: PropTypes.func.isRequired,
@@ -517,8 +604,13 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  clearItem: sightsActions.clearItem,
   changeDefaultTranslation: sightsActions.changeDefaultTranslation,
+  clearItem: sightsActions.clearItem,
+  createImage: sightsActions.createImage,
+  createImageCancel: sightsActions.createImageCancel,
+  createMainImage: sightsActions.createMainImage,
+  createMainImageCancel: sightsActions.createMainImageCancel,
+  deleteImage: sightsActions.deleteImage,
   deleteTranslation: sightsActions.deleteTranslation,
   fetchItem: sightsActions.fetchItem,
   fetchSightsList: sightsActions.fetchList,
