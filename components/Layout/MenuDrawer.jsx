@@ -1,52 +1,67 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import withStyles from '@material-ui/core/styles/withStyles';
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListSubheader from '@material-ui/core/ListSubheader';
 import Link from 'next/link';
 
-const MenuDrawer = ({
-  menuItems, currentPath, ...props
-}) => {
-  const { onClose } = props;
+const drawerWidth = 240;
 
-  return (
-    <Drawer variant="temporary" {...props}>
-      <nav>
-        <List>
-          {menuItems.map(({
-            label, href, Icon, ...other
-          }) => (
-            <li key={label}>
-              <Link href={href} passHref prefetch={!other.disabled}>
-                <ListItem button component="a" selected={currentPath === href} onClick={onClose} {...other}>
-                  {Icon
-                    && <Icon color="action" />
-                  }
-                  <ListItemText primary={label} />
-                </ListItem>
-              </Link>
-            </li>
-          ))}
-        </List>
-      </nav>
-    </Drawer>
-  );
-};
+const styles = theme => ({
+  root: {
+    minWidth: drawerWidth,
+    flexShrink: 0,
+  },
+  drawerPaper: {
+    minWidth: drawerWidth,
+  },
+  toolbar: theme.mixins.toolbar,
+});
+
+const MenuDrawer = ({
+  classes, currentPath, menuItems,
+}) => (
+  <Drawer variant="permanent" className={classes.root} classes={{ paper: classes.drawerPaper }}>
+    <div className={classes.toolbar} />
+    <nav>
+      <List>
+        {menuItems.map(({
+          disabled, label, href, Icon,
+        }) => {
+          if (!href) {
+            return <ListSubheader key={label}>{label}</ListSubheader>;
+          }
+
+          const isSelected = href.length === 1
+            ? currentPath === href
+            : currentPath.includes(href);
+
+          return (
+            <Link key={`${label}-${href}`} href={href} passHref>
+              <ListItem button disabled={disabled} selected={isSelected}>
+                <ListItemIcon><Icon /></ListItemIcon>
+                <ListItemText primary={label} />
+              </ListItem>
+            </Link>
+          );
+        })}
+      </List>
+    </nav>
+  </Drawer>
+);
 
 MenuDrawer.propTypes = {
+  classes: PropTypes.shape({}).isRequired,
   currentPath: PropTypes.string.isRequired,
   menuItems: PropTypes.arrayOf(PropTypes.shape({
     label: PropTypes.string.isRequired,
-    href: PropTypes.string.isRequired,
-    Icon: PropTypes.func.isRequired,
+    href: PropTypes.string,
+    Icon: PropTypes.func,
   })).isRequired,
-  onClose: PropTypes.func.isRequired,
 };
 
-MenuDrawer.defaultProps = {
-
-};
-
-export default MenuDrawer;
+export default withStyles(styles)(MenuDrawer);

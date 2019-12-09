@@ -2,10 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import Link from 'next/link';
 import Router from 'next/router';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
 import {
   actions as ushersActions,
   selectors as ushersSelectors,
@@ -53,7 +50,7 @@ class PasswordView extends Component {
     changePassword({
       id: usherId,
       data,
-      onFailure: this.handleSubmitFailure({
+      onFailure: () => this.handleSubmitFailure({
         formikActions: actions,
         message: 'Wystąpił błąd podczas zmiany hasła.',
       }),
@@ -96,25 +93,8 @@ class PasswordView extends Component {
     const { profile } = this.props;
     const { activeTab } = this.state;
 
-    let breadcrumbName = '';
-
-    if (Object.keys(profile).length) {
-      breadcrumbName = profile.name || profile.email;
-    }
-
     return (
       <Layout>
-        <Link href="/" passHref prefetch>
-          <Button component="a">Strona główna</Button>
-        </Link>
-        <Link href="/ushers" passHref prefetch>
-          <Button component="a">
-            Bileterzy
-          </Button>
-        </Link>
-        <Typography variant="h6" gutterBottom>
-          {`Bileterzy / ${breadcrumbName}`}
-        </Typography>
         <ProfileComponent
           activeTab={activeTab}
           profile={profile}

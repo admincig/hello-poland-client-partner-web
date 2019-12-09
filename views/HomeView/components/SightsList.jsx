@@ -2,7 +2,6 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import Link from 'next/link';
 import formatDate from 'date-fns/format';
 import List from '@material-ui/core/List';
 import Button from '@material-ui/core/Button';
@@ -26,7 +25,6 @@ import AlertDialog from 'components/AlertDialog';
 import FormDialog from 'components/FormDialog';
 import SightFormDialog from 'components/SightForm/Dialog';
 import SightEventFormDialog from 'components/SightEventForm/Dialog';
-import StatsDialog from 'components/StatsDialog';
 import StopSellDialog from 'components/StopSellForm';
 import TicketPoolDefinitionForm from 'components/TicketPoolDefinitionForm';
 import { EmptyResultsMessage } from 'components/ViewMessage';
@@ -37,7 +35,6 @@ import serialize from 'utils/form-generator/data/serialize';
 import formatPrice from 'utils/formatPrice';
 import createSlug from 'utils/createSlug';
 import config from 'config';
-import MailingFormDialig from 'components/MailingForm/Dialog';
 import ticketPoolDefinitionSchema from './ticketPoolDefinitionSchema';
 import HomeListItem from './HomeListItem';
 
@@ -57,10 +54,6 @@ class SightsList extends Component {
     schema: null,
     sightForm: false,
     sightEventForm: false,
-    stats: {
-      open: false,
-    },
-    mailingForm: false,
     stopSellForm: false,
     submitError: false,
     title: '',
@@ -72,16 +65,6 @@ class SightsList extends Component {
     fetchSightsList();
     fetchSightEventsList();
   }
-
-  getFormattedDate = (date) => {
-    if (date == null) {
-      return null;
-    }
-
-    const d = new Date(date);
-
-    return `${d.toLocaleDateString()} ${d.toLocaleTimeString().substr(0, 5)}`;
-  };
 
   getFormComponent = (props, type) => {
     switch (type) {
@@ -334,60 +317,17 @@ class SightsList extends Component {
     }
   };
 
-  handleStatsDialogClose = () => this.setState(state => ({
-    stats: {
-      ...state.stats,
-      open: false,
-    },
-  }));
-
-  handleStatsDialogOpen = () => this.setState(state => ({
-    stats: {
-      ...state.stats,
-      open: true,
-    },
-  }));
-
-  updateFormData = (schema, data) => {
-    const serializedData = serialize(schema);
-    const formData = populate(serializedData, data);
-
-    this.setState({ formData });
-  };
-
-  handleMailingFormOpen = () => this.setState({ mailingForm: true });
-
-  handleMailingFormClose = () => {
-    this.setState({ mailingForm: false });
-  };
-
   render() {
     const { sightEventsList, sightsList } = this.props;
     const {
-      alertDialog, dialog, formData, formType, schema, sightForm, mailingForm, sightEventForm,
-      stats, stopSellForm, submitError, title, readOnly,
+      alertDialog, dialog, formData, formType, schema,
+      sightForm, sightEventForm, stopSellForm, submitError, title, readOnly,
     } = this.state;
 
     return (
       <Fragment>
         <Button onClick={() => this.handleSightFormOpen({ title: 'Dodaj atrakcję' })}>
           Dodaj atrakcję
-        </Button>
-        <Link href="/ushers" passHref prefetch>
-          <Button component="a">
-            Bileterzy
-          </Button>
-        </Link>
-        <Link href="/card" passHref prefetch>
-          <Button component="a">
-            Dane Partnera
-          </Button>
-        </Link>
-        <Button onClick={this.handleStatsDialogOpen}>
-          Statystyki
-        </Button>
-        <Button onClick={this.handleMailingFormOpen}>
-          Wyślij bilet
         </Button>
         {sightsList && sightsList.length
           ? (
@@ -584,14 +524,6 @@ class SightsList extends Component {
           open={stopSellForm}
           title={title}
           {...formData}
-        />
-        <StatsDialog
-          onClose={this.handleStatsDialogClose}
-          {...stats}
-        />
-        <MailingFormDialig
-          open={mailingForm}
-          onClose={this.handleMailingFormClose}
         />
       </Fragment>
     );

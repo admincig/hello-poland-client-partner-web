@@ -1,171 +1,65 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { selectors as viewSelectors } from 'redux/view';
-import { selectors as profileSelectors, actions as profileActions } from '@hello-poland/commons/redux/profile';
+import { actions as profileActions, selectors as profileSelectors } from 'redux/profile';
 import withStyles from '@material-ui/core/styles/withStyles';
 import AppBar from '@material-ui/core/AppBar';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
-import MenuItem from '@material-ui/core/MenuItem';
-import Menu from '@material-ui/core/Menu';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import HomeIcon from '@material-ui/icons/Home';
 import NoSsr from '@material-ui/core/NoSsr';
-import Avatar from '@material-ui/core/Avatar';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Link from 'next/link';
-import classNames from 'classnames';
-import DefaultAvatar from './DefaultAvatar';
+import MenuIcon from '@material-ui/icons/Menu';
+import ProfileMenu from './ProfileMenu';
 
-const styles = () => ({
+const styles = theme => ({
   root: {
-    '@media print': {
-      position: 'absolute',
-    },
+    zIndex: theme.zIndex.drawer + 1,
   },
-  languageSelect: {
-    flex: '0 0 auto',
-  },
-  loginButton: {
-    marginLeft: 'auto',
-    flex: '0 0 auto',
+  grow: {
+    display: 'flex',
+    flexGrow: 1,
   },
 });
 
-class Header extends Component {
-  state = {
-    menuAnchorEl: null,
-  };
+const menuItems = [
+  { label: 'Profil', url: '/account' },
+];
 
-  handleLanguageChange = ({ target: { value } }) => {
-    document.cookie = `language=${value};path=/`;
-    window.location.reload();
-  };
-
-  handleLogout = () => {
-    const { logout } = this.props;
-    const { menuAnchorEl } = this.state;
-
-    if (menuAnchorEl) {
-      this.handleMenuClose();
-    }
-
-    logout({ onSuccess: () => window.location.reload() });
-  };
-
-  handleMenuOpen = (event) => {
-    this.setState({ menuAnchorEl: event.currentTarget });
-  };
-
-  handleMenuClose = () => {
-    this.setState({ menuAnchorEl: null });
-  };
-
-  render() {
-    const {
-      classes, className, documentTitle, isAuthenticated, logout,
-      loginButtonUrl, onMenuButtonClick, profile, ...props
-    } = this.props;
-    const { menuAnchorEl } = this.state;
-
-    const { email, name, picture } = profile || {};
-    const isMenuOpen = Boolean(menuAnchorEl);
-
-    return (
-      <AppBar className={classNames(classes.root, className)} {...props}>
-        <Toolbar>
-          <Grid container alignItems="center">
-            <Link href="/" passHref prefetch>
-              <IconButton aria-label="Home" component="a" color="inherit">
-                <HomeIcon />
-              </IconButton>
-            </Link>
-            <Typography variant="h6" color="inherit">
-              {documentTitle}
-            </Typography>
-          </Grid>
-          <NoSsr
-            fallback={(
-              <div>
-                <CircularProgress />
-              </div>
-            )}
-          >
-            {isAuthenticated
-              ? (
-                <React.Fragment>
-                  <IconButton
-                    aria-owns={isMenuOpen ? 'menu-appbar' : null}
-                    aria-haspopup="true"
-                    color="inherit"
-                    onClick={this.handleMenuOpen}
-                  >
-                    {picture
-                      ? <Avatar src={picture} />
-                      : <DefaultAvatar style={{ fontSize: 36 }} />
-                    }
-                  </IconButton>
-                  <Menu
-                    id="menu-appbar"
-                    anchorEl={menuAnchorEl}
-                    getContentAnchorEl={null}
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
-                    }}
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
-                    }}
-                    open={isMenuOpen}
-                    onClose={this.handleMenuClose}
-                  >
-                    <MenuItem disabled>{name || email}</MenuItem>
-                    <li>
-                      <Link href="/account" passHref>
-                        <MenuItem component="a">
-                          Profil
-                        </MenuItem>
-                      </Link>
-                    </li>
-                    <MenuItem onClick={this.handleLogout}>Wyloguj</MenuItem>
-                  </Menu>
-                </React.Fragment>
-              )
-              : <div />
-            }
-          </NoSsr>
-        </Toolbar>
-      </AppBar>
-    );
-  }
-}
+const Header = ({
+  classes, documentTitle, isAuthenticated, logout, profile, ...props
+}) => (
+  <AppBar className={classes.root} {...props}>
+    <Toolbar>
+      <Grid container alignItems="center">
+        <IconButton><MenuIcon /></IconButton>
+        <Typography variant="h6" color="inherit">{documentTitle}</Typography>
+      </Grid>
+      <Grid container alignItems="center" justify="flex-end">
+        <NoSsr fallback={<CircularProgress color="secondary" />}>
+          <ProfileMenu
+            isAuthenticated={isAuthenticated}
+            onLogout={args => logout(args)}
+            menuItems={menuItems}
+            profile={profile}
+          />
+        </NoSsr>
+      </Grid>
+    </Toolbar>
+  </AppBar>
+);
 
 Header.propTypes = {
   classes: PropTypes.shape({}).isRequired,
-  className: PropTypes.string,
   documentTitle: PropTypes.string.isRequired,
   isAuthenticated: PropTypes.bool.isRequired,
-  loginButtonUrl: PropTypes.string,
   logout: PropTypes.func.isRequired,
-  onMenuButtonClick: PropTypes.func.isRequired,
-  profile: PropTypes.shape({
-    email: PropTypes.string,
-    name: PropTypes.string,
-  }).isRequired,
+  profile: PropTypes.shape({}).isRequired,
 };
-
-Header.defaultProps = {
-  className: '',
-  loginButtonUrl: '/login',
-};
-
 
 const mapStateToProps = state => ({
-  documentTitle: viewSelectors.getDocumentTitle(state),
   isAuthenticated: profileSelectors.isAuthenticated(state),
   profile: profileSelectors.getProfile(state),
 });

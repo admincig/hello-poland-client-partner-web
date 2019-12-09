@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Router from 'next/router';
-import { selectors as profileSelectors } from '@hello-poland/commons/redux/profile';
+import { selectors as profileSelectors } from 'redux/profile';
 
-export default ({ redirectURL } = { redirectURL: '/login' }) => (View) => {
+export default ({ redirectURL } = { redirectURL: '/sign-in' }) => (View) => {
   class ViewWithAuth extends React.Component {
     componentDidMount() {
       const { isAuthenticated } = this.props;
@@ -16,6 +16,7 @@ export default ({ redirectURL } = { redirectURL: '/login' }) => (View) => {
 
     componentDidUpdate() {
       const { isAuthenticated } = this.props;
+
       if (!isAuthenticated) {
         this.redirect();
       }

@@ -10,12 +10,17 @@ import {
   actions as bookingsActions,
   selectors as bookingsSelectors,
 } from '@hello-poland/commons/redux/bookings';
-import { Button } from '@material-ui/core';
+import Button from '@material-ui/core/Button/Button';
 import Typography from '@material-ui/core/Typography/Typography';
+
+const commonProps = {
+  fullWidth: true,
+};
 
 class MailingForm extends Component {
   constructor(props) {
     super(props);
+
 
     this.validationSchema = yupObject().shape({
       p24Statement: yupString()
@@ -36,6 +41,7 @@ class MailingForm extends Component {
 
       return;
     }
+
     const { p24Statement } = values;
     const { sendTicketEmail } = this.props;
     const payload = {
@@ -84,11 +90,11 @@ class MailingForm extends Component {
         onSubmit={this.handleSubmit}
       >
         <Form autoComplete="off" noValidate>
-          <Grid container wrap="nowrap" alignItems="center" spacing={16}>
-            <Grid item xs={8}>
-              <Field name="p24Statement" label="Tytuł przelewu" component={TextField} required helperText="Wpisz tytuł przelewu od P24 w formacie: p24-xxx-xxx-xxx" />
+          <Grid container spacing={16} wrap="nowrap" alignItems="center">
+            <Grid item>
+              <Field name="p24Statement" label="Numer przelewu" component={TextField} required helperText="Wpisz numer przelewu od P24 w formacie: p24-xxx-xxx-xxx" {...commonProps} />
             </Grid>
-            <Grid item xs={2}>
+            <Grid item>
               <Button type="submit" color="secondary">Wyślij</Button>
             </Grid>
           </Grid>
@@ -126,6 +132,7 @@ MailingForm.defaultProps = {
 const mapStateToProps = state => ({
   error: bookingsSelectors.getError(state),
 });
+
 const mapDispatchToProps = {
   clearError: bookingsActions.clearError,
   sendTicketEmail: bookingsActions.sendTicketsEmail,

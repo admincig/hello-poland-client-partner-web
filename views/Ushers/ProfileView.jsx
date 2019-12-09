@@ -2,10 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import Link from 'next/link';
 import Router from 'next/router';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
 import {
   actions as ushersActions,
   selectors as ushersSelectors,
@@ -97,25 +94,9 @@ class ProfileView extends Component {
 
     const userProfile = profile.id === usherId ? profile : {};
     const key = userProfile.id;
-    let breadcrumbName = '';
-
-    if (Object.keys(profile).length) {
-      breadcrumbName = profile.name || profile.email;
-    }
 
     return (
       <Layout>
-        <Link href="/" passHref prefetch>
-          <Button component="a">Strona główna</Button>
-        </Link>
-        <Link href="/ushers" passHref prefetch>
-          <Button component="a">
-            Bileterzy
-          </Button>
-        </Link>
-        <Typography variant="h6" gutterBottom>
-          {`Bileterzy / ${breadcrumbName}`}
-        </Typography>
         <ProfileComponent
           activeTab={activeTab}
           profile={profile}

@@ -2,9 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import Link from 'next/link';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
 import {
   actions as profileActions,
   selectors as profileSelectors,
@@ -51,15 +48,6 @@ class PasswordView extends Component {
     const { profile } = this.props;
     return (
       <Layout>
-        <Link href="/" passHref prefetch>
-          <Button component="a">Strona główna</Button>
-        </Link>
-        <Link href="/ushers" passHref prefetch>
-          <Button component="a">
-            Bileterzy
-          </Button>
-        </Link>
-        <Typography variant="h6" gutterBottom>Profil</Typography>
         <ProfileComponent activeTab="password" profile={profile} onTabChange={() => {}} disableProfile>
           <PasswordForm type="submit" onSubmit={this.handleSubmit} />
         </ProfileComponent>
