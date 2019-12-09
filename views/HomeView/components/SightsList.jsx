@@ -26,7 +26,6 @@ import FormDialog from 'components/FormDialog';
 import SightFormDialog from 'components/SightForm/Dialog';
 import SightEventFormDialog from 'components/SightEventForm/Dialog';
 import StopSellDialog from 'components/StopSellForm';
-import MediaManager from 'components/MediaManager';
 import TicketPoolDefinitionForm from 'components/TicketPoolDefinitionForm';
 import { EmptyResultsMessage } from 'components/ViewMessage';
 import FormGenerator from 'utils/form-generator';
@@ -38,17 +37,6 @@ import createSlug from 'utils/createSlug';
 import config from 'config';
 import ticketPoolDefinitionSchema from './ticketPoolDefinitionSchema';
 import HomeListItem from './HomeListItem';
-
-const PARENT_TYPES = {
-  SIGHT: 'SIGHT',
-  OFFER: 'OFFER',
-};
-
-const FILE_TYPES = {
-  DOCUMENT: 'DOCUMENT',
-  IMAGE: 'IMAGE',
-  MAIN_IMAGE: 'MAIN_IMAGE',
-};
 
 class SightsList extends Component {
   state = {
@@ -62,9 +50,7 @@ class SightsList extends Component {
     formConfig: null,
     formData: null,
     formType: null,
-    mediaManager: false,
     readOnly: false,
-    mediaManagerData: {},
     schema: null,
     sightForm: false,
     sightEventForm: false,
@@ -158,86 +144,6 @@ class SightsList extends Component {
       title,
     });
   };
-
-  handleMediaManagerClose = () => {
-    const {
-      createMainSightImageCancel,
-      createMainSightEventImageCancel,
-      createPDFCancel,
-    } = this.props;
-    const { mediaManagerData } = this.state;
-    const { fileType, parentType } = mediaManagerData;
-    let action = () => {};
-    this.setState({
-      mediaManager: false,
-      mediaManagerData: {},
-      submitError: false,
-    });
-    if (fileType === FILE_TYPES.MAIN_IMAGE) {
-      if (parentType === PARENT_TYPES.SIGHT) {
-        action = createMainSightImageCancel;
-      } else {
-        action = createMainSightEventImageCancel;
-      }
-    } else if (fileType === FILE_TYPES.IMAGE) {
-      if (parentType === PARENT_TYPES.SIGHT) {
-        action = () => {};
-      } else {
-        action = () => {};
-      }
-    } else if (fileType === FILE_TYPES.DOCUMENT) {
-      action = createPDFCancel;
-    }
-    action();
-  };
-
-  handleMediaManagerOpen = ({ parentId, parentType, fileType }) => this.setState({
-    mediaManager: true,
-    mediaManagerData: {
-      fileType,
-      parentId,
-      parentType,
-    },
-  });
-
-  handleMediaManagerSubmit = ({ data, options }) => {
-    const { createMainSightImage, createMainSightEventImage, createPDF } = this.props;
-    const { mediaManagerData } = this.state;
-    const { fileType, parentId, parentType } = mediaManagerData;
-    let action = () => {};
-
-    if (fileType === FILE_TYPES.MAIN_IMAGE) {
-      if (parentType === PARENT_TYPES.SIGHT) {
-        action = createMainSightImage;
-      } else {
-        action = createMainSightEventImage;
-      }
-    } else if (fileType === FILE_TYPES.IMAGE) {
-      if (parentType === PARENT_TYPES.SIGHT) {
-        action = () => {};
-      } else {
-        action = () => {};
-      }
-    } else if (fileType === FILE_TYPES.DOCUMENT) {
-      action = createPDF;
-    }
-
-    action({
-      id: parentId,
-      data,
-      options,
-      onFailure: this.handleMediaManagerSubmitFailure,
-      onSuccess: this.handleMediaManagerSubmitSuccess,
-    });
-
-    this.setState({ submitError: false });
-  };
-
-  handleMediaManagerSubmitFailure = () => this.setState({
-    submitError: true,
-  });
-
-  handleMediaManagerSubmitSuccess = () => this.handleMediaManagerClose();
 
   handleSightDelete = (sightId) => {
     const { deleteSight } = this.props;
@@ -414,7 +320,7 @@ class SightsList extends Component {
   render() {
     const { sightEventsList, sightsList } = this.props;
     const {
-      alertDialog, dialog, formData, formType, mediaManager, schema,
+      alertDialog, dialog, formData, formType, schema,
       sightForm, sightEventForm, stopSellForm, submitError, title, readOnly,
     } = this.state;
 
@@ -452,14 +358,6 @@ class SightsList extends Component {
                       this.handleSightFormOpen({ sightId: sight.id, title: 'Edytuj atrakcję' });
                     }}
                     onEditLabel="Edytuj atrakcję"
-                    onMainImageClick={() => {
-                      this.handleMediaManagerOpen({
-                        parentId: sight.id,
-                        parentType: PARENT_TYPES.SIGHT,
-                        fileType: FILE_TYPES.MAIN_IMAGE,
-                      });
-                    }}
-                    onMainImageLabel="Dodaj główny obrazek"
                     published={sight.published}
                   />
                   <List style={{ marginLeft: 55 }}>
@@ -492,22 +390,6 @@ class SightsList extends Component {
                               title: 'Edytuj ofertę',
                             })}
                             onEditLabel="Edytuj ofertę"
-                            onMainImageClick={() => {
-                              this.handleMediaManagerOpen({
-                                parentId: sightEvent.id,
-                                parentType: PARENT_TYPES.OFFER,
-                                fileType: FILE_TYPES.MAIN_IMAGE,
-                              });
-                            }}
-                            onMainImageLabel="Dodaj główny obrazek"
-                            onDocumentClick={() => {
-                              this.handleMediaManagerOpen({
-                                parentId: sightEvent.id,
-                                parentType: PARENT_TYPES.OFFER,
-                                fileType: FILE_TYPES.DOCUMENT,
-                              });
-                            }}
-                            onDocumentLabel="Dodaj broszurę PDF"
                             published={sightEvent.published}
                             affiliation={sightEvent.partnerAffiliateCode
                               ? {
@@ -643,26 +525,12 @@ class SightsList extends Component {
           title={title}
           {...formData}
         />
-        <MediaManager
-          disableBackdropClick
-          error={submitError}
-          onClose={this.handleMediaManagerClose}
-          onSubmit={this.handleMediaManagerSubmit}
-          open={mediaManager}
-          title="Dodaj multimedia"
-        />
       </Fragment>
     );
   }
 }
 
 SightsList.propTypes = {
-  createMainSightImageCancel: PropTypes.func.isRequired,
-  createMainSightEventImageCancel: PropTypes.func.isRequired,
-  createMainSightImage: PropTypes.func.isRequired,
-  createMainSightEventImage: PropTypes.func.isRequired,
-  createPDF: PropTypes.func.isRequired,
-  createPDFCancel: PropTypes.func.isRequired,
   createTicketPoolDefinition: PropTypes.func.isRequired,
   deleteSight: PropTypes.func.isRequired,
   deleteSightEvent: PropTypes.func.isRequired,
@@ -694,12 +562,6 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  createMainSightImageCancel: sightsActions.createMainImageCancel,
-  createMainSightEventImageCancel: sightEventActions.createMainImageCancel,
-  createMainSightImage: sightsActions.createMainImage,
-  createMainSightEventImage: sightEventActions.createMainImage,
-  createPDF: sightEventActions.createPDF,
-  createPDFCancel: sightEventActions.createPDFCancel,
   createTicketPoolDefinition: ticketPoolDefinitionActions.createItem,
   deleteSight: sightsActions.deleteItem,
   deleteSightEvent: sightEventActions.deleteItem,
