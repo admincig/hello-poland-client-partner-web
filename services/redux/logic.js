@@ -3,7 +3,7 @@ import { logic as bookingLogic } from '@hello-poland/commons/redux/bookings';
 import { logic as categoriesLogic } from '@hello-poland/commons/redux/categories';
 import { logic as configLogic } from 'redux/config';
 import { logic as partnersLogic } from 'redux/partners';
-import { logic as profileLogic } from '@hello-poland/commons/redux/profile';
+import { logic as profileLogic } from 'redux/profile';
 import { logic as sightsLogic } from '@hello-poland/commons/redux/sights';
 import { logic as sightEventsLogic } from '@hello-poland/commons/redux/sightEvents';
 import { logic as tagsLogic } from '@hello-poland/commons/redux/tags';
