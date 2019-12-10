@@ -23,13 +23,11 @@ class MailingForm extends Component {
 
 
     this.validationSchema = yupObject().shape({
-      p24Statement: yupString()
-        .length(15)
-        .required(),
+      orderId: yupString().required(),
     });
 
     this.initialValues = {
-      p24Statement: '',
+      orderId: '',
     };
   }
 
@@ -42,10 +40,10 @@ class MailingForm extends Component {
       return;
     }
 
-    const { p24Statement } = values;
+    const { orderId } = values;
     const { sendTicketEmail } = this.props;
     const payload = {
-      p24Statement,
+      orderId,
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
     };
@@ -92,18 +90,18 @@ class MailingForm extends Component {
         <Form autoComplete="off" noValidate>
           <Grid container spacing={16} wrap="nowrap" alignItems="center">
             <Grid item>
-              <Field name="p24Statement" label="Numer przelewu" component={TextField} required helperText="Wpisz numer przelewu od P24 w formacie: p24-xxx-xxx-xxx" {...commonProps} />
+              <Field name="orderId" label="Numer zamówienia" component={TextField} required helperText="Wpisz pierwsze 8 znaków nr transakcji HP" {...commonProps} />
             </Grid>
             <Grid item>
               <Button type="submit" color="secondary">Wyślij</Button>
             </Grid>
           </Grid>
           {!hideErrors
-            && (
-              <Typography color="error">
-                {message}
-              </Typography>
-            )
+          && (
+            <Typography color="error">
+              {message}
+            </Typography>
+          )
           }
         </Form>
       </Formik>
