@@ -43,7 +43,7 @@ class MailingForm extends Component {
     const { orderId } = values;
     const { sendTicketEmail } = this.props;
     const payload = {
-      p24Statement: orderId,
+      orderId,
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
     };
@@ -97,11 +97,11 @@ class MailingForm extends Component {
             </Grid>
           </Grid>
           {!hideErrors
-            && (
-              <Typography color="error">
-                {message}
-              </Typography>
-            )
+          && (
+            <Typography color="error">
+              {message}
+            </Typography>
+          )
           }
         </Form>
       </Formik>
