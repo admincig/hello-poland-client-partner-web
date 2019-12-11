@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import Link from 'next/link';
 import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import GridItem from 'components/GridItem';
 import Layout from 'components/Layout';
@@ -47,26 +45,8 @@ class UshersView extends Component {
       <Layout>
         <Grid container spacing={8}>
           <GridItem>
-            <Link href="/" passHref prefetch>
-              <Button component="a">Strona główna</Button>
-            </Link>
-            <Link href="/ushers" passHref prefetch>
-              <Button component="a">
-                Bileterzy
-              </Button>
-            </Link>
-          </GridItem>
-          <GridItem>
-            <Typography variant="h6" gutterBottom>Bileterzy</Typography>
-          </GridItem>
-          <GridItem>
-            <Button
-              color="primary"
-              size="small"
-              variant="contained"
-              onClick={this.handleUsherFormOpen}
-            >
-            Dodaj biletera
+            <Button onClick={this.handleUsherFormOpen}>
+              Dodaj biletera
             </Button>
           </GridItem>
           <GridItem>

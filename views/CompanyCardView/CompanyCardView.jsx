@@ -3,15 +3,12 @@ import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Snackbar from '@material-ui/core/Snackbar';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
-import Typography from '@material-ui/core/Typography';
 import _sortedUniq from 'lodash/sortedUniq';
-import Link from 'next/link';
 
 import Layout from 'components/Layout';
 import ContentTranslation from 'components/ContentTranslation';
@@ -35,7 +32,7 @@ const tabs = [
   { id: 'multimedia', label: 'Multimedia' },
 ];
 
-class CardView extends React.Component {
+class CompanyCardView extends React.Component {
   constructor(props) {
     super(props);
 
@@ -209,10 +206,6 @@ class CardView extends React.Component {
 
     return (
       <Layout>
-        <Link href="/" passHref prefetch>
-          <Button component="a">Strona główna</Button>
-        </Link>
-        <Typography variant="h6" gutterBottom>Dane partnera</Typography>
         <Paper className={classes.wrapper}>
           <Grid container justify="flex-end">
             <Grid item>
@@ -274,7 +267,7 @@ class CardView extends React.Component {
   }
 }
 
-CardView.propTypes = {
+CompanyCardView.propTypes = {
   changeDefaultTranslation: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
@@ -284,7 +277,7 @@ CardView.propTypes = {
   item: PropTypes.shape({}),
 };
 
-CardView.defaultProps = {
+CompanyCardView.defaultProps = {
   error: null,
   item: {},
 };
@@ -306,4 +299,4 @@ export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withAuth(),
   withStyles(styles),
-)(CardView);
+)(CompanyCardView);

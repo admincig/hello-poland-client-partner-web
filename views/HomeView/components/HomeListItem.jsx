@@ -17,13 +17,11 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import DesktopWindows from '@material-ui/icons/DesktopWindows';
 import AddIcon from '@material-ui/icons/Add';
-import AddAPhoto from '@material-ui/icons/AddAPhoto';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import CreateIcon from '@material-ui/icons/Create';
 import InfoIcon from '@material-ui/icons/Info';
 import DeleteIcon from '@material-ui/icons/Delete';
 import LinkIcon from '@material-ui/icons/Link';
-import NoteAdd from '@material-ui/icons/NoteAdd';
 import NotificationImportantIcon from '@material-ui/icons/NotificationImportant';
 import RemoveShoppingCart from '@material-ui/icons/RemoveShoppingCart';
 import VisibilityIcon from '@material-ui/icons/Visibility';
@@ -81,9 +79,8 @@ class HomeListItem extends Component {
     const { affiliationAnchorEl, affiliationOpen } = this.state;
     const {
       affiliation, blocked, classes, icon: Icon, primary, secondary, onAddClick, onAddLabel,
-      onDeleteClick, onDeleteLabel, onDocumentClick, onDocumentLabel, onEditClick, onPreviewClick,
-      onPreviewLabel, onEditLabel, onMainImageClick, onMainImageLabel, onStatsClick,
-      onStopSellClick, onStopSellLabel, onViewClick, onViewLabel, published,
+      onDeleteClick, onDeleteLabel, onEditClick, onPreviewClick, onPreviewLabel, onEditLabel,
+      onStatsClick, onStopSellClick, onStopSellLabel, onViewClick, onViewLabel, published,
     } = this.props;
 
     const id = affiliationOpen ? 'simple-popper' : null;
@@ -185,28 +182,6 @@ class HomeListItem extends Component {
               </IconButton>
             )
           }
-          {onMainImageClick
-          && (
-          <IconButton
-            aria-label={onMainImageLabel}
-            onClick={onMainImageClick}
-            title={onMainImageLabel}
-          >
-            <AddAPhoto />
-          </IconButton>
-          )
-          }
-          {onDocumentClick
-          && (
-          <IconButton
-            aria-label={onDocumentLabel}
-            onClick={onDocumentClick}
-            title={onDocumentLabel}
-          >
-            <NoteAdd />
-          </IconButton>
-          )
-          }
           {onAddClick
           && (
           <IconButton
@@ -282,14 +257,10 @@ HomeListItem.propTypes = {
   onAffiliationClick: PropTypes.func,
   onDeleteClick: PropTypes.func,
   onDeleteLabel: PropTypes.string,
-  onDocumentClick: PropTypes.func,
-  onDocumentLabel: PropTypes.string,
   onEditClick: PropTypes.func,
   onEditLabel: PropTypes.string,
   onPreviewClick: PropTypes.func,
   onPreviewLabel: PropTypes.string,
-  onMainImageClick: PropTypes.func,
-  onMainImageLabel: PropTypes.string,
   onStatsClick: PropTypes.func,
   onStopSellClick: PropTypes.func,
   onStopSellLabel: PropTypes.string,
@@ -308,14 +279,10 @@ HomeListItem.defaultProps = {
   onAffiliationClick: null,
   onDeleteClick: null,
   onDeleteLabel: null,
-  onDocumentClick: null,
-  onDocumentLabel: null,
   onEditClick: null,
   onEditLabel: null,
   onPreviewClick: null,
   onPreviewLabel: null,
-  onMainImageClick: null,
-  onMainImageLabel: null,
   onStatsClick: null,
   onStopSellClick: null,
   onStopSellLabel: null,

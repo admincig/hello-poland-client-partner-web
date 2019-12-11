@@ -3,7 +3,7 @@ import bookings, { name as bookingsName } from '@hello-poland/commons/redux/book
 import categories, { name as categoriesName } from '@hello-poland/commons/redux/categories';
 import config, { name as configName } from 'redux/config';
 import partners, { name as partnersName } from 'redux/partners';
-import profile, { name as profileName } from '@hello-poland/commons/redux/profile';
+import profile, { name as profileName } from 'redux/profile';
 import sightEvents, { name as sightEventsName } from '@hello-poland/commons/redux/sightEvents';
 import sights, { name as sightsName } from '@hello-poland/commons/redux/sights';
 import tags, { name as tagsName } from '@hello-poland/commons/redux/tags';

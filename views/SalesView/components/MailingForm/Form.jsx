@@ -10,21 +10,24 @@ import {
   actions as bookingsActions,
   selectors as bookingsSelectors,
 } from '@hello-poland/commons/redux/bookings';
-import { Button } from '@material-ui/core';
+import Button from '@material-ui/core/Button/Button';
 import Typography from '@material-ui/core/Typography/Typography';
+
+const commonProps = {
+  fullWidth: true,
+};
 
 class MailingForm extends Component {
   constructor(props) {
     super(props);
 
+
     this.validationSchema = yupObject().shape({
-      p24Statement: yupString()
-        .length(15)
-        .required(),
+      orderId: yupString().required(),
     });
 
     this.initialValues = {
-      p24Statement: '',
+      orderId: '',
     };
   }
 
@@ -36,10 +39,11 @@ class MailingForm extends Component {
 
       return;
     }
-    const { p24Statement } = values;
+
+    const { orderId } = values;
     const { sendTicketEmail } = this.props;
     const payload = {
-      p24Statement,
+      orderId,
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
     };
@@ -84,20 +88,20 @@ class MailingForm extends Component {
         onSubmit={this.handleSubmit}
       >
         <Form autoComplete="off" noValidate>
-          <Grid container wrap="nowrap" alignItems="center" spacing={16}>
-            <Grid item xs={8}>
-              <Field name="p24Statement" label="Tytuł przelewu" component={TextField} required helperText="Wpisz tytuł przelewu od P24 w formacie: p24-xxx-xxx-xxx" />
+          <Grid container spacing={16} wrap="nowrap" alignItems="center">
+            <Grid item>
+              <Field name="orderId" label="Numer zamówienia" component={TextField} required helperText="Wpisz numer transakcji HP" {...commonProps} />
             </Grid>
-            <Grid item xs={2}>
+            <Grid item>
               <Button type="submit" color="secondary">Wyślij</Button>
             </Grid>
           </Grid>
           {!hideErrors
-            && (
-              <Typography color="error">
-                {message}
-              </Typography>
-            )
+          && (
+            <Typography color="error">
+              {message}
+            </Typography>
+          )
           }
         </Form>
       </Formik>
@@ -126,6 +130,7 @@ MailingForm.defaultProps = {
 const mapStateToProps = state => ({
   error: bookingsSelectors.getError(state),
 });
+
 const mapDispatchToProps = {
   clearError: bookingsActions.clearError,
   sendTicketEmail: bookingsActions.sendTicketsEmail,
