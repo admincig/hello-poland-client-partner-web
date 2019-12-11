@@ -90,7 +90,7 @@ class MailingForm extends Component {
         <Form autoComplete="off" noValidate>
           <Grid container spacing={16} wrap="nowrap" alignItems="center">
             <Grid item>
-              <Field name="orderId" label="Numer zamówienia" component={TextField} required helperText="Wpisz numerr transakcji HP" {...commonProps} />
+              <Field name="orderId" label="Numer zamówienia" component={TextField} required helperText="Wpisz numer transakcji HP" {...commonProps} />
             </Grid>
             <Grid item>
               <Button type="submit" color="secondary">Wyślij</Button>
