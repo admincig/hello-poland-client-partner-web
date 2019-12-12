@@ -482,16 +482,31 @@ const loginLogic = createLogic({
           onSuccess();
         }
       } else {
-        dispatch(loginFailure(data));
+        const errors = [];
+
+        if (status === 401) {
+          errors.push({ status, detail: 'Zły login lub hasło' });
+        } else {
+          errors.push({ status, detail: 'Wystąpił błąd podczas logowania' });
+        }
+
+        dispatch(loginFailure({ errors }));
 
         if (onFailure) {
           onFailure();
         }
       }
     } catch ({ response }) {
-      const { data } = response;
+      const { status } = response;
+      const errors = [];
 
-      dispatch(loginFailure(data));
+      if (status === 401) {
+        errors.push({ status, detail: 'Zły login lub hasło' });
+      } else {
+        errors.push({ status, detail: 'Wystąpił błąd podczas logowania' });
+      }
+
+      dispatch(loginFailure({ errors }));
 
       if (onFailure) {
         onFailure();
