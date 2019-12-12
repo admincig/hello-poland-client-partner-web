@@ -19,7 +19,6 @@ class PasswordView extends Component {
 
     setStatus(null);
 
-    debugger;
     changePassword({
       data: {
         oldPassword,
