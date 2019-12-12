@@ -106,7 +106,7 @@ class SignIn extends Component {
   };
 
   handleSnackbarOpen = (errors = []) => {
-    const credentialError = errors.filter(error => error.status === '401')[0];
+    const credentialError = errors.filter(error => error.status === 401)[0];
 
     if (credentialError) {
       this.setState({ snackbar: { open: true, message: credentialError.detail } });
@@ -215,8 +215,8 @@ class SignIn extends Component {
 SignIn.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   errors: PropTypes.arrayOf(PropTypes.shape({
-    status: PropTypes.string.isRequired,
-    detail: PropTypes.string.isRequired,
+    status: PropTypes.number,
+    detail: PropTypes.string,
   })),
   isAuthenticated: PropTypes.bool.isRequired,
   login: PropTypes.func.isRequired,

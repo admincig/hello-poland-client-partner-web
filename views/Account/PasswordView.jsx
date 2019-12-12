@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import {
   actions as profileActions,
   selectors as profileSelectors,
-} from '@hello-poland/commons/redux/profile';
+} from 'redux/profile';
 import Layout from 'components/Layout';
 import ProfileComponent from 'components/ProfileComponent/ProfileComponent';
 import PasswordForm from 'components/ProfileComponent/PasswordForm';
