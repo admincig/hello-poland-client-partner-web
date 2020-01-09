@@ -50,7 +50,7 @@ class TicketDefinitionForm extends Component {
   getInitialValues = initialValues => ({
     id: initialValues.id || undefined,
     name: initialValues.name || '',
-    price: initialValues.price || '',
+    price: initialValues.price ? parseFloat(initialValues.price / 100).toFixed(2) : '',
   });
 
   setInitialValues = initialValues => this.setState({
@@ -143,33 +143,35 @@ class TicketDefinitionForm extends Component {
         {({ isSubmitting }) => (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
-              <Hidden xlDown implementation="css">
-                <Field component={TextField} name="id" type="hidden" {...commonProps} />
+              <Hidden xsUp>
+                <Field name="id" hidden component={TextField} {...commonProps} />
               </Hidden>
               <GridItem md={12} sm={12}>
                 <Field component={TextField} label="Nazwa (np. Normalny)" name="name" required {...commonProps} />
-                <Field component={TextField} label="Cena (PLN)" name="price" type="number" helperText={initialValues.itemId ? priceWarningMessage : ''} required {...commonProps} />
+              </GridItem>
+              <GridItem md={12} sm={12}>
+                <Field component={TextField} label="Cena (PLN)" name="price" type="number" helperText={initialValues.id ? priceWarningMessage : ''} required {...commonProps} />
               </GridItem>
             </Grid>
             {(!hideButtons || (!hideErrors && requestError)) && (
               <Grid container spacing={16} justify="flex-end">
                 {!hideErrors && requestError
-                && (
-                  <GridItem container md={9} sm={9}>
-                    <Typography color="error">
-                      {errorMessage || 'Wystąpił błąd podczas zapisywania'}
-                    </Typography>
-                  </GridItem>
-                )
+                  && (
+                    <GridItem container md={9} sm={9}>
+                      <Typography color="error">
+                        {errorMessage || 'Wystąpił błąd podczas zapisywania'}
+                      </Typography>
+                    </GridItem>
+                  )
                 }
                 {!hideButtons
-                && (
-                  <GridItem container md={3} sm={3} justify="flex-end">
-                    <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
-                      Zapisz
-                    </Button>
-                  </GridItem>
-                )
+                  && (
+                    <GridItem container md={3} sm={3} justify="flex-end">
+                      <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
+                        Zapisz
+                      </Button>
+                    </GridItem>
+                  )
                 }
               </Grid>
             )}
