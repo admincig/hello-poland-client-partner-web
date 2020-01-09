@@ -5,12 +5,14 @@ import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import ClearIcon from '@material-ui/icons/Clear';
 import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import MuiPickersUtilsProvider from 'material-ui-pickers/MuiPickersUtilsProvider';
 import SwitchLabel from 'components/SwitchLabel';
@@ -550,11 +552,19 @@ class CalendarEventForm extends React.Component {
                     {isDefinitionFormVisible && !readOnly
                       && (
                       <div className={classNames(classes.section, classes.fullWidth)}>
-                        <Typography variant="h6">
-                          Nowy rodzaj biletu
-                        </Typography>
+                        <Grid container direction="row" alignItems="center">
+                          <Grid item>
+                            <Typography variant="h6">
+                              Nowy rodzaj biletu
+                            </Typography>
+                          </Grid>
+                          <Grid item>
+                            <IconButton onClick={handleDefinitionFormClose}>
+                              <ClearIcon />
+                            </IconButton>
+                          </Grid>
+                        </Grid>
                         <TicketDefinitionForm
-                          onReset={handleDefinitionFormClose}
                           onSubmitSuccess={(ticketDefinitionId) => {
                             fetchTicketDefinitions();
                             handleTicketDefinitionAdd(ticketDefinitionId);
