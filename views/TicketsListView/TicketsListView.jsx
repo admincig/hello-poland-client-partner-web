@@ -83,6 +83,23 @@ class TicketsListView extends React.Component {
     }
   };
 
+  handleFetchItemsFailure = () => this.setState({ isFetching: false });
+
+  handleFetchItemsSuccess = () => this.setState({ isFetching: false });
+
+  handleItemDelete = (itemId) => {
+    const { deleteItem } = this.props;
+
+    if (deleteItem) {
+      deleteItem({
+        id: itemId,
+        onSuccess: () => this.handleFetchItems(),
+      });
+    }
+
+    this.handleMenuClose();
+  };
+
   handleItemEdit = (itemId) => {
     const { router } = this.props;
 
@@ -93,10 +110,6 @@ class TicketsListView extends React.Component {
 
     this.handleMenuClose();
   };
-
-  handleFetchItemsFailure = () => this.setState({ isFetching: false });
-
-  handleFetchItemsSuccess = () => this.setState({ isFetching: false });
 
   handleMenuOpen = (event, itemId) => this.setState({
     menuAnchor: event.currentTarget,
@@ -133,13 +146,13 @@ class TicketsListView extends React.Component {
                 label="Brak biletów"
                 loading={isFetching}
                 message="Dodaj bilet lub ponów zapytanie aby wyświetlić listę."
-                // onRefresh={this.handleFetchItems}
+                onRefresh={this.handleFetchItems}
               />
             )}
             {sortedList.length > 0 && (
               <React.Fragment>
                 <Table aria-labelledby="items-list">
-                  <TableHead columns={tableColumns}/>
+                  <TableHead columns={tableColumns} />
                   <TableBody>
                     {
                       sortedList.map(({
@@ -189,6 +202,7 @@ class TicketsListView extends React.Component {
 
 TicketsListView.propTypes = {
   classes: PropTypes.shape({}).isRequired,
+  deleteItem: PropTypes.func.isRequired,
   fetchList: PropTypes.func.isRequired,
   items: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   router: PropTypes.shape({}).isRequired,
@@ -200,6 +214,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   fetchList: ticketDefinitionsActions.fetchList,
+  deleteItem: ticketDefinitionsActions.deleteItem,
 };
 
 export default compose(
