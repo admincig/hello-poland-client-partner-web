@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import _find from 'lodash/find';
 import { connect } from 'react-redux';
 import _cloneDeep from 'lodash/cloneDeep';
+import _isEqual from 'lodash/isEqual';
 import _isNumber from 'lodash/isNumber';
 import addMinutes from 'date-fns/addMinutes';
 import addMonths from 'date-fns/addMonths';
@@ -32,9 +33,9 @@ const MIN_TIME_INTERVAL = 30;
 class CalendarEventController extends React.Component {
   constructor(props) {
     super(props);
-    const { formData, readOnly } = props;
+    const { formData } = props;
     const {
-      endDate, entryEndDate, entryStartDate, frequencyData, isCyclic, startDate,
+      endDate, entryEndDate, entryStartDate, frequencyData, startDate,
     } = formData || {};
     const { endDate: frequencyEndDate } = frequencyData || {};
 
@@ -51,7 +52,7 @@ class CalendarEventController extends React.Component {
         endDate: endDate || initialEndDate,
         entryEndDate: entryEndDate || initialEndDate,
         entryStartDate: entryStartDate || initialStartDate,
-        frequencyData: null,
+        frequencyData: frequencyData || null,
         sightEventId: null,
         isCyclic: false,
         startDate: startDate || initialStartDate,
@@ -60,7 +61,7 @@ class CalendarEventController extends React.Component {
         ...formData,
       },
       entryStartDateOffset: this.getInitialEntryStartDateOffset(entryStartDate, startDate),
-      frequencyType: this.getInitialFrequecyType(isCyclic, readOnly),
+      frequencyType: this.getInitialFrequecyType(frequencyData),
       frequencyEndDateType: this.getInitialFrequencyTypeDate(frequencyEndDate),
       poolDate: startDate || initialStartDate,
       selectedTicketDefinitionId: '',
@@ -102,7 +103,22 @@ class CalendarEventController extends React.Component {
     return 0;
   };
 
-  getInitialFrequecyType = (isCyclic, readOnly) => (isCyclic && readOnly ? 'CUSTOM' : 'NONE');
+  getInitialFrequecyType = (frequencyData) => {
+    const { daysOfWeek, frequencyType } = frequencyData || {};
+    let formType = 'NONE';
+
+    if (frequencyType === 'WEEKLY') {
+      if (_isEqual(daysOfWeek, [1, 2, 3, 4, 5])) {
+        formType = 'WEEKDAYS';
+      } else if (frequencyType === 'WEEKLY' && _isEqual(daysOfWeek, [6, 7])) {
+        formType = 'WEEKDAYS';
+      } else {
+        formType = 'CUSTOM';
+      }
+    }
+
+    return formType;
+  };
 
   getInitialFrequencyTypeDate = endDate => (endDate ? 'SINGLE' : 'NONE');
 
@@ -455,10 +471,12 @@ class CalendarEventController extends React.Component {
 
   render() {
     const { children } = this.props;
+    const { formData, ...state } = this.state;
 
     return children({
       ...this.props,
-      ...this.state,
+      ...state,
+      formData,
       handleAvailableTicketsChange: this.handleAvailableTicketsChange,
       handleChange: this.handleChange,
       handleDateChange: this.handleDateChange,
@@ -476,6 +494,7 @@ class CalendarEventController extends React.Component {
       handleTicketDefinitionAdd: this.handleTicketDefinitionAdd,
       handleTicketDefinitionChange: this.handleTicketDefinitionChange,
       handleTicketDefinitionDelete: this.handleTicketDefinitionDelete,
+      editMode: !!formData.id,
     });
   }
 }
@@ -485,7 +504,6 @@ CalendarEventController.propTypes = {
   fetchTicketDefinitions: PropTypes.func.isRequired,
   formData: PropTypes.shape({}),
   onChange: PropTypes.func,
-  readOnly: PropTypes.bool.isRequired,
   ticketDefinitionsList: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,

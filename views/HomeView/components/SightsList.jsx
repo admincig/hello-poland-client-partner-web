@@ -243,11 +243,19 @@ class SightsList extends Component {
     });
   };
 
-  handleTicketPoolPreview = (formData) => {
+  handleTicketPoolEditMode = (formData) => {
+    const { fetchSightEventsList, updateTicketPoolDefinition } = this.props;
+
     this.setState({
       formData,
-      readOnly: true,
       dialog: true,
+      formConfig: {
+        action: (args) => {
+          updateTicketPoolDefinition(args);
+
+          fetchSightEventsList();
+        },
+      },
       formType: 'TicketPoolDefinitionForm',
       schema: ticketPoolDefinitionSchema,
       title: 'Podgląd puli',
@@ -421,8 +429,8 @@ class SightsList extends Component {
                                       ? 'Brak' : `${ticketPoolDefinition.availableTicketsNumber} szt`
                                     }`
                                   }
-                                    onPreviewClick={
-                                    () => this.handleTicketPoolPreview(ticketPoolDefinition)
+                                    onEditClick={
+                                    () => this.handleTicketPoolEditMode(ticketPoolDefinition)
                                   }
                                     onStopSellClick={
                                     () => this.handleStopSellClick(
@@ -433,7 +441,7 @@ class SightsList extends Component {
                                     )
                                   }
                                     onStopSellLabel="Wstrzymaj sprzedaż"
-                                    onPreviewLabel="Podgląd puli"
+                                    onEditLabel="Edycja puli"
                                     onDeleteClick={() => this.handleAlertDialogOpen({
                                       content: '',
                                       onSuccess: () => {
