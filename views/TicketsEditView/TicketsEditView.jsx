@@ -73,10 +73,14 @@ class TicketsEditView extends React.Component {
 
     this.setState({ isFetching: false });
 
-    this.handleSnackbarOpen(error && error.message);
+    if (error) {
+      const { data: errorData } = error;
 
-    if (clearError) {
-      clearError();
+      this.handleSnackbarOpen(errorData && errorData.message);
+
+      if (clearError) {
+        clearError();
+      }
     }
   };
 

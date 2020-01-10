@@ -9,6 +9,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
+import Snackbar from '@material-ui/core/Snackbar';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -59,6 +60,8 @@ class TicketsListView extends React.Component {
     isFetching: false,
     menuAnchor: null,
     menuItemId: null,
+    snackbarOpen: false,
+    snackbarMessage: '',
   };
 
   componentDidMount() {
@@ -93,11 +96,26 @@ class TicketsListView extends React.Component {
     if (deleteItem) {
       deleteItem({
         id: itemId,
+        onFailure: this.handleItemDeleteFailure,
         onSuccess: () => this.handleFetchItems(),
       });
     }
 
     this.handleMenuClose();
+  };
+
+  handleItemDeleteFailure = () => {
+    const { clearError, error } = this.props;
+
+    if (error) {
+      const { data: errorData } = error;
+
+      this.handleSnackbarOpen(errorData && errorData.message);
+
+      if (clearError) {
+        clearError();
+      }
+    }
   };
 
   handleItemEdit = (itemId) => {
@@ -120,8 +138,20 @@ class TicketsListView extends React.Component {
 
   handleMenuExited = () => this.setState({ menuItemId: null });
 
+  handleSnackbarOpen = message => this.setState({
+    snackbarOpen: true,
+    snackbarMessage: typeof message === 'string' ? message : 'Wystąpił nieznany błąd.',
+  });
+
+  handleSnackbarClose = () => this.setState({
+    snackbarOpen: false,
+    snackbarMessage: '',
+  });
+
   render() {
-    const { isFetching, menuAnchor, menuItemId } = this.state;
+    const {
+      isFetching, menuAnchor, menuItemId, snackbarOpen, snackbarMessage,
+    } = this.state;
     const { classes, items: sortedList } = this.props;
 
     return (
@@ -194,6 +224,15 @@ class TicketsListView extends React.Component {
               </React.Fragment>
             )}
           </Paper>
+          <Snackbar
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            open={snackbarOpen}
+            onClose={this.handleSnackbarClose}
+            ContentProps={{
+              'aria-describedby': 'message-id',
+            }}
+            message={snackbarMessage}
+          />
         </Grid>
       </Layout>
     );
@@ -202,19 +241,27 @@ class TicketsListView extends React.Component {
 
 TicketsListView.propTypes = {
   classes: PropTypes.shape({}).isRequired,
+  clearError: PropTypes.func.isRequired,
   deleteItem: PropTypes.func.isRequired,
+  error: PropTypes.shape({}),
   fetchList: PropTypes.func.isRequired,
   items: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   router: PropTypes.shape({}).isRequired,
 };
 
+TicketsListView.defaultProps = {
+  error: null,
+};
+
 const mapStateToProps = state => ({
+  error: ticketDefinitionsSelectors.getError(state),
   items: ticketDefinitionsSelectors.getTicketDefinitions(state),
 });
 
 const mapDispatchToProps = {
-  fetchList: ticketDefinitionsActions.fetchList,
+  clearError: ticketDefinitionsActions.clearError,
   deleteItem: ticketDefinitionsActions.deleteItem,
+  fetchList: ticketDefinitionsActions.fetchList,
 };
 
 export default compose(
