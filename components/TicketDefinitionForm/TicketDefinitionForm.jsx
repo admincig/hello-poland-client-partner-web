@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import _isEqual from 'lodash/isEqual';
+import _isNumber from 'lodash/isNumber';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
@@ -50,7 +51,7 @@ class TicketDefinitionForm extends Component {
   getInitialValues = initialValues => ({
     id: initialValues.id || undefined,
     name: initialValues.name || '',
-    price: initialValues.price ? parseFloat(initialValues.price / 100).toFixed(2) : '',
+    price: _isNumber(initialValues.price) ? parseFloat(initialValues.price / 100).toFixed(2) : '',
   });
 
   setInitialValues = initialValues => this.setState({
