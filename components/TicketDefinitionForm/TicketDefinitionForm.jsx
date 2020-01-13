@@ -2,31 +2,61 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import withStyles from '@material-ui/core/styles/withStyles';
+import _isEqual from 'lodash/isEqual';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
+import Typography from '@material-ui/core/Typography';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import yupNumber from 'yup/lib/number';
-import { actions as ticketDefinitionsActions } from 'redux/ticketDefinitions';
+import {
+  actions as ticketDefinitionsActions,
+  selectors as ticketDefinitionsSelectors,
+} from 'redux/ticketDefinitions';
 import GridItem from 'components/GridItem';
 
 const commonProps = {
   fullWidth: true,
 };
 
-const styles = () => ({
-  limit: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    alignItems: 'flex-end',
-  },
-});
-
 class TicketDefinitionForm extends Component {
+  constructor(props) {
+    super(props);
+
+    const { initialValues } = this.props;
+
+    this.state = {
+      initialValues: this.getInitialValues(initialValues || {}),
+    };
+
+    this.validationSchema = yupObject().shape({
+      name: yupString().min(3).max(30).required(),
+      price: yupNumber().min(0).required(),
+    });
+  }
+
+  componentDidUpdate(prevProps) {
+    const { initialValues: prevInitialValues } = prevProps;
+    const { initialValues } = this.props;
+
+    if (!_isEqual(prevInitialValues, initialValues)) {
+      this.setInitialValues(initialValues);
+    }
+  }
+
+  getInitialValues = initialValues => ({
+    id: initialValues.id || undefined,
+    name: initialValues.name || '',
+    price: initialValues.price ? parseFloat(initialValues.price / 100).toFixed(2) : '',
+  });
+
+  setInitialValues = initialValues => this.setState({
+    initialValues: this.getInitialValues(initialValues),
+  });
+
   handleReset = (values, formikActions) => {
     const { onReset } = this.props;
 
@@ -55,6 +85,7 @@ class TicketDefinitionForm extends Component {
       onFailure: this.handleSubmitFailure(formikActions),
       onSuccess: this.handleSubmitSuccess(formikActions),
     };
+
     if (id) {
       action = updateItem;
       payload.id = id;
@@ -76,7 +107,7 @@ class TicketDefinitionForm extends Component {
   };
 
   handleSubmitSuccess = formikActions => (ticketDefinitionId) => {
-    const { onSubmitSuccess } = this.props;
+    const { clearError, onSubmitSuccess } = this.props;
 
     if (onSubmitSuccess) {
       onSubmitSuccess(ticketDefinitionId, formikActions);
@@ -86,49 +117,64 @@ class TicketDefinitionForm extends Component {
 
     const { resetForm, setSubmitting } = formikActions;
 
+    clearError();
     setSubmitting(false);
     resetForm();
   };
 
   render() {
+    const { initialValues } = this.state;
     const {
-      classes, createItem, onReset, onSubmit, onSubmitFailure, onSubmitSuccess, updateItem, ...props
+      FormikProps, hideButtons, hideErrors, requestError,
     } = this.props;
-
+    const { data: errorData } = requestError || {};
+    const { message: errorMessage } = errorData || {};
+    const priceWarningMessage = 'Uwaga: edycja ceny biletu wpłynie na wszystkie pule, do których bilet jest przypisany.';
 
     return (
       <Formik
-        {...props}
+        enableReinitialize
+        {...FormikProps}
+        initialValues={initialValues}
+        validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
         onReset={this.handleReset}
       >
-        {({ isSubmitting, ...formikActions }) => (
+        {({ isSubmitting }) => (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
-              <Hidden xlDown implementation="css">
-                <Field component={TextField} name="id" type="hidden" {...commonProps} />
+              <Hidden xsUp>
+                <Field name="id" hidden component={TextField} {...commonProps} />
               </Hidden>
               <GridItem md={12} sm={12}>
                 <Field component={TextField} label="Nazwa (np. Normalny)" name="name" required {...commonProps} />
-                <Field component={TextField} label="Cena (PLN)" name="price" type="number" required {...commonProps} />
+              </GridItem>
+              <GridItem md={12} sm={12}>
+                <Field component={TextField} label="Cena (PLN)" name="price" type="number" helperText={initialValues.id ? priceWarningMessage : ''} required {...commonProps} />
               </GridItem>
             </Grid>
-            <Grid container spacing={16}>
-              <GridItem md={2} sm={2}>
-                <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
-                  Dodaj
-                </Button>
-              </GridItem>
-              <GridItem md={2} sm={2}>
-                {onReset
+            {(!hideButtons || (!hideErrors && requestError)) && (
+              <Grid container spacing={16} justify="flex-end">
+                {!hideErrors && requestError
                   && (
-                  <Button variant="contained" color="primary" type="reset" disabled={isSubmitting} onClick={() => this.handleReset(null, formikActions)}>
-                    Anuluj
-                  </Button>
+                    <GridItem container md={9} sm={9}>
+                      <Typography color="error">
+                        {errorMessage || 'Wystąpił błąd podczas zapisywania'}
+                      </Typography>
+                    </GridItem>
                   )
                 }
-              </GridItem>
-            </Grid>
+                {!hideButtons
+                  && (
+                    <GridItem container md={3} sm={3} justify="flex-end">
+                      <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
+                        Zapisz
+                      </Button>
+                    </GridItem>
+                  )
+                }
+              </Grid>
+            )}
           </Form>
         )}
       </Formik>
@@ -137,41 +183,44 @@ class TicketDefinitionForm extends Component {
 }
 
 TicketDefinitionForm.propTypes = {
-  classes: PropTypes.shape({}).isRequired,
+  clearError: PropTypes.func.isRequired,
+  createItem: PropTypes.func.isRequired,
+  FormikProps: PropTypes.shape({}),
+  hideButtons: PropTypes.bool,
+  hideErrors: PropTypes.bool,
+  initialValues: PropTypes.shape({}),
   onReset: PropTypes.func,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
-  createItem: PropTypes.func.isRequired,
-  initialValues: PropTypes.shape({}),
+  requestError: PropTypes.shape({
+    message: PropTypes.string,
+  }),
   updateItem: PropTypes.func.isRequired,
-  validationSchema: PropTypes.shape({}),
 };
 
 TicketDefinitionForm.defaultProps = {
-  initialValues: {
-    id: '',
-    name: '',
-    price: '',
-  },
+  FormikProps: null,
+  hideButtons: false,
+  hideErrors: false,
+  initialValues: null,
   onReset: null,
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,
-  validationSchema: yupObject().shape({
-    name: yupString().min(3).max(30).required(),
-    price: yupNumber().min(0).required(),
-  }),
+  requestError: null,
 };
 
-const mapStateToProps = () => ({});
+const mapStateToProps = state => ({
+  requestError: ticketDefinitionsSelectors.getError(state),
+});
 
 const mapDispatchToProps = {
+  clearError: ticketDefinitionsActions.clearError,
   createItem: ticketDefinitionsActions.createItem,
   updateItem: ticketDefinitionsActions.updateItem,
 };
 
 export default compose(
-  withStyles(styles),
   connect(mapStateToProps, mapDispatchToProps),
 )(TicketDefinitionForm);
