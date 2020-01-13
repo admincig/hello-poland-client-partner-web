@@ -110,7 +110,7 @@ class CalendarEventController extends React.Component {
     if (frequencyType === 'WEEKLY') {
       if (_isEqual(daysOfWeek, [1, 2, 3, 4, 5])) {
         formType = 'WEEKDAYS';
-      } else if (frequencyType === 'WEEKLY' && _isEqual(daysOfWeek, [6, 7])) {
+      } else if (_isEqual(daysOfWeek, [6, 7])) {
         formType = 'WEEKDAYS';
       } else {
         formType = 'CUSTOM';
