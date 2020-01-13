@@ -251,9 +251,6 @@ class CalendarEventForm extends React.Component {
                   Aby Twoja oferta była widoczna dla kupujących, musisz zdefiniować termin
                   i rodzaje biletów. Dla każdej oferty możesz stworzyć kilka pul biletów.
                 </Typography>
-                <div>
-                  {`debug: ${frequencyType}`}
-                </div>
                 <TextField
                   disabled={readOnly}
                   fullWidth
