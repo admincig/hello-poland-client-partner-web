@@ -4,6 +4,11 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
@@ -57,6 +62,8 @@ class TicketsListView extends React.Component {
   baseURL = '/tickets';
 
   state = {
+    dialogOpen: false,
+    dialogProps: {},
     isFetching: false,
     menuAnchor: null,
     menuItemId: null,
@@ -67,6 +74,26 @@ class TicketsListView extends React.Component {
   componentDidMount() {
     this.handleFetchItems();
   }
+
+  handleDialogAccept = () => {
+    const { dialogProps } = this.state;
+    const { itemId } = dialogProps || {};
+
+    if (itemId) {
+      this.handleItemDelete(itemId);
+    }
+
+    this.handleDialogClose();
+  };
+
+  handleDialogClose = () => this.setState({ dialogOpen: false });
+
+  handleDialogExited = () => this.setState({ dialogProps: {} });
+
+  handleDialogOpen = (dialogProps) => {
+    this.setState({ dialogOpen: true, dialogProps });
+    this.handleMenuClose();
+  };
 
   handleFetchItems = () => {
     const { fetchList } = this.props;
@@ -129,9 +156,10 @@ class TicketsListView extends React.Component {
     this.handleMenuClose();
   };
 
-  handleMenuOpen = (event, itemId) => this.setState({
+  handleMenuOpen = (event, itemId, itemName) => this.setState({
     menuAnchor: event.currentTarget,
     menuItemId: itemId,
+    menuItemName: itemName,
   });
 
   handleMenuClose = () => this.setState({ menuAnchor: null });
@@ -150,7 +178,8 @@ class TicketsListView extends React.Component {
 
   render() {
     const {
-      isFetching, menuAnchor, menuItemId, snackbarOpen, snackbarMessage,
+      dialogOpen, dialogProps, isFetching, menuAnchor, menuItemId, menuItemName, snackbarOpen,
+      snackbarMessage,
     } = this.state;
     const { classes, items: sortedList } = this.props;
 
@@ -195,7 +224,7 @@ class TicketsListView extends React.Component {
                             <IconButton
                               aria-owns={menuAnchor ? 'item-menu' : undefined}
                               aria-haspopup="true"
-                              onClick={event => this.handleMenuOpen(event, listItemId)}
+                              onClick={event => this.handleMenuOpen(event, listItemId, name)}
                             >
                               <MoreVertIcon />
                             </IconButton>
@@ -216,11 +245,38 @@ class TicketsListView extends React.Component {
                   <MenuItem onClick={() => this.handleItemEdit(menuItemId)}>
                     Edytuj
                   </MenuItem>
-                  <MenuItem onClick={() => this.handleItemDelete(menuItemId)}>
+                  <MenuItem
+                    onClick={() => this.handleDialogOpen(
+                      { itemId: menuItemId, name: menuItemName },
+                    )}
+                  >
                     Usuń
                   </MenuItem>
                 </Menu>
-
+                <Dialog
+                  open={dialogOpen}
+                  onClose={this.handleDialogClose}
+                  onExited={this.handleDialogExited}
+                  aria-labelledby="alert-dialog-title"
+                  aria-describedby="alert-dialog-description"
+                >
+                  <DialogTitle id="alert-dialog-title">
+                    Usuń bilet
+                  </DialogTitle>
+                  <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                      {`Czy napewno usunąć bilet "${dialogProps.name}"?`}
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={this.handleDialogClose} color="primary">
+                      Anuluj
+                    </Button>
+                    <Button onClick={this.handleDialogAccept} color="primary">
+                      OK
+                    </Button>
+                  </DialogActions>
+                </Dialog>
               </React.Fragment>
             )}
           </Paper>
