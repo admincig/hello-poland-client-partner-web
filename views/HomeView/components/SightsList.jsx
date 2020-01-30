@@ -462,16 +462,27 @@ class SightsList extends Component {
                                           key={`ticketDefinition-${ticketDefinition.id}-${ticketDefinition.name}`}
                                           primary={ticketDefinition.name}
                                           secondary={(() => {
-                                            const { availableTicketsNumber } = ticketDefinition;
+                                            const {
+                                              availableTicketsNumber, discount,
+                                            } = ticketDefinition;
                                             const availableTickets = !availableTicketsNumber
                                               || availableTicketsNumber === -1
                                               ? 'Brak'
                                               : `${availableTicketsNumber} szt`;
-                                            const price = formatPrice(ticketDefinition.price);
-
-                                            return (
-                                              `Limit biletów: ${availableTickets} | Cena: ${price}`
+                                            const price = formatPrice(
+                                              ticketDefinition.originalPrice,
                                             );
+                                            let label = `Limit biletów: ${availableTickets} | Cena: ${price}`;
+
+                                            if (discount) {
+                                              const discountPrice = formatPrice(
+                                                discount && discount.price,
+                                              );
+
+                                              label = `${label} | Cena promocyjna: ${discountPrice}`;
+                                            }
+
+                                            return label;
                                           })()}
                                         />
                                       ))

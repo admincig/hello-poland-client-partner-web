@@ -526,20 +526,18 @@ class CalendarEventForm extends React.Component {
                       </div>
                       )
                     }
-                    {formData.ticketDefinitions
-                      && (
+                    {formData.ticketDefinitions && (
                       <TicketDefinitionList
                         disableAvailability={
                           Number.isInteger(formData.availableTicketsNumber)
                           && formData.availableTicketsNumber > 0
                         }
-                        ticketDefinitions={formData.ticketDefinitions}
-                        ticketDefinitionsList={ticketDefinitionsList}
-                        onAvailabilityChange={handleTicketDefinitionChange}
-                        onDeleteClick={(ticketDefinitionId, name) => this.handleAlertDialogOpen({
-                          content: `Próbujesz usunąć bilet o nazwie "${name}". Kontynuować?`,
+                        items={formData.ticketDefinitions}
+                        onChange={handleTicketDefinitionChange}
+                        onDelete={ticketDefinition => this.handleAlertDialogOpen({
+                          content: `Próbujesz usunąć bilet o nazwie "${ticketDefinition.name}". Kontynuować?`,
                           onSuccess: () => {
-                            handleTicketDefinitionDelete(ticketDefinitionId);
+                            handleTicketDefinitionDelete(ticketDefinition.id);
                             this.handleAlertDialogCancel();
                           },
                           open: true,
@@ -547,8 +545,7 @@ class CalendarEventForm extends React.Component {
                         })}
                         readOnly={readOnly}
                       />
-                      )
-                    }
+                    )}
                     {isDefinitionFormVisible && !readOnly
                       && (
                       <div className={classNames(classes.section, classes.fullWidth)}>
