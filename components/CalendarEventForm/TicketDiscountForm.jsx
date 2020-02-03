@@ -283,9 +283,7 @@ class TicketDiscountForm extends React.Component {
                           let finalValue = value;
 
                           if (!value) {
-                            finalValue = this.convertBaseCurrencyToCurrency(values.amount);
-
-                            setFieldValue('hplPart', 0);
+                            finalValue = 0;
                           }
 
                           setFieldValue(name, finalValue);

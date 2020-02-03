@@ -9,9 +9,11 @@ import Typography from '@material-ui/core/Typography/Typography';
 
 
 const FormDialog = ({
-  children, error, onCancel, onSubmit, title, readOnly, ...rest
+  children, error, errorData, onCancel, onSubmit, title, readOnly, ...rest
 }) => {
   const buttonClose = readOnly ? 'Zamknij' : 'Anuluj';
+  const { message: errorMessage } = errorData || {};
+
   return (
     <Dialog onClose={onCancel} aria-labelledby="form-dialog-title" {...rest}>
       <DialogTitle id="form-dialog-title">{title}</DialogTitle>
@@ -21,9 +23,9 @@ const FormDialog = ({
       <DialogActions>
         {error
           && (
-          <Typography style={{ color: 'red' }}>
-            Wystąpił błąd podczas zapisywania.
-          </Typography>
+            <Typography style={{ color: 'red' }}>
+              {errorMessage || 'Wystąpił błąd podczas zapisywania.'}
+            </Typography>
           )
         }
         <Button onClick={onCancel} color="primary">{buttonClose}</Button>
@@ -38,6 +40,7 @@ const FormDialog = ({
 FormDialog.propTypes = {
   children: PropTypes.element,
   error: PropTypes.bool,
+  errorData: PropTypes.shape({}),
   onCancel: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   title: PropTypes.string,
@@ -47,6 +50,7 @@ FormDialog.propTypes = {
 FormDialog.defaultProps = {
   children: null,
   error: false,
+  errorData: null,
   onCancel: null,
   title: null,
   readOnly: false,
