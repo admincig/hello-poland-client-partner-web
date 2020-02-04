@@ -20,7 +20,10 @@ import {
   actions as sightEventActions,
   selectors as sightEventSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
-import { actions as ticketPoolDefinitionActions } from '@hello-poland/commons/redux/ticketPoolDefinitions';
+import {
+  actions as ticketPoolDefinitionActions,
+  selectors as ticketPoolDefinitionSelectors,
+} from '@hello-poland/commons/redux/ticketPoolDefinitions';
 import AlertDialog from 'components/AlertDialog';
 import FormDialog from 'components/FormDialog';
 import SightFormDialog from 'components/SightForm/Dialog';
@@ -56,6 +59,7 @@ class SightsList extends Component {
     sightEventForm: false,
     stopSellForm: false,
     submitError: false,
+    errorData: null,
     title: '',
   };
 
@@ -126,7 +130,9 @@ class SightsList extends Component {
 
   handleAlertDialogOpen = alertDialog => this.setState({ alertDialog });
 
-  handleFormDialogClose = () => this.setState({ dialog: false, submitError: false });
+  handleFormDialogClose = () => this.setState({
+    dialog: false, submitError: false, errorData: null,
+  });
 
   handleFormDialogOpen = ({
     data, formConfig, formType, schema, title,
@@ -258,7 +264,7 @@ class SightsList extends Component {
       },
       formType: 'TicketPoolDefinitionForm',
       schema: ticketPoolDefinitionSchema,
-      title: 'Podgląd puli',
+      title: 'Edycja puli',
     });
   };
 
@@ -290,9 +296,18 @@ class SightsList extends Component {
     this.handleFormDialogClose();
   };
 
-  handleFormSubmitError = () => this.setState({ submitError: true });
+  handleFormSubmitError = () => {
+    const { tpdError } = this.props;
+    let errorData = null;
 
-  clearFormSubmitError = () => this.setState({ submitError: false });
+    if (tpdError) {
+      errorData = tpdError.data;
+    }
+
+    this.setState({ submitError: true, errorData });
+  };
+
+  clearFormSubmitError = () => this.setState({ submitError: false, errorData: null });
 
   handleFormSubmit = () => {
     const { formConfig, formData, formType } = this.state;
@@ -329,7 +344,7 @@ class SightsList extends Component {
     const { sightEventsList, sightsList } = this.props;
     const {
       alertDialog, dialog, formData, formType, schema,
-      sightForm, sightEventForm, stopSellForm, submitError, title, readOnly,
+      sightForm, sightEventForm, stopSellForm, errorData, submitError, title, readOnly,
     } = this.state;
 
     return (
@@ -462,16 +477,27 @@ class SightsList extends Component {
                                           key={`ticketDefinition-${ticketDefinition.id}-${ticketDefinition.name}`}
                                           primary={ticketDefinition.name}
                                           secondary={(() => {
-                                            const { availableTicketsNumber } = ticketDefinition;
+                                            const {
+                                              availableTicketsNumber, discount,
+                                            } = ticketDefinition;
                                             const availableTickets = !availableTicketsNumber
                                               || availableTicketsNumber === -1
                                               ? 'Brak'
                                               : `${availableTicketsNumber} szt`;
-                                            const price = formatPrice(ticketDefinition.price);
-
-                                            return (
-                                              `Limit biletów: ${availableTickets} | Cena: ${price}`
+                                            const price = formatPrice(
+                                              ticketDefinition.originalPrice,
                                             );
+                                            let label = `Limit biletów: ${availableTickets} | Cena: ${price}`;
+
+                                            if (discount) {
+                                              const discountPrice = formatPrice(
+                                                discount && discount.price,
+                                              );
+
+                                              label = `${label} | Cena promocyjna: ${discountPrice}`;
+                                            }
+
+                                            return label;
                                           })()}
                                         />
                                       ))
@@ -503,6 +529,7 @@ class SightsList extends Component {
           onSubmit={this.handleFormSubmit}
           open={dialog}
           error={submitError}
+          errorData={errorData}
           readOnly={readOnly}
           title={title}
         >
@@ -543,6 +570,7 @@ SightsList.propTypes = {
   deleteSight: PropTypes.func.isRequired,
   deleteSightEvent: PropTypes.func.isRequired,
   deleteTicketPoolDefinition: PropTypes.func.isRequired,
+  tpdError: PropTypes.shape({}),
   fetchSightEvent: PropTypes.func.isRequired,
   fetchTicketPoolDefinition: PropTypes.func.isRequired,
   fetchSightsList: PropTypes.func.isRequired,
@@ -560,9 +588,11 @@ SightsList.defaultProps = {
   sightEvent: null,
   sightEventsList: null,
   sightsList: null,
+  tpdError: null,
 };
 
 const mapStateToProps = state => ({
+  tpdError: ticketPoolDefinitionSelectors.getError(state),
   sight: sightsSelectors.getSight(state),
   sightEvent: sightEventSelectors.getSightEvent(state),
   sightsList: sightsSelectors.getSights(state),
