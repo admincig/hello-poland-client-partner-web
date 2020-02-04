@@ -234,7 +234,10 @@ class TicketDiscountForm extends React.Component {
                         onChange: (event) => {
                           const { name, value: dirtyValue } = event.target;
                           const { value: currentValue } = values;
-                          let value = !dirtyValue || +dirtyValue > 0 ? dirtyValue : 0;
+                          let value = !dirtyValue || +dirtyValue > 0 ? +dirtyValue : 0;
+
+                          value = values.type === DISCOUNT_TYPES.FLAT ? value : value.toFixed(0);
+
                           let price = this.calculateDiscountPrice(values.type, value);
 
                           if (price < 0) {
