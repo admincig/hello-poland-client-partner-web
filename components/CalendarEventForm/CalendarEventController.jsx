@@ -419,7 +419,7 @@ class CalendarEventController extends React.Component {
       console.log('add', formData.ticketDefinitions, ticketDefinitionId);
       if (!isTicketDefinitionPresent) {
         const { ticketDefinitionsList } = this.props;
-        const ticketDefinition = _find(ticketDefinitionsList, { id: ticketDefinitionId })
+        const ticketDefinition = _find(ticketDefinitionsList, { id: ticketDefinitionId });
 
         console.log(ticketDefinition);
         if (ticketDefinition) {
