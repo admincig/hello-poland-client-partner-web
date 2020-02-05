@@ -563,8 +563,9 @@ class CalendarEventForm extends React.Component {
                         </Grid>
                         <TicketDefinitionForm
                           onSubmitSuccess={(ticketDefinitionId) => {
-                            fetchTicketDefinitions();
-                            handleTicketDefinitionAdd(ticketDefinitionId);
+                            fetchTicketDefinitions({
+                              onSuccess: () => handleTicketDefinitionAdd(ticketDefinitionId),
+                            });
                             handleDefinitionFormClose();
                           }}
                         />

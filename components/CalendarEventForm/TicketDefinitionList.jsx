@@ -94,6 +94,7 @@ class TicketDefinitionList extends React.Component {
       classes, disableAvailability, items, onDelete, readOnly,
     } = this.props;
 
+    console.log(items);
     return (items && items.length
       ? (
         <List component="div">
