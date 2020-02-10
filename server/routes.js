@@ -4,6 +4,10 @@
 
 module.exports = [
   {
+    page: '/tickets/edit',
+    path: '/tickets/:itemId/edit',
+  },
+  {
     page: '/ushers',
     path: '/ushers/:usherId',
   },

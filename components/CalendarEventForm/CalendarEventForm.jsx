@@ -5,12 +5,14 @@ import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import ClearIcon from '@material-ui/icons/Clear';
 import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import MuiPickersUtilsProvider from 'material-ui-pickers/MuiPickersUtilsProvider';
 import SwitchLabel from 'components/SwitchLabel';
@@ -234,7 +236,7 @@ class CalendarEventForm extends React.Component {
       <div>
         <CalendarEventController readOnly={readOnly} formData={initialFormData} onChange={onChange}>
           {({
-            formData, entryStartDateOffset, frequencyEndDateType, frequencyType,
+            editMode, formData, entryStartDateOffset, frequencyEndDateType, frequencyType,
             selectedTicketDefinitionId, ticketDefinitionsList, poolDate, fetchTicketDefinitions,
             handleAvailableTicketsChange, handleDateChange, handleDefinitionFormClose,
             handleDefinitionFormOpen, handleFormDataChange, handleEntryStartDateOffsetChange,
@@ -282,26 +284,26 @@ class CalendarEventForm extends React.Component {
                 <div className={classNames(classes.columns, classes.fullWidth)}>
                   <div className={classes.horizontal}>
                     <DateTimePicker
-                      disabled={readOnly}
+                      disabled={readOnly || editMode}
                       date={poolDate}
                       fullDay={formData.wholeDay}
                       hasTime={false}
                       name="poolDate"
                       onChange={handlePoolDateChange}
                       DatePickerProps={{
-                        disabled: readOnly,
-                        disablePast: !readOnly,
+                        disabled: readOnly || editMode,
+                        disablePast: !(readOnly || editMode),
                         margin: 'dense',
                       }}
                     />
                     <CustomTimePicker
-                      disabled={readOnly}
+                      disabled={readOnly || editMode}
                       date={formData.startDate}
                       fullDay={formData.wholeDay}
                       name="startDate"
                       onChange={handleDateChange}
                       TimePickerProps={{
-                        disabled: readOnly,
+                        disabled: readOnly || editMode,
                         margin: 'dense',
                       }}
                     />
@@ -313,20 +315,20 @@ class CalendarEventForm extends React.Component {
                       )
                     }
                     <CustomTimePicker
-                      disabled={readOnly}
+                      disabled={readOnly || editMode}
                       date={formData.endDate}
                       fullDay={formData.wholeDay}
                       name="endDate"
                       onChange={handleDateChange}
                       TimePickerProps={{
-                        disabled: readOnly,
+                        disabled: readOnly || editMode,
                         margin: 'dense',
                       }}
                     />
                   </div>
                   <SwitchLabel
                     label="Cały dzień"
-                    disabled={readOnly}
+                    disabled={readOnly || editMode}
                     name="wholeDay"
                     onChange={handleFullDayChange}
                     value={formData.wholeDay}
@@ -338,7 +340,7 @@ class CalendarEventForm extends React.Component {
                       Powtarzaj co:
                     </Typography>
                     <TextField
-                      disabled={readOnly}
+                      disabled={readOnly || editMode}
                       onChange={this.handleBasicFrequencyChange(handleFrequencyDataChange)}
                       select
                       value={frequencyType}
@@ -363,7 +365,7 @@ class CalendarEventForm extends React.Component {
                         <Typography>Powtarzaj co:</Typography>
                         <TextField
                           className={classes.frequencyTextfield}
-                          disabled={readOnly}
+                          disabled={readOnly || editMode}
                           onChange={this.handleFrequencyPropChange(handleFrequencyDataChange)}
                           name="frequency"
                           type="number"
@@ -373,7 +375,7 @@ class CalendarEventForm extends React.Component {
                           }
                         />
                         <TextField
-                          disabled={readOnly}
+                          disabled={readOnly || editMode}
                           onChange={
                             this.handleFrequencyPropChange(
                               handleFrequencyDataChange,
@@ -405,7 +407,7 @@ class CalendarEventForm extends React.Component {
                               control={(
                                 <Checkbox
                                   checked={this.isChecked(formData.frequencyData.daysOfWeek, value)}
-                                  disabled={readOnly}
+                                  disabled={readOnly || editMode}
                                   onChange={handleFrequencyItemChange}
                                   name="daysOfWeek"
                                   value={`${value}`}
@@ -433,16 +435,16 @@ class CalendarEventForm extends React.Component {
                         <FormControlLabel
                           value="NONE"
                           control={<Radio />}
-                          disabled={readOnly}
+                          disabled={readOnly || editMode}
                           label="Nigdy"
                         />
                         <FormControlLabel
                           value="SINGLE"
-                          disabled={readOnly}
+                          disabled={readOnly || editMode}
                           control={<Radio />}
                           label={(
                             <div className={classNames(classes.frequencyRadioWrapper)}>
-                              <Typography className={classNames(readOnly
+                              <Typography className={classNames(readOnly || editMode
                                 ? [classes.disabled, classes.frequencyRadioLabel]
                                 : classes.frequencyRadioLabel)}
                               >
@@ -456,7 +458,7 @@ class CalendarEventForm extends React.Component {
                                 name="endDate"
                                 onChange={handleFrequencyDataFieldChange}
                                 DatePickerProps={{
-                                  disabled: readOnly,
+                                  disabled: readOnly || editMode,
                                   minDate: formData.endDate,
                                 }}
                               />
@@ -524,20 +526,18 @@ class CalendarEventForm extends React.Component {
                       </div>
                       )
                     }
-                    {formData.ticketDefinitions
-                      && (
+                    {formData.ticketDefinitions && (
                       <TicketDefinitionList
                         disableAvailability={
                           Number.isInteger(formData.availableTicketsNumber)
                           && formData.availableTicketsNumber > 0
                         }
-                        ticketDefinitions={formData.ticketDefinitions}
-                        ticketDefinitionsList={ticketDefinitionsList}
-                        onAvailabilityChange={handleTicketDefinitionChange}
-                        onDeleteClick={(ticketDefinitionId, name) => this.handleAlertDialogOpen({
-                          content: `Próbujesz usunąć bilet o nazwie "${name}". Kontynuować?`,
+                        items={formData.ticketDefinitions}
+                        onChange={handleTicketDefinitionChange}
+                        onDelete={ticketDefinition => this.handleAlertDialogOpen({
+                          content: `Próbujesz usunąć bilet o nazwie "${ticketDefinition.name}". Kontynuować?`,
                           onSuccess: () => {
-                            handleTicketDefinitionDelete(ticketDefinitionId);
+                            handleTicketDefinitionDelete(ticketDefinition.id);
                             this.handleAlertDialogCancel();
                           },
                           open: true,
@@ -545,19 +545,27 @@ class CalendarEventForm extends React.Component {
                         })}
                         readOnly={readOnly}
                       />
-                      )
-                    }
+                    )}
                     {isDefinitionFormVisible && !readOnly
                       && (
                       <div className={classNames(classes.section, classes.fullWidth)}>
-                        <Typography variant="h6">
-                          Nowy rodzaj biletu
-                        </Typography>
+                        <Grid container direction="row" alignItems="center">
+                          <Grid item>
+                            <Typography variant="h6">
+                              Nowy rodzaj biletu
+                            </Typography>
+                          </Grid>
+                          <Grid item>
+                            <IconButton onClick={handleDefinitionFormClose}>
+                              <ClearIcon />
+                            </IconButton>
+                          </Grid>
+                        </Grid>
                         <TicketDefinitionForm
-                          onReset={handleDefinitionFormClose}
                           onSubmitSuccess={(ticketDefinitionId) => {
-                            fetchTicketDefinitions();
-                            handleTicketDefinitionAdd(ticketDefinitionId);
+                            fetchTicketDefinitions({
+                              onSuccess: () => handleTicketDefinitionAdd(ticketDefinitionId),
+                            });
                             handleDefinitionFormClose();
                           }}
                         />
@@ -570,7 +578,7 @@ class CalendarEventForm extends React.Component {
                 <div className={classNames(classes.section, classes.fullWidth)}>
                   <Typography variant="subtitle1">Sprawdzanie biletów:</Typography>
                   <TextField
-                    disabled={readOnly}
+                    disabled={readOnly || editMode}
                     onChange={handleEntryStartDateOffsetChange}
                     name="entryStartDateOffset"
                     select

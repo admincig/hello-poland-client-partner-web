@@ -13,8 +13,9 @@ const prefix = `${name}/`;
  */
 
 const CLEAR = `${prefix}CLEAR`;
-const CLEAR_SEARCH_RESULTS = `${prefix}CLEAR_SEARCH_RESULTS`;
+const CLEAR_ERROR = `${prefix}CLEAR_ERROR`;
 const CLEAR_ITEM = `${prefix}CLEAR_ITEM`;
+const CLEAR_SEARCH_RESULTS = `${prefix}CLEAR_SEARCH_RESULTS`;
 const CREATE_ITEM = `${prefix}CREATE_ITEM`;
 const CREATE_ITEM_FAILURE = `${prefix}CREATE_ITEM_FAILURE`;
 const CREATE_ITEM_SUCCESS = `${prefix}CREATE_ITEM_SUCCESS`;
@@ -38,8 +39,9 @@ const UPDATE_ITEM_FAILURE = `${prefix}UPDATE_ITEM_FAILURE`;
 const UPDATE_ITEM_SUCCESS = `${prefix}UPDATE_ITEM_SUCCESS`;
 
 export const types = {
-  CLEAR_SEARCH_RESULTS,
+  CLEAR_ERROR,
   CLEAR_ITEM,
+  CLEAR_SEARCH_RESULTS,
   CREATE_ITEM,
   CREATE_ITEM_FAILURE,
   CREATE_ITEM_SUCCESS,
@@ -76,6 +78,16 @@ export const types = {
  */
 const clear = () => ({
   type: CLEAR,
+});
+
+/**
+ * Creates action for clearing request error reducer data.
+ *
+ * @method
+ * @return {{type: string}}
+ */
+const clearError = () => ({
+  type: CLEAR_ERROR,
 });
 
 /**
@@ -510,8 +522,9 @@ const updateItemSuccess = data => ({
 });
 
 export const actions = {
-  clearSearchResults,
+  clearError,
   clearItem,
+  clearSearchResults,
   createItem,
   createItemFailure,
   createItemSuccess,
@@ -898,17 +911,22 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
         ...state,
         ...initialState,
       };
-    case CLEAR_SEARCH_RESULTS:
+    case CLEAR_ERROR:
       return {
         ...state,
         error: initialState.error,
-        list: initialState.list,
       };
     case CLEAR_ITEM:
       return {
         ...state,
         error: initialState.error,
         item: initialState.item,
+      };
+    case CLEAR_SEARCH_RESULTS:
+      return {
+        ...state,
+        error: initialState.error,
+        list: initialState.list,
       };
     case CREATE_ITEM_FAILURE:
     case DELETE_ITEM_FAILURE:
