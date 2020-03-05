@@ -43,6 +43,6 @@ SalesView.propTypes = {
 };
 
 export default compose(
-  withStyles(styles),
   withAuth(),
+  withStyles(styles),
 )(SalesView);

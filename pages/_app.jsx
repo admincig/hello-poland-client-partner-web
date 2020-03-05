@@ -12,6 +12,7 @@ import withReduxStore from 'services/redux/withReduxStore';
 import { Provider } from 'react-redux';
 import config from 'config';
 import { actions as profileActions } from '@hello-poland/commons/redux/profile';
+import 'static/empty.css';
 
 Router.onRouteChangeStart = () => {
   NProgress.start();
