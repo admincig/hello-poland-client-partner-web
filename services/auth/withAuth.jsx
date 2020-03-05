@@ -14,6 +14,10 @@ export default ({ redirectURL } = { redirectURL: '/sign-in' }) => (View) => {
       }
     }
 
+    shouldComponentUpdate() {
+      return true;
+    }
+
     componentDidUpdate() {
       const { isAuthenticated } = this.props;
 
@@ -23,7 +27,9 @@ export default ({ redirectURL } = { redirectURL: '/sign-in' }) => (View) => {
     }
 
     redirect = () => {
-      Router.push(redirectURL);
+      if (Router.pathname !== redirectURL) {
+        Router.push(redirectURL);
+      }
     };
 
     render() {

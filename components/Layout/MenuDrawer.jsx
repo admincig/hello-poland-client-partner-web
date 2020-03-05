@@ -28,7 +28,7 @@ const MenuDrawer = ({
   <Drawer variant="permanent" className={classes.root} classes={{ paper: classes.drawerPaper }}>
     <div className={classes.toolbar} />
     <nav>
-      <List>
+      <List component="div">
         {menuItems.map(({
           disabled, label, href, Icon,
         }) => {
@@ -42,7 +42,7 @@ const MenuDrawer = ({
 
           return (
             <Link key={`${label}-${href}`} href={href} passHref>
-              <ListItem button disabled={disabled} selected={isSelected}>
+              <ListItem component="a" disabled={disabled} selected={isSelected}>
                 <ListItemIcon><Icon /></ListItemIcon>
                 <ListItemText primary={label} />
               </ListItem>

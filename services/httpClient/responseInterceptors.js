@@ -2,7 +2,7 @@ import responseJWTInterceptor from '@fream/axios-commons/interceptors/responseJW
 import {
   actions as profileActions,
   selectors as profileSelectors,
-} from '@hello-poland/commons/redux/profile';
+} from 'redux/profile';
 
 function getResponseInterceptors(reduxStore) {
   return [
