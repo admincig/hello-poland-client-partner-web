@@ -168,7 +168,7 @@ class TicketDiscountForm extends React.Component {
     const {
       disabled, enableCustomCommission, FormikProps, ticketDefinition,
     } = this.props;
-    const { operatorName } = (config && config.public) || {};
+    const { brandName } = (config && config.public) || {};
 
     return (
       <Formik
@@ -311,7 +311,7 @@ class TicketDiscountForm extends React.Component {
                     <Field
                       component={TextField}
                       disabled
-                      label={operatorName || 'Administrator serwisu'}
+                      label={brandName || 'Administrator serwisu'}
                       name="hplPart"
                       type="number"
                       InputProps={{

@@ -9,7 +9,7 @@ module.exports = {
     availableTicketsURL: 'http://hpl.fream.pl/api/v1/market/sight-events/:id/available-tickets?date=:date',
     baseAffiliationURL: 'https://hpl.fream.pl/sight-events',
     name: 'Hello! Poland Partner',
-    operatorName: 'Hello! Poland',
+    brandName: 'Hello! Poland',
     axios: {
       baseURL: 'http://localhost:3000/api',
     },

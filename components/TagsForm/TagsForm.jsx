@@ -57,7 +57,7 @@ function TagsForm({
   tags, classes, defaultTranslation, items, managePublic, manageRestricted, onSubmit,
   onDelete, translation,
 }) {
-  const { operatorName } = (config && config.public) || {};
+  const { brandName } = (config && config.public) || {};
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [dialogType, setDialogType] = React.useState(null);
   const [selectedTagId, setSelectedTagId] = React.useState('');
@@ -170,7 +170,7 @@ function TagsForm({
       }
       <Grid container alignItems="center" justify="space-between" className={classes.section}>
         <Grid item>
-          <Typography variant="h6">{`Tagi ${operatorName || 'administratora'}`}</Typography>
+          <Typography variant="h6">{`Tagi ${brandName || 'administratora'}`}</Typography>
         </Grid>
         {manageRestricted
           && (
@@ -190,7 +190,7 @@ function TagsForm({
       {(restrictedItems.length === 0)
         && (
           <Grid container item direction="column" alignItems="center" justify="center">
-            <Typography>{`Brak tagów przypisanych przez ${operatorName || 'administratora'}.`}</Typography>
+            <Typography>{`Brak tagów przypisanych przez ${brandName || 'administratora'}.`}</Typography>
           </Grid>
         )
       }
