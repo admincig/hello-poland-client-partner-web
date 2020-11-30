@@ -22,6 +22,7 @@ import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
+import config from 'config';
 
 const DIALOG_TYPE = {
   COMBINED: 'COMBINED',
@@ -56,6 +57,7 @@ function CategoriesForm({
   categories, classes, defaultTranslation, items, managePublic, manageRestricted, onSubmit,
   onDelete, translation,
 }) {
+  const { brandName } = (config && config.public) || {};
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [dialogType, setDialogType] = React.useState(null);
   const [selectedCategoryId, setSelectedCategoryId] = React.useState('');
@@ -172,7 +174,7 @@ function CategoriesForm({
       }
       <Grid container alignItems="center" justify="space-between" className={classes.section}>
         <Grid item>
-          <Typography variant="h6">Kategorie Hello! Poland</Typography>
+          <Typography variant="h6">{`Kategorie ${brandName || 'administratora'}`}</Typography>
         </Grid>
         {manageRestricted
           && (
@@ -192,7 +194,7 @@ function CategoriesForm({
       {(restrictedCategories.length === 0)
         && (
           <Grid container item direction="column" alignItems="center" justify="center">
-            <Typography>Brak kategorii przypisanych przez Hello! Poland.</Typography>
+            <Typography>{`Brak kategorii przypisanych przez ${brandName || 'administratora'}.`}</Typography>
           </Grid>
         )
       }

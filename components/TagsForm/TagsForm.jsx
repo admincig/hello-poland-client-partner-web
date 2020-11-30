@@ -22,6 +22,7 @@ import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
+import config from 'config';
 
 const DIALOG_TYPE = {
   COMBINED: 'COMBINED',
@@ -56,6 +57,7 @@ function TagsForm({
   tags, classes, defaultTranslation, items, managePublic, manageRestricted, onSubmit,
   onDelete, translation,
 }) {
+  const { brandName } = (config && config.public) || {};
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [dialogType, setDialogType] = React.useState(null);
   const [selectedTagId, setSelectedTagId] = React.useState('');
@@ -168,7 +170,7 @@ function TagsForm({
       }
       <Grid container alignItems="center" justify="space-between" className={classes.section}>
         <Grid item>
-          <Typography variant="h6">Tagi Hello! Poland</Typography>
+          <Typography variant="h6">{`Tagi ${brandName || 'administratora'}`}</Typography>
         </Grid>
         {manageRestricted
           && (
@@ -188,7 +190,7 @@ function TagsForm({
       {(restrictedItems.length === 0)
         && (
           <Grid container item direction="column" alignItems="center" justify="center">
-            <Typography>Brak tagów przypisanych przez Hello! Poland.</Typography>
+            <Typography>{`Brak tagów przypisanych przez ${brandName || 'administratora'}.`}</Typography>
           </Grid>
         )
       }

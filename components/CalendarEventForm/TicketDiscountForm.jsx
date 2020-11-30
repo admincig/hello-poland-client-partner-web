@@ -24,6 +24,7 @@ import formatPrice from 'utils/formatPrice';
 import yupNumber from 'yup/lib/number';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
+import config from 'config';
 
 const DISCOUNT_TYPES = {
   FLAT: 'FLAT',
@@ -167,6 +168,7 @@ class TicketDiscountForm extends React.Component {
     const {
       disabled, enableCustomCommission, FormikProps, ticketDefinition,
     } = this.props;
+    const { brandName } = (config && config.public) || {};
 
     return (
       <Formik
@@ -309,7 +311,7 @@ class TicketDiscountForm extends React.Component {
                     <Field
                       component={TextField}
                       disabled
-                      label="Hello! Poland"
+                      label={brandName || 'Administrator serwisu'}
                       name="hplPart"
                       type="number"
                       InputProps={{
