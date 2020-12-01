@@ -1,5 +1,8 @@
 const proxyMiddleware = require('http-proxy-middleware');
-const config = require('../config/develop.config');
+
+const configPath = process.env.CONFIG_PATH || '../config/develop.config';
+// eslint-disable-next-line import/no-dynamic-require
+const config = require(configPath);
 
 const port = parseInt(process.env.NODE_PORT, 10) || 3000;
 const serverConfig = config.server;
