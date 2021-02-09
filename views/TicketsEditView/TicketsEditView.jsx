@@ -147,7 +147,7 @@ class TicketsEditView extends React.Component {
   render() {
     const { snackbarOpen, snackbarMessage } = this.state;
     const { classes, item, itemId } = this.props;
-    const pageTitle = itemId ? 'Edycja definicji biletu' : 'Nowa definicja biletu';
+    const pageTitle = itemId ? 'Edycja definicji produktu' : 'Nowa definicja produktu';
 
     return (
       <Layout>

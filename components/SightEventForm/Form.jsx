@@ -245,7 +245,7 @@ class SightEventForm extends Component {
                 )
               }
               <GridItem>
-                <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
+                <Field name="lead" label="Warunki oferty" component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
                 <Field name="description" label="Opis oferty" required component={TextField} {...commonProps} multiline rowsMax={20} />

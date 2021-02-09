@@ -130,7 +130,7 @@ class TicketDefinitionForm extends Component {
     } = this.props;
     const { data: errorData } = requestError || {};
     const { message: errorMessage } = errorData || {};
-    const priceWarningMessage = 'Uwaga: edycja ceny biletu wpłynie na wszystkie pule, do których bilet jest przypisany.';
+    const priceWarningMessage = 'Uwaga: edycja ceny produktu wpłynie na wszystkie pule, do których produkt jest przypisany.';
 
     return (
       <Formik
