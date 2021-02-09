@@ -46,7 +46,7 @@ class UshersView extends Component {
         <Grid container spacing={8}>
           <GridItem>
             <Button onClick={this.handleUsherFormOpen}>
-              Dodaj biletera
+              Dodaj pracownika
             </Button>
           </GridItem>
           <GridItem>
