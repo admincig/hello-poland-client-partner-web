@@ -434,9 +434,9 @@ class SightFormDialog extends Component {
       translationDialog, translations,
     } = this.state;
     const {
-      classes, createFile, createFileCancel, clearItem, createImage, createImageCancel, createMainImage,
-      createMainImageCancel, deleteImage, deleteFile, deleteTranslation, fetchItem, fetchSightsList,
-      fetchSightEventsList, item, itemId, onClose, title, changeDefaultTranslation, ...rest
+      classes, createFile, createFileCancel, clearItem, deleteFile, deleteTranslation,
+      fetchItem, fetchSightsList, fetchSightEventsList, item, itemId, onClose, title,
+      changeDefaultTranslation, ...rest
     } = this.props;
 
     let defaultLanguage;
@@ -518,16 +518,14 @@ class SightFormDialog extends Component {
                 <GridItem>
                   <MultimediaForm
                     defaultTranslation={defaultLanguage}
+                    createFile={createFile}
+                    createFileCancel={createFileCancel}
+                    deleteFile={deleteFile}
                     ImageGalleryProps={{
-                      createFile,
-                      createFileCancel,
-                      deleteFile,
                       items: multimedia.images,
                     }}
                     itemId={itemId}
                     MainImageProps={{
-                      createFile,
-                      createFileCancel,
                       item: multimedia.mainImage,
                     }}
                     onSuccess={() => this.handleFetchItem(itemId, language)}
@@ -578,12 +576,12 @@ SightFormDialog.propTypes = {
   clearItem: PropTypes.func.isRequired,
   createFile: PropTypes.func.isRequired,
   createFileCancel: PropTypes.func.isRequired,
-  createImage: PropTypes.func.isRequired,
-  createImageCancel: PropTypes.func.isRequired,
-  createMainImage: PropTypes.func.isRequired,
-  createMainImageCancel: PropTypes.func.isRequired,
+  // createImage: PropTypes.func.isRequired,
+  // createImageCancel: PropTypes.func.isRequired,
+  // createMainImage: PropTypes.func.isRequired,
+  // createMainImageCancel: PropTypes.func.isRequired,
   deleteFile: PropTypes.func.isRequired,
-  deleteImage: PropTypes.func.isRequired,
+  // deleteImage: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   fetchSightsList: PropTypes.func.isRequired,
