@@ -77,10 +77,10 @@ class MultimediaForm extends React.Component {
 
   handleImageDelete = (imageId) => {
     const { ImageGalleryProps, itemId } = this.props;
-    const { deleteImage } = ImageGalleryProps || {};
+    const { deleteFile } = ImageGalleryProps || {};
 
-    if (deleteImage) {
-      deleteImage({
+    if (deleteFile) {
+      deleteFile({
         id: imageId,
         itemId,
         onFailure: this.handleImageDeleteFailure,
@@ -107,10 +107,10 @@ class MultimediaForm extends React.Component {
 
   handleAttachmentDelete = () => {
     const { AttachmentProps, itemId } = this.props;
-    const { deleteAttachment } = AttachmentProps || {};
+    const { deleteFile } = AttachmentProps || {};
 
-    if (deleteAttachment) {
-      deleteAttachment({
+    if (deleteFile) {
+      deleteFile({
         id: itemId,
         onFailure: this.handleAttachmentDeleteFailure,
         onSuccess: this.handleAttachmentDeleteSuccess,
@@ -149,14 +149,14 @@ class MultimediaForm extends React.Component {
     });
 
     if (uploadType === UPLOAD_TYPE.ATTACHMENT) {
-      const { createAttachmentCancel } = AttachmentProps;
-      action = createAttachmentCancel;
+      const { createFileCancel } = AttachmentProps;
+      action = createFileCancel;
     } else if (uploadType === UPLOAD_TYPE.GALLERY_IMAGE) {
-      const { createImageCancel } = ImageGalleryProps;
-      action = createImageCancel;
+      const { createFileCancel } = ImageGalleryProps;
+      action = createFileCancel;
     } else if (uploadType === UPLOAD_TYPE.MAIN_IMAGE) {
-      const { createMainImageCancel } = MainImageProps;
-      action = createMainImageCancel;
+      const { createFileCancel } = MainImageProps;
+      action = createFileCancel;
     }
 
     if (action) {
@@ -180,14 +180,14 @@ class MultimediaForm extends React.Component {
     this.setState({ uploadError: false });
 
     if (uploadType === UPLOAD_TYPE.ATTACHMENT) {
-      const { createAttachment } = AttachmentProps;
-      action = createAttachment;
+      const { createFile } = AttachmentProps;
+      action = createFile;
     } else if (uploadType === UPLOAD_TYPE.GALLERY_IMAGE) {
-      const { createImage } = ImageGalleryProps;
-      action = createImage;
+      const { createFile } = ImageGalleryProps;
+      action = createFile;
     } else if (uploadType === UPLOAD_TYPE.MAIN_IMAGE) {
-      const { createMainImage } = MainImageProps;
-      action = createMainImage;
+      const { createFile } = MainImageProps;
+      action = createFile;
     }
 
     if (action) {
@@ -243,7 +243,7 @@ class MultimediaForm extends React.Component {
               <Grid item>
                 <Typography variant="h6">Zdjęcie promocyjne</Typography>
               </Grid>
-              {MainImageProps.createMainImage && (
+              {MainImageProps.createFile && (
                 <Grid item>
                   <IconButton
                     aria-label="Dodaj"
@@ -268,7 +268,7 @@ class MultimediaForm extends React.Component {
               <Grid item>
                 <Typography variant="h6">Galeria zdjęć</Typography>
               </Grid>
-              {ImageGalleryProps.createImage && (
+              {ImageGalleryProps.createFile && (
                 <Grid item>
                   <IconButton
                     aria-label="Dodaj"
@@ -294,7 +294,7 @@ class MultimediaForm extends React.Component {
               <Grid item>
                 <Typography variant="h6">Pliki</Typography>
               </Grid>
-              {AttachmentProps.createAttachment && (
+              {AttachmentProps.createFile && (
                 <Grid item>
                   <IconButton
                     aria-label="Dodaj"
@@ -344,7 +344,7 @@ MultimediaForm.propTypes = {
   ImageGalleryProps: PropTypes.shape({
     createImage: PropTypes.func,
     createImageCancel: PropTypes.func,
-    deleteImage: PropTypes.func,
+    deleteFile: PropTypes.func,
     items: PropTypes.arrayOf(PropTypes.shape({})),
   }),
   itemId: PropTypes.number.isRequired,

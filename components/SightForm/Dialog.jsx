@@ -17,6 +17,7 @@ import {
   selectors as sightsSelectors,
 } from '@hello-poland/commons/redux/sights';
 import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
+import { actions as filesActions } from '@hello-poland/commons/redux/files';
 import {
   CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getLanguageLabel, getTranslatedLanguages,
   getUntranslatedLanguages,
@@ -433,9 +434,9 @@ class SightFormDialog extends Component {
       translationDialog, translations,
     } = this.state;
     const {
-      classes, clearItem, createImage, createImageCancel, createMainImage, createMainImageCancel,
-      deleteImage, deleteTranslation, fetchItem, fetchSightsList, fetchSightEventsList, item,
-      itemId, onClose, title, changeDefaultTranslation, ...rest
+      classes, createFile, createFileCancel, clearItem, createImage, createImageCancel, createMainImage,
+      createMainImageCancel, deleteImage, deleteFile, deleteTranslation, fetchItem, fetchSightsList,
+      fetchSightEventsList, item, itemId, onClose, title, changeDefaultTranslation, ...rest
     } = this.props;
 
     let defaultLanguage;
@@ -518,15 +519,15 @@ class SightFormDialog extends Component {
                   <MultimediaForm
                     defaultTranslation={defaultLanguage}
                     ImageGalleryProps={{
-                      createImage,
-                      createImageCancel,
-                      deleteImage,
+                      createFile,
+                      createFileCancel,
+                      deleteFile,
                       items: multimedia.images,
                     }}
                     itemId={itemId}
                     MainImageProps={{
-                      createMainImage,
-                      createMainImageCancel,
+                      createFile,
+                      createFileCancel,
                       item: multimedia.mainImage,
                     }}
                     onSuccess={() => this.handleFetchItem(itemId, language)}
@@ -575,10 +576,13 @@ SightFormDialog.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   changeDefaultTranslation: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
+  createFile: PropTypes.func.isRequired,
+  createFileCancel: PropTypes.func.isRequired,
   createImage: PropTypes.func.isRequired,
   createImageCancel: PropTypes.func.isRequired,
   createMainImage: PropTypes.func.isRequired,
   createMainImageCancel: PropTypes.func.isRequired,
+  deleteFile: PropTypes.func.isRequired,
   deleteImage: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
@@ -606,10 +610,13 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   changeDefaultTranslation: sightsActions.changeDefaultTranslation,
   clearItem: sightsActions.clearItem,
+  createFile: filesActions.createFile,
+  createFileCancel: filesActions.createFileCancel,
   createImage: sightsActions.createImage,
   createImageCancel: sightsActions.createImageCancel,
   createMainImage: sightsActions.createMainImage,
   createMainImageCancel: sightsActions.createMainImageCancel,
+  deleteFile: filesActions.deleteFile,
   deleteImage: sightsActions.deleteImage,
   deleteTranslation: sightsActions.deleteTranslation,
   fetchItem: sightsActions.fetchItem,

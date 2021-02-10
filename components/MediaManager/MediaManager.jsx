@@ -44,16 +44,10 @@ class MediaManager extends Component {
     this.handleDropStart();
 
     acceptedFiles.forEach((acceptedFile) => {
-      const { arrayBuffer, metadata } = acceptedFile;
-      const data = new Uint8Array(arrayBuffer);
-      const options = {
-        headers: {
-          'content-type': metadata.type,
-        },
-        timeout: 0,
-      };
+      const formData = new FormData();
+      formData.append('file', acceptedFile, acceptedFile.name);
 
-      onSubmit({ data, options });
+      onSubmit({ data: formData });
     });
   };
 

@@ -6,15 +6,6 @@ import Button from '@material-ui/core/Button/Button';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography/Typography';
 
-const readFileBuffer = file => new Promise((resolve, reject) => {
-  const FR = new FileReader();
-
-  FR.onloadend = event => resolve(event.target.result);
-  FR.onerror = error => reject(error);
-
-  FR.readAsArrayBuffer(file);
-});
-
 const styles = theme => ({
   dropzone: {
     border: `${theme.palette.grey['400']} dashed`,
@@ -49,17 +40,7 @@ class MediaDropzone extends Component {
   async handleDropCallback(acceptedIncomingFiles, rejectedIncomingFiles) {
     const { onDrop } = this.props;
 
-    const acceptedFiles = await Promise.all(acceptedIncomingFiles.map(async file => ({
-      arrayBuffer: await readFileBuffer(file),
-      metadata: file,
-    })));
-
-    const rejectedFiles = await Promise.all(rejectedIncomingFiles.map(async file => ({
-      arrayBuffer: await readFileBuffer(file),
-      metadata: file,
-    })));
-
-    onDrop(acceptedFiles, rejectedFiles);
+    onDrop(acceptedIncomingFiles, rejectedIncomingFiles);
   }
 
   render() {
