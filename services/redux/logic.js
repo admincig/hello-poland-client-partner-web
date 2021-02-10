@@ -2,6 +2,7 @@ import reduxUtils from '@hello-poland/commons/utils/redux';
 import { logic as bookingLogic } from '@hello-poland/commons/redux/bookings';
 import { logic as categoriesLogic } from '@hello-poland/commons/redux/categories';
 import { logic as configLogic } from 'redux/config';
+import { logic as filesLogic } from '@hello-poland/commons/redux/files';
 import { logic as partnersLogic } from 'redux/partners';
 import { logic as profileLogic } from 'redux/profile';
 import { logic as sightsLogic } from '@hello-poland/commons/redux/sights';
@@ -16,6 +17,7 @@ export default reduxUtils.parseReduxLogic({
   bookingLogic,
   categoriesLogic,
   configLogic,
+  filesLogic,
   partnersLogic,
   profileLogic,
   sightEventsLogic,
