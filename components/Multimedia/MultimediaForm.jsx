@@ -31,7 +31,6 @@ const styles = theme => ({
   },
 });
 
-// TODO: remove type dependancy
 class MultimediaForm extends React.Component {
   state = {
     alertDialog: {
@@ -69,12 +68,11 @@ class MultimediaForm extends React.Component {
   };
 
   handleFileDelete = (fileId) => {
-    const { deleteFile, itemId } = this.props;
+    const { deleteFile } = this.props;
 
     if (deleteFile) {
       deleteFile({
         id: fileId,
-        itemId,
         onFailure: this.handleImageDeleteFailure,
         onSuccess: this.handleImageDeleteSuccess,
       });
@@ -142,13 +140,34 @@ class MultimediaForm extends React.Component {
     this.setState({ uploadError: true });
   };
 
-  handleMediaManagerSubmitSuccess = () => {
-    const { onSuccess } = this.props;
+  handleMediaManagerSubmitSuccess = (data) => {
+    const {
+      onSuccess, ImageGalleryProps, AttachmentProps,
+    } = this.props;
+    const { mediaManagerData } = this.state;
+    const { uploadType } = mediaManagerData || {};
+    let multimedia = {};
+
+    if (uploadType === UPLOAD_TYPE.MAIN_IMAGE) {
+      const mainImage = data.images[0];
+      const mainImageMeta = {
+        id: mainImage.id, name: 'Zdjęcie promocyjne', type: 'image/jpeg', downloadUrl: { qvgWebp: mainImage.qvgWebp },
+      };
+      multimedia = { mainImage: { ...mainImage, ...mainImageMeta } };
+    } else if (uploadType === UPLOAD_TYPE.GALLERY_IMAGE) {
+      const images = data.images.map(image => ({
+        ...image, id: image.id, name: `Zdjęcie galerii (id #${image.id})`, type: 'image/jpeg', downloadUrl: { qvgWebp: image.qvgWebp },
+      }));
+      multimedia = { images: [...ImageGalleryProps.items, ...images] };
+    } else {
+      const files = data.files.map(file => ({ ...file, id: file.id, type: 'application/pdf' }));
+      multimedia = { files: [...AttachmentProps.items, ...files] };
+    }
 
     this.setState({ uploadError: false });
 
     if (onSuccess) {
-      onSuccess();
+      onSuccess(multimedia);
     }
 
     this.handleMediaManagerClose();

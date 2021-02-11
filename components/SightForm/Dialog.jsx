@@ -62,6 +62,7 @@ class SightFormDialog extends Component {
         translations: [],
       },
       translations: CONTENT_LANGUAGES,
+      uploadedMultimedia: { images: [], mainImage: {}, files: [] },
     };
   }
 
@@ -83,6 +84,7 @@ class SightFormDialog extends Component {
   getInitialValues = (item) => {
     const { itemId } = this.props;
     const { language } = this.state;
+    // console.log(item);
 
     if (this.isItemLoaded(itemId, item)) {
       const { availableLanguageVersions } = item;
@@ -184,6 +186,7 @@ class SightFormDialog extends Component {
       language: DEFAULT_LANGUAGE,
       submittingError: false,
       translations: CONTENT_LANGUAGES,
+      uploadedMultimedia: { images: [], mainImage: {}, files: [] },
     });
 
     clearItem();
@@ -285,6 +288,12 @@ class SightFormDialog extends Component {
   };
 
   handleDiscardClick = () => this.handleCancel();
+
+  handleUploadFileSuccess = (itemId, language, data) => {
+    this.setState(state => ({ uploadedMultimedia: { ...state.uploadedMultimedia, ...data } }));
+    // console.log({ uploadedMultimedia: { ...this.state.uploadedMultimedia, ...data } });
+    this.handleFetchItem(itemId, language);
+  }
 
   handleFetchItem = (id, language) => {
     const { fetchItem } = this.props;
@@ -431,7 +440,7 @@ class SightFormDialog extends Component {
   render() {
     const {
       alertDialog, fetchingError, isFetching, isSubmitting, language, submittingError,
-      translationDialog, translations,
+      translationDialog, translations, uploadedMultimedia,
     } = this.state;
     const {
       classes, createFile, createFileCancel, clearItem, deleteFile, deleteTranslation,
@@ -445,6 +454,7 @@ class SightFormDialog extends Component {
 
     if (this.isItemLoaded(itemId, item)) {
       const { defaultLanguage: itemDefaultLanguage } = item;
+      // console.log(item);
 
       defaultLanguage = itemDefaultLanguage;
       isDefaultLanguage = language === defaultLanguage;
@@ -502,6 +512,7 @@ class SightFormDialog extends Component {
                 />
               </GridItem>
               <SightForm
+                uploadedMultimedia={uploadedMultimedia}
                 buttons={false}
                 FormikProps={{ ref: this.formikRef }}
                 initialValues={this.getInitialValues(item)}
@@ -522,13 +533,17 @@ class SightFormDialog extends Component {
                     createFileCancel={createFileCancel}
                     deleteFile={deleteFile}
                     ImageGalleryProps={{
-                      items: multimedia.images,
+                      items: uploadedMultimedia.images.length
+                        ? uploadedMultimedia.images : multimedia.images,
                     }}
                     itemId={itemId}
                     MainImageProps={{
-                      item: multimedia.mainImage,
+                      item: uploadedMultimedia.mainImage.id
+                        ? uploadedMultimedia.mainImage : multimedia.mainImage,
                     }}
-                    onSuccess={() => this.handleFetchItem(itemId, language)}
+                    onSuccess={
+                      data => this.handleUploadFileSuccess(itemId, language, data)
+                    }
                     translation={language}
                   />
                 </GridItem>
@@ -576,12 +591,7 @@ SightFormDialog.propTypes = {
   clearItem: PropTypes.func.isRequired,
   createFile: PropTypes.func.isRequired,
   createFileCancel: PropTypes.func.isRequired,
-  // createImage: PropTypes.func.isRequired,
-  // createImageCancel: PropTypes.func.isRequired,
-  // createMainImage: PropTypes.func.isRequired,
-  // createMainImageCancel: PropTypes.func.isRequired,
   deleteFile: PropTypes.func.isRequired,
-  // deleteImage: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   fetchSightsList: PropTypes.func.isRequired,
@@ -610,12 +620,7 @@ const mapDispatchToProps = {
   clearItem: sightsActions.clearItem,
   createFile: filesActions.createFile,
   createFileCancel: filesActions.createFileCancel,
-  createImage: sightsActions.createImage,
-  createImageCancel: sightsActions.createImageCancel,
-  createMainImage: sightsActions.createMainImage,
-  createMainImageCancel: sightsActions.createMainImageCancel,
   deleteFile: filesActions.deleteFile,
-  deleteImage: sightsActions.deleteImage,
   deleteTranslation: sightsActions.deleteTranslation,
   fetchItem: sightsActions.fetchItem,
   fetchSightsList: sightsActions.fetchList,

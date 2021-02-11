@@ -35,6 +35,7 @@ import GridItem from 'components/GridItem';
 import CategoriesForm from 'components/CategoriesForm';
 import TagsForm from 'components/TagsForm';
 import MultimediaForm from 'components/Multimedia/MultimediaForm';
+import { actions as filesActions } from '@hello-poland/commons/redux/files';
 import SightForm from './Form';
 import i18n from './i18n/pl-PL';
 
@@ -350,7 +351,7 @@ class SightEventFormDialog extends Component {
   };
 
   handleDeletePDF = (sightEventId) => {
-    const { deletePDF } = this.props;
+    const { deleteFile } = this.props;
     const { language } = this.state;
 
     const payload = {
@@ -358,7 +359,7 @@ class SightEventFormDialog extends Component {
       onSuccess: () => this.handleFetchItem(sightEventId, language),
     };
 
-    deletePDF(payload);
+    deleteFile(payload);
   };
 
   handleDeleteTranslation = (language) => {
@@ -556,11 +557,10 @@ class SightEventFormDialog extends Component {
       translationDialog, translations,
     } = this.state;
     const {
-      categoriesList, classes, clearItem, createImage, createImageCancel, createMainImage,
-      createMainImageCancel, createPDF, createPDFCancel, deleteImage, deleteItemCategory,
-      deleteItemTag, deleteTranslation, fetchCategoriesList, fetchItem, fetchList, fetchTagsList,
-      item, itemId, onClose, parentId, tagsList, title, deletePDF, changeDefaultTranslation,
-      updateItemCategory, updateItemTag, ...rest
+      categoriesList, classes, clearItem, createFile, createFileCancel, deleteFile,
+      deleteItemCategory, deleteItemTag, deleteTranslation, fetchCategoriesList, fetchItem,
+      fetchList, fetchTagsList, item, itemId, onClose, parentId, tagsList, title,
+      changeDefaultTranslation, updateItemCategory, updateItemTag, ...rest
     } = this.props;
 
     let defaultLanguage;
@@ -657,22 +657,17 @@ class SightEventFormDialog extends Component {
                 <div>
                   <MultimediaForm
                     AttachmentProps={{
-                      createAttachment: createPDF,
-                      createAttachmentCancel: createPDFCancel,
-                      deleteAttachment: deletePDF,
                       items: multimedia.attachments,
                     }}
                     defaultTranslation={defaultLanguage}
+                    createFile={createFile}
+                    createFileCancel={createFileCancel}
+                    deleteFile={deleteFile}
                     ImageGalleryProps={{
-                      createImage,
-                      createImageCancel,
-                      deleteImage,
                       items: multimedia.images,
                     }}
                     itemId={itemId}
                     MainImageProps={{
-                      createMainImage,
-                      createMainImageCancel,
                       item: multimedia.mainImage,
                     }}
                     onSuccess={() => this.handleFetchItem(itemId, language)}
@@ -721,16 +716,11 @@ SightEventFormDialog.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   changeDefaultTranslation: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
-  createImage: PropTypes.func.isRequired,
-  createImageCancel: PropTypes.func.isRequired,
-  createMainImage: PropTypes.func.isRequired,
-  createMainImageCancel: PropTypes.func.isRequired,
-  createPDF: PropTypes.func.isRequired,
-  createPDFCancel: PropTypes.func.isRequired,
-  deleteImage: PropTypes.func.isRequired,
+  createFile: PropTypes.func.isRequired,
+  createFileCancel: PropTypes.func.isRequired,
+  deleteFile: PropTypes.func.isRequired,
   deleteItemCategory: PropTypes.func.isRequired,
   deleteItemTag: PropTypes.func.isRequired,
-  deletePDF: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
   fetchCategoriesList: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
@@ -765,16 +755,11 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   clearItem: sightEventsActions.clearItem,
   changeDefaultTranslation: sightEventsActions.changeDefaultTranslation,
-  createImage: sightEventsActions.createImage,
-  createImageCancel: sightEventsActions.createImageCancel,
-  createMainImage: sightEventsActions.createMainImage,
-  createMainImageCancel: sightEventsActions.createMainImageCancel,
-  createPDF: sightEventsActions.createPDF,
-  createPDFCancel: sightEventsActions.createPDFCancel,
-  deleteImage: sightEventsActions.deleteImage,
+  createFile: filesActions.createFile,
+  createFileCancel: filesActions.createFileCancel,
+  deleteFile: filesActions.deleteFile,
   deleteItemCategory: sightEventsActions.deleteItemCategory,
   deleteItemTag: sightEventsActions.deleteItemTag,
-  deletePDF: sightEventsActions.deletePDF,
   deleteTranslation: sightEventsActions.deleteTranslation,
   fetchCategoriesList: categoriesActions.fetchList,
   fetchItem: sightEventsActions.fetchItem,
