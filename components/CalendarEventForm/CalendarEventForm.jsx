@@ -249,7 +249,7 @@ class CalendarEventForm extends React.Component {
               <Grid container>
                 <Typography>
                   Aby Twoja oferta była widoczna dla kupujących, musisz zdefiniować termin
-                  i rodzaje biletów. Dla każdej oferty możesz stworzyć kilka pul biletów.
+                  i rodzaje produktów. Dla każdej oferty możesz stworzyć kilka pul produktów.
                 </Typography>
                 <TextField
                   disabled={readOnly}
@@ -266,7 +266,7 @@ class CalendarEventForm extends React.Component {
                   fullWidth
                   disabled={readOnly || this.hasTicketAvailabilityLimit(formData.ticketDefinitions)}
                   helperText="Puste pole - brak limitu"
-                  label="Limit biletów w puli"
+                  label="Limit produktów w puli"
                   margin="normal"
                   name="availableTicketsNumber"
                   onChange={handleAvailableTicketsChange}
@@ -476,7 +476,7 @@ class CalendarEventForm extends React.Component {
                   && (
                   <div className={classNames(classes.section, classes.fullWidth)}>
                     <Typography variant="h6" gutterBottom>
-                      Bilety
+                      Produkty
                     </Typography>
                     {!readOnly
                       && (
@@ -494,7 +494,7 @@ class CalendarEventForm extends React.Component {
                             disabled
                             value=""
                           >
-                            Wybierz rodzaj biletu
+                            Wybierz rodzaj produktu
                           </MenuItem>
                           {ticketDefinitionsList
                             && ticketDefinitionsList.map(({ id, name, price }) => (
@@ -520,7 +520,7 @@ class CalendarEventForm extends React.Component {
                             color="primary"
                             onClick={handleDefinitionFormOpen}
                           >
-                            Nowy bilet
+                            Nowy produkt
                           </Button>
                         </div>
                       </div>
@@ -535,13 +535,13 @@ class CalendarEventForm extends React.Component {
                         items={formData.ticketDefinitions}
                         onChange={handleTicketDefinitionChange}
                         onDelete={ticketDefinition => this.handleAlertDialogOpen({
-                          content: `Próbujesz usunąć bilet o nazwie "${ticketDefinition.name}". Kontynuować?`,
+                          content: `Próbujesz usunąć produkt o nazwie "${ticketDefinition.name}". Kontynuować?`,
                           onSuccess: () => {
                             handleTicketDefinitionDelete(ticketDefinition.id);
                             this.handleAlertDialogCancel();
                           },
                           open: true,
-                          title: 'Czy na pewno usunąć wybrany bilet?',
+                          title: 'Czy na pewno usunąć wybrany produkt?',
                         })}
                         readOnly={readOnly}
                       />
@@ -552,7 +552,7 @@ class CalendarEventForm extends React.Component {
                         <Grid container direction="row" alignItems="center">
                           <Grid item>
                             <Typography variant="h6">
-                              Nowy rodzaj biletu
+                              Nowy rodzaj produktu
                             </Typography>
                           </Grid>
                           <Grid item>
@@ -576,7 +576,7 @@ class CalendarEventForm extends React.Component {
                   )
                 }
                 <div className={classNames(classes.section, classes.fullWidth)}>
-                  <Typography variant="subtitle1">Sprawdzanie biletów:</Typography>
+                  <Typography variant="subtitle1">Sprawdzanie produktów:</Typography>
                   <TextField
                     disabled={readOnly || editMode}
                     onChange={handleEntryStartDateOffsetChange}

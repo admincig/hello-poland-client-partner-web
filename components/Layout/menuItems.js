@@ -6,18 +6,18 @@ import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 
 export default [
   {
-    label: 'Atrakcje i oferty', href: '/', Icon: DashboardIcon,
+    label: 'Obiekty i oferty', href: '/', Icon: DashboardIcon,
   },
   {
-    label: 'Wizyówka firmy', href: '/company-card', Icon: DomainIcon,
+    label: 'Wizytówka firmy', href: '/company-card', Icon: DomainIcon,
   },
   {
-    label: 'Definicje biletów', href: '/tickets', Icon: LocalOfferIcon,
+    label: 'Definicje produktów', href: '/tickets', Icon: LocalOfferIcon,
   },
   {
-    label: 'Sprzedaż', href: '/sales', Icon: ShoppingCartIcon,
+    label: 'Sprzedaż/Raporty', href: '/sales', Icon: ShoppingCartIcon,
   },
   {
-    label: 'Bileterzy', href: '/ushers', Icon: PeopleIcon,
+    label: 'Pracownicy', href: '/ushers', Icon: PeopleIcon,
   },
 ];
