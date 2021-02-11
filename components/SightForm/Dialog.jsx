@@ -108,14 +108,8 @@ class SightFormDialog extends Component {
       const { id, ...downloadUrl } = mainImage;
 
       data.mainImage = {
-        createdBy: '',
-        createdDate: '',
         id,
-        modifiedBy: '',
-        modifiedDate: '',
         name: 'Zdjęcie promocyjne',
-        path: '/home/hpl/var/DMS/omg/1234.jpg',
-        size: 12345,
         type: 'image/jpeg',
         downloadUrl,
       };
@@ -125,14 +119,8 @@ class SightFormDialog extends Component {
       data.images = images.map((image) => {
         const { id, ...downloadUrl } = image;
         return {
-          createdBy: '',
-          createdDate: '',
           id,
-          modifiedBy: '',
-          modifiedDate: '',
           name: `Zdjęcie galerii (id #${id})`,
-          path: '/home/hpl/var/DMS/omg/1234.jpg',
-          size: 12345,
           type: 'image/jpeg',
           downloadUrl,
         };
@@ -143,11 +131,6 @@ class SightFormDialog extends Component {
       data.attachments = [
         {
           ...pdfAttachment,
-          createdBy: '',
-          createdDate: '',
-          modifiedBy: '',
-          modifiedDate: '',
-          size: 12345,
           type: 'application/pdf',
         },
       ];
@@ -291,7 +274,6 @@ class SightFormDialog extends Component {
 
   handleUploadFileSuccess = (itemId, language, data) => {
     this.setState(state => ({ uploadedMultimedia: { ...state.uploadedMultimedia, ...data } }));
-    // console.log({ uploadedMultimedia: { ...this.state.uploadedMultimedia, ...data } });
     this.handleFetchItem(itemId, language);
   }
 
@@ -454,7 +436,6 @@ class SightFormDialog extends Component {
 
     if (this.isItemLoaded(itemId, item)) {
       const { defaultLanguage: itemDefaultLanguage } = item;
-      // console.log(item);
 
       defaultLanguage = itemDefaultLanguage;
       isDefaultLanguage = language === defaultLanguage;

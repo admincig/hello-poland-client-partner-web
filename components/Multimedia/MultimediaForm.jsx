@@ -150,17 +150,26 @@ class MultimediaForm extends React.Component {
 
     if (uploadType === UPLOAD_TYPE.MAIN_IMAGE) {
       const mainImage = data.images[0];
+      const { id, ...downloadUrl } = mainImage || {};
       const mainImageMeta = {
-        id: mainImage.id, name: 'Zdjęcie promocyjne', type: 'image/jpeg', downloadUrl: { qvgWebp: mainImage.qvgWebp },
+        id, name: 'Zdjęcie promocyjne', type: 'image/jpeg', downloadUrl,
       };
-      multimedia = { mainImage: { ...mainImage, ...mainImageMeta } };
+      multimedia = { mainImage: { id: mainImage.id, ...mainImageMeta } };
     } else if (uploadType === UPLOAD_TYPE.GALLERY_IMAGE) {
-      const images = data.images.map(image => ({
-        ...image, id: image.id, name: `Zdjęcie galerii (id #${image.id})`, type: 'image/jpeg', downloadUrl: { qvgWebp: image.qvgWebp },
-      }));
+      const images = data.images.map((image) => {
+        const { id, ...downloadUrl } = image || {};
+        return ({
+          id, name: `Zdjęcie galerii (id #${image.id})`, type: 'image/jpeg', downloadUrl,
+        });
+      });
       multimedia = { images: [...ImageGalleryProps.items, ...images] };
     } else {
-      const files = data.files.map(file => ({ ...file, id: file.id, type: 'application/pdf' }));
+      const files = data.files.map((file) => {
+        const { id, downloadUrl } = file || {};
+        return ({
+          id, type: 'application/pdf', downloadUrl,
+        });
+      });
       multimedia = { files: [...AttachmentProps.items, ...files] };
     }
 

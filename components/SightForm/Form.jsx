@@ -227,7 +227,6 @@ class SightForm extends Component {
 
   handleSubmit = (values, actions) => {
     const { language, onSubmit, uploadedMultimedia } = this.props;
-    console.log(uploadedMultimedia.images.length, uploadedMultimedia.mainImage.id);
     const options = {
       headers: {
         'Content-Language': language,
@@ -238,13 +237,7 @@ class SightForm extends Component {
     };
 
     if (onSubmit) {
-      const payload = {
-        ...values,
-        mainImage: uploadedMultimedia.mainImage.id
-          ? uploadedMultimedia.mainImage : values.mainImage,
-        images: uploadedMultimedia.images,
-      };
-      onSubmit(payload, actions, options, pathParams);
+      onSubmit(values, actions, options, pathParams);
 
       return;
     }
@@ -255,7 +248,12 @@ class SightForm extends Component {
     } = this.props;
     let action = createItem;
     const payload = {
-      data,
+      data: {
+        ...data,
+        mainImage: uploadedMultimedia.mainImage.id
+          ? uploadedMultimedia.mainImage : values.mainImage,
+        images: uploadedMultimedia.images.length ? uploadedMultimedia.images : values.images,
+      },
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
       options,
@@ -271,7 +269,6 @@ class SightForm extends Component {
         payload.pathParams = pathParams;
       }
     }
-
     action(payload);
   };
 
@@ -459,6 +456,7 @@ SightForm.propTypes = {
   onSubmitSuccess: PropTypes.func,
   translation: PropTypes.bool,
   updateItem: PropTypes.func.isRequired,
+  uploadedMultimedia: PropTypes.shape({}),
 };
 
 SightForm.defaultProps = {
@@ -469,6 +467,7 @@ SightForm.defaultProps = {
   onSubmitFailure: null,
   onSubmitSuccess: null,
   translation: false,
+  uploadedMultimedia: null,
 };
 
 const mapStateToProps = () => ({});
