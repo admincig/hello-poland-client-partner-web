@@ -202,7 +202,7 @@ class SightsList extends Component {
       formData: {
         sightEventId, poolDefinitionId, poolDefinitionName, startDate,
       },
-      title: 'Zatrzymaj sprzedaż biletów',
+      title: 'Zatrzymaj sprzedaż produktów',
     });
   };
 
@@ -226,7 +226,7 @@ class SightsList extends Component {
       createTicketPoolDefinition, updateTicketPoolDefinition, fetchTicketPoolDefinition,
     } = this.props;
     const isPersisted = Number.isInteger(data.id);
-    let title = isPersisted ? 'Edytuj pulę biletów' : 'Dodaj pulę biletów';
+    let title = isPersisted ? 'Edytuj pulę produktów' : 'Dodaj pulę produktów';
     const formType = 'TicketPoolDefinitionForm';
     const formConfig = {
       action: createTicketPoolDefinition,
@@ -238,7 +238,7 @@ class SightsList extends Component {
       fetchTicketPoolDefinition(data.id);
     }
 
-    title += ' - ustaw dostępność biletów dla oferty';
+    title += ' - ustaw dostępność produktów dla oferty';
 
     this.handleFormDialogOpen({
       data,
@@ -349,8 +349,8 @@ class SightsList extends Component {
 
     return (
       <Fragment>
-        <Button onClick={() => this.handleSightFormOpen({ title: 'Dodaj atrakcję' })}>
-          Dodaj atrakcję
+        <Button onClick={() => this.handleSightFormOpen({ title: 'Dodaj Obiekt' })}>
+          Dodaj Obiekt
         </Button>
         {sightsList && sightsList.length
           ? (
@@ -374,13 +374,13 @@ class SightsList extends Component {
                         this.handleAlertDialogCancel();
                       },
                       open: true,
-                      title: 'Czy na pewno usunąć wybraną atrakcję?',
+                      title: 'Czy na pewno usunąć wybraną obiekt?',
                     })}
-                    onDeleteLabel="Usuń atrakcję"
+                    onDeleteLabel="Usuń obiekt"
                     onEditClick={() => {
-                      this.handleSightFormOpen({ sightId: sight.id, title: 'Edytuj atrakcję' });
+                      this.handleSightFormOpen({ sightId: sight.id, title: 'Edytuj obiekt' });
                     }}
-                    onEditLabel="Edytuj atrakcję"
+                    onEditLabel="Edytuj obiekt"
                     published={sight.published}
                   />
                   <List style={{ marginLeft: 55 }}>
@@ -396,7 +396,7 @@ class SightsList extends Component {
                             onAddClick={() => {
                               this.handleTicketPoolEdit({ sightEventId: sightEvent.id });
                             }}
-                            onAddLabel="Dodaj pulę biletów"
+                            onAddLabel="Dodaj pulę produktów"
                             onDeleteClick={() => this.handleAlertDialogOpen({
                               content: '',
                               onSuccess: () => {
@@ -440,7 +440,7 @@ class SightsList extends Component {
                                     key={`${ticketPoolDefinition.id}-${ticketPoolDefinition.name}`}
                                     primary={ticketPoolDefinition.name}
                                     secondary={
-                                    `Limit biletów w puli: ${ticketPoolDefinition.availableTicketsNumber === -1
+                                    `Limit produktów w puli: ${ticketPoolDefinition.availableTicketsNumber === -1
                                       ? 'Brak' : `${ticketPoolDefinition.availableTicketsNumber} szt`
                                     }`
                                   }
@@ -466,7 +466,7 @@ class SightsList extends Component {
                                       open: true,
                                       title: 'Czy na pewno usunąć wybraną pulę?',
                                     })}
-                                    onAddLabel="Usuń pulę biletów"
+                                    onAddLabel="Usuń pulę produktów"
                                   />
                                   <List style={{ marginLeft: 55 }}>
                                     {ticketPoolDefinition.ticketDefinitions
@@ -487,7 +487,7 @@ class SightsList extends Component {
                                             const price = formatPrice(
                                               ticketDefinition.originalPrice,
                                             );
-                                            let label = `Limit biletów: ${availableTickets} | Cena: ${price}`;
+                                            let label = `Limit produktów: ${availableTickets} | Cena: ${price}`;
 
                                             if (discount) {
                                               const discountPrice = formatPrice(

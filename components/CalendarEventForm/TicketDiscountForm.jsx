@@ -367,7 +367,7 @@ class TicketDiscountForm extends React.Component {
               </DialogTitle>
               <DialogContent>
                 <DialogContentText id="reset-dialog-description">
-                  Czy napewno wyczyścić rabat dla wybranego rodzaju biletu?
+                  Czy napewno wyczyścić rabat dla wybranego rodzaju produktu?
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
