@@ -385,7 +385,7 @@ class SightEventFormDialog extends Component {
 
   handleUploadFileSuccess = (itemId, language, data) => {
     this.setState(state => ({ uploadedMultimedia: { ...state.uploadedMultimedia, ...data } }));
-    this.handleFetchItem(itemId, language);
+    if (itemId) this.handleFetchItem(itemId, language);
   }
 
   handleFetchItem = (id, language) => {
@@ -644,31 +644,31 @@ class SightEventFormDialog extends Component {
                     onDelete={this.handleItemDataTypeDelete(ITEM_DATA_TYPES.TAG)}
                   />
                 </div>
-                <div>
-                  <MultimediaForm
-                    AttachmentProps={{
-                      items: uploadedMultimedia.files.length
-                        ? uploadedMultimedia.files : multimedia.attachments || [],
-                    }}
-                    defaultTranslation={defaultLanguage}
-                    createFile={createFile}
-                    createFileCancel={createFileCancel}
-                    deleteFile={deleteFile}
-                    ImageGalleryProps={{
-                      items: uploadedMultimedia.images.length
-                        ? uploadedMultimedia.images : multimedia.images,
-                    }}
-                    itemId={itemId}
-                    MainImageProps={{
-                      item: uploadedMultimedia.mainImage.id
-                        ? uploadedMultimedia.mainImage : multimedia.mainImage,
-                    }}
-                    onSuccess={data => this.handleUploadFileSuccess(itemId, language, data)}
-                    translation={language}
-                  />
-                </div>
               </React.Fragment>
             )}
+            <div>
+              <MultimediaForm
+                AttachmentProps={{
+                  items: uploadedMultimedia.files.length
+                    ? uploadedMultimedia.files : multimedia.attachments || [],
+                }}
+                defaultTranslation={defaultLanguage}
+                createFile={createFile}
+                createFileCancel={createFileCancel}
+                deleteFile={deleteFile}
+                ImageGalleryProps={{
+                  items: uploadedMultimedia.images.length
+                    ? uploadedMultimedia.images : multimedia.images || [],
+                }}
+                itemId={itemId}
+                MainImageProps={{
+                  item: uploadedMultimedia.mainImage.id
+                    ? uploadedMultimedia.mainImage : multimedia.mainImage,
+                }}
+                onSuccess={data => this.handleUploadFileSuccess(itemId, language, data)}
+                translation={language}
+              />
+            </div>
           </DialogContent>
           <DialogActions>
             {submittingError

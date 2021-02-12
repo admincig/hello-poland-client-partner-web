@@ -274,7 +274,7 @@ class SightFormDialog extends Component {
 
   handleUploadFileSuccess = (itemId, language, data) => {
     this.setState(state => ({ uploadedMultimedia: { ...state.uploadedMultimedia, ...data } }));
-    this.handleFetchItem(itemId, language);
+    if (itemId) this.handleFetchItem(itemId, language);
   }
 
   handleFetchItem = (id, language) => {
@@ -431,14 +431,12 @@ class SightFormDialog extends Component {
     } = this.props;
 
     let defaultLanguage;
-    let isDefaultLanguage = true;
     let multimedia = {};
 
     if (this.isItemLoaded(itemId, item)) {
       const { defaultLanguage: itemDefaultLanguage } = item;
 
       defaultLanguage = itemDefaultLanguage;
-      isDefaultLanguage = language === defaultLanguage;
 
       multimedia = this.getMultimediaFromItem(item);
     }
@@ -502,34 +500,32 @@ class SightFormDialog extends Component {
                 onSubmitSuccess={this.handleSubmitSuccess}
               />
             </Grid>
-            {itemId && isDefaultLanguage && (
-              <Grid container>
-                <GridItem className={classes.section}>
-                  <CategoriesForm items={item.categories} />
-                </GridItem>
-                <GridItem>
-                  <MultimediaForm
-                    defaultTranslation={defaultLanguage}
-                    createFile={createFile}
-                    createFileCancel={createFileCancel}
-                    deleteFile={deleteFile}
-                    ImageGalleryProps={{
-                      items: uploadedMultimedia.images.length
-                        ? uploadedMultimedia.images : multimedia.images,
-                    }}
-                    itemId={itemId}
-                    MainImageProps={{
-                      item: uploadedMultimedia.mainImage.id
-                        ? uploadedMultimedia.mainImage : multimedia.mainImage,
-                    }}
-                    onSuccess={
+            <Grid container>
+              <GridItem className={classes.section}>
+                <CategoriesForm items={item.categories} />
+              </GridItem>
+              <GridItem>
+                <MultimediaForm
+                  defaultTranslation={defaultLanguage}
+                  createFile={createFile}
+                  createFileCancel={createFileCancel}
+                  deleteFile={deleteFile}
+                  ImageGalleryProps={{
+                    items: uploadedMultimedia.images.length
+                      ? uploadedMultimedia.images : multimedia.images || [],
+                  }}
+                  itemId={itemId}
+                  MainImageProps={{
+                    item: uploadedMultimedia.mainImage.id
+                      ? uploadedMultimedia.mainImage : multimedia.mainImage,
+                  }}
+                  onSuccess={
                       data => this.handleUploadFileSuccess(itemId, language, data)
                     }
-                    translation={language}
-                  />
-                </GridItem>
-              </Grid>
-            )}
+                  translation={language}
+                />
+              </GridItem>
+            </Grid>
           </DialogContent>
           <DialogActions>
             {submittingError

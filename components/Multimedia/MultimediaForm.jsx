@@ -309,7 +309,7 @@ MultimediaForm.propTypes = {
   ImageGalleryProps: PropTypes.shape({
     items: PropTypes.arrayOf(PropTypes.shape({})),
   }),
-  itemId: PropTypes.number.isRequired,
+  itemId: PropTypes.number,
   MainImageProps: PropTypes.shape({
     item: PropTypes.shape({}),
   }),
@@ -325,6 +325,7 @@ MultimediaForm.defaultProps = {
   defaultTranslation: DEFAULT_LANGUAGE,
   deleteFile: null,
   ImageGalleryProps: null,
+  itemId: null,
   MainImageProps: null,
   onFailure: null,
   onSuccess: null,
