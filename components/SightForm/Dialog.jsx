@@ -84,7 +84,6 @@ class SightFormDialog extends Component {
   getInitialValues = (item) => {
     const { itemId } = this.props;
     const { language } = this.state;
-    // console.log(item);
 
     if (this.isItemLoaded(itemId, item)) {
       const { availableLanguageVersions } = item;
@@ -273,8 +272,26 @@ class SightFormDialog extends Component {
   handleDiscardClick = () => this.handleCancel();
 
   handleUploadFileSuccess = (itemId, language, data) => {
+    const { updateItem, item } = this.props;
     this.setState(state => ({ uploadedMultimedia: { ...state.uploadedMultimedia, ...data } }));
-    if (itemId) this.handleFetchItem(itemId, language);
+    if (itemId) {
+      updateItem({
+        id: itemId,
+        data: {
+          ...item,
+          ...data,
+        },
+        onSuccess: this.handleFetchItem(itemId, language),
+        pathParams: {
+          languageVersion: language,
+        },
+        options: {
+          headers: {
+            'Content-Language': language,
+          },
+        },
+      });
+    }
   }
 
   handleFetchItem = (id, language) => {
@@ -427,16 +444,18 @@ class SightFormDialog extends Component {
     const {
       classes, createFile, createFileCancel, clearItem, deleteFile, deleteTranslation,
       fetchItem, fetchSightsList, fetchSightEventsList, item, itemId, onClose, title,
-      changeDefaultTranslation, ...rest
+      changeDefaultTranslation, updateItem, ...rest
     } = this.props;
 
     let defaultLanguage;
+    let isDefaultLanguage = true;
     let multimedia = {};
 
     if (this.isItemLoaded(itemId, item)) {
       const { defaultLanguage: itemDefaultLanguage } = item;
 
       defaultLanguage = itemDefaultLanguage;
+      isDefaultLanguage = language === defaultLanguage;
 
       multimedia = this.getMultimediaFromItem(item);
     }
@@ -505,25 +524,29 @@ class SightFormDialog extends Component {
                 <CategoriesForm items={item.categories} />
               </GridItem>
               <GridItem>
-                <MultimediaForm
-                  defaultTranslation={defaultLanguage}
-                  createFile={createFile}
-                  createFileCancel={createFileCancel}
-                  deleteFile={deleteFile}
-                  ImageGalleryProps={{
-                    items: uploadedMultimedia.images.length
-                      ? uploadedMultimedia.images : multimedia.images || [],
-                  }}
-                  itemId={itemId}
-                  MainImageProps={{
-                    item: uploadedMultimedia.mainImage.id
-                      ? uploadedMultimedia.mainImage : multimedia.mainImage,
-                  }}
-                  onSuccess={
-                      data => this.handleUploadFileSuccess(itemId, language, data)
-                    }
-                  translation={language}
-                />
+                {
+                  (!itemId || (itemId && isDefaultLanguage)) && (
+                    <MultimediaForm
+                      defaultTranslation={defaultLanguage}
+                      createFile={createFile}
+                      createFileCancel={createFileCancel}
+                      deleteFile={deleteFile}
+                      ImageGalleryProps={{
+                        items: uploadedMultimedia.images.length
+                          ? uploadedMultimedia.images : multimedia.images || [],
+                      }}
+                      itemId={itemId}
+                      MainImageProps={{
+                        item: uploadedMultimedia.mainImage.id
+                          ? uploadedMultimedia.mainImage : multimedia.mainImage,
+                      }}
+                      onSuccess={
+                          data => this.handleUploadFileSuccess(itemId, language, data)
+                        }
+                      translation={language}
+                    />
+                  )
+                }
               </GridItem>
             </Grid>
           </DialogContent>
@@ -578,6 +601,7 @@ SightFormDialog.propTypes = {
   item: PropTypes.shape({}),
   itemId: PropTypes.number,
   title: PropTypes.string,
+  updateItem: PropTypes.func.isRequired,
 };
 
 SightFormDialog.defaultProps = {
@@ -602,6 +626,7 @@ const mapDispatchToProps = {
   fetchItem: sightsActions.fetchItem,
   fetchSightsList: sightsActions.fetchList,
   fetchSightEventsList: sightEventsActions.fetchList,
+  updateItem: sightsActions.updateItem,
 };
 
 export default compose(

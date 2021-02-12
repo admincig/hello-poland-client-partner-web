@@ -384,8 +384,26 @@ class SightEventFormDialog extends Component {
   handleDiscardClick = () => this.handleCancel();
 
   handleUploadFileSuccess = (itemId, language, data) => {
+    const { updateItem, item } = this.props;
     this.setState(state => ({ uploadedMultimedia: { ...state.uploadedMultimedia, ...data } }));
-    if (itemId) this.handleFetchItem(itemId, language);
+    if (itemId) {
+      updateItem({
+        id: itemId,
+        data: {
+          ...item,
+          ...data,
+        },
+        onSuccess: this.handleFetchItem(itemId, language),
+        pathParams: {
+          languageVersion: language,
+        },
+        options: {
+          headers: {
+            'Content-Language': language,
+          },
+        },
+      });
+    }
   }
 
   handleFetchItem = (id, language) => {
@@ -549,7 +567,7 @@ class SightEventFormDialog extends Component {
       categoriesList, classes, clearItem, createFile, createFileCancel, deleteFile,
       deleteItemCategory, deleteItemTag, deleteTranslation, fetchCategoriesList, fetchItem,
       fetchList, fetchTagsList, item, itemId, onClose, parentId, tagsList, title,
-      changeDefaultTranslation, updateItemCategory, updateItemTag, ...rest
+      changeDefaultTranslation, updateItemCategory, updateItemTag, updateItem, ...rest
     } = this.props;
 
     let defaultLanguage;
@@ -726,6 +744,7 @@ SightEventFormDialog.propTypes = {
   parentId: PropTypes.number,
   tagsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   title: PropTypes.string,
+  updateItem: PropTypes.func.isRequired,
   updateItemCategory: PropTypes.func.isRequired,
   updateItemTag: PropTypes.func.isRequired,
 };
@@ -758,6 +777,7 @@ const mapDispatchToProps = {
   fetchItem: sightEventsActions.fetchItem,
   fetchList: sightEventsActions.fetchList,
   fetchTagsList: tagsActions.fetchList,
+  updateItem: sightEventsActions.updateItem,
   updateItemCategory: sightEventsActions.updateItemCategory,
   updateItemTag: sightEventsActions.updateItemTag,
 };
