@@ -164,6 +164,7 @@ class MultimediaForm extends React.Component {
       });
       multimedia = { images: [...ImageGalleryProps.items, ...images] };
     } else {
+      // there could be only one pdf. + check if this is called files or attachments in item.
       const files = data.files.map((file) => {
         const { id, ...fileData } = file;
         return ({
