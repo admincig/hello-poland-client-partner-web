@@ -75,6 +75,7 @@ class SightEventFormDialog extends Component {
         translations: [],
       },
       translations: CONTENT_LANGUAGES,
+      uploadedMultimedia: { images: [], mainImage: {}, files: [] },
     };
   }
 
@@ -126,14 +127,8 @@ class SightEventFormDialog extends Component {
       const { id, ...downloadUrl } = mainImage;
 
       data.mainImage = {
-        createdBy: '',
-        createdDate: '',
         id,
-        modifiedBy: '',
-        modifiedDate: '',
         name: 'Zdjęcie promocyjne',
-        path: '/home/hpl/var/DMS/omg/1234.jpg',
-        size: 12345,
         type: 'image/jpeg',
         downloadUrl,
       };
@@ -143,14 +138,8 @@ class SightEventFormDialog extends Component {
       data.images = images.map((image) => {
         const { id, ...downloadUrl } = image;
         return {
-          createdBy: '',
-          createdDate: '',
           id,
-          modifiedBy: '',
-          modifiedDate: '',
           name: `Zdjęcie galerii (id #${id})`,
-          path: '/home/hpl/var/DMS/omg/1234.jpg',
-          size: 12345,
           type: 'image/jpeg',
           downloadUrl,
         };
@@ -161,11 +150,6 @@ class SightEventFormDialog extends Component {
       data.attachments = [
         {
           ...pdfAttachment,
-          createdBy: '',
-          createdDate: '',
-          modifiedBy: '',
-          modifiedDate: '',
-          size: 12345,
           type: 'application/pdf',
         },
       ];
@@ -192,7 +176,7 @@ class SightEventFormDialog extends Component {
 
   handleAlertDialogOpen = (sightEventId, name) => this.setState({
     alertDialog: {
-      content: `Plik ${name} zostanie trwale usunięty i nie będzie można go przywrócic.`,
+      content: `Plik ${name} zostanie trwale usunięty i nie będzie można go przywrócić.`,
       onSuccess: () => {
         this.handleDeletePDF(sightEventId);
         this.handleAlertDialogCancel();
@@ -399,6 +383,11 @@ class SightEventFormDialog extends Component {
 
   handleDiscardClick = () => this.handleCancel();
 
+  handleUploadFileSuccess = (itemId, language, data) => {
+    this.setState(state => ({ uploadedMultimedia: { ...state.uploadedMultimedia, ...data } }));
+    this.handleFetchItem(itemId, language);
+  }
+
   handleFetchItem = (id, language) => {
     const { fetchItem } = this.props;
 
@@ -554,7 +543,7 @@ class SightEventFormDialog extends Component {
   render() {
     const {
       alertDialog, fetchingError, isFetching, isSubmitting, language, submittingError,
-      translationDialog, translations,
+      translationDialog, translations, uploadedMultimedia,
     } = this.state;
     const {
       categoriesList, classes, clearItem, createFile, createFileCancel, deleteFile,
@@ -626,6 +615,7 @@ class SightEventFormDialog extends Component {
                 />
               </GridItem>
               <SightForm
+                uploadedMultimedia={uploadedMultimedia}
                 buttons={false}
                 FormikProps={{ ref: this.formikRef }}
                 initialValues={this.getInitialValues(item)}
@@ -657,20 +647,23 @@ class SightEventFormDialog extends Component {
                 <div>
                   <MultimediaForm
                     AttachmentProps={{
-                      items: multimedia.attachments,
+                      items: uploadedMultimedia.files.length
+                        ? uploadedMultimedia.files : multimedia.attachments || [],
                     }}
                     defaultTranslation={defaultLanguage}
                     createFile={createFile}
                     createFileCancel={createFileCancel}
                     deleteFile={deleteFile}
                     ImageGalleryProps={{
-                      items: multimedia.images,
+                      items: uploadedMultimedia.images.length
+                        ? uploadedMultimedia.images : multimedia.images,
                     }}
                     itemId={itemId}
                     MainImageProps={{
-                      item: multimedia.mainImage,
+                      item: uploadedMultimedia.mainImage.id
+                        ? uploadedMultimedia.mainImage : multimedia.mainImage,
                     }}
-                    onSuccess={() => this.handleFetchItem(itemId, language)}
+                    onSuccess={data => this.handleUploadFileSuccess(itemId, language, data)}
                     translation={language}
                   />
                 </div>

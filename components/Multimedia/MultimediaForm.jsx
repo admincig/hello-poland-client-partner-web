@@ -73,8 +73,8 @@ class MultimediaForm extends React.Component {
     if (deleteFile) {
       deleteFile({
         id: fileId,
-        onFailure: this.handleImageDeleteFailure,
-        onSuccess: this.handleImageDeleteSuccess,
+        onFailure: this.handleFileDeleteFailure,
+        onSuccess: this.handleFileDeleteSuccess,
       });
     }
   }
@@ -157,7 +157,7 @@ class MultimediaForm extends React.Component {
       multimedia = { mainImage: { id: mainImage.id, ...mainImageMeta } };
     } else if (uploadType === UPLOAD_TYPE.GALLERY_IMAGE) {
       const images = data.images.map((image) => {
-        const { id, ...downloadUrl } = image || {};
+        const { id, ...downloadUrl } = image;
         return ({
           id, name: `Zdjęcie galerii (id #${image.id})`, type: 'image/jpeg', downloadUrl,
         });
@@ -165,9 +165,9 @@ class MultimediaForm extends React.Component {
       multimedia = { images: [...ImageGalleryProps.items, ...images] };
     } else {
       const files = data.files.map((file) => {
-        const { id, downloadUrl } = file || {};
+        const { id, ...fileData } = file;
         return ({
-          id, type: 'application/pdf', downloadUrl,
+          id, type: 'application/pdf', ...fileData,
         });
       });
       multimedia = { files: [...AttachmentProps.items, ...files] };

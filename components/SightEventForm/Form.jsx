@@ -43,7 +43,6 @@ const styles = () => ({
     marginTop: 40,
   },
 });
-
 class SightEventForm extends Component {
   constructor(props) {
     super(props);
@@ -93,7 +92,9 @@ class SightEventForm extends Component {
   }
 
   getInitialValues = (initialValues) => {
-    const { location: initialLocation, pdfAttachment: files, ...details } = initialValues || {};
+    const {
+      location: initialLocation, pdfAttachment: files, mainImage, images, ...details
+    } = initialValues || {};
     const location = initialLocation || {};
     return {
       id: details.id || '',
@@ -111,6 +112,9 @@ class SightEventForm extends Component {
         city: location.city || '',
         country: location.country || 'Polska',
       },
+      mainImage,
+      images,
+      files,
     };
   };
 
@@ -138,11 +142,17 @@ class SightEventForm extends Component {
 
     const { id, ...data } = values;
     const {
-      createItem, createTranslation, initialValues, updateItem,
+      createItem, createTranslation, initialValues, updateItem, uploadedMultimedia,
     } = this.props;
     let action = createItem;
     const payload = {
-      data,
+      data: {
+        ...data,
+        mainImage: uploadedMultimedia.mainImage.id
+          ? uploadedMultimedia.mainImage : values.mainImage,
+        images: uploadedMultimedia.images.length ? uploadedMultimedia.images : values.images,
+        files: uploadedMultimedia.files.length ? uploadedMultimedia.files : values.files,
+      },
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
       options,
@@ -314,6 +324,7 @@ SightEventForm.propTypes = {
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
   updateItem: PropTypes.func.isRequired,
+  uploadedMultimedia: PropTypes.shape({}),
 };
 
 SightEventForm.defaultProps = {
@@ -323,6 +334,7 @@ SightEventForm.defaultProps = {
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,
+  uploadedMultimedia: null,
 };
 
 const mapStateToProps = () => ({});
