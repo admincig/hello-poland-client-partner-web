@@ -95,7 +95,7 @@ class MultimediaForm extends React.Component {
     }
   };
 
-  handleMediaManagerClose = ({ shouldNotRunOnSuccessCallback = false }) => {
+  handleMediaManagerClose = (shouldNotRunOnSuccessCallback = false) => {
     const {
       createFileCancel, onFailure, onSuccess,
     } = this.props;
@@ -189,7 +189,7 @@ class MultimediaForm extends React.Component {
       onSuccess(multimedia);
     }
 
-    this.handleMediaManagerClose({ shouldNotRunOnSuccessCallback: true });
+    this.handleMediaManagerClose(true);
   };
 
   handleUploadModalOpen = (itemId, uploadType) => this.setState({

@@ -159,7 +159,7 @@ class SightFormDialog extends Component {
       language: DEFAULT_LANGUAGE,
       submittingError: false,
       translations: CONTENT_LANGUAGES,
-      uploadedMultimedia: { images: [], mainImage: {}, files: [] },
+      uploadedMultimedia: { images: [], mainImage: {} },
     });
 
     clearItem();
@@ -262,10 +262,10 @@ class SightFormDialog extends Component {
 
   handleDiscardClick = () => this.handleCancel();
 
-  handleUploadFileSuccess = (itemId, language, data) => {
+  fileActionSuccess = (itemId, language, data) => {
     const { updateItem, item } = this.props;
     this.setState(state => ({ uploadedMultimedia: { ...state.uploadedMultimedia, ...data } }));
-    if (itemId) {
+    if (itemId && data) {
       updateItem({
         id: itemId,
         data: {
@@ -282,6 +282,8 @@ class SightFormDialog extends Component {
           },
         },
       });
+    } else if (itemId && !data) {
+      this.handleFetchItem(itemId, language);
     }
   }
 
@@ -532,7 +534,7 @@ class SightFormDialog extends Component {
                           ? uploadedMultimedia.mainImage : multimedia.mainImage,
                       }}
                       onSuccess={
-                          data => this.handleUploadFileSuccess(itemId, language, data)
+                          data => this.fileActionSuccess(itemId, language, data)
                         }
                       translation={language}
                     />
