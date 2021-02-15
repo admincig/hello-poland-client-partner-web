@@ -53,13 +53,13 @@ class MultimediaForm extends React.Component {
     },
   });
 
-  handleDelete = (fileId, { name }) => {
+  handleDelete = (fileId, { name, type }) => {
     const alertDialog = {
       content: `Plik ${name} zostanie trwale usunięty i nie będzie można go przywrócić.`,
       open: true,
       title: 'Czy na pewno usunąć wybrany plik?',
       onSuccess: () => {
-        this.handleFileDelete(fileId);
+        this.handleFileDelete(fileId, type);
         this.handleAlertDialogCancel();
       },
     };
@@ -67,12 +67,17 @@ class MultimediaForm extends React.Component {
     this.setState({ alertDialog });
   };
 
-  handleFileDelete = (fileId) => {
+  handleFileDelete = (fileId, type) => {
     const { deleteFile } = this.props;
 
     if (deleteFile) {
       deleteFile({
         id: fileId,
+        options: {
+          params: {
+            type: type === UPLOAD_TYPE.GALLERY_IMAGE ? 'image' : 'file',
+          },
+        },
         onFailure: this.handleFileDeleteFailure,
         onSuccess: this.handleFileDeleteSuccess,
       });
