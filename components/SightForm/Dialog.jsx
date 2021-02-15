@@ -62,7 +62,7 @@ class SightFormDialog extends Component {
         translations: [],
       },
       translations: CONTENT_LANGUAGES,
-      uploadedMultimedia: { images: [], mainImage: {}, files: [] },
+      uploadedMultimedia: { images: [], mainImage: {} },
     };
   }
 
@@ -100,7 +100,7 @@ class SightFormDialog extends Component {
   };
 
   getMultimediaFromItem = (item) => {
-    const { images, mainImage, pdfAttachment } = item;
+    const { images, mainImage } = item;
     const data = {};
 
     if (mainImage) {
@@ -124,15 +124,6 @@ class SightFormDialog extends Component {
           downloadUrl,
         };
       });
-    }
-
-    if (pdfAttachment) {
-      data.attachments = [
-        {
-          ...pdfAttachment,
-          type: 'application/pdf',
-        },
-      ];
     }
 
     return data;

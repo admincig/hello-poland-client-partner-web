@@ -93,7 +93,7 @@ class SightEventForm extends Component {
 
   getInitialValues = (initialValues) => {
     const {
-      location: initialLocation, pdfAttachment: files, mainImage, images, ...details
+      location: initialLocation, pdfAttachment, mainImage, images, ...details
     } = initialValues || {};
     const location = initialLocation || {};
     return {
@@ -114,7 +114,7 @@ class SightEventForm extends Component {
       },
       mainImage,
       images,
-      files,
+      pdfAttachment,
     };
   };
 
@@ -151,7 +151,8 @@ class SightEventForm extends Component {
         mainImage: uploadedMultimedia.mainImage.id
           ? uploadedMultimedia.mainImage : values.mainImage,
         images: uploadedMultimedia.images.length ? uploadedMultimedia.images : values.images,
-        files: uploadedMultimedia.files.length ? uploadedMultimedia.files : values.files,
+        pdfAttachment: uploadedMultimedia.pdfAttachment.id
+          ? uploadedMultimedia.pdfAttachment : values.pdfAttachment,
       },
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),

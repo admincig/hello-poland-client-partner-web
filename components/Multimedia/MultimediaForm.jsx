@@ -142,36 +142,45 @@ class MultimediaForm extends React.Component {
 
   handleMediaManagerSubmitSuccess = (data) => {
     const {
-      onSuccess, ImageGalleryProps, AttachmentProps,
+      onSuccess, ImageGalleryProps, AttachmentProps, MainImageProps,
     } = this.props;
     const { mediaManagerData } = this.state;
     const { uploadType } = mediaManagerData || {};
     let multimedia = {};
+    const { items: images } = ImageGalleryProps || {};
+    const { item: mainImage } = MainImageProps || {};
+    const { item: pdfAttachment } = AttachmentProps || {};
 
     if (uploadType === UPLOAD_TYPE.MAIN_IMAGE) {
-      const mainImage = data.images[0];
-      const { id, ...downloadUrl } = mainImage || {};
+      const newMainImage = data.images[0];
+      const { id, ...downloadUrl } = newMainImage || {};
       const mainImageMeta = {
         id, name: 'Zdjęcie promocyjne', type: 'image/jpeg', downloadUrl,
       };
-      multimedia = { mainImage: { id: mainImage.id, ...mainImageMeta } };
+      multimedia = {
+        mainImage: { id: newMainImage.id, ...mainImageMeta },
+        images: [...images],
+        pdfAttachment: { ...pdfAttachment },
+      };
     } else if (uploadType === UPLOAD_TYPE.GALLERY_IMAGE) {
-      const images = data.images.map((image) => {
+      const newImages = data.images.map((image) => {
         const { id, ...downloadUrl } = image;
         return ({
           id, name: `Zdjęcie galerii (id #${image.id})`, type: 'image/jpeg', downloadUrl,
         });
       });
-      multimedia = { images: [...ImageGalleryProps.items, ...images] };
+      multimedia = {
+        images: [...images, ...newImages],
+        mainImage: { ...mainImage },
+        pdfAttachment: { ...pdfAttachment },
+      };
     } else {
-      // there could be only one pdf. + check if this is called files or attachments in item.
-      const files = data.files.map((file) => {
-        const { id, ...fileData } = file;
-        return ({
-          id, type: 'application/pdf', ...fileData,
-        });
-      });
-      multimedia = { files: [...AttachmentProps.items, ...files] };
+      const newPdfAttachment = data.files[0];
+      multimedia = {
+        pdfAttachment: { ...newPdfAttachment },
+        mainImage: { ...mainImage },
+        images: [...images],
+      };
     }
 
     this.setState({ uploadError: false });
@@ -274,7 +283,7 @@ class MultimediaForm extends React.Component {
               )}
             </Grid>
             <MultimediaSection
-              items={AttachmentProps.items}
+              items={AttachmentProps.item ? [AttachmentProps.item] : []}
               sectionType={UPLOAD_TYPE.ATTACHMENT}
               onDelete={this.handleDelete}
             />

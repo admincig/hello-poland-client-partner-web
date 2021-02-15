@@ -75,7 +75,7 @@ class SightEventFormDialog extends Component {
         translations: [],
       },
       translations: CONTENT_LANGUAGES,
-      uploadedMultimedia: { images: [], mainImage: {}, files: [] },
+      uploadedMultimedia: { images: [], mainImage: {}, pdfAttachment: {} },
     };
   }
 
@@ -147,12 +147,10 @@ class SightEventFormDialog extends Component {
     }
 
     if (pdfAttachment) {
-      data.attachments = [
-        {
-          ...pdfAttachment,
-          type: 'application/pdf',
-        },
-      ];
+      data.pdfAttachment = {
+        ...pdfAttachment,
+        type: 'PDF',
+      };
     }
 
     return data;
@@ -667,8 +665,8 @@ class SightEventFormDialog extends Component {
             <div>
               <MultimediaForm
                 AttachmentProps={{
-                  items: uploadedMultimedia.files.length
-                    ? uploadedMultimedia.files : multimedia.attachments || [],
+                  item: uploadedMultimedia.pdfAttachment.id
+                    ? uploadedMultimedia.pdfAttachment : multimedia.pdfAttachment,
                 }}
                 defaultTranslation={defaultLanguage}
                 createFile={createFile}
