@@ -70,7 +70,6 @@ class SightFormDialog extends Component {
     if (this.shouldComponentFetch()) {
       const { itemId } = this.props;
       const { language } = this.state;
-
       this.handleFetchItem(itemId, language);
     }
   }
@@ -272,7 +271,7 @@ class SightFormDialog extends Component {
           ...item,
           ...data,
         },
-        onSuccess: this.handleFetchItem(itemId, language),
+        onSuccess: () => this.handleFetchItem(itemId, language),
         pathParams: {
           languageVersion: language,
         },
@@ -289,7 +288,6 @@ class SightFormDialog extends Component {
 
   handleFetchItem = (id, language) => {
     const { fetchItem } = this.props;
-
     fetchItem({
       id,
       options: {
@@ -312,7 +310,11 @@ class SightFormDialog extends Component {
     const translations = getTranslatedLanguages(availableLanguageVersions);
 
     this.setState({
-      fetchingError: false, isFetching: false, language, translations,
+      fetchingError: false,
+      isFetching: false,
+      language,
+      translations,
+      uploadedMultimedia: { images: [], mainImage: {} },
     });
   };
 

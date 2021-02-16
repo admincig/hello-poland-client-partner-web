@@ -198,6 +198,7 @@ class SightEventFormDialog extends Component {
       language: DEFAULT_LANGUAGE,
       submittingError: false,
       translations: CONTENT_LANGUAGES,
+      uploadedMultimedia: { images: [], mainImage: {}, pdfAttachment: {} },
     });
 
     clearItem();
@@ -381,17 +382,17 @@ class SightEventFormDialog extends Component {
 
   handleDiscardClick = () => this.handleCancel();
 
-  handleUploadFileSuccess = (itemId, language, data) => {
+  fileActionSuccess = (itemId, language, data) => {
     const { updateItem, item } = this.props;
     this.setState(state => ({ uploadedMultimedia: { ...state.uploadedMultimedia, ...data } }));
-    if (itemId) {
+    if (itemId && data) {
       updateItem({
         id: itemId,
         data: {
           ...item,
           ...data,
         },
-        onSuccess: this.handleFetchItem(itemId, language),
+        onSuccess: () => this.handleFetchItem(itemId, language),
         pathParams: {
           languageVersion: language,
         },
@@ -401,6 +402,8 @@ class SightEventFormDialog extends Component {
           },
         },
       });
+    } else if (itemId && !data) {
+      this.handleFetchItem(itemId, language);
     }
   }
 
@@ -429,7 +432,11 @@ class SightEventFormDialog extends Component {
     const translations = getTranslatedLanguages(availableLanguageVersions);
 
     this.setState({
-      fetchingError: false, isFetching: false, language, translations,
+      fetchingError: false,
+      isFetching: false,
+      language,
+      translations,
+      uploadedMultimedia: { images: [], mainImage: {}, pdfAttachment: {} },
     });
   };
 
@@ -681,7 +688,7 @@ class SightEventFormDialog extends Component {
                   item: uploadedMultimedia.mainImage.id
                     ? uploadedMultimedia.mainImage : multimedia.mainImage,
                 }}
-                onSuccess={data => this.handleUploadFileSuccess(itemId, language, data)}
+                onSuccess={data => this.fileActionSuccess(itemId, language, data)}
                 translation={language}
               />
             </div>
