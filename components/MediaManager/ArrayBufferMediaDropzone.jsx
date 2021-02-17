@@ -6,6 +6,15 @@ import Button from '@material-ui/core/Button/Button';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography/Typography';
 
+const readFileBuffer = file => new Promise((resolve, reject) => {
+  const FR = new FileReader();
+
+  FR.onloadend = event => resolve(event.target.result);
+  FR.onerror = error => reject(error);
+
+  FR.readAsArrayBuffer(file);
+});
+
 const styles = theme => ({
   dropzone: {
     border: `${theme.palette.grey['400']} dashed`,
@@ -26,7 +35,10 @@ const styles = theme => ({
   },
 });
 
-class MediaDropzone extends Component {
+// TODO This component is kind of old thing. Kill it with fire if you have time,
+// and migrate to MediaDropzone.jsx component which uses FormData instead of Uint8Array.
+// The last usage of this component --> ArrayBufferMediaManager.jsx
+class ArrayBufferMediaDropzone extends Component {
   constructor(props) {
     super(props);
 
@@ -40,7 +52,17 @@ class MediaDropzone extends Component {
   async handleDropCallback(acceptedIncomingFiles, rejectedIncomingFiles) {
     const { onDrop } = this.props;
 
-    onDrop(acceptedIncomingFiles, rejectedIncomingFiles);
+    const acceptedFiles = await Promise.all(acceptedIncomingFiles.map(async file => ({
+      arrayBuffer: await readFileBuffer(file),
+      metadata: file,
+    })));
+
+    const rejectedFiles = await Promise.all(rejectedIncomingFiles.map(async file => ({
+      arrayBuffer: await readFileBuffer(file),
+      metadata: file,
+    })));
+
+    onDrop(acceptedFiles, rejectedFiles);
   }
 
   render() {
@@ -79,14 +101,14 @@ class MediaDropzone extends Component {
   }
 }
 
-MediaDropzone.propTypes = {
+ArrayBufferMediaDropzone.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   disabled: PropTypes.bool,
   onDrop: PropTypes.func.isRequired,
 };
 
-MediaDropzone.defaultProps = {
+ArrayBufferMediaDropzone.defaultProps = {
   disabled: false,
 };
 
-export default withStyles(styles)(MediaDropzone);
+export default withStyles(styles)(ArrayBufferMediaDropzone);

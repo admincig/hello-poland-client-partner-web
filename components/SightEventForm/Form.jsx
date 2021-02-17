@@ -43,7 +43,6 @@ const styles = () => ({
     marginTop: 40,
   },
 });
-
 class SightEventForm extends Component {
   constructor(props) {
     super(props);
@@ -93,7 +92,9 @@ class SightEventForm extends Component {
   }
 
   getInitialValues = (initialValues) => {
-    const { location: initialLocation, pdfAttachment: files, ...details } = initialValues || {};
+    const {
+      location: initialLocation, pdfAttachment, mainImage, images, ...details
+    } = initialValues || {};
     const location = initialLocation || {};
     return {
       id: details.id || '',
@@ -111,6 +112,9 @@ class SightEventForm extends Component {
         city: location.city || '',
         country: location.country || 'Polska',
       },
+      mainImage,
+      images,
+      pdfAttachment,
     };
   };
 
@@ -120,7 +124,7 @@ class SightEventForm extends Component {
   });
 
   handleSubmit = (values, actions) => {
-    const { language, onSubmit } = this.props;
+    const { language, onSubmit, clearFormChanges } = this.props;
     const options = {
       headers: {
         'Content-Language': language,
@@ -132,17 +136,25 @@ class SightEventForm extends Component {
 
     if (onSubmit) {
       onSubmit(values, actions, options, pathParams);
+      clearFormChanges();
 
       return;
     }
 
     const { id, ...data } = values;
     const {
-      createItem, createTranslation, initialValues, updateItem,
+      createItem, createTranslation, initialValues, updateItem, uploadedMultimedia,
     } = this.props;
     let action = createItem;
     const payload = {
-      data,
+      data: {
+        ...data,
+        mainImage: uploadedMultimedia.mainImage.id
+          ? uploadedMultimedia.mainImage : values.mainImage,
+        images: uploadedMultimedia.images.length ? uploadedMultimedia.images : values.images,
+        pdfAttachment: uploadedMultimedia.pdfAttachment.id
+          ? uploadedMultimedia.pdfAttachment : values.pdfAttachment,
+      },
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
       options,
@@ -162,6 +174,7 @@ class SightEventForm extends Component {
     }
 
     action(payload);
+    clearFormChanges();
   };
 
   handleSubmitFailure = actions => () => {
@@ -305,6 +318,7 @@ class SightEventForm extends Component {
 SightEventForm.propTypes = {
   buttons: PropTypes.bool,
   classes: PropTypes.shape({}).isRequired,
+  clearFormChanges: PropTypes.func.isRequired,
   createItem: PropTypes.func.isRequired,
   createTranslation: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
@@ -314,6 +328,7 @@ SightEventForm.propTypes = {
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
   updateItem: PropTypes.func.isRequired,
+  uploadedMultimedia: PropTypes.shape({}),
 };
 
 SightEventForm.defaultProps = {
@@ -323,6 +338,7 @@ SightEventForm.defaultProps = {
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,
+  uploadedMultimedia: null,
 };
 
 const mapStateToProps = () => ({});

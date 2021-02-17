@@ -58,38 +58,33 @@ class MultimediaForm extends React.Component {
       content: `Plik ${name} zostanie trwale usunięty i nie będzie można go przywrócić.`,
       open: true,
       title: 'Czy na pewno usunąć wybrany plik?',
+      onSuccess: () => {
+        this.handleFileDelete(fileId, type);
+        this.handleAlertDialogCancel();
+      },
     };
-
-    if (type === UPLOAD_TYPE.ATTACHMENT) {
-      alertDialog.onSuccess = () => {
-        this.handleAttachmentDelete(fileId);
-        this.handleAlertDialogCancel();
-      };
-    } else if (type === UPLOAD_TYPE.GALLERY_IMAGE) {
-      alertDialog.onSuccess = () => {
-        this.handleImageDelete(fileId);
-        this.handleAlertDialogCancel();
-      };
-    }
 
     this.setState({ alertDialog });
   };
 
-  handleImageDelete = (imageId) => {
-    const { ImageGalleryProps, itemId } = this.props;
-    const { deleteImage } = ImageGalleryProps || {};
+  handleFileDelete = (fileId, type) => {
+    const { deleteFile } = this.props;
 
-    if (deleteImage) {
-      deleteImage({
-        id: imageId,
-        itemId,
-        onFailure: this.handleImageDeleteFailure,
-        onSuccess: this.handleImageDeleteSuccess,
+    if (deleteFile) {
+      deleteFile({
+        id: fileId,
+        options: {
+          params: {
+            type: type === UPLOAD_TYPE.GALLERY_IMAGE ? 'image' : 'file',
+          },
+        },
+        onFailure: this.handleFileDeleteFailure,
+        onSuccess: this.handleFileDeleteSuccess,
       });
     }
-  };
+  }
 
-  handleImageDeleteFailure = () => {
+  handleFileDeleteFailure = () => {
     const { onFailure } = this.props;
 
     if (onFailure) {
@@ -97,7 +92,7 @@ class MultimediaForm extends React.Component {
     }
   };
 
-  handleImageDeleteSuccess = () => {
+  handleFileDeleteSuccess = () => {
     const { onSuccess } = this.props;
 
     if (onSuccess) {
@@ -105,42 +100,10 @@ class MultimediaForm extends React.Component {
     }
   };
 
-  handleAttachmentDelete = () => {
-    const { AttachmentProps, itemId } = this.props;
-    const { deleteAttachment } = AttachmentProps || {};
-
-    if (deleteAttachment) {
-      deleteAttachment({
-        id: itemId,
-        onFailure: this.handleAttachmentDeleteFailure,
-        onSuccess: this.handleAttachmentDeleteSuccess,
-      });
-    }
-  };
-
-  handleAttachmentDeleteFailure = () => {
-    const { onFailure } = this.props;
-
-    if (onFailure) {
-      onFailure();
-    }
-  };
-
-  handleAttachmentDeleteSuccess = () => {
-    const { onSuccess } = this.props;
-
-    if (onSuccess) {
-      onSuccess();
-    }
-  };
-
-  handleMediaManagerClose = () => {
+  handleMediaManagerClose = (shouldNotRunOnSuccessCallback = false) => {
     const {
-      AttachmentProps, ImageGalleryProps, MainImageProps, onFailure, onSuccess,
+      createFileCancel, onFailure, onSuccess,
     } = this.props;
-    const { mediaManagerData } = this.state;
-    const { uploadType } = mediaManagerData;
-    let action = () => {};
 
     this.setState({
       mediaManager: false,
@@ -148,50 +111,27 @@ class MultimediaForm extends React.Component {
       uploadError: false,
     });
 
-    if (uploadType === UPLOAD_TYPE.ATTACHMENT) {
-      const { createAttachmentCancel } = AttachmentProps;
-      action = createAttachmentCancel;
-    } else if (uploadType === UPLOAD_TYPE.GALLERY_IMAGE) {
-      const { createImageCancel } = ImageGalleryProps;
-      action = createImageCancel;
-    } else if (uploadType === UPLOAD_TYPE.MAIN_IMAGE) {
-      const { createMainImageCancel } = MainImageProps;
-      action = createMainImageCancel;
-    }
-
-    if (action) {
-      action({
+    if (createFileCancel) {
+      createFileCancel({
         onFailure: () => onFailure && onFailure(),
         onSuccess: () => onSuccess && onSuccess(),
       });
     }
 
-    if (onSuccess) {
+    if (onSuccess && !shouldNotRunOnSuccessCallback) {
       onSuccess();
     }
   };
 
   handleMediaManagerSubmit = ({ data, options }) => {
-    const { AttachmentProps, ImageGalleryProps, MainImageProps } = this.props;
+    const { createFile } = this.props;
     const { mediaManagerData } = this.state;
-    const { uploadType, itemId } = mediaManagerData;
-    let action = () => {};
+    const { itemId } = mediaManagerData;
 
     this.setState({ uploadError: false });
 
-    if (uploadType === UPLOAD_TYPE.ATTACHMENT) {
-      const { createAttachment } = AttachmentProps;
-      action = createAttachment;
-    } else if (uploadType === UPLOAD_TYPE.GALLERY_IMAGE) {
-      const { createImage } = ImageGalleryProps;
-      action = createImage;
-    } else if (uploadType === UPLOAD_TYPE.MAIN_IMAGE) {
-      const { createMainImage } = MainImageProps;
-      action = createMainImage;
-    }
-
-    if (action) {
-      action({
+    if (createFile) {
+      createFile({
         id: itemId,
         data,
         options,
@@ -205,16 +145,56 @@ class MultimediaForm extends React.Component {
     this.setState({ uploadError: true });
   };
 
-  handleMediaManagerSubmitSuccess = () => {
-    const { onSuccess } = this.props;
+  handleMediaManagerSubmitSuccess = (data) => {
+    const {
+      onSuccess, ImageGalleryProps, AttachmentProps, MainImageProps,
+    } = this.props;
+    const { mediaManagerData } = this.state;
+    const { uploadType } = mediaManagerData || {};
+    let multimedia = {};
+    const { items: images } = ImageGalleryProps || {};
+    const { item: mainImage } = MainImageProps || {};
+    const { item: pdfAttachment } = AttachmentProps || {};
+
+    if (uploadType === UPLOAD_TYPE.MAIN_IMAGE) {
+      const newMainImage = data.images[0];
+      const { id, ...downloadUrl } = newMainImage || {};
+      const mainImageMeta = {
+        id, name: 'Zdjęcie promocyjne', type: 'image/jpeg', downloadUrl,
+      };
+      multimedia = {
+        mainImage: { id: newMainImage.id, ...mainImageMeta },
+        images: [...images],
+        pdfAttachment: { ...pdfAttachment },
+      };
+    } else if (uploadType === UPLOAD_TYPE.GALLERY_IMAGE) {
+      const newImages = data.images.map((image) => {
+        const { id, ...downloadUrl } = image;
+        return ({
+          id, name: `Zdjęcie galerii (id #${image.id})`, type: 'image/jpeg', downloadUrl,
+        });
+      });
+      multimedia = {
+        images: [...images, ...newImages],
+        mainImage: { ...mainImage },
+        pdfAttachment: { ...pdfAttachment },
+      };
+    } else {
+      const newPdfAttachment = data.files[0];
+      multimedia = {
+        pdfAttachment: { ...newPdfAttachment },
+        mainImage: { ...mainImage },
+        images: [...images],
+      };
+    }
 
     this.setState({ uploadError: false });
 
     if (onSuccess) {
-      onSuccess();
+      onSuccess(multimedia);
     }
 
-    this.handleMediaManagerClose();
+    this.handleMediaManagerClose(true);
   };
 
   handleUploadModalOpen = (itemId, uploadType) => this.setState({
@@ -231,7 +211,7 @@ class MultimediaForm extends React.Component {
     } = this.state;
     const {
       classes, AttachmentProps, ImageGalleryProps, MainImageProps, defaultTranslation, itemId,
-      translation,
+      translation, createFile,
     } = this.props;
     const isDefaultTranslation = defaultTranslation === translation;
 
@@ -243,7 +223,7 @@ class MultimediaForm extends React.Component {
               <Grid item>
                 <Typography variant="h6">Zdjęcie promocyjne</Typography>
               </Grid>
-              {MainImageProps.createMainImage && (
+              {createFile && (
                 <Grid item>
                   <IconButton
                     aria-label="Dodaj"
@@ -268,7 +248,7 @@ class MultimediaForm extends React.Component {
               <Grid item>
                 <Typography variant="h6">Galeria zdjęć</Typography>
               </Grid>
-              {ImageGalleryProps.createImage && (
+              {createFile && (
                 <Grid item>
                   <IconButton
                     aria-label="Dodaj"
@@ -294,7 +274,7 @@ class MultimediaForm extends React.Component {
               <Grid item>
                 <Typography variant="h6">Pliki</Typography>
               </Grid>
-              {AttachmentProps.createAttachment && (
+              {createFile && (
                 <Grid item>
                   <IconButton
                     aria-label="Dodaj"
@@ -308,7 +288,7 @@ class MultimediaForm extends React.Component {
               )}
             </Grid>
             <MultimediaSection
-              items={AttachmentProps.items}
+              items={AttachmentProps.item ? [AttachmentProps.item] : []}
               sectionType={UPLOAD_TYPE.ATTACHMENT}
               onDelete={this.handleDelete}
             />
@@ -334,23 +314,18 @@ class MultimediaForm extends React.Component {
 
 MultimediaForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
+  createFile: PropTypes.func,
+  createFileCancel: PropTypes.func,
+  deleteFile: PropTypes.func,
   AttachmentProps: PropTypes.shape({
-    createAttachment: PropTypes.func,
-    createAttachmentCancel: PropTypes.func,
-    deleteAttachment: PropTypes.func,
     items: PropTypes.arrayOf(PropTypes.shape({})),
   }),
   defaultTranslation: PropTypes.string,
   ImageGalleryProps: PropTypes.shape({
-    createImage: PropTypes.func,
-    createImageCancel: PropTypes.func,
-    deleteImage: PropTypes.func,
     items: PropTypes.arrayOf(PropTypes.shape({})),
   }),
-  itemId: PropTypes.number.isRequired,
+  itemId: PropTypes.number,
   MainImageProps: PropTypes.shape({
-    createMainImage: PropTypes.func,
-    createMainImageCancel: PropTypes.func,
     item: PropTypes.shape({}),
   }),
   onFailure: PropTypes.func,
@@ -359,9 +334,13 @@ MultimediaForm.propTypes = {
 };
 
 MultimediaForm.defaultProps = {
+  createFile: null,
+  createFileCancel: null,
   AttachmentProps: null,
   defaultTranslation: DEFAULT_LANGUAGE,
+  deleteFile: null,
   ImageGalleryProps: null,
+  itemId: null,
   MainImageProps: null,
   onFailure: null,
   onSuccess: null,

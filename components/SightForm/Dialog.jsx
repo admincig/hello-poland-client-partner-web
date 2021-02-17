@@ -17,6 +17,7 @@ import {
   selectors as sightsSelectors,
 } from '@hello-poland/commons/redux/sights';
 import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
+import { actions as filesActions } from '@hello-poland/commons/redux/files';
 import {
   CONTENT_LANGUAGES, DEFAULT_LANGUAGE, getLanguageLabel, getTranslatedLanguages,
   getUntranslatedLanguages,
@@ -61,6 +62,8 @@ class SightFormDialog extends Component {
         translations: [],
       },
       translations: CONTENT_LANGUAGES,
+      uploadedMultimedia: { images: [], mainImage: {} },
+      formChanges: null,
     };
   }
 
@@ -68,7 +71,6 @@ class SightFormDialog extends Component {
     if (this.shouldComponentFetch()) {
       const { itemId } = this.props;
       const { language } = this.state;
-
       this.handleFetchItem(itemId, language);
     }
   }
@@ -81,7 +83,7 @@ class SightFormDialog extends Component {
 
   getInitialValues = (item) => {
     const { itemId } = this.props;
-    const { language } = this.state;
+    const { language, formChanges } = this.state;
 
     if (this.isItemLoaded(itemId, item)) {
       const { availableLanguageVersions } = item;
@@ -91,6 +93,10 @@ class SightFormDialog extends Component {
         return { id: itemId };
       }
 
+      if (formChanges) {
+        return { ...item, ...formChanges };
+      }
+
       return { ...item };
     }
 
@@ -98,21 +104,15 @@ class SightFormDialog extends Component {
   };
 
   getMultimediaFromItem = (item) => {
-    const { images, mainImage, pdfAttachment } = item;
+    const { images, mainImage } = item;
     const data = {};
 
     if (mainImage) {
       const { id, ...downloadUrl } = mainImage;
 
       data.mainImage = {
-        createdBy: '',
-        createdDate: '',
         id,
-        modifiedBy: '',
-        modifiedDate: '',
         name: 'Zdjęcie promocyjne',
-        path: '/home/hpl/var/DMS/omg/1234.jpg',
-        size: 12345,
         type: 'image/jpeg',
         downloadUrl,
       };
@@ -122,32 +122,12 @@ class SightFormDialog extends Component {
       data.images = images.map((image) => {
         const { id, ...downloadUrl } = image;
         return {
-          createdBy: '',
-          createdDate: '',
           id,
-          modifiedBy: '',
-          modifiedDate: '',
           name: `Zdjęcie galerii (id #${id})`,
-          path: '/home/hpl/var/DMS/omg/1234.jpg',
-          size: 12345,
           type: 'image/jpeg',
           downloadUrl,
         };
       });
-    }
-
-    if (pdfAttachment) {
-      data.attachments = [
-        {
-          ...pdfAttachment,
-          createdBy: '',
-          createdDate: '',
-          modifiedBy: '',
-          modifiedDate: '',
-          size: 12345,
-          type: 'application/pdf',
-        },
-      ];
     }
 
     return data;
@@ -183,6 +163,7 @@ class SightFormDialog extends Component {
       language: DEFAULT_LANGUAGE,
       submittingError: false,
       translations: CONTENT_LANGUAGES,
+      uploadedMultimedia: { images: [], mainImage: {} },
     });
 
     clearItem();
@@ -285,9 +266,36 @@ class SightFormDialog extends Component {
 
   handleDiscardClick = () => this.handleCancel();
 
+  fileActionSuccess = (itemId, language, data) => {
+    const { updateItem, item } = this.props;
+    this.setState(state => ({ uploadedMultimedia: { ...state.uploadedMultimedia, ...data } }));
+    if (itemId && data) {
+      updateItem({
+        id: itemId,
+        data: {
+          ...item,
+          ...data,
+        },
+        onSuccess: () => {
+          this.saveFormChanges();
+          this.handleFetchItem(itemId, language);
+        },
+        pathParams: {
+          languageVersion: language,
+        },
+        options: {
+          headers: {
+            'Content-Language': language,
+          },
+        },
+      });
+    } else if (itemId && !data) {
+      this.handleFetchItem(itemId, language);
+    }
+  }
+
   handleFetchItem = (id, language) => {
     const { fetchItem } = this.props;
-
     fetchItem({
       id,
       options: {
@@ -310,7 +318,11 @@ class SightFormDialog extends Component {
     const translations = getTranslatedLanguages(availableLanguageVersions);
 
     this.setState({
-      fetchingError: false, isFetching: false, language, translations,
+      fetchingError: false,
+      isFetching: false,
+      language,
+      translations,
+      uploadedMultimedia: { images: [], mainImage: {} },
     });
   };
 
@@ -412,6 +424,23 @@ class SightFormDialog extends Component {
     return false;
   };
 
+  saveFormChanges = () => {
+    const dirty = this.isFormDirty();
+    if (dirty) {
+      const { current } = this.formikRef;
+
+      if (current && current.getFormikBag) {
+        const { values } = current.getFormikBag();
+        const { images, mainImage, ...rest } = values || {};
+        this.setState({ formChanges: { ...rest } });
+      }
+    }
+  }
+
+  clearFormChanges = () => {
+    this.setState({ formChanges: null });
+  }
+
   isItemLoaded = (itemId, item) => item
     && Object.getOwnPropertyNames(item).length
     && item.id === itemId;
@@ -430,12 +459,12 @@ class SightFormDialog extends Component {
   render() {
     const {
       alertDialog, fetchingError, isFetching, isSubmitting, language, submittingError,
-      translationDialog, translations,
+      translationDialog, translations, uploadedMultimedia,
     } = this.state;
     const {
-      classes, clearItem, createImage, createImageCancel, createMainImage, createMainImageCancel,
-      deleteImage, deleteTranslation, fetchItem, fetchSightsList, fetchSightEventsList, item,
-      itemId, onClose, title, changeDefaultTranslation, ...rest
+      classes, createFile, createFileCancel, clearItem, deleteFile, deleteTranslation,
+      fetchItem, fetchSightsList, fetchSightEventsList, item, itemId, onClose, title,
+      changeDefaultTranslation, updateItem, ...rest
     } = this.props;
 
     let defaultLanguage;
@@ -501,40 +530,46 @@ class SightFormDialog extends Component {
                 />
               </GridItem>
               <SightForm
+                uploadedMultimedia={uploadedMultimedia}
                 buttons={false}
                 FormikProps={{ ref: this.formikRef }}
                 initialValues={this.getInitialValues(item)}
                 language={language}
                 onSubmitFailure={this.handleSubmitFailure}
                 onSubmitSuccess={this.handleSubmitSuccess}
+                clearChanges={this.clearFormChanges}
               />
             </Grid>
-            {itemId && isDefaultLanguage && (
-              <Grid container>
-                <GridItem className={classes.section}>
-                  <CategoriesForm items={item.categories} />
-                </GridItem>
-                <GridItem>
-                  <MultimediaForm
-                    defaultTranslation={defaultLanguage}
-                    ImageGalleryProps={{
-                      createImage,
-                      createImageCancel,
-                      deleteImage,
-                      items: multimedia.images,
-                    }}
-                    itemId={itemId}
-                    MainImageProps={{
-                      createMainImage,
-                      createMainImageCancel,
-                      item: multimedia.mainImage,
-                    }}
-                    onSuccess={() => this.handleFetchItem(itemId, language)}
-                    translation={language}
-                  />
-                </GridItem>
-              </Grid>
-            )}
+            <Grid container>
+              <GridItem className={classes.section}>
+                <CategoriesForm items={item.categories} />
+              </GridItem>
+              <GridItem>
+                {
+                  (!itemId || (itemId && isDefaultLanguage)) && (
+                    <MultimediaForm
+                      defaultTranslation={defaultLanguage}
+                      createFile={createFile}
+                      createFileCancel={createFileCancel}
+                      deleteFile={deleteFile}
+                      ImageGalleryProps={{
+                        items: uploadedMultimedia.images.length
+                          ? uploadedMultimedia.images : multimedia.images || [],
+                      }}
+                      itemId={itemId}
+                      MainImageProps={{
+                        item: uploadedMultimedia.mainImage.id
+                          ? uploadedMultimedia.mainImage : multimedia.mainImage,
+                      }}
+                      onSuccess={
+                          data => this.fileActionSuccess(itemId, language, data)
+                        }
+                      translation={language}
+                    />
+                  )
+                }
+              </GridItem>
+            </Grid>
           </DialogContent>
           <DialogActions>
             {submittingError
@@ -575,11 +610,9 @@ SightFormDialog.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   changeDefaultTranslation: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
-  createImage: PropTypes.func.isRequired,
-  createImageCancel: PropTypes.func.isRequired,
-  createMainImage: PropTypes.func.isRequired,
-  createMainImageCancel: PropTypes.func.isRequired,
-  deleteImage: PropTypes.func.isRequired,
+  createFile: PropTypes.func.isRequired,
+  createFileCancel: PropTypes.func.isRequired,
+  deleteFile: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   fetchSightsList: PropTypes.func.isRequired,
@@ -589,6 +622,7 @@ SightFormDialog.propTypes = {
   item: PropTypes.shape({}),
   itemId: PropTypes.number,
   title: PropTypes.string,
+  updateItem: PropTypes.func.isRequired,
 };
 
 SightFormDialog.defaultProps = {
@@ -606,15 +640,14 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   changeDefaultTranslation: sightsActions.changeDefaultTranslation,
   clearItem: sightsActions.clearItem,
-  createImage: sightsActions.createImage,
-  createImageCancel: sightsActions.createImageCancel,
-  createMainImage: sightsActions.createMainImage,
-  createMainImageCancel: sightsActions.createMainImageCancel,
-  deleteImage: sightsActions.deleteImage,
+  createFile: filesActions.createFile,
+  createFileCancel: filesActions.createFileCancel,
+  deleteFile: filesActions.deleteFile,
   deleteTranslation: sightsActions.deleteTranslation,
   fetchItem: sightsActions.fetchItem,
   fetchSightsList: sightsActions.fetchList,
   fetchSightEventsList: sightEventsActions.fetchList,
+  updateItem: sightsActions.updateItem,
 };
 
 export default compose(
