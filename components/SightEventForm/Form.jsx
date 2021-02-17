@@ -124,7 +124,7 @@ class SightEventForm extends Component {
   });
 
   handleSubmit = (values, actions) => {
-    const { language, onSubmit } = this.props;
+    const { language, onSubmit, clearFormChanges } = this.props;
     const options = {
       headers: {
         'Content-Language': language,
@@ -136,6 +136,7 @@ class SightEventForm extends Component {
 
     if (onSubmit) {
       onSubmit(values, actions, options, pathParams);
+      clearFormChanges();
 
       return;
     }
@@ -173,6 +174,7 @@ class SightEventForm extends Component {
     }
 
     action(payload);
+    clearFormChanges();
   };
 
   handleSubmitFailure = actions => () => {
@@ -316,6 +318,7 @@ class SightEventForm extends Component {
 SightEventForm.propTypes = {
   buttons: PropTypes.bool,
   classes: PropTypes.shape({}).isRequired,
+  clearFormChanges: PropTypes.func.isRequired,
   createItem: PropTypes.func.isRequired,
   createTranslation: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),

@@ -226,7 +226,9 @@ class SightForm extends Component {
   };
 
   handleSubmit = (values, actions) => {
-    const { language, onSubmit, uploadedMultimedia } = this.props;
+    const {
+      language, onSubmit, uploadedMultimedia, clearChanges,
+    } = this.props;
     const options = {
       headers: {
         'Content-Language': language,
@@ -238,6 +240,7 @@ class SightForm extends Component {
 
     if (onSubmit) {
       onSubmit(values, actions, options, pathParams);
+      clearChanges();
 
       return;
     }
@@ -270,6 +273,7 @@ class SightForm extends Component {
       }
     }
     action(payload);
+    clearChanges();
   };
 
   handleSubmitFailure = actions => () => {
@@ -446,6 +450,7 @@ class SightForm extends Component {
 SightForm.propTypes = {
   buttons: PropTypes.bool,
   classes: PropTypes.shape({}).isRequired,
+  clearChanges: PropTypes.func.isRequired,
   createItem: PropTypes.func.isRequired,
   createTranslation: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),

@@ -63,6 +63,7 @@ class SightFormDialog extends Component {
       },
       translations: CONTENT_LANGUAGES,
       uploadedMultimedia: { images: [], mainImage: {} },
+      formChanges: null,
     };
   }
 
@@ -82,7 +83,7 @@ class SightFormDialog extends Component {
 
   getInitialValues = (item) => {
     const { itemId } = this.props;
-    const { language } = this.state;
+    const { language, formChanges } = this.state;
 
     if (this.isItemLoaded(itemId, item)) {
       const { availableLanguageVersions } = item;
@@ -90,6 +91,10 @@ class SightFormDialog extends Component {
 
       if (hasNewTranslation) {
         return { id: itemId };
+      }
+
+      if (formChanges) {
+        return { ...item, ...formChanges };
       }
 
       return { ...item };
@@ -271,7 +276,10 @@ class SightFormDialog extends Component {
           ...item,
           ...data,
         },
-        onSuccess: () => this.handleFetchItem(itemId, language),
+        onSuccess: () => {
+          this.saveFormChanges();
+          this.handleFetchItem(itemId, language);
+        },
         pathParams: {
           languageVersion: language,
         },
@@ -416,6 +424,23 @@ class SightFormDialog extends Component {
     return false;
   };
 
+  saveFormChanges = () => {
+    const dirty = this.isFormDirty();
+    if (dirty) {
+      const { current } = this.formikRef;
+
+      if (current && current.getFormikBag) {
+        const { values } = current.getFormikBag();
+        const { images, mainImage, ...rest } = values || {};
+        this.setState({ formChanges: { ...rest } });
+      }
+    }
+  }
+
+  clearFormChanges = () => {
+    this.setState({ formChanges: null });
+  }
+
   isItemLoaded = (itemId, item) => item
     && Object.getOwnPropertyNames(item).length
     && item.id === itemId;
@@ -512,6 +537,7 @@ class SightFormDialog extends Component {
                 language={language}
                 onSubmitFailure={this.handleSubmitFailure}
                 onSubmitSuccess={this.handleSubmitSuccess}
+                clearChanges={this.clearFormChanges}
               />
             </Grid>
             <Grid container>

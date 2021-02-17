@@ -76,6 +76,7 @@ class SightEventFormDialog extends Component {
       },
       translations: CONTENT_LANGUAGES,
       uploadedMultimedia: { images: [], mainImage: {}, pdfAttachment: {} },
+      formChanges: null,
     };
   }
 
@@ -102,7 +103,7 @@ class SightEventFormDialog extends Component {
 
   getInitialValues = (item) => {
     const { itemId, parentId } = this.props;
-    const { language } = this.state;
+    const { language, formChanges } = this.state;
     const sightId = item.sightId || parentId;
 
     if (this.isItemLoaded(itemId, item)) {
@@ -111,6 +112,10 @@ class SightEventFormDialog extends Component {
 
       if (hasNewTranslation) {
         return { id: itemId, sightId };
+      }
+
+      if (formChanges) {
+        return { ...item, sightId, ...formChanges };
       }
 
       return { ...item, sightId };
@@ -392,7 +397,10 @@ class SightEventFormDialog extends Component {
           ...item,
           ...data,
         },
-        onSuccess: () => this.handleFetchItem(itemId, language),
+        onSuccess: () => {
+          this.saveFormChanges();
+          this.handleFetchItem(itemId, language);
+        },
         pathParams: {
           languageVersion: language,
         },
@@ -548,6 +556,25 @@ class SightEventFormDialog extends Component {
     return false;
   };
 
+  saveFormChanges = () => {
+    const dirty = this.isFormDirty();
+    if (dirty) {
+      const { current } = this.formikRef;
+
+      if (current && current.getFormikBag) {
+        const { values } = current.getFormikBag();
+        const {
+ images, mainImage, pdfAttachment, ...rest 
+} = values || {};
+        this.setState({ formChanges: { ...rest } });
+      }
+    }
+  }
+
+  clearFormChanges = () => {
+    this.setState({ formChanges: null });
+  }
+
   isItemLoaded = (itemId, item) => item
     && Object.getOwnPropertyNames(item).length
     && item.id === itemId;
@@ -645,6 +672,7 @@ class SightEventFormDialog extends Component {
                 language={language}
                 onSubmitFailure={this.handleSubmitFailure}
                 onSubmitSuccess={this.handleSubmitSuccess}
+                clearFormChanges={this.clearFormChanges}
               />
             </Grid>
             {itemId && isDefaultLanguage && (
