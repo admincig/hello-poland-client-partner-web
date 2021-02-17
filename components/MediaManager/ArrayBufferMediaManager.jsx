@@ -7,9 +7,12 @@ import Typography from '@material-ui/core/Typography/Typography';
 import Button from '@material-ui/core/Button/Button';
 import Dialog from '@material-ui/core/Dialog/Dialog';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import MediaDropzone from './MediaDropzone';
+import ArrayBufferMediaDropzone from './ArrayBufferMediaDropzone';
 
-class MediaManager extends Component {
+// TODO This component is kind of old thing. Kill it with fire if you have time,
+// and migrate to MediaManager.jsx component which uses FormData instead of Uint8Array.
+// The last usage of this component --> PartnerMultimediaForm.jsx
+class ArrayBufferMediaManager extends Component {
   state = {
     processing: false,
   };
@@ -44,10 +47,16 @@ class MediaManager extends Component {
     this.handleDropStart();
 
     acceptedFiles.forEach((acceptedFile) => {
-      const formData = new FormData();
-      formData.append('file', acceptedFile, acceptedFile.name);
+      const { arrayBuffer, metadata } = acceptedFile;
+      const data = new Uint8Array(arrayBuffer);
+      const options = {
+        headers: {
+          'content-type': metadata.type,
+        },
+        timeout: 0,
+      };
 
-      onSubmit({ data: formData });
+      onSubmit({ data, options });
     });
   };
 
@@ -63,7 +72,7 @@ class MediaManager extends Component {
       <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
         <DialogTitle id="form-dialog-title">{title}</DialogTitle>
         <DialogContent>
-          <MediaDropzone
+          <ArrayBufferMediaDropzone
             disabled={processing}
             disableClick
             multiple={false}
@@ -89,7 +98,7 @@ class MediaManager extends Component {
   }
 }
 
-MediaManager.propTypes = {
+ArrayBufferMediaManager.propTypes = {
   error: PropTypes.bool,
   imageUpload: PropTypes.bool,
   onClose: PropTypes.func.isRequired,
@@ -98,11 +107,11 @@ MediaManager.propTypes = {
   title: PropTypes.string,
 };
 
-MediaManager.defaultProps = {
+ArrayBufferMediaManager.defaultProps = {
   error: false,
   imageUpload: false,
   open: false,
   title: null,
 };
 
-export default MediaManager;
+export default ArrayBufferMediaManager;

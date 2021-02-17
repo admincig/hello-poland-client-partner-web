@@ -13,7 +13,7 @@ import {
 } from 'redux/partners';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import AlertDialog from 'components/AlertDialog';
-import MediaManager from 'components/MediaManager';
+import ArrayBufferMediaManager from 'components/MediaManager/ArrayBufferMediaManager';
 import MultimediaSection from './Section';
 
 const styles = theme => ({
@@ -159,7 +159,7 @@ class PartnerMultimediaForm extends React.Component {
           </Grid>
           <MultimediaSection items={images} onDelete={this.handleDelete} />
         </div>
-        <MediaManager
+        <ArrayBufferMediaManager
           disableBackdropClick
           error={!!requestError}
           onClose={this.handleMediaManagerClose}

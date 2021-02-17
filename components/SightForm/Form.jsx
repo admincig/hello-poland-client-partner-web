@@ -142,7 +142,9 @@ class SightForm extends Component {
   };
 
   getInitialValues = (initialValues) => {
-    const { location: initialLocation, openingHours, ...details } = initialValues || {};
+    const {
+      location: initialLocation, openingHours, mainImage, images, ...details
+    } = initialValues || {};
     const location = initialLocation || {};
 
     return {
@@ -160,6 +162,8 @@ class SightForm extends Component {
         city: location.city || '',
         country: location.country || 'Polska',
       },
+      mainImage,
+      images,
     };
   };
 
@@ -222,7 +226,9 @@ class SightForm extends Component {
   };
 
   handleSubmit = (values, actions) => {
-    const { language, onSubmit } = this.props;
+    const {
+      language, onSubmit, uploadedMultimedia, clearChanges,
+    } = this.props;
     const options = {
       headers: {
         'Content-Language': language,
@@ -234,6 +240,7 @@ class SightForm extends Component {
 
     if (onSubmit) {
       onSubmit(values, actions, options, pathParams);
+      clearChanges();
 
       return;
     }
@@ -244,7 +251,12 @@ class SightForm extends Component {
     } = this.props;
     let action = createItem;
     const payload = {
-      data,
+      data: {
+        ...data,
+        mainImage: uploadedMultimedia.mainImage.id
+          ? uploadedMultimedia.mainImage : values.mainImage,
+        images: uploadedMultimedia.images.length ? uploadedMultimedia.images : values.images,
+      },
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
       options,
@@ -260,8 +272,8 @@ class SightForm extends Component {
         payload.pathParams = pathParams;
       }
     }
-
     action(payload);
+    clearChanges();
   };
 
   handleSubmitFailure = actions => () => {
@@ -438,6 +450,7 @@ class SightForm extends Component {
 SightForm.propTypes = {
   buttons: PropTypes.bool,
   classes: PropTypes.shape({}).isRequired,
+  clearChanges: PropTypes.func.isRequired,
   createItem: PropTypes.func.isRequired,
   createTranslation: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
@@ -448,6 +461,7 @@ SightForm.propTypes = {
   onSubmitSuccess: PropTypes.func,
   translation: PropTypes.bool,
   updateItem: PropTypes.func.isRequired,
+  uploadedMultimedia: PropTypes.shape({}),
 };
 
 SightForm.defaultProps = {
@@ -458,6 +472,7 @@ SightForm.defaultProps = {
   onSubmitFailure: null,
   onSubmitSuccess: null,
   translation: false,
+  uploadedMultimedia: null,
 };
 
 const mapStateToProps = () => ({});

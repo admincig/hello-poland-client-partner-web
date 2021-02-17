@@ -35,6 +35,7 @@ import GridItem from 'components/GridItem';
 import CategoriesForm from 'components/CategoriesForm';
 import TagsForm from 'components/TagsForm';
 import MultimediaForm from 'components/Multimedia/MultimediaForm';
+import { actions as filesActions } from '@hello-poland/commons/redux/files';
 import SightForm from './Form';
 import i18n from './i18n/pl-PL';
 
@@ -74,6 +75,8 @@ class SightEventFormDialog extends Component {
         translations: [],
       },
       translations: CONTENT_LANGUAGES,
+      uploadedMultimedia: { images: [], mainImage: {}, pdfAttachment: {} },
+      formChanges: null,
     };
   }
 
@@ -100,7 +103,7 @@ class SightEventFormDialog extends Component {
 
   getInitialValues = (item) => {
     const { itemId, parentId } = this.props;
-    const { language } = this.state;
+    const { language, formChanges } = this.state;
     const sightId = item.sightId || parentId;
 
     if (this.isItemLoaded(itemId, item)) {
@@ -109,6 +112,10 @@ class SightEventFormDialog extends Component {
 
       if (hasNewTranslation) {
         return { id: itemId, sightId };
+      }
+
+      if (formChanges) {
+        return { ...item, sightId, ...formChanges };
       }
 
       return { ...item, sightId };
@@ -125,14 +132,8 @@ class SightEventFormDialog extends Component {
       const { id, ...downloadUrl } = mainImage;
 
       data.mainImage = {
-        createdBy: '',
-        createdDate: '',
         id,
-        modifiedBy: '',
-        modifiedDate: '',
         name: 'Zdjęcie promocyjne',
-        path: '/home/hpl/var/DMS/omg/1234.jpg',
-        size: 12345,
         type: 'image/jpeg',
         downloadUrl,
       };
@@ -142,14 +143,8 @@ class SightEventFormDialog extends Component {
       data.images = images.map((image) => {
         const { id, ...downloadUrl } = image;
         return {
-          createdBy: '',
-          createdDate: '',
           id,
-          modifiedBy: '',
-          modifiedDate: '',
           name: `Zdjęcie galerii (id #${id})`,
-          path: '/home/hpl/var/DMS/omg/1234.jpg',
-          size: 12345,
           type: 'image/jpeg',
           downloadUrl,
         };
@@ -157,17 +152,10 @@ class SightEventFormDialog extends Component {
     }
 
     if (pdfAttachment) {
-      data.attachments = [
-        {
-          ...pdfAttachment,
-          createdBy: '',
-          createdDate: '',
-          modifiedBy: '',
-          modifiedDate: '',
-          size: 12345,
-          type: 'application/pdf',
-        },
-      ];
+      data.pdfAttachment = {
+        ...pdfAttachment,
+        type: 'PDF',
+      };
     }
 
     return data;
@@ -191,7 +179,7 @@ class SightEventFormDialog extends Component {
 
   handleAlertDialogOpen = (sightEventId, name) => this.setState({
     alertDialog: {
-      content: `Plik ${name} zostanie trwale usunięty i nie będzie można go przywrócic.`,
+      content: `Plik ${name} zostanie trwale usunięty i nie będzie można go przywrócić.`,
       onSuccess: () => {
         this.handleDeletePDF(sightEventId);
         this.handleAlertDialogCancel();
@@ -215,6 +203,7 @@ class SightEventFormDialog extends Component {
       language: DEFAULT_LANGUAGE,
       submittingError: false,
       translations: CONTENT_LANGUAGES,
+      uploadedMultimedia: { images: [], mainImage: {}, pdfAttachment: {} },
     });
 
     clearItem();
@@ -350,7 +339,7 @@ class SightEventFormDialog extends Component {
   };
 
   handleDeletePDF = (sightEventId) => {
-    const { deletePDF } = this.props;
+    const { deleteFile } = this.props;
     const { language } = this.state;
 
     const payload = {
@@ -358,7 +347,7 @@ class SightEventFormDialog extends Component {
       onSuccess: () => this.handleFetchItem(sightEventId, language),
     };
 
-    deletePDF(payload);
+    deleteFile(payload);
   };
 
   handleDeleteTranslation = (language) => {
@@ -398,6 +387,34 @@ class SightEventFormDialog extends Component {
 
   handleDiscardClick = () => this.handleCancel();
 
+  fileActionSuccess = (itemId, language, data) => {
+    const { updateItem, item } = this.props;
+    this.setState(state => ({ uploadedMultimedia: { ...state.uploadedMultimedia, ...data } }));
+    if (itemId && data) {
+      updateItem({
+        id: itemId,
+        data: {
+          ...item,
+          ...data,
+        },
+        onSuccess: () => {
+          this.saveFormChanges();
+          this.handleFetchItem(itemId, language);
+        },
+        pathParams: {
+          languageVersion: language,
+        },
+        options: {
+          headers: {
+            'Content-Language': language,
+          },
+        },
+      });
+    } else if (itemId && !data) {
+      this.handleFetchItem(itemId, language);
+    }
+  }
+
   handleFetchItem = (id, language) => {
     const { fetchItem } = this.props;
 
@@ -423,7 +440,11 @@ class SightEventFormDialog extends Component {
     const translations = getTranslatedLanguages(availableLanguageVersions);
 
     this.setState({
-      fetchingError: false, isFetching: false, language, translations,
+      fetchingError: false,
+      isFetching: false,
+      language,
+      translations,
+      uploadedMultimedia: { images: [], mainImage: {}, pdfAttachment: {} },
     });
   };
 
@@ -535,6 +556,25 @@ class SightEventFormDialog extends Component {
     return false;
   };
 
+  saveFormChanges = () => {
+    const dirty = this.isFormDirty();
+    if (dirty) {
+      const { current } = this.formikRef;
+
+      if (current && current.getFormikBag) {
+        const { values } = current.getFormikBag();
+        const {
+ images, mainImage, pdfAttachment, ...rest 
+} = values || {};
+        this.setState({ formChanges: { ...rest } });
+      }
+    }
+  }
+
+  clearFormChanges = () => {
+    this.setState({ formChanges: null });
+  }
+
   isItemLoaded = (itemId, item) => item
     && Object.getOwnPropertyNames(item).length
     && item.id === itemId;
@@ -553,14 +593,13 @@ class SightEventFormDialog extends Component {
   render() {
     const {
       alertDialog, fetchingError, isFetching, isSubmitting, language, submittingError,
-      translationDialog, translations,
+      translationDialog, translations, uploadedMultimedia,
     } = this.state;
     const {
-      categoriesList, classes, clearItem, createImage, createImageCancel, createMainImage,
-      createMainImageCancel, createPDF, createPDFCancel, deleteImage, deleteItemCategory,
-      deleteItemTag, deleteTranslation, fetchCategoriesList, fetchItem, fetchList, fetchTagsList,
-      item, itemId, onClose, parentId, tagsList, title, deletePDF, changeDefaultTranslation,
-      updateItemCategory, updateItemTag, ...rest
+      categoriesList, classes, clearItem, createFile, createFileCancel, deleteFile,
+      deleteItemCategory, deleteItemTag, deleteTranslation, fetchCategoriesList, fetchItem,
+      fetchList, fetchTagsList, item, itemId, onClose, parentId, tagsList, title,
+      changeDefaultTranslation, updateItemCategory, updateItemTag, updateItem, ...rest
     } = this.props;
 
     let defaultLanguage;
@@ -626,12 +665,14 @@ class SightEventFormDialog extends Component {
                 />
               </GridItem>
               <SightForm
+                uploadedMultimedia={uploadedMultimedia}
                 buttons={false}
                 FormikProps={{ ref: this.formikRef }}
                 initialValues={this.getInitialValues(item)}
                 language={language}
                 onSubmitFailure={this.handleSubmitFailure}
                 onSubmitSuccess={this.handleSubmitSuccess}
+                clearFormChanges={this.clearFormChanges}
               />
             </Grid>
             {itemId && isDefaultLanguage && (
@@ -654,33 +695,31 @@ class SightEventFormDialog extends Component {
                     onDelete={this.handleItemDataTypeDelete(ITEM_DATA_TYPES.TAG)}
                   />
                 </div>
-                <div>
-                  <MultimediaForm
-                    AttachmentProps={{
-                      createAttachment: createPDF,
-                      createAttachmentCancel: createPDFCancel,
-                      deleteAttachment: deletePDF,
-                      items: multimedia.attachments,
-                    }}
-                    defaultTranslation={defaultLanguage}
-                    ImageGalleryProps={{
-                      createImage,
-                      createImageCancel,
-                      deleteImage,
-                      items: multimedia.images,
-                    }}
-                    itemId={itemId}
-                    MainImageProps={{
-                      createMainImage,
-                      createMainImageCancel,
-                      item: multimedia.mainImage,
-                    }}
-                    onSuccess={() => this.handleFetchItem(itemId, language)}
-                    translation={language}
-                  />
-                </div>
               </React.Fragment>
             )}
+            <div>
+              <MultimediaForm
+                AttachmentProps={{
+                  item: uploadedMultimedia.pdfAttachment.id
+                    ? uploadedMultimedia.pdfAttachment : multimedia.pdfAttachment,
+                }}
+                defaultTranslation={defaultLanguage}
+                createFile={createFile}
+                createFileCancel={createFileCancel}
+                deleteFile={deleteFile}
+                ImageGalleryProps={{
+                  items: uploadedMultimedia.images.length
+                    ? uploadedMultimedia.images : multimedia.images || [],
+                }}
+                itemId={itemId}
+                MainImageProps={{
+                  item: uploadedMultimedia.mainImage.id
+                    ? uploadedMultimedia.mainImage : multimedia.mainImage,
+                }}
+                onSuccess={data => this.fileActionSuccess(itemId, language, data)}
+                translation={language}
+              />
+            </div>
           </DialogContent>
           <DialogActions>
             {submittingError
@@ -721,16 +760,11 @@ SightEventFormDialog.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   changeDefaultTranslation: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
-  createImage: PropTypes.func.isRequired,
-  createImageCancel: PropTypes.func.isRequired,
-  createMainImage: PropTypes.func.isRequired,
-  createMainImageCancel: PropTypes.func.isRequired,
-  createPDF: PropTypes.func.isRequired,
-  createPDFCancel: PropTypes.func.isRequired,
-  deleteImage: PropTypes.func.isRequired,
+  createFile: PropTypes.func.isRequired,
+  createFileCancel: PropTypes.func.isRequired,
+  deleteFile: PropTypes.func.isRequired,
   deleteItemCategory: PropTypes.func.isRequired,
   deleteItemTag: PropTypes.func.isRequired,
-  deletePDF: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
   fetchCategoriesList: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
@@ -743,6 +777,7 @@ SightEventFormDialog.propTypes = {
   parentId: PropTypes.number,
   tagsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   title: PropTypes.string,
+  updateItem: PropTypes.func.isRequired,
   updateItemCategory: PropTypes.func.isRequired,
   updateItemTag: PropTypes.func.isRequired,
 };
@@ -765,21 +800,17 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   clearItem: sightEventsActions.clearItem,
   changeDefaultTranslation: sightEventsActions.changeDefaultTranslation,
-  createImage: sightEventsActions.createImage,
-  createImageCancel: sightEventsActions.createImageCancel,
-  createMainImage: sightEventsActions.createMainImage,
-  createMainImageCancel: sightEventsActions.createMainImageCancel,
-  createPDF: sightEventsActions.createPDF,
-  createPDFCancel: sightEventsActions.createPDFCancel,
-  deleteImage: sightEventsActions.deleteImage,
+  createFile: filesActions.createFile,
+  createFileCancel: filesActions.createFileCancel,
+  deleteFile: filesActions.deleteFile,
   deleteItemCategory: sightEventsActions.deleteItemCategory,
   deleteItemTag: sightEventsActions.deleteItemTag,
-  deletePDF: sightEventsActions.deletePDF,
   deleteTranslation: sightEventsActions.deleteTranslation,
   fetchCategoriesList: categoriesActions.fetchList,
   fetchItem: sightEventsActions.fetchItem,
   fetchList: sightEventsActions.fetchList,
   fetchTagsList: tagsActions.fetchList,
+  updateItem: sightEventsActions.updateItem,
   updateItemCategory: sightEventsActions.updateItemCategory,
   updateItemTag: sightEventsActions.updateItemTag,
 };
