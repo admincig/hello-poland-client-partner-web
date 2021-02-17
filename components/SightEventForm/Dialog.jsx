@@ -204,6 +204,7 @@ class SightEventFormDialog extends Component {
       submittingError: false,
       translations: CONTENT_LANGUAGES,
       uploadedMultimedia: { images: [], mainImage: {}, pdfAttachment: {} },
+      formChanges: null,
     });
 
     clearItem();
@@ -461,7 +462,8 @@ class SightEventFormDialog extends Component {
   };
 
   handleFormReload = (callback, options) => {
-    if (this.isFormDirty()) {
+    const { formChanges } = this.state;
+    if (this.isFormDirty() || formChanges) {
       this.setState({
         alertDialog: {
           content: 'W formularzu są niezapisane zmiany. Wykonać operację mimo to?',
@@ -718,6 +720,7 @@ class SightEventFormDialog extends Component {
                 }}
                 onSuccess={data => this.fileActionSuccess(itemId, language, data)}
                 translation={language}
+                saveFormChanges={this.saveFormChanges}
               />
             </div>
           </DialogContent>

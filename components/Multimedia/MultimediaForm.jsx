@@ -93,7 +93,9 @@ class MultimediaForm extends React.Component {
   };
 
   handleFileDeleteSuccess = () => {
-    const { onSuccess } = this.props;
+    const { onSuccess, saveFormChanges } = this.props;
+
+    saveFormChanges();
 
     if (onSuccess) {
       onSuccess();
@@ -330,6 +332,7 @@ MultimediaForm.propTypes = {
   }),
   onFailure: PropTypes.func,
   onSuccess: PropTypes.func,
+  saveFormChanges: PropTypes.func.isRequired,
   translation: PropTypes.string,
 };
 
