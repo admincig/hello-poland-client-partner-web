@@ -564,8 +564,8 @@ class SightEventFormDialog extends Component {
       if (current && current.getFormikBag) {
         const { values } = current.getFormikBag();
         const {
- images, mainImage, pdfAttachment, ...rest 
-} = values || {};
+          images, mainImage, pdfAttachment, ...rest
+        } = values || {};
         this.setState({ formChanges: { ...rest } });
       }
     }
