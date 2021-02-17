@@ -52,7 +52,7 @@ const getAffiliationLink = (slug, affiliationCode) => `
     text-transform: uppercase; text-decoration: none; margin: 0"
    rel="nofollow"
   >
-    Kup bilet
+    Kup produkt
   </a>
 `;
 
@@ -172,11 +172,11 @@ class HomeListItem extends Component {
           {onStatsClick
             && (
               <IconButton
-                aria-label="Pokaż dostępność biletów"
+                aria-label="Pokaż dostępność produktów"
                 component="a"
                 href={onStatsClick()}
                 target="_blank"
-                title="Pokaż dostępność biletów"
+                title="Pokaż dostępność produktów"
               >
                 <AssessmentIcon />
               </IconButton>
