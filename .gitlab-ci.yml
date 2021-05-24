@@ -170,6 +170,9 @@ Deploy Hello Poland Production Environment:
     - docker pull "${FRM_DOCKER_IMAGE}"
     - docker ps -aq --filter "name=${FRM_PRODUCTION_CONTAINER_NAME}" | grep -q . && docker stop "${FRM_PRODUCTION_CONTAINER_NAME}" && docker rm "${FRM_PRODUCTION_CONTAINER_NAME}"
     - docker run -d -v ${FRM_PRODUCTION_VOLUME}:/data -p ${FRM_PRODUCTION_PORT}:3000 --restart "${FRM_PRODUCTION_RESTART_POLICY}" --name "${FRM_PRODUCTION_CONTAINER_NAME}" "${FRM_DOCKER_IMAGE}"
+    - CICD_NOTIFICATION_MESSAGE="{\"payload\":{\"commitShortSHA\":\"${CI_COMMIT_SHORT_SHA}\",\"environmentName\":\"${CI_ENVIRONMENT_NAME}\",\"environmentURL\":\"${CI_ENVIRONMENT_URL}\",\"jobStartedAt\":\"${CI_JOB_STARTED_AT}\",\"notificationRecipients\":\"${CICD_NOTIFICATION_RECIPIENTS}\",\"pipelineURL\":\"${CI_PIPELINE_URL}\",\"projectName\":\"${CI_PROJECT_NAME}\",\"projectNamespace\":\"${CI_PROJECT_NAMESPACE}\",\"projectURL\":\"${CI_PROJECT_URL}\",\"userName\":\"${GITLAB_USER_NAME}\",\"userEmail\":\"${GITLAB_USER_EMAIL}\"}}"
+    - |
+      curl -s -X POST -H 'Content-type: application/json' --data "${CICD_NOTIFICATION_MESSAGE}" ${CICD_NOTIFICATION_URL}
   tags:
     - hpl-prod
   when: manual
@@ -193,6 +196,9 @@ Deploy Wroclaw ON Production Environment:
     - docker pull "${FRM_DOCKER_IMAGE}"
     - docker ps -aq --filter "name=${FRM_WON_PRODUCTION_CONTAINER_NAME}" | grep -q . && docker stop "${FRM_WON_PRODUCTION_CONTAINER_NAME}" && docker rm "${FRM_WON_PRODUCTION_CONTAINER_NAME}"
     - docker run -d -v ${FRM_WON_PRODUCTION_VOLUME}:/data -p ${FRM_WON_PRODUCTION_PORT}:3000 --restart "${FRM_WON_PRODUCTION_RESTART_POLICY}" --name "${FRM_WON_PRODUCTION_CONTAINER_NAME}" "${FRM_DOCKER_IMAGE}"
+    - CICD_NOTIFICATION_MESSAGE="{\"payload\":{\"commitShortSHA\":\"${CI_COMMIT_SHORT_SHA}\",\"environmentName\":\"${CI_ENVIRONMENT_NAME}\",\"environmentURL\":\"${CI_ENVIRONMENT_URL}\",\"jobStartedAt\":\"${CI_JOB_STARTED_AT}\",\"notificationRecipients\":\"${CICD_NOTIFICATION_RECIPIENTS}\",\"pipelineURL\":\"${CI_PIPELINE_URL}\",\"projectName\":\"${CI_PROJECT_NAME}\",\"projectNamespace\":\"${CI_PROJECT_NAMESPACE}\",\"projectURL\":\"${CI_PROJECT_URL}\",\"userName\":\"${GITLAB_USER_NAME}\",\"userEmail\":\"${GITLAB_USER_EMAIL}\"}}"
+    - |
+      curl -s -X POST -H 'Content-type: application/json' --data "${CICD_NOTIFICATION_MESSAGE}" ${CICD_NOTIFICATION_URL}
   tags:
     - hpl-prod
   when: manual
