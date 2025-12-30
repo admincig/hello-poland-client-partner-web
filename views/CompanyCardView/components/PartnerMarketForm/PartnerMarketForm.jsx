@@ -52,7 +52,7 @@ class PartnerMarketForm extends React.Component {
     // TODO: see https://github.com/jaredpalmer/formik/issues/986
     this.validationSchema = yupObject().shape({
       published: yupBoolean(),
-      description: yupString().min(10).max(2500).required(),
+      description: yupString().min(10).max(1000).required(),
       location: yupObject().shape({
         directions: yupString(),
       }),

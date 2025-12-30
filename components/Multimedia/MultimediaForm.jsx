@@ -31,6 +31,19 @@ const styles = theme => ({
   },
 });
 
+const getHumanFileName = (f) => {
+  if (!f) return '';
+  return (
+    f.originalName ||
+    f.originalFilename ||
+    f.fileName ||
+    f.filename ||
+    f.name ||
+    ''
+  );
+};
+
+
 class MultimediaForm extends React.Component {
   state = {
     alertDialog: {
@@ -181,14 +194,21 @@ class MultimediaForm extends React.Component {
         mainImage: { ...mainImage },
         pdfAttachment: { ...pdfAttachment },
       };
-    } else {
-      const newPdfAttachment = data.files[0];
-      multimedia = {
-        pdfAttachment: { ...newPdfAttachment },
-        mainImage: { ...mainImage },
-        images: [...images],
-      };
-    }
+      } else { // UPLOAD_TYPE.ATTACHMENT
+        const newPdfAttachment = data.files[0];
+
+        const patchedAttachment = {
+          ...newPdfAttachment,
+          name: getHumanFileName(newPdfAttachment),
+        };
+
+        multimedia = {
+          pdfAttachment: patchedAttachment,
+          mainImage: { ...mainImage },
+          images: [...images],
+        };
+      }
+
 
     this.setState({ uploadError: false });
 
@@ -216,6 +236,11 @@ class MultimediaForm extends React.Component {
       translation, createFile,
     } = this.props;
     const isDefaultTranslation = defaultTranslation === translation;
+    const attachmentItem =
+      AttachmentProps && AttachmentProps.item
+        ? [{ ...AttachmentProps.item, name: getHumanFileName(AttachmentProps.item) }]
+        : [];
+
 
     return (
       <React.Fragment>
@@ -290,10 +315,10 @@ class MultimediaForm extends React.Component {
               )}
             </Grid>
             <MultimediaSection
-              items={AttachmentProps.item ? [AttachmentProps.item] : []}
+              items={attachmentItem}
               sectionType={UPLOAD_TYPE.ATTACHMENT}
               onDelete={this.handleDelete}
-            />
+          />
           </div>
         )}
         <MediaManager

@@ -8,7 +8,7 @@ import _isNumber from 'lodash/isNumber';
 import format from 'date-fns/format';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
-import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
+//import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
 import Switch from '@material-ui/core/Switch';
@@ -20,9 +20,11 @@ import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
-import yupBoolen from 'yup/lib/boolean';
+import yupBoolean from 'yup/lib/boolean';
 import { actions as sightsActions } from '@hello-poland/commons/redux/sights';
 import GridItem from 'components/GridItem';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 const i18n = {
   days: {
@@ -84,7 +86,7 @@ class SightForm extends Component {
         .min(3)
         .max(250)
         .required(),
-      published: yupBoolen(),
+      published: yupBoolean(),
       // generalAdmission: yupBoolen(),
       lead: yupString()
         .min(10)
@@ -105,16 +107,17 @@ class SightForm extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { initialValues: prevInitialValues } = prevProps;
-    const { initialValues } = this.props;
+    const prev = prevProps.initialValues || {};
+    const curr = this.props.initialValues || {};
 
-    if (!_isEqual(prevInitialValues, initialValues)) {
-      const { openingHours } = initialValues || {};
-
-      this.setInitialValues(initialValues);
+    // reinit TYLKO gdy zmienił się obiekt (np. weszliśmy w inną atrakcję) albo język
+    if (prev.id !== curr.id || prev.language !== curr.language) {
+      const { openingHours } = curr || {};
+      this.setInitialValues(curr);
       this.setViewOpeningHours(openingHours, true);
     }
   }
+
 
   getFormattedTime = (datetime, dateFormat = 'HH:mm') => format(datetime, dateFormat);
 
@@ -155,13 +158,26 @@ class SightForm extends Component {
       description: details.description || '',
       email: details.email || '',
       phone: details.phone || '',
+      animalsAllowed: details.animalsAllowed || false,
+      carParkAvailable: details.carParkAvailable || false,
+      foodAndDrinkAvailable: details.foodAndDrinkAvailable || false,
+
+      disabledAccessHearing: details.disabledAccessHearing || false,
+      disabledAccessMovement: details.disabledAccessMovement || false,
+      disabledAccessVision: details.disabledAccessVision || false,
       openingHours: this.getInitialOpeningHours(openingHours),
       location: {
         street: location.street || '',
         zipCode: location.zipCode || '',
         city: location.city || '',
         country: location.country || 'Polska',
+        latitude: location.latitude || '',
+        longitude: location.longitude || '',
+        commune: location.commune || '',
+        county: location.county || '',
+        voivodeship: location.voivodeship || '',
       },
+
       mainImage,
       images,
     };
@@ -322,7 +338,7 @@ class SightForm extends Component {
         validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
       >
-        {({ isSubmitting, values }) => (
+        {({ isSubmitting, values, setFieldValue }) => (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <GridItem>
@@ -425,6 +441,43 @@ class SightForm extends Component {
                     <GridItem>
                       <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
                     </GridItem>
+                    <GridItem>
+                      <Field name="location.voivodeship" label="Województwo" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Field name="location.county" label="Powiat" component={TextField} {...commonProps}  />
+                    </GridItem>
+                    <GridItem>
+                      <Field  name="location.commune" label="Gmina" component={TextField} {...commonProps}  />
+                    </GridItem>
+                    <GridItem md={6} sm={6}>
+                      <Field name="location.latitude" label="Szerokość geograficzna (lat)" component={TextField} type="text" inputProps={{ inputMode: "decimal",  pattern: "[0-9.\\-]*", }} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={6} sm={6}>
+                      <Field  name="location.longitude"  label="Długość geograficzna (lon)" component={TextField}  inputProps={{ inputMode: "decimal",  pattern: "[0-9.\\-]*", }}  {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Typography variant="h6" className={classes.title}>Udogodnienia i dostępność</Typography>
+                    </GridItem>
+                    <GridItem md={6} sm={6}>
+                      <FormControlLabel control={<Checkbox checked={!!values.animalsAllowed} onChange={(e) => setFieldValue('animalsAllowed', e.target.checked)} /> } label="Zwierzęta dozwolone" />
+                    </GridItem>
+                    <GridItem md={6} sm={6}>
+                      <FormControlLabel control={ <Checkbox checked={!!values.carParkAvailable} onChange={(e) => setFieldValue('carParkAvailable', e.target.checked)} /> } label="Parking dostępny" />
+                    </GridItem>
+                    <GridItem md={6} sm={6}>
+                      <FormControlLabel control={ <Checkbox checked={!!values.foodAndDrinkAvailable} onChange={(e) => setFieldValue('foodAndDrinkAvailable', e.target.checked)} /> } label="Jedzenie i napoje dostępne" />
+                    </GridItem>
+                    <GridItem md={6} sm={6}>
+                      <FormControlLabel control={ <Checkbox checked={!!values.disabledAccessMovement} onChange={(e) => setFieldValue('disabledAccessMovement', e.target.checked)} /> } label="Dostępność: ruch" />
+                    </GridItem>
+                    <GridItem md={6} sm={6}>
+                      <FormControlLabel control={ <Checkbox checked={!!values.disabledAccessVision} onChange={(e) => setFieldValue('disabledAccessVision', e.target.checked)} /> } label="Dostępność: wzrok" />
+                    </GridItem>
+                    <GridItem md={6} sm={6}>
+                      <FormControlLabel control={ <Checkbox checked={!!values.disabledAccessHearing} onChange={(e) => setFieldValue('disabledAccessHearing', e.target.checked)} /> } label="Dostępność: słuch" />
+                    </GridItem>
+
                   </Fragment>
                 )
               }

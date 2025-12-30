@@ -15,7 +15,7 @@ import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
-import yupBoolen from 'yup/lib/boolean';
+import yupBoolean from 'yup/lib/boolean';
 import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
 import GridItem from 'components/GridItem';
 
@@ -61,7 +61,7 @@ class SightEventForm extends Component {
         .min(3)
         .max(250)
         .required(),
-      published: yupBoolen(),
+      published: yupBoolean(),
       // generalAdmission: yupBoolen(),
       lead: yupString()
         .min(10)
@@ -111,6 +111,11 @@ class SightEventForm extends Component {
         zipCode: location.zipCode || '',
         city: location.city || '',
         country: location.country || 'Polska',
+        latitude: location.latitude || '',
+        longitude: location.longitude || '',
+        commune:location.commune || '',
+        county: location.county || '',
+        voivodeship: location.voivodeship || '',
       },
       mainImage,
       images,
@@ -291,7 +296,22 @@ class SightEventForm extends Component {
                       <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem>
-                      <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={20} />
+                      <Field name="location.voivodeship" label="Województwo" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Field name="location.county" label="Powiat" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Field name="location.commune" label="Gmina" component={TextField} {...commonProps}  />
+                    </GridItem>
+                      <GridItem md={6} sm={6}>
+                        <Field name="location.latitude" label="Szerokość geograficzna (lat)"  component={TextField} type="text" inputProps={{ inputMode: "decimal",  pattern: "[0-9.\\-]*", }} {...commonProps} />
+                      </GridItem>
+                      <GridItem md={6} sm={6}>
+                        <Field name="location.longitude" label="Długość geograficzna (lon)" component={TextField} type="text" inputProps={{ inputMode: "decimal",  pattern: "[0-9.\\-]*", }} {...commonProps} />
+                      </GridItem>
+                    <GridItem>
+                      <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={20} inputProps={{ maxLength: 1000 }} />
                     </GridItem>
                   </Fragment>
                 )
