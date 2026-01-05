@@ -43,6 +43,24 @@ const styles = () => ({
     marginTop: 40,
   },
 });
+
+const normalizeCoord = (v) => {
+  if (v === null || v === undefined) return null;
+
+  // formik często trzyma '' dla pustych pól
+  if (typeof v === 'string') {
+    const s = v.trim();
+    if (s === '') return null;
+    const n = Number(s.replace(',', '.'));
+    return Number.isFinite(n) ? n : null;
+  }
+
+  if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+
+  return null;
+};
+
+
 class SightEventForm extends Component {
   constructor(props) {
     super(props);
@@ -151,6 +169,11 @@ class SightEventForm extends Component {
       createItem, createTranslation, initialValues, updateItem, uploadedMultimedia,
     } = this.props;
     let action = createItem;
+    if (data.location) {
+      data.location.latitude = normalizeCoord(data.location.latitude);
+      data.location.longitude = normalizeCoord(data.location.longitude);
+    }
+
     const payload = {
       data: {
         ...data,
@@ -305,10 +328,10 @@ class SightEventForm extends Component {
                       <Field name="location.commune" label="Gmina" component={TextField} {...commonProps}  />
                     </GridItem>
                       <GridItem md={6} sm={6}>
-                        <Field name="location.latitude" label="Szerokość geograficzna (lat)"  component={TextField} type="text" inputProps={{ inputMode: "decimal",  pattern: "[0-9.\\-]*", }} {...commonProps} />
+                        <Field name="location.latitude" label="Szerokość geograficzna (lat)"  component={TextField} type="text" inputProps={{ inputMode: "decimal",  pattern: "[0-9.,\\-]*", }} {...commonProps} />
                       </GridItem>
                       <GridItem md={6} sm={6}>
-                        <Field name="location.longitude" label="Długość geograficzna (lon)" component={TextField} type="text" inputProps={{ inputMode: "decimal",  pattern: "[0-9.\\-]*", }} {...commonProps} />
+                        <Field name="location.longitude" label="Długość geograficzna (lon)" component={TextField} type="text" inputProps={{ inputMode: "decimal",  pattern: "[0-9.,\\-]*", }} {...commonProps} />
                       </GridItem>
                     <GridItem>
                       <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={20} inputProps={{ maxLength: 1000 }} />
