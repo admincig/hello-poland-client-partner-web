@@ -1,131 +1,150 @@
-# React Web App
-Template project for web applications.
+# Partner Web (Hello! Poland)
+
+React / Next.js aplikacja webowa dla **Partnera** w ekosystemie **Hello! Poland**.
+
+Pełna dokumentacja runtime, zgodna z aktualnym wdrożeniem TST (Docker + nginx + CONFIG_PATH).
+
+---
 
 ## Overview
-### Project structure
+
+Partner Web to aplikacja **Next.js (Node.js)** uruchamiana w **kontenerze Docker**, konfigurowana **wyłącznie przez plik `config.json` wskazywany zmienną `CONFIG_PATH`**.
+
+Aplikacja:
+- komunikuje się z **HelloPoland Backend (HPL)** przez REST API,
+- korzysta z **DMS** montowanego do kontenera jako `/DMS`,
+- jest wystawiana na zewnątrz **przez nginx (reverse proxy)**.
+
+---
+
+## Project structure (kod źródłowy)
 
 ```
-/components - global components directory (used by more than one view)
-  /ExampleComponent
-    /__mocks__ - mock data used in tests
-    /redux - component reducers
-    index.jsx - exports component
-    ExampleComponent.jsx - implementation of main component
-    ExampleComponent.test.jsx - all kinds of tests
-    ExampleButton.jsx - partial component
-    ExampleButton.test.jsx
-/config - default app configuration
-/pages - next.js magic folder. Handles routing. Use [kebab-kase](http://wiki.c2.com/?KebabCase) naming convention.
-  /account
-    index.jsx - redirects to profile.jsx (preferably with 302 status)
-    profile.jsx
-    edit.jsx
-  /movies
-    index.jsx - resolves list and item routes (/movies - list view, /movies/:id - item view)
-    add.jsx
-    edit.jsc
-  example-view.jsx
-/redux - global reducers
-/scripts - build scripts
-/services - application services
-/static - static files
-  /images
-  manifest.json - PWA manifest
-/utils - pure JS utility functions
-/views - view implamentations
-  /ExampleView
-    /components - view specific components
-    /redux - component reducers
-    index.jsx - exports view
-    ExampleView.jsx - view implementation
-.editorconfig - common editor settings
-.eslintrc.json - linter configuration
-.gitignore - files ignored by git
-.gitlab-cu.yml - CI/CD configuration file - see https://docs.gitlab.com/ce/ci/yaml/
-.npmrc - npm configuration
-next.config.js - next.js configuration
+/components        – globalne komponenty UI
+/config            – domyślne konfiguracje developerskie (nieużywane na TST/PROD)
+/pages             – routing Next.js (kebab-case)
+/redux             – globalne reducery
+/scripts           – skrypty buildowe
+/services          – warstwa serwisów / API
+/static             – pliki statyczne (obrazy, manifest)
+/utils              – funkcje pomocnicze
+/views              – implementacje widoków
 ```
 
-### App config
-Default development config is located in `config/develop.config.js`.
+> ⚠️ Runtime **nie używa katalogu `/config`** z repozytorium.
 
-#### Structure:
-```code
+---
+
+## Runtime configuration (TST / PROD)
+
+### Zasada
+
+Konfiguracja runtime **nie jest bundlowana** w obrazie Dockera.
+
+Aplikacja **czyta ją tylko przy starcie** z pliku JSON wskazanego przez:
+
+```
+CONFIG_PATH=/data/config.json
+```
+
+---
+
+## Struktura katalogów na serwerze (TST)
+
+```
+/srv/partner/tst/
+├── config.json
+├── config.json.bak_YYYYMMDD_HHMMSS
+└── deploy_partner_image.sh (opcjonalnie)
+```
+
+Mount do kontenera:
+
+```
+-v /srv/partner/tst:/data
+```
+
+---
+
+## Przykładowy config.json (TST)
+
+```json
 {
-  // Will only be available on the server side
-  server: {
-    secret: 'my-secret'
+  "server": {
+    "apiURL": "http://127.0.0.1:8180/hellopoland/v1",
+    "host": "0.0.0.0"
   },
-  // Will be available on both server and client
-  public: {
-    name: 'Default application name',
-    axios: {
-      baseURL: '/'
-    }
+  "public": {
+    "axios": {
+      "baseURL": "http://145.239.133.29:8300/api/v1/partner"
+    },
+    "iconBaseURL": "http://127.0.0.1:8180/hellopoland/v1/static/icons",
+    "availableTicketsURL": "http://127.0.0.1:8180/hellopoland/v1/market/sight-events/:id/available-tickets?date=:date",
+    "baseAffiliationURL": "https://hello-mazovia.pl/oferty",
+    "name": "Hello! Poland – Partner (TST)",
+    "brandName": "Hello! Poland"
   }
 }
 ```
-See [Next.js docs](https://github.com/zeit/next.js#exposing-configuration-to-the-server--client-side) for more info.
 
-#### Usage:
-```code
-import config from 'config';
+---
 
-const { secret } = config.server;
-const { name } = config.public;
-```
+## Docker
 
-#### Production
-Usually, different configs are used for production and development.
-By default, development config is used.
-To override it, pass `CONFIG_PATH` variable to `npm start` script:
-```bash
-CONFIG_PATH='./path-to-prod-config/config.js' npm run start
-```
-:warning: Remember to restart app after config changes.
-
-## Initializing new project
-To initialize new project using this repository click the "New project" button available in group directory. Next go to "Import project" tab and click "Repo by URL" button.
-
-In "Git repository URL" paste the following URL:
+### Obraz
 
 ```
-git@git.fream.pl:fream/web/react-web-app.git
+hp-partner-web:1.6.2
 ```
 
-and specify new project path and name (use [kebab-case](http://wiki.c2.com/?KebabCase) convention). 
-
-## Project stack
-### Core packages
-React + Redux + Next.js + Jest + JSS
-
-### Other common libraries
-Material UI
-
-## Using HTTPClient
-By default we use [axios](https://github.com/axios/axios) for request handling. It consists of two classes:
-- `axios-commons`, which provides common methods that can be used depending on project requirements
-- httpClient, which configures axios instance
-
-For detailed information on `axios-commons` see it's readme.false
-
-## Modifying `next.config.js`
-
-### Adding new plugins
-
-Example:
-
-```diff
-const withPlugins = require('next-compose-plugins');
-const bundleAnalyzer = require('@zeit/next-bundle-analyzer');
-+ const css = require('@zeit/next-css');
-
-...
-
-module.exports = withPlugins([
-  [bundleAnalyzer, bundleAnalyzerConfig],
-+ [css],
-  nextConfig,
-]);
+### Uruchomienie kontenera (TST)
 
 ```
+docker run -d --name hello_poland_partner_tst \
+  -p 127.0.0.1:8301:3000 \
+  -e NODE_ENV=production \
+  -e CONFIG_PATH=/data/config.json \
+  -v /srv/partner/tst:/data \
+  -v /var/lib/docker/volumes/HELLO_DMS_TST/_data:/DMS:rw \
+  --restart unless-stopped \
+  hp-partner-web:1.6.2
+```
+
+---
+
+## nginx (reverse proxy)
+
+```
+server {
+  listen 8300;
+  server_name _;
+
+  location / {
+    proxy_pass http://127.0.0.1:8301/;
+  }
+
+  location /api/ {
+    proxy_pass http://127.0.0.1:8180/hellopoland/;
+  }
+}
+```
+
+---
+
+## Dostęp (TST)
+
+- UI: http://145.239.133.29:8300/
+- API: http://145.239.133.29:8300/api/v1/partner/
+
+---
+
+## SSL
+
+Na TST pracujemy na **HTTP (IP)**.  
+SSL zostanie dodany po pojawieniu się domen TST.
+
+---
+
+## Status
+
+✔ Partner Web działa poprawnie na TST
