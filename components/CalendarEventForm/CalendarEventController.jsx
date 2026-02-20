@@ -171,7 +171,7 @@ class CalendarEventController extends React.Component {
     return fieldValue;
   };
 
-  handleAvailableTicketsChange = (...args) => {
+  /*handleAvailableTicketsChange = (...args) => {
     const { formData } = this.state;
     const key = this.getKeyFromEvent(...args);
     const value = this.getValueFromEvent(...args);
@@ -182,7 +182,37 @@ class CalendarEventController extends React.Component {
         [key]: value > 0 ? value : -1,
       },
     });
+  };*/
+
+  handleAvailableTicketsChange = (event) => {
+    const { formData } = this.state;
+    const key = this.getKeyFromEvent(event);
+
+    // SUROWA wartość z inputa (string albo '')
+    let raw = null;
+    if (event && event.target) {
+      raw = event.target.value;
+    }
+
+    let nextValue = -1; // -1 = brak limitu
+
+    if (raw === '') {
+      nextValue = -1; // puste pole => brak limitu
+    } else {
+      const num = Number(raw);
+      if (!Number.isNaN(num) && num >= 0) {
+        nextValue = num; // 0 i >0 dozwolone
+      }
+    }
+
+    this.handleChange({
+      formData: {
+        ...formData,
+        [key]: nextValue,
+      },
+    });
   };
+
 
   handleChange = (props) => {
     this.setState(props, () => {

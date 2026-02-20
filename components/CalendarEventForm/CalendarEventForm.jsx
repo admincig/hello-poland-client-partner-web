@@ -271,10 +271,17 @@ class CalendarEventForm extends React.Component {
                   name="availableTicketsNumber"
                   onChange={handleAvailableTicketsChange}
                   type="number"
+                  inputProps={{ min: 0 }}
                   value={
-                    formData.availableTicketsNumber && formData.availableTicketsNumber > 0
-                      ? formData.availableTicketsNumber : ''
+                    typeof formData.availableTicketsNumber === 'number' &&
+                    formData.availableTicketsNumber >= 0
+                      ? formData.availableTicketsNumber
+                      : ''
                   }
+                 //value={
+                 //   formData.availableTicketsNumber && formData.availableTicketsNumber > 0
+                 //     ? formData.availableTicketsNumber : ''
+                 //     }
                 />
                 <div className={classNames(classes.section, classes.fullWidth)}>
                   <Typography variant="subtitle1" gutterBottom>

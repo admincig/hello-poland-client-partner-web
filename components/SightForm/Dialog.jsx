@@ -28,6 +28,7 @@ import CreateTranslationDialog from 'components/ContentLanguage/CreateTranslatio
 import GridItem from 'components/GridItem';
 import CategoriesForm from 'components/CategoriesForm';
 import MultimediaForm from 'components/Multimedia/MultimediaForm';
+import TagsForm from 'components/TagsForm';
 import SightForm from './Form';
 import i18n from './i18n/pl-PL';
 
@@ -458,6 +459,25 @@ class SightFormDialog extends Component {
       && !this.isItemLoaded(itemId, item);
   };
 
+  getAggregatedTagsFromEvents = (events = []) => {
+    const map = new Map();
+
+    events
+      .filter(e => e && e.published && !e.blocked)
+      .forEach(e => {
+        if (Array.isArray(e.tags)) {
+          e.tags.forEach(tag => {
+            if (!map.has(tag.id)) {
+              map.set(tag.id, tag);
+            }
+          });
+        }
+      });
+
+    return Array.from(map.values());
+  };
+
+
   render() {
     const {
       alertDialog, fetchingError, isFetching, isSubmitting, language, submittingError,
@@ -545,6 +565,16 @@ class SightFormDialog extends Component {
             <Grid container>
               <GridItem className={classes.section}>
                 <CategoriesForm items={item.categories} />
+              </GridItem>
+
+              <GridItem className={classes.section}>
+                <TagsForm
+                  items={this.getAggregatedTagsFromEvents(item.sightEvents)}
+                  managePublic={false}
+                  manageRestricted={false}
+                  defaultTranslation="__readonly__"
+                  translation="__readonly__"
+                />
               </GridItem>
               <GridItem>
                 {
