@@ -21,6 +21,12 @@ import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
+import Checkbox from '@material-ui/core/Checkbox';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import config from 'config';
 
@@ -51,16 +57,24 @@ const styles = theme => ({
   thumbnail: {
     width: 70,
   },
+  listBox: {
+    width: 360,
+    maxHeight: 380, // ~10-12 pozycji
+    overflowY: 'auto',
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: 6,
+    padding: theme.spacing.unit,
+  },
 });
 
 function TagsForm({
-  tags, classes, defaultTranslation, items, managePublic, manageRestricted, onSubmit,
-  onDelete, translation,
+  tags, classes, defaultTranslation, items, managePublic, manageRestricted, showRestrictedSection,
+  onSubmit, onDelete, translation,
 }) {
   const { brandName } = (config && config.public) || {};
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [dialogType, setDialogType] = React.useState(null);
-  const [selectedTagId, setSelectedTagId] = React.useState('');
+  const [selectedTagIds, setSelectedTagIds] = React.useState([]);
 
   function getItemsByRestriction(originalItems, isRestricted) {
     if (Array.isArray(originalItems)) {
@@ -70,21 +84,26 @@ function TagsForm({
     return [];
   }
 
-  function handleChangeSelectedTagId(event) {
-    const { value } = event.target;
-
-    setSelectedTagId(value);
-  }
+ function handleChangeSelectedTagId(event) {
+   const { value } = event.target;
+   setSelectedTagIds(value);
+ }
 
   function handleDialogClose() {
     setDialogOpen(false);
     setDialogType(null);
-    setSelectedTagId('');
+    setSelectedTagIds([]);
   }
 
   function handleDialogOpen(type) {
-    setDialogOpen(true);
     setDialogType(type);
+
+    const existingIds = Array.isArray(items)
+      ? items.map(item => item.id)
+      : [];
+
+    setSelectedTagIds(existingIds);
+    setDialogOpen(true);
   }
 
   function handleItemDelete(itemId) {
@@ -93,17 +112,37 @@ function TagsForm({
     }
   }
 
-  function handleItemSubmit(itemId) {
-    if (itemId && onSubmit) {
-      onSubmit(itemId);
+  function handleItemSubmit() {
+    if (selectedTagIds.length && onSubmit) {
+      onSubmit(selectedTagIds); // <-- zamiast forEach
     }
-
     handleDialogClose();
+  }
+
+  function toggleTag(tagId) {
+    setSelectedTagIds(prev =>
+      prev.includes(tagId) ? prev.filter(id => id !== tagId) : [...prev, tagId]
+    );
   }
 
   const publicItems = getItemsByRestriction(items, false);
   const restrictedItems = getItemsByRestriction(items, true);
   const isDefaultTranslation = defaultTranslation === translation;
+  const availableTags = tags
+    .filter(({ id: tagId, restricted }) => {
+      const isExisting = items.some(item => item.id === tagId);
+      if (isExisting) return false;
+
+      switch (dialogType) {
+        case DIALOG_TYPE.RESTRICTED:
+          return restricted;
+        case DIALOG_TYPE.PUBLIC:
+          return !restricted;
+        default:
+          return true;
+      }
+    });
+
 
   return (
     <React.Fragment>
@@ -168,49 +207,63 @@ function TagsForm({
           </Grid>
         )
       }
-      <Grid container alignItems="center" justify="space-between" className={classes.section}>
-        <Grid item>
-          <Typography variant="h6">{`Tagi ${brandName || 'administratora'}`}</Typography>
-        </Grid>
-        {manageRestricted
-          && (
+      {showRestrictedSection && (
+        <>
+          <Grid
+            container
+            alignItems="center"
+            justify="space-between"
+            className={classes.section}
+          >
             <Grid item>
-              <IconButton
-                aria-label="Dodaj"
-                disabled={!isDefaultTranslation}
-                onClick={() => handleDialogOpen(DIALOG_TYPE.RESTRICTED)}
-                title="Dodaj"
-              >
-                <AddIcon />
-              </IconButton>
+              <Typography variant="h6">
+                {`Tagi ${brandName || 'administratora'}`}
+              </Typography>
             </Grid>
-          )
-        }
-      </Grid>
-      {(restrictedItems.length === 0)
-        && (
-          <Grid container item direction="column" alignItems="center" justify="center">
-            <Typography>{`Brak tagów przypisanych przez ${brandName || 'administratora'}.`}</Typography>
+
+            {manageRestricted && (
+              <Grid item>
+                <IconButton
+                  aria-label="Dodaj"
+                  disabled={!isDefaultTranslation}
+                  onClick={() => handleDialogOpen(DIALOG_TYPE.RESTRICTED)}
+                  title="Dodaj"
+                >
+                  <AddIcon />
+                </IconButton>
+              </Grid>
+            )}
           </Grid>
-        )
-      }
-      {restrictedItems.length > 0
-        && (
-          <Grid container>
-            <Table>
-              <TableBody>
-                {restrictedItems.map(({ iconUrl, id: itemId, label }) => (
-                  <TableRow key={`${label}-${itemId}`} hover={manageRestricted}>
-                    <TableCell className={classes.thumbnail} padding="none">
-                      {iconUrl
-                        ? <img src={iconUrl} height={32} width={32} alt={label} />
-                        : <InsertDriveFileIcon />
-                      }
-                    </TableCell>
-                    <TableCell>{label}</TableCell>
-                    <TableCell align="right" padding="none">
-                      {manageRestricted
-                        && (
+
+          {restrictedItems.length === 0 && (
+            <Grid
+              container
+              item
+              direction="column"
+              alignItems="center"
+              justify="center"
+            >
+              <Typography>
+                {`Brak tagów przypisanych przez ${brandName || 'administratora'}.`}
+              </Typography>
+            </Grid>
+          )}
+
+          {restrictedItems.length > 0 && (
+            <Grid container>
+              <Table>
+                <TableBody>
+                  {restrictedItems.map(({ iconUrl, id: itemId, label }) => (
+                    <TableRow key={`${label}-${itemId}`} hover>
+                      <TableCell className={classes.thumbnail} padding="none">
+                        {iconUrl
+                          ? <img src={iconUrl} height={32} width={32} alt={label} />
+                          : <InsertDriveFileIcon />
+                        }
+                      </TableCell>
+                      <TableCell>{label}</TableCell>
+                      <TableCell align="right" padding="none">
+                        {manageRestricted && (
                           <IconButton
                             aria-label="Usuń"
                             disabled={!isDefaultTranslation}
@@ -219,16 +272,16 @@ function TagsForm({
                           >
                             <DeleteIcon />
                           </IconButton>
-                        )
-                      }
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Grid>
-        )
-      }
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Grid>
+          )}
+        </>
+      )}
       <Dialog
         open={dialogOpen}
         onClose={handleDialogClose}
@@ -236,35 +289,63 @@ function TagsForm({
       >
         <DialogTitle id="form-dialog-title">Dodaj tag</DialogTitle>
         <DialogContent>
-          <FormControl className={classes.formControl}>
-            <InputLabel htmlFor="selected-tag">Tag</InputLabel>
-            <Select
-              input={<Input id="selected-tag" />}
-              onChange={handleChangeSelectedTagId}
-              value={selectedTagId}
-            >
-              {tags.filter(({ id: categoryId, restricted }) => {
-                const isExistingCategory = items.some(item => item.id === categoryId);
+          <div className={classes.listBox}>
+            <List dense>
+              {availableTags.map(({ id: tagId, label, iconUrl }) => (
+                <ListItem
+                  key={tagId}
+                  button
+                  onClick={() => toggleTag(tagId)}
+                  style={{ paddingTop: 6, paddingBottom: 6 }}
+                >
 
-                switch (dialogType) {
-                  case DIALOG_TYPE.RESTRICTED:
-                    return !isExistingCategory && restricted;
-                  case DIALOG_TYPE.PUBLIC:
-                    return !isExistingCategory && !restricted;
-                  default:
-                    return !isExistingCategory;
-                }
-              }).map(({ id: categoryId, label }) => (
-                <MenuItem key={categoryId} value={categoryId}>{label}</MenuItem>
+                  {/* CHECKBOX */}
+                  <ListItemIcon style={{ minWidth: 36 }}>
+                    <Checkbox
+                      edge="start"
+                      checked={selectedTagIds.includes(tagId)}
+                      tabIndex={-1}
+                      disableRipple
+                      style={{ padding: 4 }}
+                    />
+                  </ListItemIcon>
+
+                  {/* IKONA */}
+                  <ListItemIcon style={{ minWidth: 36 }}>
+                    {iconUrl
+                      ? (
+                        <img
+                          src={iconUrl}
+                          alt={label}
+                          style={{
+                            width: 20,
+                            height: 20,
+                            display: 'block'
+                          }}
+                        />
+                      )
+                      : <InsertDriveFileIcon style={{ fontSize: 20 }} />
+                    }
+                  </ListItemIcon>
+
+                  {/* TEKST */}
+                  <ListItemText
+                    primary={label}
+                    primaryTypographyProps={{
+                      style: { fontSize: 14 }
+                    }}
+                  />
+
+                </ListItem>
               ))}
-            </Select>
-          </FormControl>
+            </List>
+          </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose} color="primary">
             Anuluj
           </Button>
-          <Button onClick={() => handleItemSubmit(selectedTagId)} color="primary">
+          <Button onClick={handleItemSubmit} color="primary" disabled={!selectedTagIds.length}>
             Dodaj
           </Button>
         </DialogActions>
@@ -280,6 +361,7 @@ TagsForm.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape({})),
   managePublic: PropTypes.bool,
   manageRestricted: PropTypes.bool,
+  showRestrictedSection: PropTypes.bool,
   onSubmit: PropTypes.func,
   onDelete: PropTypes.func,
   translation: PropTypes.string,
@@ -291,6 +373,7 @@ TagsForm.defaultProps = {
   items: [],
   managePublic: false,
   manageRestricted: false,
+  showRestrictedSection: true,
   onSubmit: null,
   onDelete: null,
   translation: DEFAULT_LANGUAGE,

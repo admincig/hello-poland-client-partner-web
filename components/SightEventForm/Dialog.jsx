@@ -53,6 +53,7 @@ const styles = () => ({
 class SightEventFormDialog extends Component {
   constructor(props) {
     super(props);
+    this.isEditBeforeSubmit = false;
 
     this.formikRef = React.createRef();
 
@@ -104,7 +105,7 @@ class SightEventFormDialog extends Component {
   getInitialValues = (item) => {
     const { itemId, parentId } = this.props;
     const { language, formChanges } = this.state;
-    const sightId = item.sightId || parentId;
+    const sightId = item && item.sightId ? item.sightId : parentId;
 
     if (this.isItemLoaded(itemId, item)) {
       const { availableLanguageVersions } = item;
@@ -121,7 +122,11 @@ class SightEventFormDialog extends Component {
       return { ...item, sightId };
     }
 
-    return { sightId };
+    if (formChanges) {
+      return { sightId, ...formChanges };
+    }
+
+    return { sightId, categories: [], tags: [] };
   };
 
   getMultimediaFromItem = (item) => {
@@ -284,26 +289,35 @@ class SightEventFormDialog extends Component {
     this.handleFetchItem(itemId, language);
   };
 
-  handleItemDataTypeSubmit = dataType => (dataTypeId) => {
+  handleItemDataTypeSubmit = dataType => (ids) => {
     const { itemId, updateItemCategory, updateItemTag } = this.props;
-    let action = () => {};
-    const options = {};
+    const { language } = this.state;
 
-    if (dataType === ITEM_DATA_TYPES.CATEGORY) {
-      action = updateItemCategory;
-      options.categoryId = dataTypeId;
-    } else if (dataType === ITEM_DATA_TYPES.TAG) {
-      action = updateItemTag;
-      options.tagId = dataTypeId;
-    }
+    const idList = Array.isArray(ids) ? ids : [ids];
 
-    if (action) {
-      action({
-        id: itemId,
-        ...options,
-        onSuccess: this.handleItemDataTypeSubmitSuccess,
-      });
-    }
+    const action =
+      dataType === ITEM_DATA_TYPES.CATEGORY
+        ? updateItemCategory
+        : updateItemTag;
+
+    const key =
+      dataType === ITEM_DATA_TYPES.CATEGORY
+        ? 'categoryId'
+        : 'tagId';
+
+    const promises = idList.map(id =>
+      new Promise(resolve =>
+        action({
+          id: itemId,
+          [key]: id,
+          onSuccess: resolve,
+        })
+      )
+    );
+
+    Promise.all(promises).then(() => {
+      this.handleFetchItem(itemId, language);
+    });
   };
 
   handleFetchCategoriesList = (language) => {
@@ -500,6 +514,8 @@ class SightEventFormDialog extends Component {
 
   handleSubmit = () => {
     const { current } = this.formikRef;
+    this.isEditBeforeSubmit = !!this.props.itemId;
+
     if (current && current.submitForm) {
       this.setState({ isSubmitting: true, submittingError: false });
       current.submitForm();
@@ -530,21 +546,67 @@ class SightEventFormDialog extends Component {
     setSubmitting(false);
   };
 
-  handleSubmitSuccess = (sightId, actions) => {
-    const { fetchList, itemId } = this.props;
-    const { language } = this.state;
-    const { setSubmitting } = actions;
+handleSubmitSuccess = (response, actions) => {
+  const { fetchList } = this.props;
+  const { language } = this.state;
+  const { setSubmitting } = actions;
 
-    setSubmitting(false);
+  setSubmitting(false);
 
-    fetchList();
+  if (this.isEditBeforeSubmit) {
+    this.handleFetchItem(response.id, language);
+    return;
+  }
 
-    if (itemId) {
-      this.handleFetchItem(itemId, language);
-    } else {
-      this.handleCancel();
-    }
-  };
+  const newItemId = response && response.id;
+
+  const bag = this.getFormikBagSafe();
+  const values = bag ? bag.values : null;
+
+  if (!newItemId || !values) {
+    this.handleCancel();
+    return;
+  }
+
+  const { categories = [], tags = [] } = values;
+
+  const promises = [];
+
+  categories.forEach(cat => {
+    promises.push(
+      new Promise(resolve =>
+        this.props.updateItemCategory({
+          id: newItemId,
+          categoryId: cat.id,
+          onSuccess: resolve,
+        })
+      )
+    );
+  });
+
+  tags.forEach(tag => {
+    promises.push(
+      new Promise(resolve =>
+        this.props.updateItemTag({
+          id: newItemId,
+          tagId: tag.id,
+          onSuccess: resolve,
+        })
+      )
+    );
+  });
+
+  Promise.all(promises).then(() => {
+    this.props.fetchItem({
+      id: newItemId,
+      options: { headers: { 'Content-Language': language } },
+      onSuccess: () => {
+        fetchList();
+        this.handleCancel();
+      },
+    });
+  });
+};
 
   isFormDirty = () => {
     const { current } = this.formikRef;
@@ -577,6 +639,55 @@ class SightEventFormDialog extends Component {
     this.setState({ formChanges: null });
   }
 
+  getFormikBagSafe = () => {
+    const { current } = this.formikRef;
+    if (current && current.getFormikBag) {
+      return current.getFormikBag();
+    }
+    return null;
+  };
+
+
+handleLocalItemDataTypeSubmit = dataType => (ids) => {
+  const bag = this.getFormikBagSafe();
+  if (!bag) return;
+
+  const field = dataType === ITEM_DATA_TYPES.CATEGORY ? 'categories' : 'tags';
+  const sourceList =
+    dataType === ITEM_DATA_TYPES.CATEGORY ? this.props.categoriesList : this.props.tagsList;
+
+  const idList = Array.isArray(ids) ? ids : [ids];
+  const current = Array.isArray(bag.values[field]) ? bag.values[field] : [];
+
+  const next = [...current];
+
+  idList.forEach(id => {
+    const fullItem = sourceList.find(x => x.id === id);
+    if (fullItem && !next.some(x => x.id === id)) {
+      next.push(fullItem);
+    }
+  });
+
+  bag.setFieldValue(field, next, false);
+  setTimeout(() => {
+    this.forceUpdate();
+  }, 0);
+};
+
+handleLocalItemDataTypeDelete = dataType => (id) => {
+  const bag = this.getFormikBagSafe();
+  if (!bag) return;
+
+  const field = dataType === ITEM_DATA_TYPES.CATEGORY ? 'categories' : 'tags';
+  const current = Array.isArray(bag.values[field]) ? bag.values[field] : [];
+  const next = current.filter(x => x && x.id !== id);
+
+  bag.setFieldValue(field, next, false);
+  setTimeout(() => {
+    this.forceUpdate();
+  }, 0);
+};
+
   isItemLoaded = (itemId, item) => item
     && Object.getOwnPropertyNames(item).length
     && item.id === itemId;
@@ -595,7 +706,7 @@ class SightEventFormDialog extends Component {
   render() {
     const {
       alertDialog, fetchingError, isFetching, isSubmitting, language, submittingError,
-      translationDialog, translations, uploadedMultimedia,
+      translationDialog, translations, uploadedMultimedia,formChanges,
     } = this.state;
     const {
       categoriesList, classes, clearItem, createFile, createFileCancel, deleteFile,
@@ -634,6 +745,28 @@ class SightEventFormDialog extends Component {
         label: 'Ustaw tłumaczenie jako domyślne',
       },
     ];
+
+    const bag = this.getFormikBagSafe();
+    const formikValues = bag ? bag.values : null;
+
+    /*const selectedCategories = itemId
+      ? (item && item.categories) || []
+      : (formikValues && formikValues.categories) || (formChanges && formChanges.categories) || [];
+
+    const selectedTags = itemId
+      ? (item && item.tags) || []
+      : (formikValues && formikValues.tags) || (formChanges && formChanges.tags) || [];
+    */
+
+    const selectedCategories =
+      (formikValues && formikValues.categories)
+      || (item && item.categories)
+      || [];
+
+    const selectedTags =
+      (formikValues && formikValues.tags)
+      || (item && item.tags)
+      || [];
 
     return (
       <Fragment>
@@ -677,28 +810,49 @@ class SightEventFormDialog extends Component {
                 clearFormChanges={this.clearFormChanges}
               />
             </Grid>
-            {itemId && isDefaultLanguage && (
-              <React.Fragment>
-                <div className={classes.section}>
-                  <CategoriesForm
-                    categories={categoriesList}
-                    items={item.categories}
-                    managePublic={!!item.id}
-                    onSubmit={this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.CATEGORY)}
-                    onDelete={this.handleItemDataTypeDelete(ITEM_DATA_TYPES.CATEGORY)}
-                  />
-                </div>
-                <div className={classes.section}>
-                  <TagsForm
-                    tags={tagsList}
-                    items={item.tags}
-                    managePublic={!!item.id}
-                    onSubmit={this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.TAG)}
-                    onDelete={this.handleItemDataTypeDelete(ITEM_DATA_TYPES.TAG)}
-                  />
-                </div>
-              </React.Fragment>
-            )}
+                {isDefaultLanguage && (
+                  <>
+                    <div className={classes.section}>
+                      <CategoriesForm
+                        categories={categoriesList}
+                        items={selectedCategories}
+                        managePublic
+                        manageRestricted={false}
+                        showRestrictedSection={!!itemId}
+                        onSubmit={
+                          itemId
+                            ? this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.CATEGORY)
+                            : this.handleLocalItemDataTypeSubmit(ITEM_DATA_TYPES.CATEGORY)
+                        }
+                        onDelete={
+                          itemId
+                            ? this.handleItemDataTypeDelete(ITEM_DATA_TYPES.CATEGORY)
+                            : this.handleLocalItemDataTypeDelete(ITEM_DATA_TYPES.CATEGORY)
+                        }
+                      />
+                    </div>
+
+                    <div className={classes.section}>
+                      <TagsForm
+                        tags={tagsList}
+                        items={selectedTags}
+                        managePublic
+                        manageRestricted={false}
+                        showRestrictedSection={!!itemId}
+                        onSubmit={
+                          itemId
+                            ? this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.TAG)
+                            : this.handleLocalItemDataTypeSubmit(ITEM_DATA_TYPES.TAG)
+                        }
+                        onDelete={
+                          itemId
+                            ? this.handleItemDataTypeDelete(ITEM_DATA_TYPES.TAG)
+                            : this.handleLocalItemDataTypeDelete(ITEM_DATA_TYPES.TAG)
+                        }
+                      />
+                    </div>
+                  </>
+                )}
             <div>
               <MultimediaForm
                 AttachmentProps={{

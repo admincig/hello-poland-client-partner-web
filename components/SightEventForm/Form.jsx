@@ -138,6 +138,8 @@ class SightEventForm extends Component {
       mainImage,
       images,
       pdfAttachment,
+      categories: details.categories || [],
+      tags: details.tags || [],
     };
   };
 
@@ -184,7 +186,9 @@ class SightEventForm extends Component {
           ? uploadedMultimedia.pdfAttachment : values.pdfAttachment,
       },
       onFailure: this.handleSubmitFailure(actions),
-      onSuccess: this.handleSubmitSuccess(actions),
+      onSuccess: (response) => {
+        this.handleSubmitSuccess(actions)(response);
+      },
       options,
       pathParams,
     };
