@@ -76,7 +76,7 @@ class MediaManager extends Component {
             && (
             <Typography style={{ color: 'red' }}>
               {imageUpload
-                ? 'Obrazek powinien być w formacie JPEG, a jego szerokość musi wynosić minimum 2000px.'
+                ? 'Obrazek powinien być w formacie JPEG, a jego szerokość musi wynosić minimum 1000px.'
                 : 'Wystąpił błąd podczas zapisywania pliku.'
               }
             </Typography>
