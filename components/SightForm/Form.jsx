@@ -40,6 +40,7 @@ const i18n = {
 
 const commonProps = {
   fullWidth: true,
+  InputLabelProps: { shrink: true },
 };
 
 // TODO: remove this function and change Switch implementation after it's fixed.
@@ -91,7 +92,7 @@ class SightForm extends Component {
     const { openingHours } = initialValues || {};
 
     this.state = {
-      initialValues: this.getInitialValues(initialValues),
+      //initialValues: this.getInitialValues(initialValues),
       isDefaultTranslation: true,
       viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
     };
@@ -130,7 +131,9 @@ class SightForm extends Component {
     // reinit TYLKO gdy zmienił się obiekt (np. weszliśmy w inną atrakcję) albo język
     if (prev.id !== curr.id || prev.language !== curr.language) {
       const { openingHours } = curr || {};
-      this.setInitialValues(curr);
+      this.setState({
+        isDefaultTranslation: this.isDefaultLanguage(curr),
+      });
       this.setViewOpeningHours(openingHours, true);
     }
   }
@@ -200,38 +203,38 @@ class SightForm extends Component {
     };
   };
 
-  setInitialValues = initialValues => this.setState({
-    initialValues: this.getInitialValues(initialValues),
-    isDefaultTranslation: this.isDefaultLanguage(initialValues),
-  });
+  //setInitialValues = initialValues => this.setState({
+  //  initialValues: this.getInitialValues(initialValues),
+  //  isDefaultTranslation: this.isDefaultLanguage(initialValues),
+  //});
 
   setViewOpeningHours = openingHours => this.setState({
     viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
   });
 
-  handleOpeningHoursChange = (day, keyName, keyValue) => {
-    const { initialValues, viewOpeningHours } = this.state;
-    const { openingHours } = initialValues;
+  handleOpeningHoursChange = (day, keyName, keyValue, values, setFieldValue) => {
+    const { viewOpeningHours } = this.state;
     const dayIndex = day - 1;
-    const entryIndex = openingHours.findIndex(o => o.day === day);
 
     viewOpeningHours[dayIndex][keyName] = keyValue;
-    openingHours[entryIndex][keyName] = this.getFormattedTime(keyValue);
 
-    this.setState({
-      initialValues: {
-        ...initialValues,
-        openingHours,
-      },
-      viewOpeningHours,
-    });
+    const openingHours = [...values.openingHours];
+    const entryIndex = openingHours.findIndex(o => o.day === day);
+
+    if (entryIndex !== -1) {
+      openingHours[entryIndex][keyName] = this.getFormattedTime(keyValue);
+    }
+
+    setFieldValue('openingHours', openingHours);
+    this.setState({ viewOpeningHours });
   };
 
-  handleOpeningHoursSelectionChange = (day, values) => (event) => {
+  handleOpeningHoursSelectionChange = (day, values, setFieldValue) => (event) => {
     const { viewOpeningHours } = this.state;
     const { target } = event;
     const dayIndex = day - 1;
-    let { openingHours } = values;
+
+    let openingHours = [...values.openingHours];
 
     viewOpeningHours[dayIndex].checked = target.checked;
 
@@ -249,13 +252,8 @@ class SightForm extends Component {
       openingHours = openingHours.filter(o => o.day !== day);
     }
 
-    this.setState({
-      initialValues: {
-        ...values,
-        openingHours,
-      },
-      viewOpeningHours,
-    });
+    setFieldValue('openingHours', openingHours);
+    this.setState({ viewOpeningHours });
   };
 
   handleSubmit = (values, actions) => {
@@ -290,7 +288,7 @@ class SightForm extends Component {
 
     const payload = {
       data: {
-        ...data,
+        ...values,
         mainImage: uploadedMultimedia.mainImage.id
           ? uploadedMultimedia.mainImage : values.mainImage,
         images: uploadedMultimedia.images.length ? uploadedMultimedia.images : values.images,
@@ -331,14 +329,16 @@ class SightForm extends Component {
 
     if (onSubmitSuccess) {
       onSubmitSuccess(sightId, actions);
-
       return;
     }
 
     const { resetForm, setSubmitting } = actions;
 
     setSubmitting(false);
-    resetForm();
+
+    resetForm({
+      values: this.state.initialValues
+    });
   };
 
   isDefaultLanguage = (initialValues) => {
@@ -349,7 +349,8 @@ class SightForm extends Component {
   };
 
   render() {
-    const { initialValues, isDefaultTranslation, viewOpeningHours } = this.state;
+    const { isDefaultTranslation, viewOpeningHours } = this.state;
+    const { initialValues } = this.props;
     const { buttons, classes, FormikProps } = this.props;
 
     return (
@@ -372,7 +373,7 @@ class SightForm extends Component {
                 </GridItem>
               </Hidden>
               <GridItem>
-                <Field name="name" label="Nazwa atrakcji" required component={TextField} {...commonProps} />
+                  <Field name="name" label="Nazwa atrakcji" required component={TextField} {...commonProps} />
               </GridItem>
               {isDefaultTranslation
                 && (
@@ -393,7 +394,7 @@ class SightForm extends Component {
                 <Field name="lead" label="Warunki oferty" component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
-                <Field name="description" label="Opis atrakcji" required component={TextField} {...commonProps} multiline rowsMax={20} />
+                <Field name="description" label="Opis atrakcji" required component={TextField} {...commonProps} multiline rowsMax={20}  />
               </GridItem>
               {isDefaultTranslation
                 && (
@@ -410,7 +411,7 @@ class SightForm extends Component {
                                 <Switch
                                   checked={item.checked}
                                   onChange={
-                                    this.handleOpeningHoursSelectionChange(item.day, values)
+                                    this.handleOpeningHoursSelectionChange(item.day, values, setFieldValue)
                                   }
                                   value={`${item.day}`}
                                 />
@@ -423,7 +424,7 @@ class SightForm extends Component {
                               ampm={false}
                               className={classes.openingHoursTimepicker}
                               disabled={!item.checked}
-                              onChange={event => this.handleOpeningHoursChange(item.day, 'openTime', event)}
+                              onChange={event => this.handleOpeningHoursChange(item.day, 'openTime', event, values, setFieldValue )}
                               value={item.openTime}
                             />
                           </GridItem>
@@ -432,7 +433,7 @@ class SightForm extends Component {
                               ampm={false}
                               className={classes.openingHoursTimepicker}
                               disabled={!item.checked}
-                              onChange={event => this.handleOpeningHoursChange(item.day, 'closeTime', event)}
+                              onChange={event => this.handleOpeningHoursChange(item.day, 'closeTime', event, values, setFieldValue )}
                               value={item.closeTime}
                             />
                           </GridItem>
@@ -443,10 +444,10 @@ class SightForm extends Component {
                       <Typography variant="h6" className={classes.title}>Dane kontaktowe</Typography>
                     </GridItem>
                     <GridItem>
-                      <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
+                      <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps}  />
                     </GridItem>
                     <GridItem>
-                      <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
+                      <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps}  />
                     </GridItem>
                     <GridItem>
                       <Typography variant="h6" className={classes.title}>Lokalizacja</Typography>
@@ -455,10 +456,10 @@ class SightForm extends Component {
                       <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem md={4} sm={4}>
-                      <Field name="location.zipCode" label="Kod pocztowy" component={TextField} {...commonProps} />
+                      <Field name="location.zipCode" label="Kod pocztowy" component={TextField} {...commonProps}  />
                     </GridItem>
                     <GridItem md={8} sm={8}>
-                      <Field name="location.city" label="Miasto" component={TextField} {...commonProps} />
+                      <Field name="location.city" label="Miasto" component={TextField} {...commonProps}  />
                     </GridItem>
                     <GridItem>
                       <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
@@ -473,10 +474,10 @@ class SightForm extends Component {
                       <Field  name="location.commune" label="Gmina" component={TextField} {...commonProps}  />
                     </GridItem>
                     <GridItem md={6} sm={6}>
-                      <Field name="location.latitude" label="Szerokość geograficzna (lat)" component={TextField} type="text" inputProps={{ inputMode: "decimal",  pattern: "[0-9.,\\-]*", }} {...commonProps} />
+                      <Field name="location.latitude" label="Szerokość geograficzna (lat)" component={TextField} type="text" inputProps={{ inputMode: "decimal",  pattern: "[0-9.,\\-]*", }} {...commonProps}  />
                     </GridItem>
                     <GridItem md={6} sm={6}>
-                      <Field  name="location.longitude"  label="Długość geograficzna (lon)" component={TextField}  inputProps={{ inputMode: "decimal",  pattern: "[0-9.,\\-]*", }}  {...commonProps} />
+                      <Field  name="location.longitude"  label="Długość geograficzna (lon)" component={TextField}  inputProps={{ inputMode: "decimal",  pattern: "[0-9.,\\-]*", }}  {...commonProps}  />
                     </GridItem>
                     <GridItem>
                       <Typography variant="h6" className={classes.title}>Udogodnienia i dostępność</Typography>

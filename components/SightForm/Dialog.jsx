@@ -45,6 +45,7 @@ class SightFormDialog extends Component {
     this.formikRef = React.createRef();
 
     this.intervalRef = null;
+    this.justSaved = false;
 
     this.state = {
       alertDialog: {
@@ -151,6 +152,12 @@ class SightFormDialog extends Component {
   });
 
   handleCancelClick = () => {
+    if (this.justSaved) {
+      this.justSaved = false;
+      this.handleCancel();
+      return;
+    }
+
     this.handleFormReload(this.handleCancel);
   };
 
@@ -268,33 +275,45 @@ class SightFormDialog extends Component {
 
   handleDiscardClick = () => this.handleCancel();
 
-  fileActionSuccess = (itemId, language, data) => {
-    const { updateItem, item } = this.props;
-    this.setState(state => ({ uploadedMultimedia: { ...state.uploadedMultimedia, ...data } }));
-    if (itemId && data) {
-      updateItem({
-        id: itemId,
-        data: {
-          ...item,
-          ...data,
-        },
-        onSuccess: () => {
-          this.saveFormChanges();
-          this.handleFetchItem(itemId, language);
-        },
-        pathParams: {
-          languageVersion: language,
-        },
-        options: {
-          headers: {
-            'Content-Language': language,
-          },
-        },
-      });
-    } else if (itemId && !data) {
-      this.handleFetchItem(itemId, language);
+fileActionSuccess = (itemId, language, data) => {
+  const { updateItem } = this.props;
+
+  this.setState(state => ({
+    uploadedMultimedia: { ...state.uploadedMultimedia, ...data }
+  }));
+
+  if (itemId && data) {
+
+    let formValues = {};
+
+    const { current } = this.formikRef;
+    if (current && current.getFormikBag) {
+      formValues = current.getFormikBag().values;
     }
+
+    updateItem({
+      id: itemId,
+      data: {
+        ...formValues,
+        ...data,
+      },
+      onSuccess: () => {
+        this.clearFormChanges();
+      },
+      pathParams: {
+        languageVersion: language,
+      },
+      options: {
+        headers: {
+          'Content-Language': language,
+        },
+      },
+    });
+
+  } else if (itemId && !data) {
+    this.handleFetchItem(itemId, language);
   }
+};
 
   handleFetchItem = (id, language) => {
     const { fetchItem } = this.props;
@@ -319,17 +338,22 @@ class SightFormDialog extends Component {
     const { availableLanguageVersions, language } = item || {};
     const translations = getTranslatedLanguages(availableLanguageVersions);
 
-    this.setState({
+    this.setState(state => ({
       fetchingError: false,
       isFetching: false,
       language,
       translations,
-      uploadedMultimedia: { images: [], mainImage: {} },
+      uploadedMultimedia: state.uploadedMultimedia,
+    }), () => {
+      if (this.formikRef.current && this.formikRef.current.resetForm) {
+        this.formikRef.current.resetForm();
+      }
     });
   };
 
   handleFormReload = (callback, options) => {
     const { formChanges } = this.state;
+
     if (this.isFormDirty() || formChanges) {
       this.setState({
         alertDialog: {
@@ -365,31 +389,46 @@ class SightFormDialog extends Component {
     this.handleFormReload(this.handleLanguageChange, event);
   };
 
-  handleSubmit = () => {
-    const { current } = this.formikRef;
+ handleSubmit = () => {
 
-    if (current && current.submitForm) {
-      this.setState({ isSubmitting: true, submittingError: false });
-      current.submitForm();
+   const { current } = this.formikRef;
 
-      this.intervalRef = setInterval(this.handleSubmitChange, 200);
-    }
-  };
+   if (current && current.getFormikBag) {
+     const { setFieldValue } = current.getFormikBag();
+     const { uploadedMultimedia } = this.state;
 
-  // hacking missing validation callback in Formik
-  handleSubmitChange = () => {
-    const { current } = this.formikRef;
+     if (uploadedMultimedia.images && uploadedMultimedia.images.length) {
+       setFieldValue('images', uploadedMultimedia.images);
+     }
 
-    if (current && current.getFormikBag) {
-      const { getFormikBag } = current;
-      const { isSubmitting } = getFormikBag();
+     if (uploadedMultimedia.mainImage && uploadedMultimedia.mainImage.id) {
+       setFieldValue('mainImage', uploadedMultimedia.mainImage);
+     }
+   }
 
-      if (!isSubmitting) {
-        this.setState({ isSubmitting });
-        clearInterval(this.intervalRef);
-      }
-    }
-  };
+   if (current && current.submitForm) {
+     this.setState({ isSubmitting: true, submittingError: false });
+     setTimeout(() => {
+       current.submitForm();
+     }, 0);
+     this.intervalRef = setInterval(this.handleSubmitChange, 200);
+   }
+ };
+
+ handleSubmitChange = () => {
+   const { current } = this.formikRef;
+
+   if (current && current.getFormikBag) {
+     const { getFormikBag, getFormikComputedProps } = current;
+
+     const { isSubmitting } = getFormikBag();
+     const { errors } = getFormikComputedProps();
+     if (!isSubmitting) {
+       this.setState({ isSubmitting });
+       clearInterval(this.intervalRef);
+     }
+   }
+ };
 
   handleSubmitFailure = (actions) => {
     const { setSubmitting } = actions;
@@ -405,6 +444,13 @@ class SightFormDialog extends Component {
 
     setSubmitting(false);
 
+    this.clearFormChanges();
+    this.justSaved = true;
+
+    if (this.formikRef.current && this.formikRef.current.resetForm) {
+      this.formikRef.current.resetForm();
+    }
+
     fetchSightsList();
     fetchSightEventsList();
 
@@ -416,11 +462,14 @@ class SightFormDialog extends Component {
   };
 
   isFormDirty = () => {
+    if (this.justSaved) {
+      return false;
+    }
+
     const { current } = this.formikRef;
 
     if (current && current.getFormikComputedProps) {
       const { dirty } = current.getFormikComputedProps();
-
       return dirty;
     }
 
@@ -429,16 +478,16 @@ class SightFormDialog extends Component {
 
   saveFormChanges = () => {
     const dirty = this.isFormDirty();
+
     if (dirty) {
       const { current } = this.formikRef;
 
       if (current && current.getFormikBag) {
         const { values } = current.getFormikBag();
-        const { images, mainImage, ...rest } = values || {};
-        this.setState({ formChanges: { ...rest } });
+        this.setState({ formChanges: { ...values } });
       }
     }
-  }
+  };
 
   clearFormChanges = () => {
     this.setState({ formChanges: null });
