@@ -102,7 +102,7 @@ class SightFormDialog extends Component {
       return { ...item };
     }
 
-    return null;
+    return { openingHours: [] };
   };
 
   getMultimediaFromItem = (item) => {

@@ -153,8 +153,10 @@ class SightForm extends Component {
         openingHours.push({
           checked,
           day: i,
-          openTime: openTime ? `1970-01-01T${openTime}` : '1970-01-01T09:00',
-          closeTime: closeTime ? `1970-01-01T${closeTime}` : '1970-01-01T18:00',
+          openTime: openTime ? new Date(`1970-01-01T${openTime}`) : new Date('1970-01-01T09:00'),
+          closeTime: closeTime ? new Date(`1970-01-01T${closeTime}`) : new Date('1970-01-01T18:00'),
+          //openTime: openTime ? `1970-01-01T${openTime}` : '1970-01-01T09:00',
+          //closeTime: closeTime ? `1970-01-01T${closeTime}` : '1970-01-01T18:00',
         });
       }
     } else {
@@ -218,7 +220,7 @@ class SightForm extends Component {
 
     viewOpeningHours[dayIndex][keyName] = keyValue;
 
-    const openingHours = [...values.openingHours];
+    const openingHours = [...(values.openingHours || [])];
     const entryIndex = openingHours.findIndex(o => o.day === day);
 
     if (entryIndex !== -1) {
@@ -234,7 +236,7 @@ class SightForm extends Component {
     const { target } = event;
     const dayIndex = day - 1;
 
-    let openingHours = [...values.openingHours];
+    let openingHours = [...(values.openingHours || [])];
 
     viewOpeningHours[dayIndex].checked = target.checked;
 
