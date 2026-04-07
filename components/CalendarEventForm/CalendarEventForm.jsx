@@ -13,22 +13,16 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import ClearIcon from '@material-ui/icons/Clear';
-import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
-import MuiPickersUtilsProvider from 'material-ui-pickers/MuiPickersUtilsProvider';
+import format from 'date-fns/format';
+import setHours from 'date-fns/setHours';
+import setMinutes from 'date-fns/setMinutes';
 import SwitchLabel from 'components/SwitchLabel';
 import formatPrice from 'utils/formatPrice';
-// import plLocale from 'date-fns/locale/pl';
 import AlertDialog from 'components/AlertDialog';
 
 import CalendarEventController from './CalendarEventController';
-import DateTimePicker from './DateTimePicker';
-import CustomTimePicker from './CustomTimePicker';
 import TicketDefinitionList from './TicketDefinitionList';
 import TicketDefinitionForm from '../TicketDefinitionForm/TicketDefinitionForm';
-
-// const locale = {
-//   pl: plLocale,
-// };
 
 const frequencyTypes = [
   {
@@ -159,6 +153,13 @@ const styles = theme => ({
   disabled: {
     color: 'rgba(0, 0, 0, 0.38)',
   },
+  nativeDateField: {
+    marginRight: theme.spacing.unit * 2,
+  },
+  nativeTimeField: {
+    marginRight: theme.spacing.unit,
+    width: 110,
+  },
 });
 
 function getNormalizedDay(dateObj) {
@@ -169,6 +170,26 @@ function getNormalizedDay(dateObj) {
   }
 
   return day;
+}
+
+function toDateInputValue(value) {
+  if (!value) return '';
+  return format(new Date(value), 'yyyy-MM-dd');
+}
+
+function toTimeInputValue(value) {
+  if (!value) return '';
+  return format(new Date(value), 'HH:mm');
+}
+
+function mergeDateAndTime(baseValue, timeValue) {
+  const [hours, minutes] = timeValue.split(':').map(Number);
+  let nextDate = new Date(baseValue);
+
+  nextDate = setHours(nextDate, hours || 0);
+  nextDate = setMinutes(nextDate, minutes || 0);
+
+  return nextDate;
 }
 
 class CalendarEventForm extends React.Component {
@@ -211,10 +232,9 @@ class CalendarEventForm extends React.Component {
     const frequencyData = {
       [name]: value,
     };
+
     if (value === 'WEEKLY') {
-      frequencyData.daysOfWeek = [
-        getNormalizedDay(startDate),
-      ];
+      frequencyData.daysOfWeek = [getNormalizedDay(startDate)];
     }
 
     callback(frequencyData);
@@ -222,326 +242,378 @@ class CalendarEventForm extends React.Component {
 
   isChecked = (data, element) => data && data.some(item => element === item);
 
-  hasTicketAvailabilityLimit = ticketDefinitions => ticketDefinitions
-    .some(({ availableTicketsNumber }) => (
-      Number.isInteger(availableTicketsNumber) && availableTicketsNumber > 0
-    ));
+  hasTicketAvailabilityLimit = ticketDefinitions =>
+    ticketDefinitions.some(
+      ({ availableTicketsNumber }) =>
+        Number.isInteger(availableTicketsNumber) && availableTicketsNumber > 0,
+    );
 
   render() {
     const { alertDialog } = this.state;
     const {
-      classes, formData: initialFormData, onChange, readOnly,
+      classes,
+      formData: initialFormData,
+      onChange,
+      readOnly,
     } = this.props;
+
     return (
       <div>
-        <CalendarEventController readOnly={readOnly} formData={initialFormData} onChange={onChange}>
+        <CalendarEventController
+          readOnly={readOnly}
+          formData={initialFormData}
+          onChange={onChange}
+        >
           {({
-            editMode, formData, entryStartDateOffset, frequencyEndDateType, frequencyType,
-            selectedTicketDefinitionId, ticketDefinitionsList, poolDate, fetchTicketDefinitions,
-            handleAvailableTicketsChange, handleDateChange, handleDefinitionFormClose,
-            handleDefinitionFormOpen, handleFormDataChange, handleEntryStartDateOffsetChange,
-            handleFrequencyDataChange, handleFrequencyDataFieldChange,
-            handleFrequencyEndDateTypeChange, handleFrequencyItemChange, handleFullDayChange,
-            handlePoolDateChange, handlePropFromEventChange, handleTicketDefinitionAdd,
-            handleTicketDefinitionChange, handleTicketDefinitionDelete, isDefinitionFormVisible,
+            editMode,
+            formData,
+            entryStartDateOffset,
+            frequencyEndDateType,
+            frequencyType,
+            selectedTicketDefinitionId,
+            ticketDefinitionsList,
+            poolDate,
+            fetchTicketDefinitions,
+            handleAvailableTicketsChange,
+            handleDateChange,
+            handleDefinitionFormClose,
+            handleDefinitionFormOpen,
+            handleFormDataChange,
+            handleEntryStartDateOffsetChange,
+            handleFrequencyDataChange,
+            handleFrequencyDataFieldChange,
+            handleFrequencyEndDateTypeChange,
+            handleFrequencyItemChange,
+            handleFullDayChange,
+            handlePoolDateChange,
+            handlePropFromEventChange,
+            handleTicketDefinitionAdd,
+            handleTicketDefinitionChange,
+            handleTicketDefinitionDelete,
+            isDefinitionFormVisible,
           }) => (
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <Grid container>
-                <Typography>
-                  Aby Twoja oferta była widoczna dla kupujących, musisz zdefiniować termin
-                  i rodzaje produktów. Dla każdej oferty możesz stworzyć kilka pul produktów.
+            <Grid container>
+              <Typography>
+                Aby Twoja oferta była widoczna dla kupujących, musisz zdefiniować termin
+                i rodzaje produktów. Dla każdej oferty możesz stworzyć kilka pul produktów.
+              </Typography>
+
+              <TextField
+                disabled={readOnly}
+                fullWidth
+                helperText="Nazwa puli będzie widoczna tylko w przypadku wielu pul w jednym dniu"
+                label="Nazwa puli"
+                margin="normal"
+                name="name"
+                onChange={handleFormDataChange}
+                required
+                value={formData.name != null ? formData.name : ''}
+              />
+
+              <TextField
+                fullWidth
+                disabled={readOnly || this.hasTicketAvailabilityLimit(formData.ticketDefinitions)}
+                helperText="Puste pole - brak limitu"
+                label="Limit produktów w puli"
+                margin="normal"
+                name="availableTicketsNumber"
+                onChange={handleAvailableTicketsChange}
+                type="number"
+                inputProps={{ min: 0 }}
+                value={
+                  typeof formData.availableTicketsNumber === 'number' &&
+                  formData.availableTicketsNumber >= 0
+                    ? formData.availableTicketsNumber
+                    : ''
+                }
+              />
+
+              <div className={classNames(classes.section, classes.fullWidth)}>
+                <Typography variant="subtitle1" gutterBottom>
+                  Termin:
                 </Typography>
-                <TextField
-                  disabled={readOnly}
-                  fullWidth
-                  helperText="Nazwa puli będzie widoczna tylko w przypadku wielu pul w jednym dniu"
-                  label="Nazwa puli"
-                  margin="normal"
-                  name="name"
-                  onChange={handleFormDataChange}
-                  required
-                  value={formData.name != null ? formData.name : ''}
-                />
-                <TextField
-                  fullWidth
-                  disabled={readOnly || this.hasTicketAvailabilityLimit(formData.ticketDefinitions)}
-                  helperText="Puste pole - brak limitu"
-                  label="Limit produktów w puli"
-                  margin="normal"
-                  name="availableTicketsNumber"
-                  onChange={handleAvailableTicketsChange}
-                  type="number"
-                  inputProps={{ min: 0 }}
-                  value={
-                    typeof formData.availableTicketsNumber === 'number' &&
-                    formData.availableTicketsNumber >= 0
-                      ? formData.availableTicketsNumber
-                      : ''
-                  }
-                 //value={
-                 //   formData.availableTicketsNumber && formData.availableTicketsNumber > 0
-                 //     ? formData.availableTicketsNumber : ''
-                 //     }
-                />
-                <div className={classNames(classes.section, classes.fullWidth)}>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Termin:
-                  </Typography>
-                </div>
-                <div className={classNames(classes.columns, classes.fullWidth)}>
-                  <div className={classes.horizontal}>
-                    <DateTimePicker
-                      disabled={readOnly || editMode}
-                      date={poolDate}
-                      fullDay={formData.wholeDay}
-                      hasTime={false}
-                      name="poolDate"
-                      onChange={handlePoolDateChange}
-                      DatePickerProps={{
-                        disabled: readOnly || editMode,
-                        disablePast: !(readOnly || editMode),
-                        margin: 'dense',
-                      }}
-                    />
-                    <CustomTimePicker
-                      disabled={readOnly || editMode}
-                      date={formData.startDate}
-                      fullDay={formData.wholeDay}
-                      name="startDate"
-                      onChange={handleDateChange}
-                      TimePickerProps={{
-                        disabled: readOnly || editMode,
-                        margin: 'dense',
-                      }}
-                    />
-                    {!formData.wholeDay
-                      && (
-                      <Typography>
-                        &nbsp;&nbsp;do
-                      </Typography>
-                      )
-                    }
-                    <CustomTimePicker
-                      disabled={readOnly || editMode}
-                      date={formData.endDate}
-                      fullDay={formData.wholeDay}
-                      name="endDate"
-                      onChange={handleDateChange}
-                      TimePickerProps={{
-                        disabled: readOnly || editMode,
-                        margin: 'dense',
-                      }}
-                    />
-                  </div>
-                  <SwitchLabel
-                    label="Cały dzień"
+              </div>
+
+              <div className={classNames(classes.columns, classes.fullWidth)}>
+                <div className={classes.horizontal}>
+                  <TextField
+                    className={classes.nativeDateField}
+                    type="date"
                     disabled={readOnly || editMode}
-                    name="wholeDay"
-                    onChange={handleFullDayChange}
-                    value={formData.wholeDay}
+                    margin="dense"
+                    value={toDateInputValue(poolDate)}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      handlePoolDateChange({
+                        target: {
+                          name: 'poolDate',
+                          value: new Date(`${value}T00:00`),
+                        },
+                      });
+                    }}
+                    InputLabelProps={{ shrink: true }}
+                  />
+
+                  <TextField
+                    className={classes.nativeTimeField}
+                    type="time"
+                    disabled={readOnly || editMode || formData.wholeDay}
+                    margin="dense"
+                    value={toTimeInputValue(formData.startDate)}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      handleDateChange({
+                        target: {
+                          name: 'startDate',
+                          value: mergeDateAndTime(formData.startDate, value),
+                        },
+                      });
+                    }}
+                    InputLabelProps={{ shrink: true }}
+                  />
+
+                  <TextField
+                    className={classes.nativeTimeField}
+                    type="time"
+                    disabled={readOnly || editMode || formData.wholeDay}
+                    margin="dense"
+                    value={toTimeInputValue(formData.endDate)}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      handleDateChange({
+                        target: {
+                          name: 'endDate',
+                          value: mergeDateAndTime(formData.endDate, value),
+                        },
+                      });
+                    }}
+                    InputLabelProps={{ shrink: true }}
                   />
                 </div>
-                <div className={classNames(classes.section, classes.fullWidth)}>
-                  <div>
+
+                <SwitchLabel
+                  label="Cały dzień"
+                  disabled={readOnly || editMode}
+                  name="wholeDay"
+                  onChange={handleFullDayChange}
+                  value={formData.wholeDay}
+                />
+              </div>
+
+              <div className={classNames(classes.section, classes.fullWidth)}>
+                <div>
+                  <Typography variant="subtitle1" gutterBottom>
+                    Powtarzaj co:
+                  </Typography>
+                  <TextField
+                    disabled={readOnly || editMode}
+                    onChange={this.handleBasicFrequencyChange(handleFrequencyDataChange)}
+                    select
+                    value={frequencyType}
+                  >
+                    {basicFrequencies.map(({ label, value }) => (
+                      <MenuItem key={value} value={value}>
+                        {label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </div>
+
+                {frequencyType === 'CUSTOM' && (
+                  <div className={classNames(classes.section, classes.fullWidth)}>
                     <Typography variant="subtitle1" gutterBottom>
-                      Powtarzaj co:
+                      Powtarzanie niestandardowe
                     </Typography>
-                    <TextField
-                      disabled={readOnly || editMode}
-                      onChange={this.handleBasicFrequencyChange(handleFrequencyDataChange)}
-                      select
-                      value={frequencyType}
-                    >
-                      {basicFrequencies.map(({ label, value }) => (
-                        <MenuItem
-                          key={value}
-                          value={value}
-                        >
-                          {label}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </div>
-                  {frequencyType === 'CUSTOM'
-                    && (
-                    <div className={classNames(classes.section, classes.fullWidth)}>
-                      <Typography variant="subtitle1" gutterBottom>
-                        Powtarzanie niestandardowe
-                      </Typography>
-                      <div className={classNames(classes.inline, classes.fullWidth)}>
-                        <Typography>Powtarzaj co:</Typography>
-                        <TextField
-                          className={classes.frequencyTextfield}
-                          disabled={readOnly || editMode}
-                          onChange={this.handleFrequencyPropChange(handleFrequencyDataChange)}
-                          name="frequency"
-                          type="number"
-                          value={formData.frequencyData && formData.frequencyData.frequency != null
+
+                    <div className={classNames(classes.inline, classes.fullWidth)}>
+                      <Typography>Powtarzaj co:</Typography>
+
+                      <TextField
+                        className={classes.frequencyTextfield}
+                        disabled={readOnly || editMode}
+                        onChange={this.handleFrequencyPropChange(handleFrequencyDataChange)}
+                        name="frequency"
+                        type="number"
+                        value={
+                          formData.frequencyData && formData.frequencyData.frequency != null
                             ? formData.frequencyData.frequency
                             : ''
-                          }
-                        />
-                        <TextField
-                          disabled={readOnly || editMode}
-                          onChange={
-                            this.handleFrequencyPropChange(
-                              handleFrequencyDataChange,
-                              formData.startDate,
-                            )
-                          }
-                          name="frequencyType"
-                          select
-                          value={
-                            formData.frequencyData && formData.frequencyData.frequencyType != null
-                              ? formData.frequencyData.frequencyType
-                              : frequencyTypes[0].value
-                          }
-                        >
-                          {frequencyTypes.map(({ label, value }) => (
-                            <MenuItem key={value} value={value}>
-                              {label}
-                            </MenuItem>
-                          ))}
-                        </TextField>
-                      </div>
-                      {formData.frequencyData && formData.frequencyData.frequencyType === 'WEEKLY'
-                        && (
+                        }
+                      />
+
+                      <TextField
+                        disabled={readOnly || editMode}
+                        onChange={this.handleFrequencyPropChange(
+                          handleFrequencyDataChange,
+                          formData.startDate,
+                        )}
+                        name="frequencyType"
+                        select
+                        value={
+                          formData.frequencyData &&
+                          formData.frequencyData.frequencyType != null
+                            ? formData.frequencyData.frequencyType
+                            : frequencyTypes[0].value
+                        }
+                      >
+                        {frequencyTypes.map(({ label, value }) => (
+                          <MenuItem key={value} value={value}>
+                            {label}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </div>
+
+                    {formData.frequencyData &&
+                      formData.frequencyData.frequencyType === 'WEEKLY' && (
                         <div className={classNames(classes.section, classes.fullWidth)}>
                           <Typography>Powtarzaj w:</Typography>
+
                           {daysOfWeekDefinitions.map(({ label, value }) => (
                             <FormControlLabel
                               key={`${label}-${value}`}
                               control={(
                                 <Checkbox
-                                  checked={this.isChecked(formData.frequencyData.daysOfWeek, value)}
+                                  checked={this.isChecked(
+                                    formData.frequencyData.daysOfWeek,
+                                    value,
+                                  )}
                                   disabled={readOnly || editMode}
                                   onChange={handleFrequencyItemChange}
                                   name="daysOfWeek"
                                   value={`${value}`}
                                 />
-)}
+                              )}
                               label={label}
                             />
                           ))}
                         </div>
-                        )
-                      }
-                    </div>
-                    )
-                  }
-                  {frequencyType !== 'NONE'
-                    && (
-                    <div className={classNames(classes.section, classes.fullWidth)}>
-                      <Typography variant="subtitle1">Kończy się:</Typography>
-                      <RadioGroup
-                        aria-label="Koniec puli"
-                        name="frequencyEndDateType"
-                        value={frequencyEndDateType}
-                        onChange={handleFrequencyEndDateTypeChange}
-                      >
-                        <FormControlLabel
-                          value="NONE"
-                          control={<Radio />}
-                          disabled={readOnly || editMode}
-                          label="Nigdy"
-                        />
-                        <FormControlLabel
-                          value="SINGLE"
-                          disabled={readOnly || editMode}
-                          control={<Radio />}
-                          label={(
-                            <div className={classNames(classes.frequencyRadioWrapper)}>
-                              <Typography className={classNames(readOnly || editMode
-                                ? [classes.disabled, classes.frequencyRadioLabel]
-                                : classes.frequencyRadioLabel)}
-                              >
-                                W dniu
-                              </Typography>
-                              {frequencyEndDateType === 'SINGLE'
-                              && (
-                              <DateTimePicker
-                                date={formData.frequencyData.endDate}
-                                fullDay
-                                name="endDate"
-                                onChange={handleFrequencyDataFieldChange}
-                                DatePickerProps={{
-                                  disabled: readOnly || editMode,
-                                  minDate: formData.endDate,
-                                }}
-                              />
-                              )
-                              }
-                            </div>
-)}
-                        />
-                      </RadioGroup>
-                    </div>
-                    )
-                  }
-                </div>
-                {!readOnly
-                  && (
+                      )}
+                  </div>
+                )}
+
+                {frequencyType !== 'NONE' && (
                   <div className={classNames(classes.section, classes.fullWidth)}>
-                    <Typography variant="h6" gutterBottom>
-                      Produkty
-                    </Typography>
-                    {!readOnly
-                      && (
-                      <div className={classNames(classes.columns, classes.fullWidth)}>
-                        <TextField
-                          onChange={event => handlePropFromEventChange(event)}
-                          name="selectedTicketDefinitionId"
-                          select
-                          SelectProps={{
-                            displayEmpty: true,
-                          }}
-                          value={selectedTicketDefinitionId}
-                        >
-                          <MenuItem
-                            disabled
-                            value=""
-                          >
-                            Wybierz rodzaj produktu
+                    <Typography variant="subtitle1">Kończy się:</Typography>
+
+                    <RadioGroup
+                      aria-label="Koniec puli"
+                      name="frequencyEndDateType"
+                      value={frequencyEndDateType}
+                      onChange={handleFrequencyEndDateTypeChange}
+                    >
+                      <FormControlLabel
+                        value="NONE"
+                        control={<Radio />}
+                        disabled={readOnly || editMode}
+                        label="Nigdy"
+                      />
+
+                      <FormControlLabel
+                        value="SINGLE"
+                        disabled={readOnly || editMode}
+                        control={<Radio />}
+                        label={(
+                          <div className={classNames(classes.frequencyRadioWrapper)}>
+                            <Typography
+                              className={classNames(
+                                readOnly || editMode
+                                  ? [classes.disabled, classes.frequencyRadioLabel]
+                                  : classes.frequencyRadioLabel,
+                              )}
+                            >
+                              W dniu
+                            </Typography>
+
+                            {frequencyEndDateType === 'SINGLE' && (
+                              <TextField
+                                className={classes.nativeDateField}
+                                type="date"
+                                disabled={readOnly || editMode}
+                                margin="dense"
+                                value={toDateInputValue(
+                                  formData.frequencyData && formData.frequencyData.endDate,
+                                )}
+                                onChange={(event) => {
+                                  const value = event.target.value;
+                                  handleFrequencyDataFieldChange({
+                                    target: {
+                                      name: 'endDate',
+                                      value: value ? new Date(`${value}T00:00`) : null,
+                                    },
+                                  });
+                                }}
+                                inputProps={{
+                                  min: toDateInputValue(formData.endDate),
+                                }}
+                                InputLabelProps={{ shrink: true }}
+                              />
+                            )}
+                          </div>
+                        )}
+                      />
+                    </RadioGroup>
+                  </div>
+                )}
+              </div>
+
+              {!readOnly && (
+                <div className={classNames(classes.section, classes.fullWidth)}>
+                  <Typography variant="h6" gutterBottom>
+                    Produkty
+                  </Typography>
+
+                  <div className={classNames(classes.columns, classes.fullWidth)}>
+                    <TextField
+                      onChange={event => handlePropFromEventChange(event)}
+                      name="selectedTicketDefinitionId"
+                      select
+                      SelectProps={{
+                        displayEmpty: true,
+                      }}
+                      value={selectedTicketDefinitionId}
+                    >
+                      <MenuItem disabled value="">
+                        Wybierz rodzaj produktu
+                      </MenuItem>
+
+                      {ticketDefinitionsList &&
+                        ticketDefinitionsList.map(({ id, name, price }) => (
+                          <MenuItem key={`${id}-${name}`} value={id}>
+                            {`${name} - ${formatPrice(price)}`}
                           </MenuItem>
-                          {ticketDefinitionsList
-                            && ticketDefinitionsList.map(({ id, name, price }) => (
-                              <MenuItem
-                                key={`${id}-${name}`}
-                                value={id}
-                              >
-                                {`${name} - ${formatPrice(price)}`}
-                              </MenuItem>
-                            ))
-                            }
-                        </TextField>
-                        <div>
-                          <Button
-                            onClick={() => handleTicketDefinitionAdd(+selectedTicketDefinitionId)}
-                            style={{ marginRight: 10 }}
-                            variant="outlined"
-                          >
-                            Dodaj do puli
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            color="primary"
-                            onClick={handleDefinitionFormOpen}
-                          >
-                            Nowy produkt
-                          </Button>
-                        </div>
-                      </div>
-                      )
-                    }
-                    {formData.ticketDefinitions && (
-                      <TicketDefinitionList
-                        disableAvailability={
-                          Number.isInteger(formData.availableTicketsNumber)
-                          && formData.availableTicketsNumber > 0
-                        }
-                        items={formData.ticketDefinitions}
-                        onChange={handleTicketDefinitionChange}
-                        onDelete={ticketDefinition => this.handleAlertDialogOpen({
+                        ))}
+                    </TextField>
+
+                    <div>
+                      <Button
+                        onClick={() => handleTicketDefinitionAdd(+selectedTicketDefinitionId)}
+                        style={{ marginRight: 10 }}
+                        variant="outlined"
+                      >
+                        Dodaj do puli
+                      </Button>
+
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={handleDefinitionFormOpen}
+                      >
+                        Nowy produkt
+                      </Button>
+                    </div>
+                  </div>
+
+                  {formData.ticketDefinitions && (
+                    <TicketDefinitionList
+                      disableAvailability={
+                        Number.isInteger(formData.availableTicketsNumber) &&
+                        formData.availableTicketsNumber > 0
+                      }
+                      items={formData.ticketDefinitions}
+                      onChange={handleTicketDefinitionChange}
+                      onDelete={ticketDefinition =>
+                        this.handleAlertDialogOpen({
                           content: `Próbujesz usunąć produkt o nazwie "${ticketDefinition.name}". Kontynuować?`,
                           onSuccess: () => {
                             handleTicketDefinitionDelete(ticketDefinition.id);
@@ -549,66 +621,69 @@ class CalendarEventForm extends React.Component {
                           },
                           open: true,
                           title: 'Czy na pewno usunąć wybrany produkt?',
-                        })}
-                        readOnly={readOnly}
-                      />
-                    )}
-                    {isDefinitionFormVisible && !readOnly
-                      && (
-                      <div className={classNames(classes.section, classes.fullWidth)}>
-                        <Grid container direction="row" alignItems="center">
-                          <Grid item>
-                            <Typography variant="h6">
-                              Nowy rodzaj produktu
-                            </Typography>
-                          </Grid>
-                          <Grid item>
-                            <IconButton onClick={handleDefinitionFormClose}>
-                              <ClearIcon />
-                            </IconButton>
-                          </Grid>
+                        })
+                      }
+                      readOnly={readOnly}
+                    />
+                  )}
+
+                  {isDefinitionFormVisible && !readOnly && (
+                    <div className={classNames(classes.section, classes.fullWidth)}>
+                      <Grid container direction="row" alignItems="center">
+                        <Grid item>
+                          <Typography variant="h6">
+                            Nowy rodzaj produktu
+                          </Typography>
                         </Grid>
-                        <TicketDefinitionForm
-                          onSubmitSuccess={(ticketDefinitionId) => {
-                            fetchTicketDefinitions({
-                              onSuccess: () => handleTicketDefinitionAdd(ticketDefinitionId),
-                            });
-                            handleDefinitionFormClose();
-                          }}
-                        />
-                      </div>
-                      )
-                    }
-                  </div>
-                  )
-                }
-                <div className={classNames(classes.section, classes.fullWidth)}>
-                  <Typography variant="subtitle1">Sprawdzanie produktów:</Typography>
-                  <TextField
-                    disabled={readOnly || editMode}
-                    onChange={handleEntryStartDateOffsetChange}
-                    name="entryStartDateOffset"
-                    select
-                    value={entryStartDateOffset}
-                  >
-                    <MenuItem value={0}>
-                      równo z godziną rozpoczęcia
-                    </MenuItem>
-                    <MenuItem value={15}>
-                      15 minut wcześniej
-                    </MenuItem>
-                    <MenuItem value={30}>
-                      30 minut wcześniej
-                    </MenuItem>
-                    <MenuItem value={60}>
-                      60 minut wcześniej
-                    </MenuItem>
-                  </TextField>
+
+                        <Grid item>
+                          <IconButton onClick={handleDefinitionFormClose}>
+                            <ClearIcon />
+                          </IconButton>
+                        </Grid>
+                      </Grid>
+
+                      <TicketDefinitionForm
+                        onSubmitSuccess={(ticketDefinitionId) => {
+                          fetchTicketDefinitions({
+                            onSuccess: () => handleTicketDefinitionAdd(ticketDefinitionId),
+                          });
+                          handleDefinitionFormClose();
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
-              </Grid>
-            </MuiPickersUtilsProvider>
+              )}
+
+              <div className={classNames(classes.section, classes.fullWidth)}>
+                <Typography variant="subtitle1">Sprawdzanie produktów:</Typography>
+
+                <TextField
+                  disabled={readOnly || editMode}
+                  onChange={handleEntryStartDateOffsetChange}
+                  name="entryStartDateOffset"
+                  select
+                  value={entryStartDateOffset}
+                >
+                  <MenuItem value={0}>
+                    równo z godziną rozpoczęcia
+                  </MenuItem>
+                  <MenuItem value={15}>
+                    15 minut wcześniej
+                  </MenuItem>
+                  <MenuItem value={30}>
+                    30 minut wcześniej
+                  </MenuItem>
+                  <MenuItem value={60}>
+                    60 minut wcześniej
+                  </MenuItem>
+                </TextField>
+              </div>
+            </Grid>
           )}
         </CalendarEventController>
+
         <AlertDialog
           onCancel={this.handleAlertDialogCancel}
           onExited={this.handleAlertDialogClear}

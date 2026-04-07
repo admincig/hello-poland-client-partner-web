@@ -8,14 +8,11 @@ import _isNumber from 'lodash/isNumber';
 import format from 'date-fns/format';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
-//import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
+// import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
 import Switch from '@material-ui/core/Switch';
 import Typography from '@material-ui/core/Typography/Typography';
-import TimePicker from 'material-ui-pickers/TimePicker';
-import MuiPickersUtilsProvider from 'material-ui-pickers/MuiPickersUtilsProvider';
-import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
@@ -25,6 +22,11 @@ import { actions as sightsActions } from '@hello-poland/commons/redux/sights';
 import GridItem from 'components/GridItem';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import MuiTextField from '@material-ui/core/TextField';
+import setHours from 'date-fns/setHours';
+import setMinutes from 'date-fns/setMinutes';
+
+// import plLocale from 'date-fns/locale/pl';
 
 const i18n = {
   days: {
@@ -63,7 +65,7 @@ const styles = () => ({
     marginTop: 40,
   },
   openingHoursTimepicker: {
-    width: 50,
+    width: 90,
   },
 });
 
@@ -83,6 +85,22 @@ const normalizeCoord = (v) => {
   return null;
 };
 
+const toTimeInputValue = (value) => {
+  if (!value) return '';
+  return format(new Date(value), 'HH:mm');
+};
+
+const mergeTimeToDate = (baseValue, timeValue) => {
+  if (!baseValue || !timeValue) return baseValue;
+
+  const [hours, minutes] = timeValue.split(':').map(Number);
+  let nextDate = new Date(baseValue);
+
+  nextDate = setHours(nextDate, hours || 0);
+  nextDate = setMinutes(nextDate, minutes || 0);
+
+  return nextDate;
+};
 
 class SightForm extends Component {
   constructor(props) {
@@ -92,7 +110,7 @@ class SightForm extends Component {
     const { openingHours } = initialValues || {};
 
     this.state = {
-      //initialValues: this.getInitialValues(initialValues),
+      // initialValues: this.getInitialValues(initialValues),
       isDefaultTranslation: true,
       viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
     };
@@ -138,7 +156,6 @@ class SightForm extends Component {
     }
   }
 
-
   getFormattedTime = (datetime, dateFormat = 'HH:mm') => format(datetime, dateFormat);
 
   getInitialOpeningHours = (initialValues = [], viewValues = false) => {
@@ -155,8 +172,8 @@ class SightForm extends Component {
           day: i,
           openTime: openTime ? new Date(`1970-01-01T${openTime}`) : new Date('1970-01-01T09:00'),
           closeTime: closeTime ? new Date(`1970-01-01T${closeTime}`) : new Date('1970-01-01T18:00'),
-          //openTime: openTime ? `1970-01-01T${openTime}` : '1970-01-01T09:00',
-          //closeTime: closeTime ? `1970-01-01T${closeTime}` : '1970-01-01T18:00',
+          // openTime: openTime ? `1970-01-01T${openTime}` : '1970-01-01T09:00',
+          // closeTime: closeTime ? `1970-01-01T${closeTime}` : '1970-01-01T18:00',
         });
       }
     } else {
@@ -205,10 +222,10 @@ class SightForm extends Component {
     };
   };
 
-  //setInitialValues = initialValues => this.setState({
-  //  initialValues: this.getInitialValues(initialValues),
-  //  isDefaultTranslation: this.isDefaultLanguage(initialValues),
-  //});
+  // setInitialValues = initialValues => this.setState({
+  //   initialValues: this.getInitialValues(initialValues),
+  //   isDefaultTranslation: this.isDefaultLanguage(initialValues),
+  // });
 
   setViewOpeningHours = openingHours => this.setState({
     viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
@@ -339,7 +356,7 @@ class SightForm extends Component {
     setSubmitting(false);
 
     resetForm({
-      values: this.state.initialValues
+      values: this.state.initialValues,
     });
   };
 
@@ -369,155 +386,231 @@ class SightForm extends Component {
               <GridItem>
                 <Typography variant="h6">Dane podstawowe</Typography>
               </GridItem>
+
               <Hidden xsUp>
                 <GridItem>
                   <Field name="id" hidden component={TextField} {...commonProps} />
                 </GridItem>
               </Hidden>
+
               <GridItem>
-                  <Field name="name" label="Nazwa atrakcji" required component={TextField} {...commonProps} />
+                <Field name="name" label="Nazwa atrakcji" required component={TextField} {...commonProps} />
               </GridItem>
-              {isDefaultTranslation
-                && (
-                  <GridItem md={4} sm={4}>
-                    <Field
-                      name="published"
-                      render={switchProps => (
-                        <FormControlLabel
-                          control={<Switch {...fieldToSwitch(switchProps)} />}
-                          label="Publikuj"
-                        />
-                      )}
-                    />
-                  </GridItem>
-                )
-              }
+
+              {isDefaultTranslation && (
+                <GridItem md={4} sm={4}>
+                  <Field
+                    name="published"
+                    render={switchProps => (
+                      <FormControlLabel
+                        control={<Switch {...fieldToSwitch(switchProps)} />}
+                        label="Publikuj"
+                      />
+                    )}
+                  />
+                </GridItem>
+              )}
+
               <GridItem>
                 <Field name="lead" label="Warunki oferty" component={TextField} {...commonProps} />
               </GridItem>
-              <GridItem>
-                <Field name="description" label="Opis atrakcji" required component={TextField} {...commonProps} multiline rowsMax={20}  />
-              </GridItem>
-              {isDefaultTranslation
-                && (
-                  <Fragment>
-                    <GridItem>
-                      <Typography variant="h6" className={classes.title}>Godziny otwarcia</Typography>
-                    </GridItem>
-                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                      {viewOpeningHours.map(item => (
-                        <Fragment key={`openingHours-list-${item.day}`}>
-                          <GridItem sm={6} md={6}>
-                            <FormControlLabel
-                              control={(
-                                <Switch
-                                  checked={item.checked}
-                                  onChange={
-                                    this.handleOpeningHoursSelectionChange(item.day, values, setFieldValue)
-                                  }
-                                  value={`${item.day}`}
-                                />
-                              )}
-                              label={i18n.days[item.day]}
-                            />
-                          </GridItem>
-                          <GridItem sm={3} md={3}>
-                            <TimePicker
-                              ampm={false}
-                              className={classes.openingHoursTimepicker}
-                              disabled={!item.checked}
-                              onChange={event => this.handleOpeningHoursChange(item.day, 'openTime', event, values, setFieldValue )}
-                              value={item.openTime}
-                            />
-                          </GridItem>
-                          <GridItem sm={3} md={3}>
-                            <TimePicker
-                              ampm={false}
-                              className={classes.openingHoursTimepicker}
-                              disabled={!item.checked}
-                              onChange={event => this.handleOpeningHoursChange(item.day, 'closeTime', event, values, setFieldValue )}
-                              value={item.closeTime}
-                            />
-                          </GridItem>
-                        </Fragment>
-                      ))}
-                    </MuiPickersUtilsProvider>
-                    <GridItem>
-                      <Typography variant="h6" className={classes.title}>Dane kontaktowe</Typography>
-                    </GridItem>
-                    <GridItem>
-                      <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps}  />
-                    </GridItem>
-                    <GridItem>
-                      <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps}  />
-                    </GridItem>
-                    <GridItem>
-                      <Typography variant="h6" className={classes.title}>Lokalizacja</Typography>
-                    </GridItem>
-                    <GridItem>
-                      <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
-                    </GridItem>
-                    <GridItem md={4} sm={4}>
-                      <Field name="location.zipCode" label="Kod pocztowy" component={TextField} {...commonProps}  />
-                    </GridItem>
-                    <GridItem md={8} sm={8}>
-                      <Field name="location.city" label="Miasto" component={TextField} {...commonProps}  />
-                    </GridItem>
-                    <GridItem>
-                      <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
-                    </GridItem>
-                    <GridItem>
-                      <Field name="location.voivodeship" label="Województwo" component={TextField} {...commonProps} />
-                    </GridItem>
-                    <GridItem>
-                      <Field name="location.county" label="Powiat" component={TextField} {...commonProps}  />
-                    </GridItem>
-                    <GridItem>
-                      <Field  name="location.commune" label="Gmina" component={TextField} {...commonProps}  />
-                    </GridItem>
-                    <GridItem md={6} sm={6}>
-                      <Field name="location.latitude" label="Szerokość geograficzna (lat)" component={TextField} type="text" inputProps={{ inputMode: "decimal",  pattern: "[0-9.,\\-]*", }} {...commonProps}  />
-                    </GridItem>
-                    <GridItem md={6} sm={6}>
-                      <Field  name="location.longitude"  label="Długość geograficzna (lon)" component={TextField}  inputProps={{ inputMode: "decimal",  pattern: "[0-9.,\\-]*", }}  {...commonProps}  />
-                    </GridItem>
-                    <GridItem>
-                      <Typography variant="h6" className={classes.title}>Udogodnienia i dostępność</Typography>
-                    </GridItem>
-                    <GridItem md={6} sm={6}>
-                      <FormControlLabel control={<Checkbox checked={!!values.animalsAllowed} onChange={(e) => setFieldValue('animalsAllowed', e.target.checked)} /> } label="Zwierzęta dozwolone" />
-                    </GridItem>
-                    <GridItem md={6} sm={6}>
-                      <FormControlLabel control={ <Checkbox checked={!!values.carParkAvailable} onChange={(e) => setFieldValue('carParkAvailable', e.target.checked)} /> } label="Parking dostępny" />
-                    </GridItem>
-                    <GridItem md={6} sm={6}>
-                      <FormControlLabel control={ <Checkbox checked={!!values.foodAndDrinkAvailable} onChange={(e) => setFieldValue('foodAndDrinkAvailable', e.target.checked)} /> } label="Jedzenie i napoje dostępne" />
-                    </GridItem>
-                    <GridItem md={6} sm={6}>
-                      <FormControlLabel control={ <Checkbox checked={!!values.disabledAccessMovement} onChange={(e) => setFieldValue('disabledAccessMovement', e.target.checked)} /> } label="Dostępność: ruch" />
-                    </GridItem>
-                    <GridItem md={6} sm={6}>
-                      <FormControlLabel control={ <Checkbox checked={!!values.disabledAccessVision} onChange={(e) => setFieldValue('disabledAccessVision', e.target.checked)} /> } label="Dostępność: wzrok" />
-                    </GridItem>
-                    <GridItem md={6} sm={6}>
-                      <FormControlLabel control={ <Checkbox checked={!!values.disabledAccessHearing} onChange={(e) => setFieldValue('disabledAccessHearing', e.target.checked)} /> } label="Dostępność: słuch" />
-                    </GridItem>
 
-                  </Fragment>
-                )
-              }
-            </Grid>
-            {buttons
-            && (
-            <Grid container spacing={16}>
-              <GridItem md={2} sm={2}>
-                <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
-                  Zapisz
-                </Button>
+              <GridItem>
+                <Field
+                  name="description"
+                  label="Opis atrakcji"
+                  required
+                  component={TextField}
+                  {...commonProps}
+                  multiline
+                  rowsMax={20}
+                />
               </GridItem>
+
+              {isDefaultTranslation && (
+                <Fragment>
+                  <GridItem>
+                    <Typography variant="h6" className={classes.title}>Godziny otwarcia</Typography>
+                  </GridItem>
+
+                  {viewOpeningHours.map(item => (
+                    <Fragment key={`openingHours-list-${item.day}`}>
+                      <GridItem sm={6} md={6}>
+                        <FormControlLabel
+                          control={(
+                            <Switch
+                              checked={item.checked}
+                              onChange={
+                                this.handleOpeningHoursSelectionChange(item.day, values, setFieldValue)
+                              }
+                              value={`${item.day}`}
+                            />
+                          )}
+                          label={i18n.days[item.day]}
+                        />
+                      </GridItem>
+
+                      <GridItem sm={3} md={3}>
+                        <MuiTextField
+                          type="time"
+                          className={classes.openingHoursTimepicker}
+                          disabled={!item.checked}
+                          margin="dense"
+                          value={toTimeInputValue(item.openTime)}
+                          onChange={(event) => this.handleOpeningHoursChange(
+                            item.day,
+                            'openTime',
+                            mergeTimeToDate(item.openTime, event.target.value),
+                            values,
+                            setFieldValue,
+                          )}
+                          InputLabelProps={{ shrink: true }}
+                        />
+                      </GridItem>
+
+                      <GridItem sm={3} md={3}>
+                        <MuiTextField
+                          type="time"
+                          className={classes.openingHoursTimepicker}
+                          disabled={!item.checked}
+                          margin="dense"
+                          value={toTimeInputValue(item.closeTime)}
+                          onChange={(event) => this.handleOpeningHoursChange(
+                            item.day,
+                            'closeTime',
+                            mergeTimeToDate(item.closeTime, event.target.value),
+                            values,
+                            setFieldValue,
+                          )}
+                          InputLabelProps={{ shrink: true }}
+                        />
+                      </GridItem>
+                    </Fragment>
+                  ))}
+
+                  <GridItem>
+                    <Typography variant="h6" className={classes.title}>Dane kontaktowe</Typography>
+                  </GridItem>
+
+                  <GridItem>
+                    <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
+                  </GridItem>
+
+                  <GridItem>
+                    <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
+                  </GridItem>
+
+                  <GridItem>
+                    <Typography variant="h6" className={classes.title}>Lokalizacja</Typography>
+                  </GridItem>
+
+                  <GridItem>
+                    <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
+                  </GridItem>
+
+                  <GridItem md={4} sm={4}>
+                    <Field name="location.zipCode" label="Kod pocztowy" component={TextField} {...commonProps} />
+                  </GridItem>
+
+                  <GridItem md={8} sm={8}>
+                    <Field name="location.city" label="Miasto" component={TextField} {...commonProps} />
+                  </GridItem>
+
+                  <GridItem>
+                    <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
+                  </GridItem>
+
+                  <GridItem>
+                    <Field name="location.voivodeship" label="Województwo" component={TextField} {...commonProps} />
+                  </GridItem>
+
+                  <GridItem>
+                    <Field name="location.county" label="Powiat" component={TextField} {...commonProps} />
+                  </GridItem>
+
+                  <GridItem>
+                    <Field name="location.commune" label="Gmina" component={TextField} {...commonProps} />
+                  </GridItem>
+
+                  <GridItem md={6} sm={6}>
+                    <Field
+                      name="location.latitude"
+                      label="Szerokość geograficzna (lat)"
+                      component={TextField}
+                      type="text"
+                      inputProps={{ inputMode: 'decimal', pattern: '[0-9.,\\-]*' }}
+                      {...commonProps}
+                    />
+                  </GridItem>
+
+                  <GridItem md={6} sm={6}>
+                    <Field
+                      name="location.longitude"
+                      label="Długość geograficzna (lon)"
+                      component={TextField}
+                      inputProps={{ inputMode: 'decimal', pattern: '[0-9.,\\-]*' }}
+                      {...commonProps}
+                    />
+                  </GridItem>
+
+                  <GridItem>
+                    <Typography variant="h6" className={classes.title}>Udogodnienia i dostępność</Typography>
+                  </GridItem>
+
+                  <GridItem md={6} sm={6}>
+                    <FormControlLabel
+                      control={<Checkbox checked={!!values.animalsAllowed} onChange={e => setFieldValue('animalsAllowed', e.target.checked)} />}
+                      label="Zwierzęta dozwolone"
+                    />
+                  </GridItem>
+
+                  <GridItem md={6} sm={6}>
+                    <FormControlLabel
+                      control={<Checkbox checked={!!values.carParkAvailable} onChange={e => setFieldValue('carParkAvailable', e.target.checked)} />}
+                      label="Parking dostępny"
+                    />
+                  </GridItem>
+
+                  <GridItem md={6} sm={6}>
+                    <FormControlLabel
+                      control={<Checkbox checked={!!values.foodAndDrinkAvailable} onChange={e => setFieldValue('foodAndDrinkAvailable', e.target.checked)} />}
+                      label="Jedzenie i napoje dostępne"
+                    />
+                  </GridItem>
+
+                  <GridItem md={6} sm={6}>
+                    <FormControlLabel
+                      control={<Checkbox checked={!!values.disabledAccessMovement} onChange={e => setFieldValue('disabledAccessMovement', e.target.checked)} />}
+                      label="Dostępność: ruch"
+                    />
+                  </GridItem>
+
+                  <GridItem md={6} sm={6}>
+                    <FormControlLabel
+                      control={<Checkbox checked={!!values.disabledAccessVision} onChange={e => setFieldValue('disabledAccessVision', e.target.checked)} />}
+                      label="Dostępność: wzrok"
+                    />
+                  </GridItem>
+
+                  <GridItem md={6} sm={6}>
+                    <FormControlLabel
+                      control={<Checkbox checked={!!values.disabledAccessHearing} onChange={e => setFieldValue('disabledAccessHearing', e.target.checked)} />}
+                      label="Dostępność: słuch"
+                    />
+                  </GridItem>
+                </Fragment>
+              )}
             </Grid>
-            )
-            }
+
+            {buttons && (
+              <Grid container spacing={16}>
+                <GridItem md={2} sm={2}>
+                  <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
+                    Zapisz
+                  </Button>
+                </GridItem>
+              </Grid>
+            )}
           </Form>
         )}
       </Formik>

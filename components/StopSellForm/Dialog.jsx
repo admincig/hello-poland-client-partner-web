@@ -11,10 +11,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography/Typography';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
-import MuiPickersUtilsProvider from 'material-ui-pickers/MuiPickersUtilsProvider';
-import DatePicker from 'material-ui-pickers/DatePicker';
-// import plLocale from 'date-fns/locale/pl';
+import TextField from '@material-ui/core/TextField';
 import {
   actions as sightEventsActions,
   selectors as sightEventsSelectors,
@@ -26,14 +23,10 @@ import setHours from 'date-fns/setHours';
 import setMinutes from 'date-fns/setMinutes';
 import AlertDialog from 'components/AlertDialog';
 
-// const locale = {
-//   pl: plLocale,
-// };
-
-const styles = () => ({
+const styles = theme => ({
   datePicker: {
-    width: 90,
-    marginRight: 20,
+    width: 150,
+    marginTop: theme.spacing.unit * 2,
   },
   error: {
     color: 'red',
@@ -52,7 +45,7 @@ class SightFormDialog extends Component {
       },
       isSubmitting: false,
       submittingError: false,
-      date: Date.now(),
+      date: new Date(),
     };
   }
 
@@ -84,8 +77,13 @@ class SightFormDialog extends Component {
     },
   });
 
-  handleDateChange = (date) => {
-    this.setState({ date, submittingError: false });
+  handleDateChange = (event) => {
+    const value = event.target.value;
+
+    this.setState({
+      date: value ? new Date(`${value}T00:00`) : null,
+      submittingError: false,
+    });
   };
 
   handleSubmit = ({ date, poolDefinitionId, sightEventId }) => {
@@ -116,7 +114,7 @@ class SightFormDialog extends Component {
   handleSubmitSuccess = () => {
     const { onClose } = this.props;
 
-    this.setState({ isSubmitting: false, date: Date.now(), submittingError: null });
+    this.setState({ isSubmitting: false, date: new Date(), submittingError: null });
 
     onClose();
   };
@@ -126,43 +124,46 @@ class SightFormDialog extends Component {
       alertDialog, isSubmitting, submittingError, date,
     } = this.state;
     const {
-      classes, poolDefinitionId, poolDefinitionName, sightEventId, title, stopSell, startDate,
+      classes, poolDefinitionId, poolDefinitionName, sightEventId, title,
       onClose, ...rest
     } = this.props;
 
     return (
-      <Dialog onClose={this.handleClose} aria-labelledby="form-dialog-title" {...rest}>
+      <Dialog onClose={onClose} aria-labelledby="form-dialog-title" {...rest}>
         <DialogTitle id="form-dialog-title">
           {title}
-          {isSubmitting
-            ? <LinearProgress />
-            : null
-          }
+          {isSubmitting ? <LinearProgress /> : null}
         </DialogTitle>
+
         <DialogContent>
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <Grid container justify="center">
-              <DatePicker
-                className={classes.datePicker}
-                format="dd MMM yyyy"
-                label="Data"
-                margin="normal"
-                minDate={format(new Date(), 'yyyy-MM-dd')}
-                onChange={this.handleDateChange}
-                value={date}
-              />
-            </Grid>
-          </MuiPickersUtilsProvider>
-          {
-            submittingError
-            && <Typography className={classes.error}>{submittingError}</Typography>
-          }
+          <Grid container justify="center">
+            <TextField
+              className={classes.datePicker}
+              label="Data"
+              type="date"
+              margin="normal"
+              value={date ? format(date, 'yyyy-MM-dd') : ''}
+              onChange={this.handleDateChange}
+              inputProps={{
+                min: format(new Date(), 'yyyy-MM-dd'),
+              }}
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
+
+          {submittingError && (
+            <Typography className={classes.error}>{submittingError}</Typography>
+          )}
         </DialogContent>
+
         <DialogActions>
-          <Button disabled={isSubmitting} onClick={onClose} color="primary">Anuluj</Button>
+          <Button disabled={isSubmitting} onClick={onClose} color="primary">
+            Anuluj
+          </Button>
+
           <Button
             color="primary"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !date}
             onClick={() => {
               this.handleAlertDialogOpen(
                 { date, poolDefinitionId, sightEventId },
@@ -173,6 +174,7 @@ class SightFormDialog extends Component {
             Zatrzymaj sprzedaż
           </Button>
         </DialogActions>
+
         <AlertDialog
           onCancel={this.handleAlertDialogCancel}
           onExited={this.handleAlertDialogClear}
@@ -209,11 +211,9 @@ const mapStateToProps = state => ({
   error: sightEventsSelectors.getError(state),
 });
 
-
 const mapDispatchToProps = {
   stopSell: sightEventsActions.stopSell,
 };
-
 
 export default compose(
   withStyles(styles),
