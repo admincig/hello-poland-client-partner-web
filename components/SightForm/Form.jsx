@@ -110,7 +110,7 @@ class SightForm extends Component {
     const { openingHours } = initialValues || {};
 
     this.state = {
-      // initialValues: this.getInitialValues(initialValues),
+      initialValues: this.getInitialValues(initialValues),
       isDefaultTranslation: true,
       viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
     };
@@ -143,15 +143,13 @@ class SightForm extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const prev = prevProps.initialValues || {};
-    const curr = this.props.initialValues || {};
+    const { initialValues: prevInitialValues } = prevProps;
+    const { initialValues } = this.props;
 
-    // reinit TYLKO gdy zmienił się obiekt (np. weszliśmy w inną atrakcję) albo język
-    if (prev.id !== curr.id || prev.language !== curr.language) {
-      const { openingHours } = curr || {};
-      this.setState({
-        isDefaultTranslation: this.isDefaultLanguage(curr),
-      });
+    if (!_isEqual(prevInitialValues, initialValues)) {
+      const { openingHours } = initialValues || {};
+
+      this.setInitialValues(initialValues);
       this.setViewOpeningHours(openingHours, true);
     }
   }
@@ -222,10 +220,10 @@ class SightForm extends Component {
     };
   };
 
-  // setInitialValues = initialValues => this.setState({
-  //   initialValues: this.getInitialValues(initialValues),
-  //   isDefaultTranslation: this.isDefaultLanguage(initialValues),
-  // });
+  setInitialValues = initialValues => this.setState({
+    initialValues: this.getInitialValues(initialValues),
+    isDefaultTranslation: this.isDefaultLanguage(initialValues),
+  });
 
   setViewOpeningHours = openingHours => this.setState({
     viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
@@ -368,8 +366,7 @@ class SightForm extends Component {
   };
 
   render() {
-    const { isDefaultTranslation, viewOpeningHours } = this.state;
-    const { initialValues } = this.props;
+    const { initialValues, isDefaultTranslation, viewOpeningHours } = this.state;
     const { buttons, classes, FormikProps } = this.props;
 
     return (
