@@ -38,6 +38,7 @@ import {
 
 const tableColumns = [
   { id: 'name', label: 'Nazwa produktu' },
+  { id: 'ticketType', label: 'Typ biletu' },
   { id: 'price', label: 'Cena' },
   { id: 'menu', label: '' },
 ];
@@ -214,13 +215,14 @@ class TicketsListView extends React.Component {
                   <TableHead columns={tableColumns} />
                   <TableBody>
                     {
-                      sortedList.map(({
-                        id: listItemId, name, price,
-                      }) => (
-                        <TableRow key={listItemId} hover>
-                          <TableCell>{name}</TableCell>
-                          <TableCell>{formatPrice(price)}</TableCell>
-                          <TableCell align="right" className={classes.actions}>
+                    sortedList.map(({
+                      id: listItemId, name, price, ticketType,
+                    }) => (
+                      <TableRow key={listItemId} hover>
+                        <TableCell>{name}</TableCell>
+                        <TableCell>{ticketType ? ticketType.label : '-'}</TableCell>
+                        <TableCell>{formatPrice(price)}</TableCell>
+                        <TableCell align="right" className={classes.actions}>
                             <IconButton
                               aria-owns={menuAnchor ? 'item-menu' : undefined}
                               aria-haspopup="true"

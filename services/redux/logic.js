@@ -10,6 +10,7 @@ import { logic as sightEventsLogic } from '@hello-poland/commons/redux/sightEven
 import { logic as tagsLogic } from '@hello-poland/commons/redux/tags';
 import { logic as ticketDefinitionsLogic } from 'redux/ticketDefinitions';
 import { logic as ticketPoolDefinitionsLogic } from '@hello-poland/commons/redux/ticketPoolDefinitions';
+import { logic as ticketTypesLogic } from 'redux/ticketTypes';
 import { logic as ushersLogic } from 'redux/ushers';
 import { logic as viewLogic } from 'redux/view';
 
@@ -25,6 +26,7 @@ export default reduxUtils.parseReduxLogic({
   tagsLogic,
   ticketDefinitionsLogic,
   ticketPoolDefinitionsLogic,
+  ticketTypesLogic,
   ushersLogic,
   viewLogic,
 });

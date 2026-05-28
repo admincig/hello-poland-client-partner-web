@@ -188,7 +188,7 @@ class SightForm extends Component {
     const location = initialLocation || {};
 
     return {
-      id: details.id || '',
+      id: details.id || undefined,
       name: details.name || '',
       published: details.published || false,
       lead: details.lead || '',
@@ -305,7 +305,7 @@ class SightForm extends Component {
 
     const payload = {
       data: {
-        ...values,
+        ...data,
         mainImage: uploadedMultimedia.mainImage.id
           ? uploadedMultimedia.mainImage : values.mainImage,
         images: uploadedMultimedia.images.length ? uploadedMultimedia.images : values.images,

@@ -7,6 +7,7 @@ import _isNumber from 'lodash/isNumber';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
+import MenuItem from '@material-ui/core/MenuItem';
 import Typography from '@material-ui/core/Typography';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
@@ -17,6 +18,10 @@ import {
   actions as ticketDefinitionsActions,
   selectors as ticketDefinitionsSelectors,
 } from 'redux/ticketDefinitions';
+import {
+  actions as ticketTypesActions,
+  selectors as ticketTypesSelectors,
+} from 'redux/ticketTypes';
 import GridItem from 'components/GridItem';
 
 const commonProps = {
@@ -36,26 +41,56 @@ class TicketDefinitionForm extends Component {
     this.validationSchema = yupObject().shape({
       name: yupString().min(3).max(30).required(),
       price: yupNumber().min(0).required(),
+      ticketTypeId: yupNumber().required(),
     });
+  }
+
+  componentDidMount() {
+    const { fetchTicketTypes, ticketTypesList } = this.props;
+
+    if (!ticketTypesList || !ticketTypesList.length) {
+      fetchTicketTypes();
+    }
   }
 
   componentDidUpdate(prevProps) {
     const { initialValues: prevInitialValues } = prevProps;
-    const { initialValues } = this.props;
+    const {
+      initialValues, lockedTicketTypeCode, ticketTypesList,
+    } = this.props;
 
-    if (!_isEqual(prevInitialValues, initialValues)) {
+    if (
+      !_isEqual(prevInitialValues, initialValues)
+      || prevProps.lockedTicketTypeCode !== lockedTicketTypeCode
+      || !_isEqual(prevProps.ticketTypesList, ticketTypesList)
+    ) {
       this.setInitialValues(initialValues);
     }
   }
 
-  getInitialValues = initialValues => ({
+  getLockedTicketTypeId = () => {
+    const { lockedTicketTypeCode, ticketTypesList } = this.props;
+
+    if (!lockedTicketTypeCode || !ticketTypesList || !ticketTypesList.length) {
+      return null;
+    }
+
+    const lockedTicketType = ticketTypesList.find(({ code }) => code === lockedTicketTypeCode);
+    return lockedTicketType ? lockedTicketType.id : null;
+  };
+
+  getInitialValues = (initialValues = {}) => ({
     id: initialValues.id || undefined,
     name: initialValues.name || '',
     price: _isNumber(initialValues.price) ? parseFloat(initialValues.price / 100).toFixed(2) : '',
+    ticketTypeId: initialValues.ticketTypeId
+      || (initialValues.ticketType && initialValues.ticketType.id)
+      || this.getLockedTicketTypeId()
+      || '',
   });
 
   setInitialValues = initialValues => this.setState({
-    initialValues: this.getInitialValues(initialValues),
+    initialValues: this.getInitialValues(initialValues || {}),
   });
 
   handleReset = (values, formikActions) => {
@@ -81,6 +116,7 @@ class TicketDefinitionForm extends Component {
     const payload = {
       data: {
         ...data,
+        ticketTypeId: data.ticketTypeId ? +data.ticketTypeId : data.ticketTypeId,
         price: Math.round(`${data.price}e2`),
       },
       onFailure: this.handleSubmitFailure(formikActions),
@@ -126,11 +162,15 @@ class TicketDefinitionForm extends Component {
   render() {
     const { initialValues } = this.state;
     const {
-      FormikProps, hideButtons, hideErrors, requestError,
+      FormikProps, hideButtons, hideErrors, lockedTicketTypeCode, requestError, ticketTypesList,
     } = this.props;
     const { data: errorData } = requestError || {};
     const { message: errorMessage } = errorData || {};
+    const isTicketTypeLocked = !!lockedTicketTypeCode;
     const priceWarningMessage = 'Uwaga: edycja ceny produktu wpłynie na wszystkie pule, do których produkt jest przypisany.';
+    const ticketTypeWarningMessage = initialValues.id
+      ? 'Zmiana typu produktu może zostać zablokowana, jeśli narusza reguły ofert.'
+      : '';
 
     return (
       <Formik
@@ -148,7 +188,28 @@ class TicketDefinitionForm extends Component {
                 <Field name="id" hidden component={TextField} {...commonProps} />
               </Hidden>
               <GridItem md={12} sm={12}>
-                <Field component={TextField} label="Nazwa (np. Normalny)" name="name" required {...commonProps} />
+                <Field component={TextField} label="Nazwa handlowa" name="name" required {...commonProps} />
+              </GridItem>
+              <GridItem md={12} sm={12}>
+                <Field
+                  component={TextField}
+                  label="Typ biletu"
+                  name="ticketTypeId"
+                  required
+                  select
+                  disabled={isTicketTypeLocked}
+                  helperText={isTicketTypeLocked ? 'Najpierw w ofercie musi zostać dodany bilet typu Normalny.' : ticketTypeWarningMessage}
+                  {...commonProps}
+                >
+                  <MenuItem disabled value="">
+                    Wybierz typ biletu
+                  </MenuItem>
+                  {ticketTypesList && ticketTypesList.map(({ id, label }) => (
+                    <MenuItem key={`${id}-${label}`} value={id}>
+                      {label}
+                    </MenuItem>
+                  ))}
+                </Field>
               </GridItem>
               <GridItem md={12} sm={12}>
                 <Field component={TextField} label="Cena (PLN)" name="price" type="number" helperText={initialValues.id ? priceWarningMessage : ''} required {...commonProps} />
@@ -186,10 +247,12 @@ class TicketDefinitionForm extends Component {
 TicketDefinitionForm.propTypes = {
   clearError: PropTypes.func.isRequired,
   createItem: PropTypes.func.isRequired,
+  fetchTicketTypes: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
   hideButtons: PropTypes.bool,
   hideErrors: PropTypes.bool,
   initialValues: PropTypes.shape({}),
+  lockedTicketTypeCode: PropTypes.string,
   onReset: PropTypes.func,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
@@ -197,6 +260,11 @@ TicketDefinitionForm.propTypes = {
   requestError: PropTypes.shape({
     message: PropTypes.string,
   }),
+  ticketTypesList: PropTypes.arrayOf(PropTypes.shape({
+    code: PropTypes.string,
+    id: PropTypes.number,
+    label: PropTypes.string,
+  })),
   updateItem: PropTypes.func.isRequired,
 };
 
@@ -205,20 +273,24 @@ TicketDefinitionForm.defaultProps = {
   hideButtons: false,
   hideErrors: false,
   initialValues: null,
+  lockedTicketTypeCode: null,
   onReset: null,
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,
   requestError: null,
+  ticketTypesList: [],
 };
 
 const mapStateToProps = state => ({
   requestError: ticketDefinitionsSelectors.getError(state),
+  ticketTypesList: ticketTypesSelectors.getTicketTypes(state),
 });
 
 const mapDispatchToProps = {
   clearError: ticketDefinitionsActions.clearError,
   createItem: ticketDefinitionsActions.createItem,
+  fetchTicketTypes: ticketTypesActions.fetchList,
   updateItem: ticketDefinitionsActions.updateItem,
 };
 

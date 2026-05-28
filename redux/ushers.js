@@ -87,7 +87,6 @@ const CLEAR_ERROR = `${prefix}CLEAR_ERROR`;
  * Type used for clearing currently loaded entity.
  * @type {string}
  */
-
 const CLEAR_ITEM = `${prefix}CLEAR_ITEM`;
 
 /**
@@ -107,6 +106,24 @@ const CREATE_ITEM_FAILURE = `${prefix}CREATE_ITEM_FAILURE`;
  * @type {string}
  */
 const CREATE_ITEM_SUCCESS = `${prefix}CREATE_ITEM_SUCCESS`;
+
+/**
+ * Type used for handling entity delete.
+ * @type {string}
+ */
+const DELETE_ITEM = `${prefix}DELETE_ITEM`;
+
+/**
+ * Type used for handling entity delete failure.
+ * @type {string}
+ */
+const DELETE_ITEM_FAILURE = `${prefix}DELETE_ITEM_FAILURE`;
+
+/**
+ * Type used for handling entity delete success.
+ * @type {string}
+ */
+const DELETE_ITEM_SUCCESS = `${prefix}DELETE_ITEM_SUCCESS`;
 
 /**
  * Type used for handling entity fetching.
@@ -170,6 +187,9 @@ export const types = {
   CREATE_ITEM,
   CREATE_ITEM_FAILURE,
   CREATE_ITEM_SUCCESS,
+  DELETE_ITEM,
+  DELETE_ITEM_FAILURE,
+  DELETE_ITEM_SUCCESS,
   FETCH_ITEM,
   FETCH_ITEM_CANCEL,
   FETCH_ITEM_FAILURE,
@@ -386,6 +406,66 @@ const createItemSuccess = data => ({
 });
 
 /**
+ * Creates action with item delete request details.
+ * @method
+ * @param {Object} params
+ * @param {number} params.id - item id
+ * @param {Object} [params.options] - request config
+ * @param {failureCallback} [params.onFailure] - failure callback
+ * @param {successCallback} [params.onSuccess] - success callback
+ * @return {{
+ *   type: string,
+ *   payload: {url: string, method: string, options: *},
+ *   id: number,
+ *   onFailure: failureCallback,
+ *   onSuccess: successCallback
+ * }}
+ */
+const deleteItem = ({
+  id, options, onFailure, onSuccess,
+} = {}) => ({
+  type: DELETE_ITEM,
+  id,
+  payload: {
+    url: `${apiURL}/${id}`,
+    method: 'delete',
+    ...options,
+  },
+  onFailure,
+  onSuccess,
+});
+
+/**
+ * Creates action for item delete request failing.
+ * @method
+ * @param {Object} params - axios response schema
+ * @param params.data - response body
+ * @param params.status - response status
+ * @return {{
+ *   type: string,
+ *   error: {data, status: number}
+ * }}
+ */
+const deleteItemFailure = ({ data, status } = {}) => ({
+  type: DELETE_ITEM_FAILURE,
+  error: {
+    data,
+    status,
+  },
+});
+
+/**
+ * Creates action for successful item delete request.
+ * @method
+ * @param {number} id - deleted item id
+ * @return {{type: string, id: number}}
+ */
+const deleteItemSuccess = id => ({
+  type: DELETE_ITEM_SUCCESS,
+  id,
+});
+
+/**
  * Creates action with item request details.
  * @method
  * @param {Object} params
@@ -542,6 +622,9 @@ export const actions = {
   clearItem,
   createItemFailure,
   createItemSuccess,
+  deleteItem,
+  deleteItemFailure,
+  deleteItemSuccess,
   fetchItem,
   fetchItemCancel,
   fetchItemFailure,
@@ -676,6 +759,49 @@ const changeProfileLogic = createLogic({
       }
     } catch ({ response }) {
       dispatch(changeProfileFailure(response));
+
+      if (onFailure) {
+        onFailure();
+      }
+    }
+
+    done();
+  },
+});
+
+/**
+ * Logic used for handling entity delete.
+ * @method
+ */
+const deleteItemLogic = createLogic({
+  type: [
+    DELETE_ITEM,
+  ],
+  latest: true,
+  async process(
+    { action: { payload, id, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { status } = response;
+
+      if (status === 200 || status === 204) {
+        dispatch(deleteItemSuccess(id));
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        dispatch(deleteItemFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch ({ response }) {
+      dispatch(deleteItemFailure(response));
 
       if (onFailure) {
         onFailure();
@@ -823,6 +949,7 @@ const createItemLogic = createLogic({
 export const logic = {
   changePasswordLogic,
   changeProfileLogic,
+  deleteItemLogic,
   fetchItemLogic,
   fetchListLogic,
   createItemLogic,
@@ -857,6 +984,7 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
     case FETCH_ITEM_FAILURE:
     case FETCH_LIST_FAILURE:
     case CREATE_ITEM_FAILURE:
+    case DELETE_ITEM_FAILURE:
       return {
         ...state,
         error: action.error,
@@ -872,6 +1000,13 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
         ...state,
         error: initialState.error,
         list: action.data.items,
+      };
+    case DELETE_ITEM_SUCCESS:
+      return {
+        ...state,
+        error: initialState.error,
+        item: state.item && state.item.id === action.id ? initialState.item : state.item,
+        list: state.list.filter(item => item.id !== action.id),
       };
     case CLEAR_ITEM:
       return {

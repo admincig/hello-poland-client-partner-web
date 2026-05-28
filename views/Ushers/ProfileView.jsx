@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import Router from 'next/router';
+import Button from '@material-ui/core/Button';
 import {
   actions as ushersActions,
   selectors as ushersSelectors,
@@ -37,6 +38,20 @@ class ProfileView extends Component {
     const { fetchUsher } = this.props;
 
     fetchUsher({ id: userId });
+  };
+
+  handleDelete = () => {
+    const { usherId, deleteUsher } = this.props;
+
+    if (!window.confirm('Czy na pewno chcesz usunąć pracownika?')) {
+      return;
+    }
+
+    deleteUsher({
+      id: usherId,
+      onSuccess: () => Router.push('/ushers'),
+      onFailure: () => window.alert('Wystąpił błąd podczas usuwania pracownika.'),
+    });
   };
 
   handleProfileSubmit = (values, actions) => {
@@ -103,7 +118,17 @@ class ProfileView extends Component {
           onTabChange={this.handleTabChange}
           disableProfile={false}
         >
-          <ProfileForm key={key} profile={userProfile} onSubmit={this.handleProfileSubmit} />
+          <div style={{ marginBottom: 16 }}>
+            <Button color="secondary" onClick={this.handleDelete}>
+              Usuń pracownika
+            </Button>
+          </div>
+
+          <ProfileForm
+            key={key}
+            profile={userProfile}
+            onSubmit={this.handleProfileSubmit}
+          />
         </ProfileComponent>
       </Layout>
     );
@@ -113,8 +138,10 @@ class ProfileView extends Component {
 ProfileView.propTypes = {
   activeTab: PropTypes.string,
   changeProfile: PropTypes.func.isRequired,
+  deleteUsher: PropTypes.func.isRequired,
   fetchUsher: PropTypes.func.isRequired,
   profile: PropTypes.shape({
+    id: PropTypes.number,
     email: PropTypes.string,
     name: PropTypes.string,
   }).isRequired,
@@ -132,6 +159,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   fetchUsher: ushersActions.fetchItem,
   changeProfile: ushersActions.changeProfile,
+  deleteUsher: ushersActions.deleteItem,
 };
 
 export default compose(
