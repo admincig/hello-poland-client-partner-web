@@ -409,7 +409,7 @@ class SightForm extends Component {
               )}
 
               <GridItem>
-                <Field name="lead" label="Warunki oferty" component={TextField} {...commonProps} />
+                <Field name="lead" label="Warunki oferty" required component={TextField} {...commonProps} />
               </GridItem>
 
               <GridItem>
@@ -494,7 +494,7 @@ class SightForm extends Component {
                   </GridItem>
 
                   <GridItem>
-                    <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
+                    <Field name="phone" label="Numer telefonu" required component={TextField} {...commonProps} />
                   </GridItem>
 
                   <GridItem>

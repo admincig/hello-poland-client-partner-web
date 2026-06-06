@@ -361,7 +361,7 @@ class CalendarEventForm extends React.Component {
 
               <div className={classNames(classes.section, classes.fullWidth)}>
                 <Typography variant="subtitle1" gutterBottom>
-                  Termin:
+                  Termin *:
                 </Typography>
               </div>
 
@@ -591,7 +591,7 @@ class CalendarEventForm extends React.Component {
               {!readOnly && (
                 <div className={classNames(classes.section, classes.fullWidth)}>
                   <Typography variant="h6" gutterBottom>
-                    Produkty
+                    Produkty *
                   </Typography>
 
                   {!hasNormalTicket && (

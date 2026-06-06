@@ -290,7 +290,7 @@ class SightEventForm extends Component {
                 )
               }
               <GridItem>
-                <Field name="lead" label="Warunki oferty" component={TextField} {...commonProps} />
+                <Field name="lead" label="Warunki oferty" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
                 <Field name="description" label="Opis oferty" required component={TextField} {...commonProps} multiline rowsMax={20} />
@@ -305,7 +305,7 @@ class SightEventForm extends Component {
                       <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem>
-                      <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
+                      <Field name="phone" label="Numer telefonu" required component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem>
                       <Typography variant="h6" className={classes.title}>Lokalizacja</Typography>
