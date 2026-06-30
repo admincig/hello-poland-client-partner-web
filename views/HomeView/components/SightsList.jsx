@@ -24,6 +24,7 @@ import {
   actions as ticketPoolDefinitionActions,
   selectors as ticketPoolDefinitionSelectors,
 } from '@hello-poland/commons/redux/ticketPoolDefinitions';
+import { selectors as profileSelectors } from 'redux/profile';
 import AlertDialog from 'components/AlertDialog';
 import FormDialog from 'components/FormDialog';
 import SightFormDialog from 'components/SightForm/Dialog';
@@ -341,7 +342,9 @@ class SightsList extends Component {
   };
 
   render() {
-    const { sightEventsList, sightsList } = this.props;
+    const { profile, sightEventsList, sightsList } = this.props;
+    const roles = (profile && profile.roles) || [];
+    const canManageSights = !roles.includes('PARTNER_SALESMAN');
     const {
       alertDialog, dialog, formData, formType, schema,
       sightForm, sightEventForm, stopSellForm, errorData, submitError, title, readOnly,
@@ -349,9 +352,11 @@ class SightsList extends Component {
 
     return (
       <Fragment>
-        <Button onClick={() => this.handleSightFormOpen({ title: 'Dodaj Obiekt' })}>
-          Dodaj Obiekt
-        </Button>
+        {canManageSights && (
+          <Button onClick={() => this.handleSightFormOpen({ title: 'Dodaj Obiekt' })}>
+            Dodaj Obiekt
+          </Button>
+        )}
         {sightsList && sightsList.length
           ? (
             <List>
@@ -367,7 +372,7 @@ class SightsList extends Component {
                       title: 'Dodaj ofertę',
                     })}
                     onAddLabel="Dodaj ofertę"
-                    onDeleteClick={() => this.handleAlertDialogOpen({
+                    onDeleteClick={canManageSights ? () => this.handleAlertDialogOpen({
                       content: '',
                       onSuccess: () => {
                         this.handleSightDelete(sight.id);
@@ -375,12 +380,12 @@ class SightsList extends Component {
                       },
                       open: true,
                       title: 'Czy na pewno usunąć wybraną obiekt?',
-                    })}
-                    onDeleteLabel="Usuń obiekt"
-                    onEditClick={() => {
+                    }) : null}
+                    onDeleteLabel={canManageSights ? 'Usuń obiekt' : null}
+                    onEditClick={canManageSights ? () => {
                       this.handleSightFormOpen({ sightId: sight.id, title: 'Edytuj obiekt' });
-                    }}
-                    onEditLabel="Edytuj obiekt"
+                    } : null}
+                    onEditLabel={canManageSights ? 'Edytuj obiekt' : null}
                     published={sight.published}
                   />
                   <List style={{ marginLeft: 55 }}>
@@ -575,6 +580,7 @@ SightsList.propTypes = {
   fetchTicketPoolDefinition: PropTypes.func.isRequired,
   fetchSightsList: PropTypes.func.isRequired,
   fetchSightEventsList: PropTypes.func.isRequired,
+  profile: PropTypes.shape({}),
   sight: PropTypes.shape({}),
   sightEvent: PropTypes.shape({}),
   sightsList: PropTypes.arrayOf(PropTypes.shape({})),
@@ -584,6 +590,7 @@ SightsList.propTypes = {
 };
 
 SightsList.defaultProps = {
+  profile: {},
   sight: null,
   sightEvent: null,
   sightEventsList: null,
@@ -592,6 +599,7 @@ SightsList.defaultProps = {
 };
 
 const mapStateToProps = state => ({
+  profile: profileSelectors.getProfile(state),
   tpdError: ticketPoolDefinitionSelectors.getError(state),
   sight: sightsSelectors.getSight(state),
   sightEvent: sightEventSelectors.getSightEvent(state),

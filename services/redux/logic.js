@@ -4,6 +4,7 @@ import { logic as categoriesLogic } from '@hello-poland/commons/redux/categories
 import { logic as configLogic } from 'redux/config';
 import { logic as filesLogic } from '@hello-poland/commons/redux/files';
 import { logic as partnersLogic } from 'redux/partners';
+import { logic as partnerUsersLogic } from 'redux/partnerUsers';
 import { logic as profileLogic } from 'redux/profile';
 import { logic as sightsLogic } from '@hello-poland/commons/redux/sights';
 import { logic as sightEventsLogic } from '@hello-poland/commons/redux/sightEvents';
@@ -20,6 +21,7 @@ export default reduxUtils.parseReduxLogic({
   configLogic,
   filesLogic,
   partnersLogic,
+  partnerUsersLogic,
   profileLogic,
   sightEventsLogic,
   sightsLogic,

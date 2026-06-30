@@ -124,7 +124,7 @@ class UsherFormDialog extends Component {
       <Fragment>
         <Dialog {...rest}>
           <DialogTitle id="form-dialog-title">
-                  Dodaj pracownika
+                  Dodaj biletera
             { isFetching || isSubmitting
               ? <CircularProgress size={18} style={{ marginLeft: 20 }} />
               : null }

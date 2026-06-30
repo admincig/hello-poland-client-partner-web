@@ -30,7 +30,7 @@ const UshersList = ({ ushers }) => (
           </Paper>
         )
         : (
-          <EmptyResultsMessage message="Brak pracowników do wyświetlenia" />
+          <EmptyResultsMessage message="Brak bileterów do wyświetlenia" />
         )
     }
   </Fragment>

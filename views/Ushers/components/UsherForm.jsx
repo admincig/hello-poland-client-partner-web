@@ -104,7 +104,7 @@ class UsherForm extends Component {
         <Form autoComplete="off" noValidate>
           <Grid container spacing={16}>
             <GridItem>
-              <Field name="email" label="Email" component={TextField} required helperText="Partner jest jednocześnie pracownikiem" {...commonProps} />
+              <Field name="email" label="Email" component={TextField} required helperText="Bileter korzysta z aplikacji do walidacji biletów" {...commonProps} />
             </GridItem>
             <GridItem>
               <Field name="name" label="Nazwa" component={TextField} required {...commonProps} />

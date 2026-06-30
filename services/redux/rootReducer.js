@@ -4,6 +4,7 @@ import categories, { name as categoriesName } from '@hello-poland/commons/redux/
 import config, { name as configName } from 'redux/config';
 import files, { name as filesName } from '@hello-poland/commons/redux/files';
 import partners, { name as partnersName } from 'redux/partners';
+import partnerUsers, { name as partnerUsersName } from 'redux/partnerUsers';
 import profile, { name as profileName } from 'redux/profile';
 import sightEvents, { name as sightEventsName } from '@hello-poland/commons/redux/sightEvents';
 import sights, { name as sightsName } from '@hello-poland/commons/redux/sights';
@@ -20,6 +21,7 @@ export default combineReducers({
   [configName]: config,
   [filesName]: files(),
   [partnersName]: partners(),
+  [partnerUsersName]: partnerUsers(),
   [profileName]: profile(),
   [sightEventsName]: sightEvents(),
   [sightsName]: sights(),
