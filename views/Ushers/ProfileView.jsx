@@ -54,6 +54,18 @@ class ProfileView extends Component {
     });
   };
 
+  handleBlockedChange = () => {
+    const { profile, setBlocked, usherId } = this.props;
+    const blocked = !profile.blocked;
+
+    setBlocked({
+      id: usherId,
+      blocked,
+      onSuccess: () => this.fetchProfile(usherId),
+      onFailure: () => window.alert('WystÄ…piĹ‚ bĹ‚Ä…d podczas zmiany statusu pracownika.'),
+    });
+  };
+
   handleProfileSubmit = (values, actions) => {
     const { email, password, ...data } = values;
     const { setStatus } = actions;
@@ -119,6 +131,9 @@ class ProfileView extends Component {
           disableProfile={false}
         >
           <div style={{ marginBottom: 16 }}>
+            <Button color="secondary" onClick={this.handleBlockedChange}>
+              {userProfile.blocked ? 'Aktywuj pracownika' : 'Dezaktywuj pracownika'}
+            </Button>
             <Button color="secondary" onClick={this.handleDelete}>
               Usuń pracownika
             </Button>
@@ -141,10 +156,12 @@ ProfileView.propTypes = {
   deleteUsher: PropTypes.func.isRequired,
   fetchUsher: PropTypes.func.isRequired,
   profile: PropTypes.shape({
+    blocked: PropTypes.bool,
     id: PropTypes.number,
     email: PropTypes.string,
     name: PropTypes.string,
   }).isRequired,
+  setBlocked: PropTypes.func.isRequired,
   usherId: PropTypes.number.isRequired,
 };
 
@@ -160,6 +177,7 @@ const mapDispatchToProps = {
   fetchUsher: ushersActions.fetchItem,
   changeProfile: ushersActions.changeProfile,
   deleteUsher: ushersActions.deleteItem,
+  setBlocked: ushersActions.setBlocked,
 };
 
 export default compose(

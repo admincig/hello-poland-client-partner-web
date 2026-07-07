@@ -23,6 +23,12 @@ const styles = theme => ({
   noAccess: {
     minHeight: `calc(100vh - ${theme.spacing.unit * 10}px)`,
   },
+  sectionHeader: {
+    paddingTop: theme.spacing.unit * 2,
+  },
+  sectionTitle: {
+    marginLeft: theme.spacing.unit * 2,
+  },
 });
 
 class UshersView extends Component {
@@ -63,8 +69,10 @@ class UshersView extends Component {
             </GridItem>
           )}
           {canManageUsers && (
-            <GridItem>
-              <Typography variant="h6" gutterBottom>Bileterzy</Typography>
+            <GridItem className={classes.sectionHeader}>
+              <Typography variant="h6" gutterBottom className={classes.sectionTitle}>
+                Bileterzy
+              </Typography>
             </GridItem>
           )}
           {canManageUsers && (

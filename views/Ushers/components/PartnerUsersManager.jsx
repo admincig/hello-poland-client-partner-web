@@ -186,6 +186,11 @@ class PartnerUsersManager extends React.Component {
     deleteUser({ id: user.id });
   };
 
+  handleBlockedChange = (user, blocked) => () => {
+    const { setBlocked } = this.props;
+    setBlocked({ id: user.id, blocked });
+  };
+
   render() {
     const {
       classes, error, onAddUsher, sights, users,
@@ -215,6 +220,7 @@ class PartnerUsersManager extends React.Component {
               <TableCell>Nazwa</TableCell>
               <TableCell>Poziom</TableCell>
               <TableCell>Obiekty</TableCell>
+              <TableCell>Status</TableCell>
               <TableCell align="right">Akcje</TableCell>
             </TableRow>
           </TableHead>
@@ -229,8 +235,12 @@ class PartnerUsersManager extends React.Component {
                     ? 'Wszystkie'
                     : (user.allowedSightIds || []).map(this.getSightLabel).join(', ') || '-'}
                 </TableCell>
+                <TableCell>{user.blocked ? 'Nieaktywny' : 'Aktywny'}</TableCell>
                 <TableCell align="right" className={classes.actions}>
                   <Button onClick={() => this.openEditDialog(user)}>Edytuj</Button>
+                  <Button onClick={this.handleBlockedChange(user, !user.blocked)} color="secondary">
+                    {user.blocked ? 'Aktywuj' : 'Dezaktywuj'}
+                  </Button>
                   <Button onClick={() => this.openPasswordDialog(user)}>Hasło</Button>
                   <Button onClick={this.handleDelete(user)} color="secondary">Usuń</Button>
                 </TableCell>
@@ -338,6 +348,7 @@ PartnerUsersManager.propTypes = {
   fetchSights: PropTypes.func.isRequired,
   fetchUsers: PropTypes.func.isRequired,
   onAddUsher: PropTypes.func.isRequired,
+  setBlocked: PropTypes.func.isRequired,
   sights: PropTypes.arrayOf(PropTypes.shape({})),
   updateUser: PropTypes.func.isRequired,
   users: PropTypes.arrayOf(PropTypes.shape({})),
@@ -361,6 +372,7 @@ const mapDispatchToProps = {
   deleteUser: partnerUsersActions.deleteItem,
   fetchSights: sightsActions.fetchList,
   fetchUsers: partnerUsersActions.fetchList,
+  setBlocked: partnerUsersActions.setBlocked,
   updateUser: partnerUsersActions.updateItem,
 };
 

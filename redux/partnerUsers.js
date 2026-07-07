@@ -12,6 +12,7 @@ const FETCH_FAILURE = `${prefix}FETCH_FAILURE`;
 const CREATE_ITEM = `${prefix}CREATE_ITEM`;
 const UPDATE_ITEM = `${prefix}UPDATE_ITEM`;
 const DELETE_ITEM = `${prefix}DELETE_ITEM`;
+const SET_BLOCKED = `${prefix}SET_BLOCKED`;
 const CHANGE_PASSWORD = `${prefix}CHANGE_PASSWORD`;
 
 const clearError = () => ({ type: CLEAR_ERROR });
@@ -77,6 +78,19 @@ const deleteItem = ({
   onSuccess,
 });
 
+const setBlocked = ({
+  id, blocked, onFailure, onSuccess,
+} = {}) => ({
+  type: SET_BLOCKED,
+  payload: {
+    url: `${apiURL}/${id}/blocked`,
+    method: 'patch',
+    data: { blocked },
+  },
+  onFailure,
+  onSuccess,
+});
+
 const changePassword = ({
   id, data, onFailure, onSuccess,
 } = {}) => ({
@@ -98,6 +112,7 @@ export const actions = {
   fetchList,
   fetchListSuccess,
   requestFailure,
+  setBlocked,
   updateItem,
 };
 
@@ -116,6 +131,7 @@ const requestLogic = createLogic({
     CREATE_ITEM,
     UPDATE_ITEM,
     DELETE_ITEM,
+    SET_BLOCKED,
     CHANGE_PASSWORD,
   ],
   latest: true,

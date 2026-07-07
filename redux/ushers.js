@@ -302,6 +302,20 @@ const changeProfile = ({
   onSuccess,
 });
 
+const setBlocked = ({
+  id, blocked, options, onFailure, onSuccess,
+} = {}) => ({
+  type: CHANGE_PROFILE,
+  payload: {
+    url: `${apiURL}/${id}/blocked`,
+    method: 'patch',
+    ...options,
+    data: { blocked },
+  },
+  onFailure,
+  onSuccess,
+});
+
 /**
  * Creates action for password change request cancelling.
  * @method
@@ -617,6 +631,7 @@ export const actions = {
   changeProfileCancel,
   changeProfileFailure,
   changeProfileSuccess,
+  setBlocked,
   clearError,
   createItem,
   clearItem,

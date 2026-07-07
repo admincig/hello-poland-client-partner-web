@@ -15,13 +15,13 @@ const UshersList = ({ ushers }) => (
           <Paper elevation={1}>
             <List>
               {ushers.map(({
-                name, picture, email, id,
+                blocked, name, picture, email, id,
               }) => (
                 <Link key={`${id}-${email}`} href={`/ushers?usherId=${id}`} as={`/ushers/${id}/profile`} passHref prefetch>
                   <UshersListItem
                     name={name}
                     picture={picture}
-                    email={email}
+                    email={`${email}${blocked ? ' | Nieaktywny' : ' | Aktywny'}`}
                     component="a"
                   />
                 </Link>
