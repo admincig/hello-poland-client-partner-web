@@ -28,6 +28,17 @@ const commonProps = {
   fullWidth: true,
 };
 
+const validationMessages = {
+  nameMin: 'Nazwa handlowa musi mieć co najmniej 3 znaki',
+  nameMax: 'Nazwa handlowa może mieć maksymalnie 30 znaków',
+  nameRequired: 'Nazwa handlowa jest wymagana',
+  priceMin: 'Cena nie może być ujemna',
+  priceRequired: 'Cena jest wymagana',
+  priceType: 'Cena musi być liczbą',
+  ticketTypeRequired: 'Typ biletu jest wymagany',
+  ticketTypeType: 'Typ biletu jest wymagany',
+};
+
 class TicketDefinitionForm extends Component {
   constructor(props) {
     super(props);
@@ -39,9 +50,17 @@ class TicketDefinitionForm extends Component {
     };
 
     this.validationSchema = yupObject().shape({
-      name: yupString().min(3).max(30).required(),
-      price: yupNumber().min(0).required(),
-      ticketTypeId: yupNumber().required(),
+      name: yupString()
+        .min(3, validationMessages.nameMin)
+        .max(30, validationMessages.nameMax)
+        .required(validationMessages.nameRequired),
+      price: yupNumber()
+        .typeError(validationMessages.priceType)
+        .min(0, validationMessages.priceMin)
+        .required(validationMessages.priceRequired),
+      ticketTypeId: yupNumber()
+        .typeError(validationMessages.ticketTypeType)
+        .required(validationMessages.ticketTypeRequired),
     });
   }
 
