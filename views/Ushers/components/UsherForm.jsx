@@ -2,8 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import GridItem from 'components/GridItem';
@@ -17,6 +21,11 @@ const commonProps = {
 class UsherForm extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      showPassword: false,
+      showConfirmPassword: false,
+    };
 
     // TODO: nested validation seems not working
     // TODO: see https://github.com/jaredpalmer/formik/issues/986
@@ -44,6 +53,32 @@ class UsherForm extends Component {
       confirmPassword: '',
     };
   }
+
+  togglePasswordVisibility = field => () => this.setState(state => ({
+    [field]: !state[field],
+  }));
+
+  handlePasswordMouseDown = (event) => {
+    event.preventDefault();
+  };
+
+  getPasswordInputProps = field => ({
+    type: this.state[field] ? 'text' : 'password',
+    InputProps: {
+      endAdornment: (
+        <InputAdornment position="end">
+          <IconButton
+            aria-label={this.state[field] ? 'Ukryj hasło' : 'Pokaż hasło'}
+            onClick={this.togglePasswordVisibility(field)}
+            onMouseDown={this.handlePasswordMouseDown}
+            tabIndex={-1}
+          >
+            {this.state[field] ? <VisibilityOffIcon /> : <VisibilityIcon />}
+          </IconButton>
+        </InputAdornment>
+      ),
+    },
+  });
 
   handleSubmit = (values, actions) => {
     const { onSubmit } = this.props;
@@ -110,10 +145,24 @@ class UsherForm extends Component {
               <Field name="name" label="Nazwa" component={TextField} required {...commonProps} />
             </GridItem>
             <GridItem>
-              <Field name="password" type="password" label="Hasło" component={TextField} required {...commonProps} />
+              <Field
+                name="password"
+                label="Hasło"
+                component={TextField}
+                required
+                {...commonProps}
+                {...this.getPasswordInputProps('showPassword')}
+              />
             </GridItem>
             <GridItem>
-              <Field name="confirmPassword" type="password" label="Powtórz Hasło" required component={TextField} {...commonProps} />
+              <Field
+                name="confirmPassword"
+                label="Powtórz Hasło"
+                required
+                component={TextField}
+                {...commonProps}
+                {...this.getPasswordInputProps('showConfirmPassword')}
+              />
             </GridItem>
           </Grid>
         </Form>

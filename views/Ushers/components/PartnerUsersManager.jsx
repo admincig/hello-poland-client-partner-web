@@ -10,6 +10,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import InputLabel from '@material-ui/core/InputLabel';
 import ListItemText from '@material-ui/core/ListItemText';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -23,6 +25,8 @@ import TableRow from '@material-ui/core/TableRow';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import {
   actions as partnerUsersActions,
   selectors as partnerUsersSelectors,
@@ -77,6 +81,8 @@ class PartnerUsersManager extends React.Component {
       allowedSightIds: [],
     },
     newPassword: '',
+    showFormPassword: false,
+    showNewPassword: false,
   };
 
   componentDidMount() {
@@ -128,6 +134,32 @@ class PartnerUsersManager extends React.Component {
   });
 
   closePasswordDialog = () => this.setState({ passwordDialogOpen: false, passwordUser: null });
+
+  togglePasswordVisibility = field => () => this.setState(state => ({
+    [field]: !state[field],
+  }));
+
+  handlePasswordMouseDown = (event) => {
+    event.preventDefault();
+  };
+
+  getPasswordInputProps = field => ({
+    type: this.state[field] ? 'text' : 'password',
+    InputProps: {
+      endAdornment: (
+        <InputAdornment position="end">
+          <IconButton
+            aria-label={this.state[field] ? 'Ukryj hasło' : 'Pokaż hasło'}
+            onClick={this.togglePasswordVisibility(field)}
+            onMouseDown={this.handlePasswordMouseDown}
+            tabIndex={-1}
+          >
+            {this.state[field] ? <VisibilityOffIcon /> : <VisibilityIcon />}
+          </IconButton>
+        </InputAdornment>
+      ),
+    },
+  });
 
   handleChange = field => event => this.setState({
     form: {
@@ -275,10 +307,10 @@ class PartnerUsersManager extends React.Component {
               <TextField
                 fullWidth
                 margin="dense"
-                type="password"
                 label="Hasło"
                 value={form.password}
                 onChange={this.handleChange('password')}
+                {...this.getPasswordInputProps('showFormPassword')}
               />
             )}
             <FormControl fullWidth className={classes.formControl}>
@@ -323,10 +355,10 @@ class PartnerUsersManager extends React.Component {
             <TextField
               fullWidth
               margin="dense"
-              type="password"
               label="Nowe hasło"
               value={newPassword}
               onChange={event => this.setState({ newPassword: event.target.value })}
+              {...this.getPasswordInputProps('showNewPassword')}
             />
           </DialogContent>
           <DialogActions>

@@ -10,10 +10,13 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import Snackbar from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import CloseIcon from '@material-ui/icons/Close';
 import ErrorIcon from '@material-ui/icons/Error';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import Router from 'next/router';
@@ -68,6 +71,7 @@ class SignIn extends Component {
       open: false,
       message: '',
     },
+    showPassword: false,
   };
 
   initialValues = {
@@ -143,8 +147,16 @@ class SignIn extends Component {
     }
   };
 
+  togglePasswordVisibility = () => this.setState(state => ({
+    showPassword: !state.showPassword,
+  }));
+
+  handlePasswordMouseDown = (event) => {
+    event.preventDefault();
+  };
+
   render() {
-    const { snackbar } = this.state;
+    const { showPassword, snackbar } = this.state;
     const { classes } = this.props;
     const { open, message } = snackbar;
 
@@ -161,7 +173,27 @@ class SignIn extends Component {
                 <Card className={classes.card}>
                   <CardContent>
                     <Field name="login" label="Login" component={TextField} {...commonProps} />
-                    <Field name="password" label="Hasło" type="password" component={TextField} {...commonProps} />
+                    <Field
+                      name="password"
+                      label="Hasło"
+                      type={showPassword ? 'text' : 'password'}
+                      component={TextField}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label={showPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
+                              onClick={this.togglePasswordVisibility}
+                              onMouseDown={this.handlePasswordMouseDown}
+                              tabIndex={-1}
+                            >
+                              {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                      {...commonProps}
+                    />
                   </CardContent>
                   <CardActions className={classes.cardActions}>
                     <Button color="primary" disabled={isSubmitting} type="submit">
