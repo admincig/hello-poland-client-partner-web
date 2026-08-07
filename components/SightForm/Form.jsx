@@ -20,6 +20,7 @@ import yupString from 'yup/lib/string';
 import yupBoolean from 'yup/lib/boolean';
 import { actions as sightsActions } from '@hello-poland/commons/redux/sights';
 import GridItem from 'components/GridItem';
+import VoivodeshipSelect, { POLISH_VOIVODESHIPS } from 'components/VoivodeshipSelect';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import MuiTextField from '@material-ui/core/TextField';
@@ -133,6 +134,11 @@ class SightForm extends Component {
         .required(),
       email: yupString().email().trim(),
       phone: yupString().min(9).trim(),
+      location: yupObject().shape({
+        voivodeship: yupString()
+          .oneOf(POLISH_VOIVODESHIPS, 'Wybierz województwo z listy.')
+          .required(),
+      }),
       // location: yupObject().shape({
       //   street: yupString().min(5),
       //   zipCode: yupString().min(6).max(6),
@@ -212,7 +218,9 @@ class SightForm extends Component {
         longitude: location.longitude || '',
         commune: location.commune || '',
         county: location.county || '',
-        voivodeship: location.voivodeship || '',
+        voivodeship: location.voivodeship
+          ? location.voivodeship.toLocaleLowerCase('pl')
+          : '',
       },
 
       mainImage,
@@ -518,7 +526,7 @@ class SightForm extends Component {
                   </GridItem>
 
                   <GridItem>
-                    <Field name="location.voivodeship" label="Województwo" component={TextField} {...commonProps} />
+                    <VoivodeshipSelect />
                   </GridItem>
 
                   <GridItem>

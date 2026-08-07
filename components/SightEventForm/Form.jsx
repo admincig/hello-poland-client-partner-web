@@ -18,6 +18,7 @@ import yupString from 'yup/lib/string';
 import yupBoolean from 'yup/lib/boolean';
 import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
 import GridItem from 'components/GridItem';
+import VoivodeshipSelect, { POLISH_VOIVODESHIPS } from 'components/VoivodeshipSelect';
 
 const commonProps = {
   fullWidth: true,
@@ -90,6 +91,11 @@ class SightEventForm extends Component {
         .required(),
       email: yupString().email().trim(),
       phone: yupString().min(9).trim(),
+      location: yupObject().shape({
+        voivodeship: yupString()
+          .oneOf(POLISH_VOIVODESHIPS, 'Wybierz województwo z listy.')
+          .required(),
+      }),
       // location: yupObject().shape({
       //   directions: yupString().min(5).max(255),
       //   street: yupString().min(5),
@@ -133,7 +139,9 @@ class SightEventForm extends Component {
         longitude: location.longitude || '',
         commune:location.commune || '',
         county: location.county || '',
-        voivodeship: location.voivodeship || '',
+        voivodeship: location.voivodeship
+          ? location.voivodeship.toLocaleLowerCase('pl')
+          : '',
       },
       mainImage,
       images,
@@ -323,7 +331,7 @@ class SightEventForm extends Component {
                       <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem>
-                      <Field name="location.voivodeship" label="Województwo" component={TextField} {...commonProps} />
+                      <VoivodeshipSelect />
                     </GridItem>
                     <GridItem>
                       <Field name="location.county" label="Powiat" component={TextField} {...commonProps} />
