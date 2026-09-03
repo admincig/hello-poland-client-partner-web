@@ -90,7 +90,10 @@ class SightEventForm extends Component {
         .max(2500)
         .required(),
       email: yupString().email().trim(),
-      phone: yupString().min(9).trim(),
+      phone: yupString()
+        .trim()
+        .transform(value => value || undefined)
+        .min(9),
       location: yupObject().shape({
         voivodeship: yupString()
           .oneOf(POLISH_VOIVODESHIPS, 'Wybierz województwo z listy.')
@@ -313,7 +316,7 @@ class SightEventForm extends Component {
                       <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem>
-                      <Field name="phone" label="Numer telefonu" required component={TextField} {...commonProps} />
+                      <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem>
                       <Typography variant="h6" className={classes.title}>Lokalizacja</Typography>
